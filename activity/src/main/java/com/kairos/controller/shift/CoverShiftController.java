@@ -34,15 +34,15 @@ public class CoverShiftController {
     @ApiOperation("create cover shift setting by unit")
     @PostMapping(value = "/cover_shift_setting")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createCoverShiftSettingByUnit(@RequestBody CoverShiftSettingDTO coverShiftSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.createCoverShiftSettingByUnit(coverShiftSettingDTO));
+    public ResponseEntity<Map<String, Object>> createCoverShiftSettingByUnit(@PathVariable Long unitId,@RequestBody CoverShiftSettingDTO coverShiftSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.createCoverShiftSettingByUnit(unitId,coverShiftSettingDTO));
     }
 
     @ApiOperation("update cover shift setting by unit")
     @PutMapping(value = "/cover_shift_setting")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateCoverShiftSettingByUnit(@RequestBody CoverShiftSettingDTO coverShiftSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.updateCoverShiftSettingByUnit(coverShiftSettingDTO));
+    public ResponseEntity<Map<String, Object>> updateCoverShiftSettingByUnit(@PathVariable Long unitId,@RequestBody CoverShiftSettingDTO coverShiftSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.updateCoverShiftSettingByUnit(unitId,coverShiftSettingDTO));
     }
 
     @ApiOperation("get cover shift setting by unit")

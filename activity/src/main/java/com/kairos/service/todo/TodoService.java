@@ -30,6 +30,7 @@ import com.kairos.service.shift.RequestAbsenceService;
 import com.kairos.service.shift.ShiftStatusService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -72,6 +73,7 @@ public class TodoService {
     private UserIntegrationService userIntegrationService;
     @Inject private TimeBankService timeBankService;
 
+    @Async
     public void createOrUpdateTodo(Shift shift, TodoType todoType) {
         List<Todo> todos = new ArrayList<>();
         if (TodoType.APPROVAL_REQUIRED.equals(todoType)) {

@@ -42,7 +42,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static org.optaplanner.core.config.solver.SolverConfig.createFromXmlFile;
 

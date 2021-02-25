@@ -20,6 +20,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * Created by prerna on 16/12/17.
  */
@@ -81,5 +83,9 @@ public class ActivityTagDTO implements Serializable {
 
     public String getDescription() {
         return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+    }
+
+    public Map<String, TranslationInfo> getTranslations() {
+        return isNull(translations) ? new HashMap<>() : translations;
     }
 }

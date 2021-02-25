@@ -12,8 +12,6 @@ import java.util.List;
 
 @Repository
 public interface StaffingLevelTemplateRepository extends MongoBaseRepository<StaffingLevelTemplate,BigInteger>,CustomStaffingLevelTemplateRepository {
-    @Query("{ 'unitId' : ?0 ,disabled:false,deleted:false, 'validity.startDate' : { '$lte' : ?1},'validity.endDate' : { '$gte' : ?2}, 'dayType' :{ '$in' : ?3 }, 'validDays' : { '$in' : ?4} }")
-    List<StaffingLevelTemplateDTO> findByUnitIdAndDayTypeAndDate(Long unitID, Date proposedStartDate, Date proposedEndDate, List<BigInteger> dayTypeId, List<String> days);
 
     @Query("{ 'unitId' : ?0 ,disabled:false,deleted:false, 'validity.startDate' : { '$lte' : ?1},'validity.endDate' : { '$gte' : ?2}, 'dayType' :{ '$in' : ?3 } }")
     List<StaffingLevelTemplateDTO> findByUnitIdHolidayDayTypeAndDate(Long unitID, Date proposedStartDate, Date proposedEndDate, List<BigInteger> dayTypeId);

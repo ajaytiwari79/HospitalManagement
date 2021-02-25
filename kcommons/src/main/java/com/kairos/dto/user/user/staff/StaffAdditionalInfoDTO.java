@@ -1,7 +1,7 @@
 package com.kairos.dto.user.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
@@ -76,6 +76,7 @@ public class StaffAdditionalInfoDTO {
     private Set<BigInteger> mainTeamActivities;
     private List<TeamDTO> teamsData;
     private Set<Long> employmentIds = new HashSet<>();
+    private ShiftActivityDTO replacedActivity;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;

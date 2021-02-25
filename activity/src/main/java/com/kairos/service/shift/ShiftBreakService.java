@@ -89,9 +89,9 @@ public class ShiftBreakService implements KPIService {
         if ((TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) && isCollectionNotEmpty(shift.getBreakActivities())) {
             validateBreakDuration(shift);
             shift.getBreakActivities().forEach(shiftActivity -> {
-                if(isNull(shiftActivity.getId())) {
+                //if(isNull(shiftActivity.getId())) {
                     shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-                }
+                //}
             });
             return shift.getBreakActivities();
             //return getBreakActivity(shift, dbShift, activityWrapperMap);
@@ -111,9 +111,9 @@ public class ShiftBreakService implements KPIService {
                     breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate, breakSettings);
                 }
                 if (isNotNull(breakActivity)) {
-                    if (breakActivity.getId() == null) {
+                    //if (breakActivity.getId() == null) {
                         breakActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-                    }
+                    //}
                     updateBreakHeldInShift(breakActivity, shift, dbShift, activityWrapperMap);
                     breakActivities.add(breakActivity);
                 }
@@ -212,7 +212,7 @@ public class ShiftBreakService implements KPIService {
 
     private ShiftActivity buildBreakActivity(Date startDate, Date endDate, BreakSettings breakSettings, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(breakSettings.getActivityId());
-        ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(), startDate, endDate, activityWrapper.getActivity().getId(), activityWrapper.getTimeType());
+        ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(), startDate, endDate, activityWrapper.getActivity().getId(), activityWrapper.getTimeType(),activityWrapper.getActivity().getActivityGeneralSettings().getUltraShortName(),activityWrapper.getActivity().getActivityGeneralSettings().getShortName());
         timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
         shiftActivity.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
         shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());

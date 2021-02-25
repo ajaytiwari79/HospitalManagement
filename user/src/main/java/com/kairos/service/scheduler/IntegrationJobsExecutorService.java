@@ -5,10 +5,7 @@ import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
-import com.kairos.utils.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -16,14 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-//import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.zip.GZIPInputStream;
 
 import static com.kairos.constants.AppConstants.*;
+
+//import java.io.ByteArrayInputStream;
 
 @Service
 public class IntegrationJobsExecutorService {

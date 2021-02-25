@@ -37,7 +37,6 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.day_type.DayTypeService;

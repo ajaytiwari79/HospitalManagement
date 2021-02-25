@@ -12,7 +12,6 @@ import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
-import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import org.joda.time.Interval;

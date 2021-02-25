@@ -55,8 +55,6 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -869,14 +867,13 @@ public class AccessGroupService {
     public StaffAccessGroupQueryResult getAccessGroupWithDayTypesByStaffIdAndUnitId(Long unitId){
         Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), UserContext.getUserDetails().getId());
-        StaffAccessGroupQueryResult accessGroupStaffQueryResult=new StaffAccessGroupQueryResult();
+        StaffAccessGroupQueryResult accessGroupStaffQueryResult = new StaffAccessGroupQueryResult();
         if(staffAtHub!=null){
             accessGroupStaffQueryResult.setCountryAdmin(true);
             return accessGroupStaffQueryResult;
         }
         Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
         List<AccessGroup> accessGroups=accessGroupRepository.getAccessGroupWithDayTypesByStaffIdAndUnitId(staffId,unitId);
-
         accessGroupStaffQueryResult.setAccessGroups(accessGroups);
         return  accessGroupStaffQueryResult;
     }
@@ -885,6 +882,9 @@ public class AccessGroupService {
         List<AccessGroup> accessGroups = new ArrayList<>();
         if(!UserContext.getUserDetails().isSystemAdmin()){
             AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
+            if(isNull(accessGroupStaffQueryResult)){
+                exceptionService.dataNotFoundByIdException(ERROR_POSITION_ACCESSGROUP_NOTFOUND);
+            }
             List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
             Map<Long,Set<BigInteger>> accessGroupAndDayTypeMap= getMapOfAccessGroupAndDayType(accessGroupDayTypesQueryResults);
             Set<BigInteger> dayTypesIds=new HashSet<>();

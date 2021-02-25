@@ -10,11 +10,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import java.util.stream.Collectors;
 
 /**
  * Created by prerna on 15/11/17.
@@ -35,12 +33,13 @@ public class OrganizationServiceDTO {
     private Map<String, TranslationInfo> translations ;
     private Long unitId;
     private List<OrganizationServiceDTO> children;
+    private boolean isEnabled;
 
     public List<OrganizationServiceDTO> getOrganizationSubService() {
         if(this.organizationSubService==null){
-            this.organizationSubService=new ArrayList<>();
+            return new ArrayList<>();
         }
-        return organizationSubService;
+        return organizationSubService.stream().filter(OrganizationServiceDTO::isEnabled).collect(Collectors.toList());
     }
 
     public OrganizationServiceDTO(@NotEmpty(message = "error.Organization.Service.customName.notEmptyOrNotNull") @NotNull(message = "error.Organization.Service.customName.notEmptyOrNotNull") String customName, Long id, String name, String description, Map<String, TranslationInfo> translations, Long unitId, List<OrganizationServiceDTO> children) {

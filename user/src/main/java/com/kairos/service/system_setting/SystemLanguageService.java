@@ -1,8 +1,6 @@
 package com.kairos.service.system_setting;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.CountryLanguageSettingRelationship;
@@ -20,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;

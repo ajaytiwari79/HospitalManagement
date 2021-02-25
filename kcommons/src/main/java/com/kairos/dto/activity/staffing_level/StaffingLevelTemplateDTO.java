@@ -25,7 +25,7 @@ public class StaffingLevelTemplateDTO {
     private Long unitId;
     private StaffingLevelTemplatePeriod validity;
     @NotNull
-    private Set<Long> dayType=new HashSet<>();
+    private Set<BigInteger> dayType=new HashSet<>();
     private List<Day> validDays =new ArrayList<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();

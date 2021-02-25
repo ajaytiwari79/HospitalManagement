@@ -5,7 +5,6 @@ import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -78,7 +77,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeType':?1 , 'activityRulesSettings.approvalAllowedPhaseIds':?2, deleted:false}")
     List<Activity> findAllAbsenceActivities(Long unitId, TimeTypeEnum timeType, BigInteger phaseId);
 
-    @Query(value = "{'activityRulesSettings.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'activityRulesSettings':1}")
+    @Query(value = "{'activityRulesSettings.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'activityRulesSettings':1,'unitId':1}")
     List<Activity> findAllSicknessActivity(Long unitId);
 
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeTypeId':{$in:?1 }, deleted:false}")

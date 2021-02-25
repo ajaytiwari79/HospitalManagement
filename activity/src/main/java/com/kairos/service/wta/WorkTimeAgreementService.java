@@ -1,30 +1,23 @@
 package com.kairos.service.wta;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
-import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
-import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
@@ -39,14 +32,10 @@ import com.kairos.enums.StaffWorkingType;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -57,13 +46,12 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.activity.*;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.kpermissions.ActivityPermissionService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.table_settings.TableSettingService;
@@ -76,6 +64,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,7 +81,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
-import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toMap;
@@ -109,6 +97,7 @@ public class WorkTimeAgreementService{
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateRepository;
     @Inject
+    @Lazy
     private RuleTemplateService ruleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
@@ -163,7 +152,7 @@ public class WorkTimeAgreementService{
     private DayTypeService dayTypeService;
     @Inject
     private TimeSlotSetService timeSlotSetService;
-    @Inject private ActivityService activityService;
+    @Inject private ActivityPermissionService activityPermissionService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -389,9 +378,6 @@ public class WorkTimeAgreementService{
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
-            if(isNull(wta.getTranslations())){
-                wta.setTranslations(new HashMap<>());
-            }
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             wtaResponseDTO.setCountryId(countryId);
             wtaResponseDTOS.add(wtaResponseDTO);
@@ -464,13 +450,13 @@ public class WorkTimeAgreementService{
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
-        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=activityService.getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap = activityPermissionService.getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
         activities.forEach(activity->{
             if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                 activity.setName("XXXXX");
             }
         });
-        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, UserContext.getUserDetails().getCountryId());
         List<TimeSlotDTO> timeSlotDTOS=timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         wtaDefaultDataInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);

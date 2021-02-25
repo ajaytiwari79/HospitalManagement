@@ -1,0 +1,250 @@
+package com.kairos.service.activity;
+
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.activity.ActivityPriorityDTO;
+import com.kairos.enums.PriorityFor;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityPriority;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.exception.ExceptionService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
+@Service
+public class ActivityPriorityService {
+
+    public static final String MESSAGE_ACTIVITY_PRIORITY_SEQUENCE = "message.activity.priority.sequence";
+    @Inject
+    private ActivityPriorityMongoRepository activityPriorityMongoRepository;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private UserIntegrationService userIntegrationService;
+
+
+    public ActivityPriorityDTO createActivityPriorityAtCountry(Long countryId, ActivityPriorityDTO activityPriorityDTO) {
+        boolean existByName = activityPriorityMongoRepository.existsByNameAndCountryIdAndNotEqualToId(activityPriorityDTO.getName(), activityPriorityDTO.getColorCode(), null, countryId);
+        if (existByName) {
+            exceptionService.actionNotPermittedException(ERROR_NAME_DUPLICATE, activityPriorityDTO.getName());
+        }
+        int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtCountry(countryId);
+        if ((activityPriorityCount + 1) != activityPriorityDTO.getSequence()) {
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findBySequenceAndCountryId(activityPriorityDTO.getSequence(), countryId);
+        if (isNotNull(activityPriority)) {
+            exceptionService.actionNotPermittedException("message.activity.priority.same.sequence");
+        }
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority.setCountryId(countryId);
+        activityPriorityMongoRepository.save(activityPriority);
+        activityPriorityDTO.setId(activityPriority.getId());
+        return activityPriorityDTO;
+    }
+
+    @CacheEvict(value = "getActivityPriorityAtOrganization", key = "#unitId")
+    public boolean createActivityPriorityForNewOrganization(Long unitId, Long countryId) {
+        List<ActivityPriorityDTO> activityPriorityDTOs = activityPriorityMongoRepository.findAllCountryId(countryId);
+        List<ActivityPriority> activityPrioritiesOfOrganization = new ArrayList<>(activityPriorityDTOs.size());
+        for (ActivityPriorityDTO activityPriorityDTO : activityPriorityDTOs) {
+            ActivityPriority organizationActivityPriority = copyActivityPriorityToOrganization(unitId, ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class));
+            activityPrioritiesOfOrganization.add(organizationActivityPriority);
+        }
+        if (isCollectionNotEmpty(activityPrioritiesOfOrganization)) {
+            activityPriorityMongoRepository.saveEntities(activityPrioritiesOfOrganization);
+        }
+        return true;
+    }
+
+    private ActivityPriority copyActivityPriorityToOrganization(Long unitId, ActivityPriority activityPriority) {
+        ActivityPriority organizationActivityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriority, ActivityPriority.class);
+        organizationActivityPriority.setId(null);
+        organizationActivityPriority.setCountryId(null);
+        organizationActivityPriority.setSequence(activityPriority.getSequence());
+        organizationActivityPriority.setOrganizationId(unitId);
+        return organizationActivityPriority;
+    }
+
+    @CacheEvict(value = "getActivityPriorityAtOrganization", key = "#unitId")
+    private boolean createActivityPriorityAtOrganizations(ActivityPriority activityPriority, Long unitId) {
+        List<Long> organizationIds = userIntegrationService.getAllOrganizationIds(unitId);
+        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findLastSeqenceByOrganizationIds(organizationIds);
+        Map<Long, Integer> activityPrioritiesMap = activityPriorities.stream().collect(Collectors.toMap(ActivityPriority::getOrganizationId, ActivityPriority::getSequence));
+        List<ActivityPriority> activityPrioritiesOfOrganization = new ArrayList<>(organizationIds.size());
+        for (Long organizationId : organizationIds) {
+            ActivityPriority organizationActivityPriority = copyActivityPriorityToOrganization(organizationId, activityPriority);
+            organizationActivityPriority.setSequence(activityPrioritiesMap.getOrDefault(organizationId, 0) + 1);
+            activityPrioritiesOfOrganization.add(organizationActivityPriority);
+        }
+        if (isCollectionNotEmpty(activityPrioritiesOfOrganization)) {
+            activityPriorityMongoRepository.saveEntities(activityPrioritiesOfOrganization);
+        }
+        return true;
+    }
+
+    @CacheEvict(value = "getActivityPriorityAtOrganization", key = "#unitId")
+    public ActivityPriorityDTO createActivityPriorityAtOrganization(Long unitId, ActivityPriorityDTO activityPriorityDTO) {
+//        boolean existByName = activityPriorityMongoRepository.existsByNameAndCountryIdAndNotEqualToId(activityPriorityDTO.getName(), activityPriorityDTO.getColorCode(), null, unitId);
+//        if (existByName) {
+//            exceptionService.actionNotPermittedException(ERROR_NAME_DUPLICATE, activityPriorityDTO.getName());
+//        }
+        int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtOrganization(unitId);
+        if ((activityPriorityCount + 1) != activityPriorityDTO.getSequence()) {
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findBySequenceAndOrganizationId(activityPriorityDTO.getSequence(), unitId);
+        if (isNotNull(activityPriority)) {
+            exceptionService.actionNotPermittedException("message.activity.priority.same.sequence");
+        }
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority.setOrganizationId(unitId);
+        activityPriorityMongoRepository.save(activityPriority);
+        activityPriorityDTO.setId(activityPriority.getId());
+        createActivityPriorityAtOrganizations(activityPriority, unitId);
+        return activityPriorityDTO;
+    }
+
+    public List<ActivityPriorityDTO> getActivityPriorityAtCountry(Long countryId) {
+        return activityPriorityMongoRepository.findAllCountryId(countryId);
+    }
+
+    @Cacheable(value = "getActivityPriorityAtOrganization", key = "#unitId", cacheManager = "cacheManager")
+    public List<ActivityPriorityDTO> getActivityPriorityAtOrganization(Long unitId) {
+        return activityPriorityMongoRepository.findAllOrganizationId(unitId);
+    }
+
+    public ActivityPriorityDTO updateActivityPriorityAtCountry(Long countryId, ActivityPriorityDTO activityPriorityDTO) {
+        boolean existByName = activityPriorityMongoRepository.existsByNameAndCountryIdAndNotEqualToId(activityPriorityDTO.getName(), activityPriorityDTO.getColorCode(), activityPriorityDTO.getId(), countryId);
+        if (existByName) {
+            exceptionService.actionNotPermittedException(ERROR_NAME_DUPLICATE, activityPriorityDTO.getName());
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityDTO.getId());
+        if (activityPriority.getSequence() < activityPriorityDTO.getSequence()) {
+            activityPriorityMongoRepository.updateSequenceOfActivityPriorityOnCountry(activityPriorityDTO.getSequence(), activityPriority.getSequence(), countryId);
+        }
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority.setCountryId(countryId);
+        activityPriorityMongoRepository.save(activityPriority);
+        return activityPriorityDTO;
+    }
+
+    @CacheEvict(value = "getActivityPriorityAtOrganization", key = "#unitId")
+    public ActivityPriorityDTO updateActivityPriorityAtOrganization(Long unitId, ActivityPriorityDTO activityPriorityDTO) {
+        boolean existByName = activityPriorityMongoRepository.existsByNameAndOrganizationIdAndNotEqualToId(activityPriorityDTO.getName(), activityPriorityDTO.getColorCode(), activityPriorityDTO.getId(), unitId);
+        if (existByName) {
+            exceptionService.actionNotPermittedException(ERROR_NAME_DUPLICATE, activityPriorityDTO.getName());
+        }
+        int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtOrganization(unitId);
+        if (activityPriorityCount < activityPriorityDTO.getSequence()) {
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityDTO.getId());
+        if (activityPriority.getSequence() != activityPriorityDTO.getSequence()) {
+            activityPriorityMongoRepository.updateSequenceOfActivityPriorityOnOrganization(activityPriorityDTO.getSequence(), activityPriority.getSequence(), unitId);
+        }
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority.setOrganizationId(unitId);
+        activityPriorityMongoRepository.save(activityPriority);
+        activityPriorityDTO.setId(activityPriority.getId());
+        return activityPriorityDTO;
+    }
+
+    public boolean deleteActivityPriorityFromCountry(BigInteger activityPriorityId, Long countryId) {
+        boolean existsActivitiesByActivityPriorityIdAndCountryId = activityMongoRepository.existsActivitiesByActivityPriorityIdAndCountryId(countryId, activityPriorityId);
+        if (existsActivitiesByActivityPriorityIdAndCountryId) {
+            exceptionService.actionNotPermittedException("error.activity.alreadyuse.priority");
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityId);
+        activityPriority.setDeleted(true);
+        activityPriorityMongoRepository.save(activityPriority);
+        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndCountryId(activityPriority.getSequence(), countryId, Sort.by(Sort.Direction.ASC, "sequence"));
+        updateSequence(activityPriority, activityPriorities);
+        activityPriorityMongoRepository.saveAll(activityPriorities);
+        return true;
+    }
+
+    private void updateSequence(ActivityPriority activityPriority, List<ActivityPriority> activityPriorities) {
+        int sequence = activityPriority.getSequence();
+        for (ActivityPriority priority : activityPriorities) {
+            priority.setSequence(sequence);
+            sequence++;
+        }
+    }
+
+    @CacheEvict(value = "getActivityPriorityAtOrganization", key = "#unitId")
+    public boolean deleteActivityPriorityFromOrganization(BigInteger activityPriorityId, Long unitId) {
+        boolean existsActivitiesByActivityPriorityIdAndUnitId = activityMongoRepository.existsActivitiesByActivityPriorityIdAndUnitId(unitId, activityPriorityId);
+        if (existsActivitiesByActivityPriorityIdAndUnitId) {
+            exceptionService.actionNotPermittedException("error.activity.alreadyuse.priority");
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityId);
+        activityPriority.setDeleted(true);
+        activityPriorityMongoRepository.save(activityPriority);
+        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndOrganizationId(activityPriority.getSequence(), unitId, Sort.by(Sort.Direction.ASC, "sequence"));
+        updateSequence(activityPriority, activityPriorities);
+        activityPriorityMongoRepository.saveAll(activityPriorities);
+        return true;
+    }
+
+
+    public boolean updateActivityPriorityInActivity(BigInteger activityPriorityId, BigInteger activityId) {
+        Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
+        if (isNull(activity)) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
+        }
+        ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityId);
+        if (isNull(activityPriority)) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_PRIORITY_ID, activityPriorityId);
+        }
+        boolean isExist = isPriorityIdExists(activity,activityPriorityId);
+        if(!isExist) {
+            activity.setActivityPriorityId(activityPriorityId);
+        }
+        activityMongoRepository.save(activity);
+        return true;
+    }
+
+    public ActivityPriority getActivityPriorityNameAndOrganizationId(String activityPriorityName, Long organizationId){
+            return activityPriorityMongoRepository.findByNameAndOrganizationId(activityPriorityName, organizationId);
+    }
+
+    public ActivityPriority getActivityPriorityById(BigInteger activityPriorityId){
+        return activityPriorityMongoRepository.findOne(activityPriorityId);
+    }
+    public boolean isPriorityIdExists(Activity activity, BigInteger activityPriorityId) {
+        if (PriorityFor.NONE.equals(activity.getActivityBalanceSettings().getPriorityFor())) {
+            exceptionService.dataNotFoundException(MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET, activityPriorityId);
+        }
+        boolean isExist = activityMongoRepository.isActivityPriorityIdIsExistOrNot(activity.getActivityBalanceSettings().getPriorityFor(), activityPriorityId,activity.getId());
+        if (isExist) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID, activityPriorityId);
+        }
+        return isExist;
+    }
+
+    @CacheEvict(value = "getActivityPriorityAtOrganization",allEntries = true)
+    public Map<String, TranslationInfo> updateTranslation(BigInteger activityPriorityId, Map<String,TranslationInfo> translations) {
+        ActivityPriority activityPriority =activityPriorityMongoRepository.findOne(activityPriorityId);
+        activityPriority.setTranslations(translations);
+        activityPriorityMongoRepository.save(activityPriority);
+        return activityPriority.getTranslations();
+    }
+
+}

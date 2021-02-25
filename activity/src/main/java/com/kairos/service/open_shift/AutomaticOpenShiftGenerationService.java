@@ -27,6 +27,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 @Component
 public class AutomaticOpenShiftGenerationService {
 
@@ -146,8 +148,10 @@ public class AutomaticOpenShiftGenerationService {
             }
             lastStaffingLevelActivityWithDuration = staffingLevelActivityWithDuration;
         }
-        filteredActivityWithDuration.getStaffingLevelDuration().setTo(lastStaffingLevelActivityWithDuration.getStaffingLevelDuration().getTo());
-        filteredActivityWithDurations.add(filteredActivityWithDuration);
+        if(isNotNull(filteredActivityWithDuration)){
+            filteredActivityWithDuration.getStaffingLevelDuration().setTo(lastStaffingLevelActivityWithDuration.getStaffingLevelDuration().getTo());
+            filteredActivityWithDurations.add(filteredActivityWithDuration);
+        }
         return filteredActivityWithDurations;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, BigInteger>,CustomTimeSlotMongoRepository {
+public interface TimeSlotMongoRepository extends MongoBaseRepository<TimeSlotSet, BigInteger>,CustomTimeSlotMongoRepository {
 
     List<TimeSlotSetDTO> getByUnitIdAndTimeSlotMode(@NotNull Long unitId, @NotNull TimeSlotMode timeSlotMode);
 
@@ -24,7 +24,7 @@ public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, Big
 
     //List<TimeSlot> findBySystemGeneratedTimeSlotsTrue();
 
-    //@Cacheable(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate", key = "#unitId", cacheManager = "cacheManager")
+    @Cacheable(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate", key = "#unitId", cacheManager = "cacheManager")
     TimeSlotSetDTO findByUnitIdAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotType timeSlotType);
 
     List<TimeSlotSetDTO> findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotMode timeSlotMode, TimeSlotType timeSlotType);

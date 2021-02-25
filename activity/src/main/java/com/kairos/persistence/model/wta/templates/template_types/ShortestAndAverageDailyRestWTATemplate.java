@@ -3,7 +3,6 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -22,7 +21,6 @@ import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.CAMELCASE_DAYS;
-import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -95,13 +93,13 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){
         ZonedDateTime zonedDateTime = null;
         switch (intervalUnit){
-            case CAMELCASE_DAYS:dateTime.plusDays(intervalLength);
+            case CAMELCASE_DAYS:zonedDateTime = dateTime.plusDays(intervalLength);
                 break;
-            case WEEKS:dateTime.plusWeeks(intervalLength);
+            case WEEKS:zonedDateTime = dateTime.plusWeeks(intervalLength);
                 break;
-            case MONTHS:dateTime.plusMonths(intervalLength);
+            case MONTHS:zonedDateTime = dateTime.plusMonths(intervalLength);
                 break;
-            case YEARS:dateTime.plusYears(intervalLength);
+            case YEARS:zonedDateTime = dateTime.plusYears(intervalLength);
                 break;
             default:
                 break;

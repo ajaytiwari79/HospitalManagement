@@ -35,6 +35,8 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
     private Integer startTime;
     private Integer endTime;
     private String activityName;
+    private String shortName;
+    private String ultraShortName;
     //used in T&A view
     private BigInteger reasonCodeId;
     //used for adding absence type of activities.
@@ -72,7 +74,7 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
     }
 
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType,String ultraShortName,String shortName) {
         this.activityId = activityId;
         this.startDate = roundDateByMinutes(startDate, 15);
         this.endDate = roundDateByMinutes(endDate, 15);
@@ -80,22 +82,19 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
         this.timeType = timeType;
         this.startTime = timeInSeconds(this.getStartDate());
         this.endTime = timeInSeconds(this.getEndDate());
+        this.ultraShortName = ultraShortName;
+        this.shortName = shortName;
     }
 
-    public ShiftActivity(BigInteger activityId, String activityName) {
-        this.activityId = activityId;
-        this.activityName = activityName;
-        this.startTime = timeInSeconds(this.getStartDate());
-        this.endTime = timeInSeconds(this.getEndDate());
-    }
-
-    public ShiftActivity(BigInteger activityId, Date startDate,Date endDate,String activityName) {
+    public ShiftActivity(BigInteger activityId, Date startDate,Date endDate,String activityName,String ultraShortName,String shortName) {
         this.activityId = activityId;
         this.startDate = roundDateByMinutes(startDate, 15);
         this.endDate = roundDateByMinutes(endDate, 15);
         this.activityName = activityName;
         this.startTime = timeInSeconds(this.getStartDate());
         this.endTime = timeInSeconds(this.getEndDate());
+        this.ultraShortName = ultraShortName;
+        this.shortName = shortName;
     }
 
     public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {

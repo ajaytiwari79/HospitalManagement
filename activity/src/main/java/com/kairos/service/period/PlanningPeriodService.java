@@ -50,18 +50,19 @@ import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.service.shift.ShiftStateService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ import static com.kairos.constants.AppConstants.PLANNING_PERIOD_NAME;
  */
 @Service
 @Transactional
-public class PlanningPeriodService extends MongoBaseService {
+public class PlanningPeriodService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlanningPeriodService.class);
     public static final String SCHEDULER_PANEL = "/scheduler_panel";
 
@@ -118,15 +119,15 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
-    private ShiftStateService shiftStateService;
-    @Inject
     private TimeBankService timeBankService;
     @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private ActivityService activityService;
-    @Inject private StaffingLevelService staffingLevelService;
+    @Autowired
+    @Lazy
+    private StaffingLevelService staffingLevelService;
 
     // To get list of phases with duration in days
     public Map<Long, List<PhaseDTO>> getPhasesWithDurationInDays(List<Long> unitIds) {
@@ -161,43 +162,45 @@ public class PlanningPeriodService extends MongoBaseService {
         // Prepare map for phases with id as key and sequence as value
         Map<BigInteger, Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
         // Fetch planning periods
-        List<PlanningPeriodDTO> planningPeriods = null;
+        List<PlanningPeriodDTO> planningPeriods;
         if (Optional.ofNullable(startDate).isPresent() || Optional.ofNullable(endDate).isPresent()) {
             planningPeriods = planningPeriodMongoRepository.findPeriodsOfUnitByStartAndEndDate(unitId, startDate, endDate);
         } else {
             planningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
         }
-        Set<LocalDateTime> localDateTimes=planningPeriods.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
-        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
-        for (PlanningPeriodDTO planningPeriod : planningPeriods) {
-            Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
-            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
-                planningPeriod.setCurrentPhase(phase.getName());
-                planningPeriod.setColor(phase.getColor());
-            }
-            planningPeriod.setPhaseEnum(phase.getPhaseEnum());
-            // Set duration of period
-            planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
+        if(isCollectionNotEmpty(planningPeriods)){
+            Set<LocalDateTime> localDateTimes=planningPeriods.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
+            Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
+            for (PlanningPeriodDTO planningPeriod : planningPeriods) {
+                Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
+                if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+                    planningPeriod.setCurrentPhase(phase.getName());
+                    planningPeriod.setColor(phase.getColor());
+                }
+                planningPeriod.setPhaseEnum(phase.getPhaseEnum());
+                // Set duration of period
+                planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
 
-            // Set flipping dates
-            FlippingDateDTO flippingDateDTO;
-            for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
-                int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
-                switch (phaseSequence) {
-                    case 4:
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
-                        planningPeriod.setConstructionToDraftDate(flippingDateDTO);
-                        break;
-                    case 3:
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
-                        planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
-                        break;
-                    case 2:
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
-                        planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
-                        break;
-                    default:
-                        break;
+                // Set flipping dates
+                FlippingDateDTO flippingDateDTO;
+                for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
+                    int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
+                    switch (phaseSequence) {
+                        case 4:
+                            flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
+                            planningPeriod.setConstructionToDraftDate(flippingDateDTO);
+                            break;
+                        case 3:
+                            flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
+                            planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
+                            break;
+                        case 2:
+                            flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
+                            planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -501,7 +504,7 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());
-        save(planningPeriod);
+        planningPeriodMongoRepository.save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
     }
 
@@ -536,7 +539,7 @@ public class PlanningPeriodService extends MongoBaseService {
             LOGGER.error("ex {}" , ex);
         }
         planningPeriod.setDeleted(true);
-        save(planningPeriod);
+        planningPeriodMongoRepository.save(planningPeriod);
         return true;
     }
 
@@ -681,7 +684,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 }
                 shiftStates.add(shiftState);
             });
-            save(shiftStates);
+            shiftStateMongoRepository.saveEntities(shiftStates);
         }
     }
 
@@ -749,9 +752,9 @@ public class PlanningPeriodService extends MongoBaseService {
                 shift.setId(shiftState.getShiftId());
                 shifts.add(shift);
             });
-            save(shifts);
+            shiftMongoRepository.saveEntities(shifts);
             shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
-            shiftStateService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
+            timeBankService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
         }
     }
 
@@ -874,7 +877,11 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate dateLiesInPeriod) {
-        return planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, dateLiesInPeriod);
+        PlanningPeriod planningPeriodContainsDate = planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, dateLiesInPeriod);
+        if(isNull(planningPeriodContainsDate)){
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
+        }
+        return planningPeriodContainsDate;
     }
 
     public PlanningPeriod getFirstPlanningPeriod(Long unitId) {
@@ -1000,5 +1007,12 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole){
         return planningPeriodMongoRepository.getDataForShiftOperation(startDate,unitId,employmentIds,expertiseIds,staffIds,countryId,activityIds,shiftId,userAccessRole);
+    }
+
+    public PhaseActivityDTO getPlanningPeriodDetails(Long unitId){
+        PlanningPeriodDTO planningPeriodDTO = findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        PlanningPeriod firstRequestPlanningPeriod = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
+        LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
+        return PhaseActivityDTO.builder().planningPeriodStartDate(planningPeriodDTO.getStartDate()).planningPeriodEndDate(planningPeriodDTO.getEndDate()).firstRequestPhasePlanningPeriodEndDate(firstRequestPhasePlanningPeriodEndDate).build();
     }
 }

@@ -85,6 +85,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class UserIntegrationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserIntegrationService.class);
+    public static final String START_DATE = "startDate";
     @Inject
     private GenericRestClient genericRestClient;
     @Inject
@@ -384,7 +385,7 @@ public class UserIntegrationService {
 
     public Map<LocalDate,List<FunctionDTO>> getFunctionsOfEmployment(Long employmentId, LocalDate startDate, LocalDate endDate) {
         List<NameValuePair> queryParamList = new ArrayList<>();
-        queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
+        queryParamList.add(new BasicNameValuePair(START_DATE, startDate.toString()));
         queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_OF_EMPLOYMENT, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,List<FunctionDTO>>>>() {
         }, employmentId);
@@ -681,8 +682,8 @@ public class UserIntegrationService {
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffByEmploymentId(Long unitId, LocalDate shiftDate, String type, Long employmentId, Set<Long> reasonCodeIds,LocalDate activityCutOffEndDate) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("startDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
-        queryParamList.add(new BasicNameValuePair("activityCutOffEndDate", activityCutOffEndDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        queryParamList.add(new BasicNameValuePair(START_DATE, shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        queryParamList.add(new BasicNameValuePair("activityCutOffEndDate", activityCutOffEndDate != null && shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
         if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
             queryParamList.add(new BasicNameValuePair("reasonCodeIds", RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
@@ -868,6 +869,14 @@ public class UserIntegrationService {
 
     public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(NotEligibleStaffDataDTO notEligibleStaffDataDTO,Long unitId) {
         return genericRestClient.publishRequest(notEligibleStaffDataDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_eligible_staffs_for_cover_shifts", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {});
+    }
+
+    public FunctionsWithUserAccessRoleDTO getFunctionsWithUserAccessRoleDTO(Long employmentId, LocalDate startDate, LocalDate endDate) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair(START_DATE, startDate.toString()));
+        queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_WITH_ACCESS_ROLE, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FunctionsWithUserAccessRoleDTO>>() {
+        }, employmentId);
     }
 }
 

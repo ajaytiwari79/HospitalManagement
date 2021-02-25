@@ -1,6 +1,8 @@
 package com.kairos.enums.shift;
 
-public enum GeneralCoverShiftCriteria {
+import java.io.Serializable;
+
+public enum GeneralCoverShiftCriteria implements Serializable {
     INVITATIONS_CAN_A_STAFF_HAVE_AT_A_SAME_TIME,
     DAYS_BEFORE_START_OF_SHIFT_DOES_A_COVER_REQUEST_EXPIRE,
     PLANNER_APPROVAL_WEEKDAYS_BEFORE_START_DOES_A_COVER_REQUEST_EXPIRE,

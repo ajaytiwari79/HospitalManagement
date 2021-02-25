@@ -26,7 +26,6 @@ import java.util.*;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
-import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**

@@ -6,7 +6,6 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.List;
 
 @Repository

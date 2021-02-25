@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.country.experties;
 
-import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by vipul on 27/3/18.

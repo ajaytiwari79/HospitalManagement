@@ -8,6 +8,7 @@ import com.kairos.service.wta.RuleTemplateService;
 import com.kairos.service.wta.WTABuilderService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class RuleTemplateController {
 
 
     @Inject
+    @Lazy
     private RuleTemplateService ruleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;

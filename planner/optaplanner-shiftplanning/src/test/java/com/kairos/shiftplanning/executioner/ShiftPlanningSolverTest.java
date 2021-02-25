@@ -1,7 +1,6 @@
 
 package com.kairos.shiftplanning.executioner;
 
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.shiftplanningNewVersion.entity.ALI;

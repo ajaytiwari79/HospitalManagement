@@ -43,11 +43,12 @@ public class ActivityGeneralSettings implements Serializable {
     private boolean active = true;
     @KPermissionField
     private String shortName;
+    @KPermissionField
+    private String ultraShortName;
     private boolean eligibleForUse = true;
     private String originalIconName;
     private String modifiedIconName;
-    @KPermissionField
-    private String ultraShortName;
+
     @KPermissionField
     private LocalDate startDate;
     @KPermissionField

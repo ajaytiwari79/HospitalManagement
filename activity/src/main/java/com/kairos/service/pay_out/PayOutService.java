@@ -23,7 +23,6 @@ import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
@@ -47,7 +46,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_
  * */
 @Transactional
 @Service
-public class PayOutService extends MongoBaseService {
+public class PayOutService {
 
 
     @Inject
@@ -90,7 +89,7 @@ public class PayOutService extends MongoBaseService {
     public boolean approvePayOutRequest(BigInteger payOutTransactionId) {
         PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(), payOutTransaction.getEmploymentId(), PayOutTrasactionStatus.APPROVED, payOutTransaction.getMinutes(), LocalDate.now());
-        save(approvedPayOutTransaction);
+        payOutTransactionMongoRepository.save(approvedPayOutTransaction);
         PayOutPerShift payOutPerShift = new PayOutPerShift(payOutTransaction.getEmploymentId(), payOutTransaction.getStaffId(), payOutTransaction.getMinutes(), payOutTransaction.getDate());
         PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(payOutTransaction.getEmploymentId(), DateUtils.asDate(payOutTransaction.getDate()));
         if (lastPayOutPerShift != null) {
@@ -114,7 +113,7 @@ public class PayOutService extends MongoBaseService {
         }
         employmentWithCtaDetailsDTO.getExpertise().setProtectedDaysOffSettings(protectedDaysOffService.getProtectedDaysOffByExpertiseId(employmentWithCtaDetailsDTO.getExpertise().getId()));
         PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId, employmentId, PayOutTrasactionStatus.REQUESTED, amount, LocalDate.now());
-        save(requestPayOutTransaction);
+        payOutTransactionMongoRepository.save(requestPayOutTransaction);
         return true;
 
     }
@@ -169,9 +168,12 @@ public class PayOutService extends MongoBaseService {
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftWithActivityDTO.class);
-        shift.getActivities().forEach(shiftActivityDTO ->
-                shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
-        );
+        shift.getActivities().forEach(shiftActivityDTO -> {
+            Activity activity = activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity();
+            shiftActivityDTO.setActivityName(activity.getName());
+            shiftActivityDTO.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
+            shiftActivityDTO.setShortName(activity.getActivityGeneralSettings().getShortName());
+        });
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
             shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());

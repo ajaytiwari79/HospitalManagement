@@ -2,10 +2,7 @@ package com.kairos.shiftplanningNewVersion.entity;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.Activity;
-
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
-
-import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;
 import lombok.*;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.lookup.PlanningId;

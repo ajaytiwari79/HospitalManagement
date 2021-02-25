@@ -163,6 +163,20 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_DELETE = "message.shift.delete";
     public static final String MESSAGE_PHASE_AUTHORITY_ABSENT = "message.phase.authority.absent";
     public static final String MESSAGE_SHIFT_OVERSTAFFING = "message.shift.overStaffing";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_GAP = "message.shift.overStaffing.gap";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_ADD = "message.shift.staffing.level.add";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_DELETE = "message.shift.staffing.level.delete";
+    public static final String MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY = "message.shift.staffing.level.replace.without.activity";
+    public static final String MESSAGE_SHIFT_STAFFING_LEVEL_PHASE_SETTING="message.shift.staffing.level.phase.setting";
+    public static final String MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY="message.shift.staffing.level.replace.with.activity";
+
+
+
+
+
+
+
+
     public static final String MESSAGE_SHIFT_UNDERSTAFFING = "message.shift.underStaffing";
     public static final String MESSAGE_STAFFINGLEVEL_ACTIVITY = "message.staffingLevel.activity";
     public static final String MESSAGE_SHIFTTEMPLATE_ABSENT = "message.shiftTemplate.absent";
@@ -212,7 +226,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_NOTELIGIBLE_FOR_ABSENCE = "activity.notEligible.for.absence";
     public static final String ACTIVITY_NOT_ELIGIBLE_DAYTYPE = "activity.not.eligible.dayType";
     public static final String DATE_OUT_OF_RANGE = "date.out.of.range";
-    public static final String STAFFINGLEVELTEMPLATE_NOT_FOUND = "staffingLevelTemplate.not.found";
+    public static final String STAFFINGLEVEL_NOT_FOUND = "staffingLevelTemplate.not.found";
 
 
     public static final String MESSAGE_EXCEPTION_SCHEDULER = "message.exception.scheduler";
@@ -402,6 +416,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_PUBLISH_DATE_INVALID = "error.auto.fill.gap.setting.publish.date.invalid";
+    public static final String MAIN_TEAM_ABSENT = "error.main.team.absent";
+    public static final String HIGHEST_RANK_ACTIVITY_ABSENT = "error.highest.team.absent";
     public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
     public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
 
@@ -417,4 +433,6 @@ public class ActivityMessagesConstants {
     public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.configuration.absent";
     public static final String TIMESLOT_NOT_FOUND_FOR_UNIT = "timeslot.not.found";
 
+    public static final String GAP_FILLING_CONFIGURATION_ABSENT = "gap.filling.configuration.absent";
+    public static final String SHIFT_STATE_NOT_FOUND_TANDA = "message.shift.state.t&A";
 }

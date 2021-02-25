@@ -1,13 +1,11 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.user.team.TeamDTO;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.StaffingLevelAvailableCountService;
 import com.kairos.service.staffing_level.StaffingLevelService;
@@ -26,7 +24,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.TEAM_TYPE;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
-
 
 /**
  * Created By G.P.Ranjan on 24/12/19

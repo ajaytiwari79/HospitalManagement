@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ShiftWithViolatedInfoDTO {
     @Valid
+    @NotEmpty
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
     private String actionPerformed;

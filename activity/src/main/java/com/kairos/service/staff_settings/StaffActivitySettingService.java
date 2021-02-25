@@ -16,13 +16,13 @@ import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffActivityAssignmentSpecification;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -35,7 +35,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class StaffActivitySettingService extends MongoBaseService {
+public class StaffActivitySettingService {
 
     public static final String SUCCESS = "success";
     public static final String ERROR = "error";
@@ -51,7 +51,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
-        activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
+        organizationActivityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
         if(isNotNull(staffActivitySettingDTO.getActivityId())) {
@@ -69,7 +69,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public StaffActivitySettingDTO updateStaffActivitySettings(BigInteger staffActivitySettingId,Long unitId, StaffActivitySettingDTO staffActivitySettingDTO){
-        activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
+        organizationActivityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
@@ -88,7 +88,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
         }
         staffActivitySetting.setDeleted(true);
-        save(staffActivitySetting);
+        staffActivitySettingRepository.save(staffActivitySetting);
         return true;
     }
 
@@ -116,8 +116,9 @@ public class StaffActivitySettingService extends MongoBaseService {
         return responseMap;
     }
 
+    //@Cacheable(value = "getStaffSpecificActivitySettings", key = "{#unitId,#staffId,#includeTeamActivity,#isActivityType}", cacheManager = "cacheManager")
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity,boolean isActivityType){
-        List<ActivityWithCompositeDTO> staffPersonalizedActivities = staffActivitySettingRepository.findAllStaffActivitySettingByStaffIdAndUnityIdWithMostUsedActivityCount(unitId,staffId);;
+        List<ActivityWithCompositeDTO> staffPersonalizedActivities;
         if(includeTeamActivity) {
             List<StaffActivitySettingDTO> activitySettings = staffActivitySettingRepository.findAllByStaffIdAndDeletedFalse(staffId);
             List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType);
@@ -155,7 +156,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setStaffId(staffId);
         });
         List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
-        save(staffActivitySettingsList);
+       staffActivitySettingRepository.saveEntities(staffActivitySettingsList);
         return staffActivitySettings;
    }
 

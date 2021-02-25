@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 30/8/17.
@@ -87,6 +89,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{deleted:false,staffId:?0,unitId:?3,disabled:false,startDate:{ $gte :?1,$lte :?2}}")
     List<ShiftDTO> findAllShiftsByStaffIdsAndDateAndUnitId(Long staffId, Date startDate, Date endDate,Long unitId);
+
+    @Query(value = "{'activities.secondLevelTimeType':{$in:?3},staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
+    List<Shift> findShiftBetweenDurationByStaffIdAndByTimeType(Long staffId, Date startDate, Date endDate, Set<TimeTypeEnum> timeTypeEnumSet);
 
 
 }

@@ -17,11 +17,11 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +29,12 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
@@ -44,7 +44,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Transactional
 @Service
-public class WTAOrganizationService extends MongoBaseService {
+public class WTAOrganizationService  {
 
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
@@ -53,6 +53,7 @@ public class WTAOrganizationService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
+    @Lazy
     private RuleTemplateService ruleTemplateService;
     @Inject
     private WTABuilderService wtaBuilderService;
@@ -76,9 +77,6 @@ public class WTAOrganizationService extends MongoBaseService {
         List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
         workingTimeAgreements.forEach(wta -> {
-            if(isNull(wta.getTranslations())){
-                wta.setTranslations(new HashMap<>());
-            }
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(organization.getCountryId(), wtaResponseDTO.getRuleTemplates());
             wtaResponseDTOs.add(wtaResponseDTO);

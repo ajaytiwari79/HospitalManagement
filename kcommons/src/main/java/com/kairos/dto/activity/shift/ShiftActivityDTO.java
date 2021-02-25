@@ -45,6 +45,8 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>, Serializa
     private int scheduledMinutes;
     private int durationMinutes;
     private String activityName;
+    private String shortName;
+    private String ultraShortName;
     //used in T&A view
     private BigInteger reasonCodeId;
     //used for adding absence type of activities.
@@ -92,6 +94,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>, Serializa
     private BigInteger timeTypeId;
     private String methodForCalculatingTime;
     private ViolatedRulesDTO violatedRules;
+    private boolean skipRules;
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
@@ -105,6 +108,15 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>, Serializa
         this.activityName = activityName;
         this.absenceReasonCodeId=absenceReasonCodeId;
     }
+
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId,boolean skipRules) {
+        this.activityId = activityId;
+        this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+        this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
+        this.activityName = activityName;
+        this.skipRules = skipRules;
+    }
+
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, String message, boolean success){
         this.activityName=activityName;
         this.startDate=isNull(startDate) ? null : roundDateByMinutes(startDate,15);

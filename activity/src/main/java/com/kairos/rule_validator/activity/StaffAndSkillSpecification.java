@@ -10,7 +10,6 @@ import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.enums.SkillLevel;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.rule_validator.RuleExecutionType;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 

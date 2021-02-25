@@ -3,9 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.ModuleId;
@@ -126,8 +124,7 @@ public class GroupService {
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);
-        groupDTO.setTranslatedDescriptions(group.getTranslatedDescriptions());
-        groupDTO.setTranslatedNames(group.getTranslatedNames());
+        groupDTO.setTranslations(group.getTranslations());
         return groupDTO;
     }
 

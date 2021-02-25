@@ -2,7 +2,6 @@ package com.kairos.shiftplanningNewVersion.entity;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.Activity;
-
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.utils.LocalTimeConverter;
@@ -20,11 +19,14 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Getter
 @Setter

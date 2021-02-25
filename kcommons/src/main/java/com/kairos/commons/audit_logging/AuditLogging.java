@@ -5,7 +5,6 @@ import com.kairos.enums.audit_logging.LoggingType;
 import de.danielbechler.diff.ObjectDifferBuilder;
 import de.danielbechler.diff.node.DiffNode;
 import de.danielbechler.diff.node.Visit;
-//import org.neo4j.ogm.annotation.NodeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.PACKAGE_NAME;
 import static de.danielbechler.diff.node.DiffNode.State.ADDED;
 import static de.danielbechler.diff.node.DiffNode.State.CHANGED;
+
+//import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * pradeep

@@ -2,7 +2,6 @@ package com.kairos.service.pay_table;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.persistence.model.country.Country;

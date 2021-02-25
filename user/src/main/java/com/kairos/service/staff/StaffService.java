@@ -2,7 +2,10 @@ package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -614,7 +617,8 @@ public class StaffService {
     private Long getCPR(Row row, Long cprAsLong) {
 
         if (isNotNull(row.getCell(41, Row.RETURN_BLANK_AS_NULL))) {
-            cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
+            String cprNumber=getStringValueOfIndexedCell(row, 41).replace("-","");
+            cprAsLong = new Double(cprNumber).longValue();
         }
         return cprAsLong;
     }

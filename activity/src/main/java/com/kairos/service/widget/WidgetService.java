@@ -3,7 +3,6 @@ package com.kairos.service.widget;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -22,7 +21,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.widget.DashboardWidget;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.widget.WidgetMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -76,14 +75,14 @@ public class WidgetService {
     @Inject
     private DayTypeService dayTypeService;
     @Inject
-    private TimeSlotRepository timeSlotRepository;
+    private TimeSlotMongoRepository timeSlotMongoRepository;
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
         Date startDate = asDate(LocalDate.now().minusDays(1));
         Date endDate = asDate(LocalDate.now().plusDays(2));
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ShiftWithActivityDTO> shiftDTOs = shiftMongoRepository.findAllShiftBetweenDurationByUnitId(unitId, startDate, endDate);
+        /*List<ShiftWithActivityDTO> shiftDTOs = shiftMongoRepository.findAllShiftBetweenDurationByUnitId(unitId, startDate, endDate);
         Object[] objects = getEmploymentIdsAndStaffIds(shiftDTOs);
         List<Long> staffIds = (List<Long>) objects[0];
         List<Long> employmentIds = (List<Long>) objects[1];
@@ -92,19 +91,19 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
-        TimeSlotSetDTO timeSlotSetDTO = timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING);
+        TimeSlotSetDTO timeSlotSetDTO = timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING);
         if(isNull(timeSlotSetDTO)){
             exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
         }
         List<TimeSlotDTO> timeSlotDTOS= timeSlotSetDTO.getTimeSlots();
-        staffAdditionalInfoDTOS.forEach(staff-> {staff.setDayTypes(dayTypeDTOS);staff.setTimeSlotSets(timeSlotDTOS);});
+        staffAdditionalInfoDTOS.forEach(staff-> {staff.setDayTypes(dayTypeDTOS);staff.setTimeSlotSets(timeSlotDTOS);});*/
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
         if (isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())) {
             exceptionService.dataNotFoundException(REALTIME_DURATION_NOT_CONFIGURED);
         }
-        dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
-        updatedetailsOfNightWorkers(dashBoardWidgetDTO, shiftDTOs, staffAdditionalInfoDTOS);
+        dashBoardWidgetDTO = new DashboardWidgetDTO(null, new ArrayList<>(), new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
+        updatedetailsOfNightWorkers(dashBoardWidgetDTO, new ArrayList<>(), new ArrayList<>());
         DashboardWidget dashboardWidget = getDashboardWidget();
         dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
         dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());

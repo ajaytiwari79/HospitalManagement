@@ -482,7 +482,6 @@ public class UserService {
         } else {
             loadUnitPermissions(unitId, userId, permissionData);
         }
-        updateLastSelectedOrganizationIdAndCountryId(unitId);
         permissionData.setRole((userAccessRoleDTO.isManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
 
         permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
@@ -527,7 +526,7 @@ public class UserService {
     }
 
 
-    private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
+    public void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);

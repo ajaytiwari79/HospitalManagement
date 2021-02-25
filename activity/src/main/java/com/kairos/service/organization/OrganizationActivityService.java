@@ -20,6 +20,8 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
@@ -36,28 +38,33 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.OrganizationHierarchy;
-import com.kairos.enums.ProtectedDaysOffUnitSettings;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.*;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivitySettingsService;
+import com.kairos.service.activity.PlannedTimeTypeService;
+import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
@@ -88,8 +95,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.data.domain.Sort;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,29 +110,27 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
 import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 import static com.kairos.enums.reason_code.ReasonCodeType.ORDER;
 
+
 /**
  * Created by vipul on 5/12/17.
  */
 @Service
 @Transactional
-public class OrganizationActivityService extends MongoBaseService {
+public class OrganizationActivityService {
 
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
+    @Inject @Lazy
     private ActivityService activityService;
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -196,10 +200,12 @@ public class OrganizationActivityService extends MongoBaseService {
     private ReasonCodeService reasonCodeService;
     @Inject
     private TimeSlotSetService timeSlotSetService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private AutoFillGapSettingsService autoFillGapSettingsService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         Activity activityCopied;
         if (checked) {
@@ -249,7 +255,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     private Activity removeActivityFromUnity(Long unitId, BigInteger activityId) {
         Activity activityCopied;
         activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
@@ -293,9 +299,6 @@ public class OrganizationActivityService extends MongoBaseService {
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
-            if(isNull(activityTagDTO.getTranslations())){
-                activityTagDTO.setTranslations(new HashMap<>());
-            }
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             boolean activityCanBeCopied = ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
                     (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))));
@@ -308,7 +311,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public Map<String, TranslationInfo> updateUnitActivityTranslationDetails(BigInteger activityId, Long unitId, Map<String, TranslationInfo> activityTranslationMap){
         Activity activity = activityMongoRepository.findByIdAndUnitIdAndDeleted(activityId,unitId,false);
         if(isNull(activity)) {
@@ -360,7 +363,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     //TODO Need to make sure that its fine to not copy expertise/skills/employmentTypes
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     private Activity copyAllActivitySettingsInUnit(Activity activity, Long unitId) {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
@@ -381,7 +384,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityCopied;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateGeneralTab(ActivityGeneralSettingsDTO generalDTO, Long unitId) {
         validateActivityOnGeneralDetailsUpdate(generalDTO, unitId);
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
@@ -486,7 +489,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(), activityDTO.getEndDate());
@@ -566,10 +569,11 @@ public class OrganizationActivityService extends MongoBaseService {
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         reasonCodeService.createReasonCodeForUnit(unitId,orgTypeAndSubTypeDTO.getCountryId());
         counterDistService.createDefaultCategory(unitId);
+        autoFillGapSettingsService.createDefaultAutoFillGapSettings(unitId, orgTypeAndSubTypeDTO, phases);
         return true;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     private void createActivityforOrganisation(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases) {
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
@@ -608,7 +612,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activity.getActivityPhaseSettings().setPhaseTemplateValues(phaseTemplateValues);
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }
-            save(activityCopiedList);
+            activityMongoRepository.saveEntities(activityCopiedList);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             activitySchedulerJobService.registerJobForActivityCutoff(activityCopiedList);
@@ -651,7 +655,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setExpertises(expertiseIds);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityGeneralSettings addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity =activityService.findActivityById(activityId);
         byte[] bytes = file.getBytes();
@@ -663,7 +667,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityMongoRepository.save(activity);
         return activity.getActivityGeneralSettings();
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityGeneralSettings addIconInActivity(Long unitId,BigInteger activityId, MultipartFile file) throws IOException {
         return this.addIconInActivity(activityId,file);
     }
@@ -672,20 +676,13 @@ public class OrganizationActivityService extends MongoBaseService {
         return this.addIconInActivity(activityId,file);
     }
 
-    public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId) {
+    public PhaseActivityDTO getActivityAndPhaseByUnitId(Long unitId) {
         SelfRosteringMetaData publicHolidayDayTypeWrapper = getSelfRosteringMetaData(unitId);
-        List<DayTypeDTO> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();
-        LocalDate date = LocalDate.now();
-        int year = date.getYear();
-        TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
-        int currentWeek = date.get(weekOfWeekBasedYear);
-        // Set access Role of staff
-        ReasonCodeWrapper reasonCodeWrapper = publicHolidayDayTypeWrapper.getReasonCodeWrapper();
-        List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
-        List<PhaseWeeklyDTO> phaseWeeklyDTOS = getPhaseWeeklyDTO(phaseDTOs,currentWeek,year);
-        // Creating dummy next remaining 2 years as PHASE with lowest sequence
-        createDummyPhase(year, currentWeek, phaseDTOs, phaseWeeklyDTOS);
-        return getPhaseActivityDTO(unitId, publicHolidayDayTypeWrapper, dayTypes, reasonCodeWrapper, phaseDTOs, phaseWeeklyDTOS);
+        List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
+        List<ActivityPhaseSettings> activityPhaseSettings = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId, new ArrayList<>(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().getAccessGroupIds()));
+        Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
+        LocalDate gracePeriodEndDate = getGracePeriodExpireDate(phase,publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().isManagement());
+        return PhaseActivityDTO.builder().activities(activities).activityPhaseSettings(activityPhaseSettings).gracePeriodExpireDate(gracePeriodEndDate).reasonCodes(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getReasonCodes()).staffAccessRole(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO()).build();
     }
 
     private SelfRosteringMetaData getSelfRosteringMetaData(long unitId) {
@@ -741,11 +738,11 @@ public class OrganizationActivityService extends MongoBaseService {
         PlanningPeriod firstRequestPlanningPeriod = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
         LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
         List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
-        List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
+        List<ActivityConfigurationDTO> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
         Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
         LocalDate gracePeriodEndDate= getGracePeriodExpireDate(phase,reasonCodeWrapper.getUserAccessRoleDTO().isManagement());
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
-                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, activityPhaseSettings, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class),gracePeriodEndDate);
+                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, activityPhaseSettings, activityConfigurations,gracePeriodEndDate);
     }
 
     private LocalDate getGracePeriodExpireDate(Phase phase,boolean management) {
@@ -774,7 +771,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return activity.getActivityNotesSettings();
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityNotesSettings addDocumentInNotesTab(Long unitId, BigInteger activityId, MultipartFile file) throws IOException{
         return this.addDocumentInNotesTab(activityId,file);
     }
@@ -799,7 +796,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         return new ActivitySettingsWrapper(activityCommunicationSettings);
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateCommunicationTabOfActivity(Long unitId,CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg){
         return this.updateCommunicationTabOfActivity(communicationActivityDTO,updateFromOrg);
     }
@@ -877,8 +874,8 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public  Map<String,Set<BigInteger>> getShowOnCallAndStandByActivityId(Long unitId,boolean showStandBy,boolean showOnCall){
         Map<String,Set<BigInteger>> showOnCallAndStandByActivityIds = new HashMap<>();
-        showOnCallAndStandByActivityIds.put("showStandBy", showStandBy ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, showStandBy, false) : newHashSet());
-        showOnCallAndStandByActivityIds.put("showOnCall", showOnCall ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, false, showOnCall) : newHashSet());
+        showOnCallAndStandByActivityIds.put("showStandBy", showStandBy ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, UnityActivitySetting.STAND_BY) : newHashSet());
+        showOnCallAndStandByActivityIds.put("showOnCall", showOnCall ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, UnityActivitySetting.ON_CALL) : newHashSet());
         return showOnCallAndStandByActivityIds;
     }
 
@@ -890,5 +887,89 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCategory.setTranslations(activityCategoryTranslationMap);
         activityCategoryRepository.save(activityCategory);
         return activityCategory.getTranslations();
+    }
+
+    public Map<BigInteger, ActivityWrapper> getActivityWrapperMap(List<Shift> shifts, ShiftDTO shiftDTO) {
+        Set<BigInteger> activityIds = new HashSet<>();
+        for (Shift shift : shifts) {
+            getActivityIdsByShift(activityIds, shift);
+            if(isNotNull(shift.getDraftShift())){
+                getActivityIdsByShift(activityIds, shift.getDraftShift());
+            }
+        }
+        if (isNotNull(shiftDTO)) {
+            activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shiftDTO.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        }
+        List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        return activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+    }
+
+    private void getActivityIdsByShift(Set<BigInteger> activityIds, Shift shift) {
+        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        if(isCollectionNotEmpty(shift.getBreakActivities())){
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        }
+    }
+    public void updateBackgroundColorInShifts(TimeTypeDTO timeTypeDTO, String existingTimeTypeColor,BigInteger timeTypeId) {
+        if(!existingTimeTypeColor.equals(timeTypeDTO.getBackgroundColor())){
+            new Thread(() -> {
+                Set<BigInteger> activityIds = updateColorInActivity(timeTypeDTO, timeTypeId);
+                updateColorInShift(timeTypeDTO.getBackgroundColor(),activityIds);
+
+            }).start();
+
+        }
+    }
+    public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO,BigInteger timeTypeId) {
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity -> {
+                activity.getActivityGeneralSettings().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                activity.getActivityRulesSettings().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+                if(isNotNull(timeTypeDTO.getActivityRulesSettings())){
+                    activity.getActivityRulesSettings().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getActivityRulesSettings().getSicknessSetting(), SicknessSetting.class));
+                }
+            });
+            activityMongoRepository.saveEntities(activities);
+        }
+        return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
+    }
+    private void updateColorInShift(String newTimeTypeColor,Set<BigInteger> activityIds) {
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
+        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+            updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
+            if(isNotNull(shift.getDraftShift())){
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, draftShiftActivity));
+            }
+        }));
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
+    }
+    private void updateBackgroundColorInShiftActivity(String newTimeTypeColor, Set<BigInteger> activitiyIds, ShiftActivity shiftActivity) {
+        if(activitiyIds.contains(shiftActivity.getActivityId())){
+            shiftActivity.setBackgroundColor(newTimeTypeColor);
+        }
+        shiftActivity.getChildActivities().forEach(childActivity -> {
+            if(activitiyIds.contains(childActivity.getActivityId())){
+                childActivity.setBackgroundColor(newTimeTypeColor);
+            }
+        });
+    }
+    public void validateActivityTimeRules( Short shortestTime, Short longestTime) {
+        if (shortestTime != null && longestTime != null && shortestTime > longestTime) {
+            exceptionService.actionNotPermittedException(SHORTEST_TIME_GREATER_LONGEST);
+        }
+    }
+    public List<ActivityDTO> getAllAbsenceActivity(Long unitId) {
+        List<ActivityDTO> activityDTOS = new ArrayList<>(activityMongoRepository.findAbsenceActivityByUnitId(unitId));
+        List<ActivityDTO> filterActivityDto=activityDTOS.stream().filter(activityDTO -> activityDTO.getActivitySequence()>0).collect(Collectors.toList());
+        activityDTOS.removeAll(filterActivityDto);
+        filterActivityDto.sort(Comparator.comparing(ActivityDTO :: getActivitySequence));
+        filterActivityDto.addAll(activityDTOS);
+        return filterActivityDto;
     }
 }

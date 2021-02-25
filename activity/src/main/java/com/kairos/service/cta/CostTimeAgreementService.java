@@ -231,9 +231,6 @@ public class CostTimeAgreementService {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
         ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
-            if(isNull(ctaRuleTemplateDTO.getTranslations())){
-                ctaRuleTemplateDTO.setTranslations(new HashMap<>());
-            }
             ctaRuleTemplateDTO.setUnitId(unitId);
         });
         return ctaRuleTemplateDTOS;
@@ -251,11 +248,6 @@ public class CostTimeAgreementService {
         if (ctaResponseDTO != null) {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
-        ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
-             if(isNull(ctaRuleTemplateDTO.getTranslations())){
-                 ctaRuleTemplateDTO.setTranslations(new HashMap<>());
-             }
-        });
         return ctaRuleTemplateDTOS;
     }
 
@@ -517,13 +509,7 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
-       List<CTAResponseDTO> ctaResponseDTOS =costTimeAgreementRepository.findCTAByCountryId(countryId);
-       ctaResponseDTOS.forEach(ctaResponseDTO -> {
-           if(isNull(ctaResponseDTO.getTranslations())){
-               ctaResponseDTO.setTranslations(new HashMap<>());
-           }
-       });
-       return ctaResponseDTOS;
+       return costTimeAgreementRepository.findCTAByCountryId(countryId);
     }
 
     /**
@@ -533,9 +519,6 @@ public class CostTimeAgreementService {
     public List<CTAResponseDTO> loadAllCTAByUnit(Long unitId) {
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.findCTAByUnitId(unitId);
         ctaResponseDTOS.forEach(ctaResponseDTO -> {
-            if(isNull(ctaResponseDTO.getTranslations())){
-                ctaResponseDTO.setTranslations(new HashMap<>());
-            }
             ctaResponseDTO.setUnitId(unitId);
         });
         return ctaResponseDTOS;
@@ -778,7 +761,6 @@ public class CostTimeAgreementService {
             if(costTimeAgreement.getStartDate().isAfter(employmentLinesDTO.getStartDate())){
                 costTimeAgreement.setStartDate(employmentLinesDTO.getStartDate());
             }
-            break;
         }
         if(isNull(employmentLinesDTO.getEndDate()) && !costTimeAgreements1.isEmpty()){
             costTimeAgreements1.get(costTimeAgreements1.size()-1).setEndDate(null);

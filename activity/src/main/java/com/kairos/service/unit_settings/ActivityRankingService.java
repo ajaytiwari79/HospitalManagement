@@ -76,10 +76,6 @@ public class ActivityRankingService {
         }
     }
 
-    /*
-          Request 2 rules A, B 30-12-2020
-          Request 1 rules C    8-01
-     */
 
     public boolean deleteActivityRanking(BigInteger id){
         ActivityRanking activityRanking = activityRankingRepository.findOne(id);

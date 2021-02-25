@@ -1,6 +1,7 @@
 package com.kairos.controller.auth;
 
 import com.kairos.dto.user.auth.UserDetailsDTO;
+import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -179,7 +180,9 @@ public class AuthController {
 
     @RequestMapping(value = UNIT_URL + "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getPermissions(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(unitId, UserContext.getUserDetails().getId()));
+        UnitWiseStaffPermissionsDTO unitWiseStaffPermissionsDTO= userService.getPermission(unitId, UserContext.getUserDetails().getId());
+        userService.updateLastSelectedOrganizationIdAndCountryId(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitWiseStaffPermissionsDTO);
     }
 
     @PreAuthorize("hasPermission()")
@@ -190,7 +193,6 @@ public class AuthController {
         userInfo.put("credentials", UserContext.getUserDetails().getId());
         userInfo.put("clientId", user.getOAuth2Request().getClientId());
         userInfo.put("user12", user.getPrincipal());
-
         return userInfo;
     }
 

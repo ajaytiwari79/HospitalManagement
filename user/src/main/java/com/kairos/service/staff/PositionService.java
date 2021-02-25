@@ -5,7 +5,6 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -55,8 +54,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -369,7 +366,9 @@ public class PositionService {
                     for (QueryResult queryResult : list) {
                         if (queryResult.getId() == id) {
                             List<QueryResult> childs = queryResult.getChildren();
-                            QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
+                            Map<String, Object> data= (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get(CHILD);
+                            TranslationUtil.convertTranslationFromStringToMap(data);
+                            QueryResult child = objectMapper.convertValue(data, QueryResult.class);
                             child.setTranslations(unit.getTranslations());
                             position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
                             if (position != null && !position.isEmpty()) {
