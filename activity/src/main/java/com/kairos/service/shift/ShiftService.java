@@ -984,6 +984,10 @@ public class ShiftService {
         return shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId, startDate, endDate);
     }
 
+    public List<Shift> findShiftBetweenDurationByStaffIdAndByTimeType(Long staffId, Date startDate, Date endDate,Set<TimeTypeEnum> timeTypeEnums){
+        return shiftMongoRepository.findShiftBetweenDurationByStaffIdAndByTimeType(staffId, startDate, endDate,timeTypeEnums);
+    }
+
     public Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting, List<Long> staffIds){
         return shiftMongoRepository.getNotEligibleStaffsForCoverShifts(startDate,endDate,coverShiftSetting,staffIds);
     }
