@@ -15,7 +15,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @Service
 public class ShiftHelperService {
 
-    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
 
     @Async
     public void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
@@ -29,23 +30,21 @@ public class ShiftHelperService {
     private void updateShiftActivityBackGroundColor(Activity activity, TimeType timeType, List<Shift> shifts) {
         shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
             if (shiftActivity.getActivityId().equals(activity.getId())) {
-                if(isNotNull(timeType)) {
+                if (isNotNull(timeType)) {
                     shiftActivity.setBackgroundColor(timeType.getBackgroundColor());
                     shiftActivity.setSecondLevelTimeType(timeType.getSecondLevelType());
-                }else {
-                    shiftActivity.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
-                    shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
                 }
+                shiftActivity.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
+                shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
             }
             shiftActivity.getChildActivities().forEach(childActivity -> {
                 if (childActivity.getActivityId().equals(activity.getId())) {
-                    if(isNotNull(timeType)) {
+                    if (isNotNull(timeType)) {
                         childActivity.setBackgroundColor(timeType.getBackgroundColor());
                         childActivity.setSecondLevelTimeType(timeType.getSecondLevelType());
-                    }else {
-                        shiftActivity.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
-                        shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
                     }
+                    shiftActivity.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
+                    shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
                 }
             });
         }));
