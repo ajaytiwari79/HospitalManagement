@@ -102,6 +102,7 @@ public class ActivityRankingService {
         ActivityRanking parentActivityRanking = activityRankingRepository.findByDraftIdAndPriorityForAndDeletedFalse(activityRanking.getId(), activityRanking.getPriorityFor());
         ActivityRanking lastActivityRanking = activityRankingRepository.findTopByExpertiseIdAndPriorityForAndDeletedFalseOrderByStartDateDesc(activityRanking.getExpertiseId(), activityRanking.getPriorityFor());
         boolean onGoingUpdated = false;
+
         if (lastActivityRanking != null && publishedDate.isAfter(lastActivityRanking.getStartDate()) && lastActivityRanking.getEndDate() == null) {
             lastActivityRanking.setEndDate(publishedDate.minusDays(1));
             activityRankingRepository.save(lastActivityRanking);
