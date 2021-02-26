@@ -29,8 +29,6 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId);
-
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);
 
     List<ActivityTagDTO> findAllowChildActivityByCountryId(long countryId);
@@ -48,8 +46,6 @@ public interface CustomActivityMongoRepository {
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
     List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
-
-    List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
 
     @Cacheable(value = "findAllActivityByUnitIdWithCompositeActivities", key = "#unitId", cacheManager = "cacheManager")
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId);
@@ -95,8 +91,6 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(Long orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds);
-
     List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds);
 
     boolean existsByActivityIdInChildActivities(BigInteger activityId);
@@ -105,18 +99,12 @@ public interface CustomActivityMongoRepository {
 
     boolean unassignCompositeActivityFromActivitiesByactivityId(BigInteger activityId);
 
-    List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
-
-    ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
-
     List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId);
 
     TimeTypeEnum findTimeTypeByActivityId(BigInteger activityId);
 
     List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId);
     List<ActivityDTO> getActivityRankWithRankByUnitId(Long unitId);
-
-    List<ActivityDTO> findActivitiesByUnitId(Long unitId, Collection<BigInteger> activityIds);
 
     List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum secondLevelTimeType, Long unitId);
 
@@ -130,5 +118,4 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId,Long staffId,boolean isActivityType);
     List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
-    List<ActivityDTO> findActivitiesWithTimeTypeByActivityId(Collection<BigInteger> activityIds);
 }

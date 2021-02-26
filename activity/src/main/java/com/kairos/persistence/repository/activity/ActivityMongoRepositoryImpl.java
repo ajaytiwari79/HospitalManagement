@@ -94,15 +94,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(UNDERSCORE_ID).is(activityId).and(DELETED).is(false))
-        );
-        AggregationResults<CompositeActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, CompositeActivityDTO.class);
-        return result.getMappedResults();
-
-    }
-
     public List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)),
@@ -221,13 +212,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
 
     }
-
-    public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds) {
-        Aggregation aggregation = getParentActivityAggregation(Criteria.where(UNDERSCORE_ID).in(activityIds).and(DELETED).is(false));
-        AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
-        return result.getMappedResults();
-    }
-
 
     public List<ActivityDTO> getAllActivityWithTimeType(List<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -607,20 +591,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    @Override
-    public List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(AppConstants.ID).in(activityIds).and(DELETED).is(false).and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).nin(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK)),
-                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID,
-                        TIME_TYPE1),
-                project().and(AppConstants.ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME)
-                        .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB)
-                        .and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
-                        .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
-        );
-        AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
-        return result.getMappedResults();
-    }
 
     @Override
     public List<ActivityDTO> findChildActivityActivityIds(Set<BigInteger> activityIds) {
@@ -639,11 +609,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public boolean existsByActivityIdInChildActivities(BigInteger activityId) {
         Query query = new Query(Criteria.where(CHILD_ACTIVITY_IDS).is(activityId).and(DELETED).is(false).and(STATE).is(ActivityStateEnum.PUBLISHED));
         return isNotNull(mongoTemplate.findOne(query, Activity.class));
-    }
-
-    public List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds) {
-        Query query = new Query(Criteria.where(UNDERSCORE_ID).ne(activityId).and(CHILD_ACTIVITY_IDS).in(allowedActivityIds).and(DELETED).is(false).and(STATE).is(ActivityStateEnum.PUBLISHED));
-        return mongoTemplate.find(query, Activity.class);
     }
 
     private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel,boolean groupByCategory) {
@@ -752,24 +717,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId) {
-        String project = $_PROJECT_ID_1_CHILD_ACTIVITIES_$_FILTER_INPUT_$_CHILD_ACTIVITIES_AS_CHILD_ACTIVITY_COND_$_EQ_$$_CHILD_ACTIVITY_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL_TRUE;
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(UNDERSCORE_ID).is(activityId).and(DELETED).is(false)),
-                lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID, CHILD_ACTIVITIES),
-                unwind(CHILD_ACTIVITIES),
-                match(Criteria.where(CHILD_ACTIVITIES_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL).is(true)),
-                group(DOLLAR_ID)
-                        .addToSet(CHILD_ACTIVITIES).as(CHILD_ACTIVITIES),
-                new CustomAggregationOperation(Document.parse(project)),
-                project(AppConstants.ID, CHILD_ACTIVITIES)
-                        .and(CHILD_ACTIVITIES_ID).as(CHILD_ACTIVITY_IDS)
-        );
-
-        return mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class).getUniqueMappedResult();
-    }
-
-    @Override
     public List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),
@@ -816,20 +763,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
                 project()
-                        .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
-        );
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return result.getMappedResults();
-    }
-
-    @Override
-    public List<ActivityDTO> findActivitiesByUnitId(Long unitId,Collection<BigInteger> activityIds) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(UNDERSCORE_ID).in(activityIds)),
-                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY),
-                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
-                        .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
-                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
@@ -907,35 +840,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         aggregations[i++] = getCustomAggregationOperationForActivities();
         aggregations[i++] = new CustomAggregationOperation("{\"$unwind\": \"$activities\"}");
         aggregations[i++] = getCustomAggregationOperationForReplaceActivity();
-        aggregations[i++] = getCustomAggregationOperationForStaffActivitySetting();
+        aggregations[i++] = getCustomAggregationOperationForStaffActivitySetting(staffId);
         aggregations[i++] = getCustomAggregationOperationForMatchCount();
         return mongoTemplate.aggregate(Aggregation.newAggregation(aggregations), STAFF_ACTIVITY_SETTING, ActivityWithCompositeDTO.class).getMappedResults();
-    }
-
-    @Override
-    public List<ActivityDTO> findActivitiesWithTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityDTOS(Criteria.where("id").in(activityIds).and(DELETED).is(false));
-    }
-
-    private List<ActivityDTO> getActivityDTOS(Criteria criteria) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID,
-                        TIME_TYPE1),
-                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
-                        ACTIVITY_PRIORITY),
-                unwind(ACTIVITY_PRIORITY,true),
-                unwind(TIME_TYPE1)
-        );
-        return mongoTemplate.aggregate(aggregation, Activity.class,ActivityDTO.class).getMappedResults();
     }
 
     private CustomAggregationOperation getCustomAggregationOperationForMatchCount() {
         return new CustomAggregationOperation(USED_COUNT);
     }
 
-    private CustomAggregationOperation getCustomAggregationOperationForStaffActivitySetting() {
-        return new CustomAggregationOperation(MOST_USED_COUNT);
+    private CustomAggregationOperation getCustomAggregationOperationForStaffActivitySetting(Long staffId) {
+        return new CustomAggregationOperation(getMostlyUsedCount(staffId));
     }
 
     private CustomAggregationOperation getCustomAggregationOperationForReplaceActivity() {
@@ -992,5 +907,48 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "    }\n" +
                 "  }");
     }
+
+
+    private String getMostlyUsedCount(Long staffId){
+                return "{\n" +
+                "      \"$lookup\": {\n" +
+                "        \"from\": \"staffActivityDetails\",\n" +
+                "        \"let\": {\n" +
+                "          \"staffId\": "+staffId+",\n" +
+                "          \"activityId\": \"$_id\"\n" +
+                "        },\n" +
+                "        \"pipeline\": [\n" +
+                "          {\n" +
+                "            \"$match\": {\n" +
+                "              \"$expr\": {\n" +
+                "                \"$and\": [\n" +
+                "                  {\n" +
+                "                    \"$eq\": [\n" +
+                "                      \"$staffId\",\n" +
+                "                      \"$$staffId\"\n" +
+                "                    ]\n" +
+                "                  },\n" +
+                "                  {\n" +
+                "                    \"$gte\": [\n" +
+                "                      \"$activityId\",\n" +
+                "                      \"$$activityId\"\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            }\n" +
+                "          },\n" +
+                "          {\n" +
+                "            \"$project\": {\n" +
+                "              \"useActivityCount\": 1,\n" +
+                "              \"_id\": 0\n" +
+                "            }\n" +
+                "          }\n" +
+                "        ],\n" +
+                "        \"as\": \"useActivityCount\"\n" +
+                "      }\n" +
+                "    }";
+    }
+
 
 }
