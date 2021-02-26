@@ -81,8 +81,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 and(NEXT_PHASE_DATA_NAME).as(NEXT_PHASE);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(ACTIVE).is(true).and(UNIT_ID).is(unitId)),
-                lookup(PHASES, CURRENT_PHASE_ID, _ID, CURRENT_PHASE_DATA),
-                lookup(PHASES, NEXT_PHASE_ID, _ID, NEXT_PHASE_DATA),
+                lookup(PHASES, CURRENT_PHASE_ID, ID1, CURRENT_PHASE_DATA),
+                lookup(PHASES, NEXT_PHASE_ID, ID1, NEXT_PHASE_DATA),
                 sort(Sort.Direction.ASC, START_DATE),
                 projectionOperation
         );
@@ -108,8 +108,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(ACTIVE).is(true).
                         and(START_DATE).lte(endDate).and(END_DATE).gte(startDate)),
-                lookup(PHASES, CURRENT_PHASE_ID, _ID, CURRENT_PHASE_DATA),
-                lookup(PHASES, NEXT_PHASE_ID, _ID, NEXT_PHASE_DATA),
+                lookup(PHASES, CURRENT_PHASE_ID, ID1, CURRENT_PHASE_DATA),
+                lookup(PHASES, NEXT_PHASE_ID, ID1, NEXT_PHASE_DATA),
                 sort(Sort.Direction.ASC, START_DATE),
                 projectionOperation
         );
@@ -134,8 +134,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup(PHASES, CURRENT_PHASE_ID, _ID, CURRENT_PHASE_DATA),
-                lookup(PHASES, NEXT_PHASE_ID, _ID, NEXT_PHASE_DATA),
+                lookup(PHASES, CURRENT_PHASE_ID, ID1, CURRENT_PHASE_DATA),
+                lookup(PHASES, NEXT_PHASE_ID, ID1, NEXT_PHASE_DATA),
                 sort(Sort.Direction.ASC, START_DATE),
                 projectionOperation
         );
@@ -164,7 +164,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName) {
         Aggregation aggregation = newAggregation(
                 match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(ACTIVE).is(true)),
-                lookup(PHASES, CURRENT_PHASE_ID, _ID, "phase_name"),
+                lookup(PHASES, CURRENT_PHASE_ID, ID1, "phase_name"),
                 match(Criteria.where("phase_name.name").is(requestPhaseName)),
                 sort(Sort.Direction.ASC, START_DATE)
         );
@@ -177,7 +177,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Aggregation aggregation = newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(ACTIVE).is(true).
                         and(START_DATE).lte(dateLiesInPeriod).and(END_DATE).gte(dateLiesInPeriod)),
-                lookup(PHASES, CURRENT_PHASE_ID, _ID, PHASE),
+                lookup(PHASES, CURRENT_PHASE_ID, ID1, PHASE),
                 project().and(PHASE).arrayElementAt(0).as(PHASE),
                 project("phase._id", "phase.name","phase.phaseEnum","phase.accessGroupIds","phase.organizationId")
         );
@@ -243,7 +243,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(START_DATE).gte(LocalDate.now())),
-                lookup(PHASES, CURRENT_PHASE_ID, _ID, PHASE),
+                lookup(PHASES, CURRENT_PHASE_ID, ID1, PHASE),
                 project(UNIT_ID, END_DATE).and(PHASE).arrayElementAt(0).as(PHASE),
                 match(Criteria.where("phase.phaseEnum").is(PhaseDefaultName.REQUEST)),
                 group(UNIT_ID).first(END_DATE).as(END_DATE)
@@ -257,7 +257,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO){
         String breakActivityIdString = getBigIntegerString(shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().stream().map(breakSettingsDTO -> breakSettingsDTO.getActivityId()).collect(Collectors.toSet()).iterator());
         Aggregation aggregation = newAggregation(
-                match(Criteria.where(_ID).is(shiftPlanningProblemSubmitDTO.getPlanningPeriodId())),
+                match(Criteria.where(ID1).is(shiftPlanningProblemSubmitDTO.getPlanningPeriodId())),
                 getlookupOperationOfShiftsForPlanning(shiftPlanningProblemSubmitDTO.getStaffIds()),
                 getStaffingLevelLookupForPlanning(),
                 new CustomAggregationOperation(Document.parse("{$addFields: { activityIds:\"$staffingLevels.presenceStaffingLevelInterval.staffingLevelActivities.activityId\"}}")),

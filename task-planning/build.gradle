@@ -35,3 +35,7 @@ dependencies {
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 }
+
+sonarqube {
+    skipProject = true
+}

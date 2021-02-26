@@ -81,12 +81,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(TAG, TAGS, UNDERSCORE_ID, TAGS_DATA),
                 unwind(TAGS_DATA, true),
                 group(DOLLAR_ID)
-                        .first($_NAME).as(NAME)
-                        .first($_DESCRIPTION).as(DESCRIPTION)
-                        .first($_UNIT_ID).as(UNIT_ID)
-                        .first($_PARENT_ID).as(PARENT_ID)
+                        .first(ActivityConstants.NAME).as(NAME)
+                        .first(ActivityConstants.DESCRIPTION).as(DESCRIPTION)
+                        .first(ActivityConstants.UNIT_ID).as(UNIT_ID)
+                        .first(ActivityConstants.PARENT_ID).as(PARENT_ID)
                         .first(GENERAL_ACTIVITY_TAB).as(GENERAL_ACTIVITY_TAB)
-                        .first($_ACTIVITY_PRIORITY_ID).as(ACTIVITY_PRIORITY_ID)
+                        .first(ActivityConstants.ACTIVITY_PRIORITY_ID).as(ACTIVITY_PRIORITY_ID)
                         .push(TAGS_DATA).as(TAGS)
 
         );
@@ -272,7 +272,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<Long> staffIds = null;
         if(isCollectionNotEmpty(result)){
             Map<String,List> stringListMap = result.get(0);
-             nonProductiveTypeActivityIds = (List<BigInteger>)ObjectMapperUtils.copyCollectionPropertiesByMapper(stringListMap.get(_ID),BigInteger.class);
+             nonProductiveTypeActivityIds = (List<BigInteger>)ObjectMapperUtils.copyCollectionPropertiesByMapper(stringListMap.get(ID1),BigInteger.class);
             staffIds = stringListMap.get(STAFF_IDS);
         }
         return new List[]{nonProductiveTypeActivityIds,staffIds};
@@ -446,7 +446,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private List<ActivityWrapper> getParentActivityWrappersByCriteria(Criteria criteria) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID,
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, ID1,
                         TIME_TYPE1),
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
                         ACTIVITY_PRIORITY),
@@ -475,7 +475,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private List<ActivityWrapper> getActivityWrappersByCriteria(Criteria criteria) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID,
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, ID1,
                         TIME_TYPE1),
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
                         ACTIVITY_PRIORITY),
@@ -720,7 +720,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         String project = PROJECT;
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),
-                project(AppConstants.ID).and($_ACTIVITY_PHASE_SETTINGS_PHASE_TEMPLATE_VALUES).as(PHASE_TEMPLATE_VALUES),
+                project(AppConstants.ID).and(ACTIVITY_PHASE_SETTINGS_PHASE_TEMPLATE_VALUES).as(PHASE_TEMPLATE_VALUES),
                 unwind(PHASE_TEMPLATE_VALUES),
                 match(Criteria.where(PHASE_TEMPLATE_VALUES_ACTIVITY_SHIFT_STATUS_SETTINGS_ACCESS_GROUP_IDS).in(accessGroupIds)),
                 unwind(PHASE_TEMPLATE_VALUES_ACTIVITY_SHIFT_STATUS_SETTINGS),
@@ -753,7 +753,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId) {
-        String project = $_PROJECT_ID_1_CHILD_ACTIVITIES_$_FILTER_INPUT_$_CHILD_ACTIVITIES_AS_CHILD_ACTIVITY_COND_$_EQ_$$_CHILD_ACTIVITY_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL_TRUE;
+        String project = PROJECT_ID_1_CHILD_ACTIVITIES_$_FILTER_INPUT_$_CHILD_ACTIVITIES_AS_CHILD_ACTIVITY_COND_$_EQ_$$_CHILD_ACTIVITY_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL_TRUE;
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNDERSCORE_ID).is(activityId).and(DELETED).is(false)),
                 lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID, CHILD_ACTIVITIES),
@@ -849,7 +849,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 graphLookup(TIME_TYPE).
                         startWith("$activityBalanceSettings.timeTypeId")
                         .connectFrom("upperLevelTimeTypeId")
-                        .connectTo(_ID)
+                        .connectTo(ID1)
                         .maxDepth(3)
                         .depthField("numofchild")
                         .as("patharray"),
@@ -920,7 +920,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private List<ActivityDTO> getActivityDTOS(Criteria criteria) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID,
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, ID1,
                         TIME_TYPE1),
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
                         ACTIVITY_PRIORITY),
