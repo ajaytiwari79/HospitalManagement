@@ -25,7 +25,7 @@ public class PlanningPeriodConstants {
     public static final String PHASE_ID = "phaseId";
     public static final String CURRENT_PHASE_NAME = "currentPhaseName";
     public static final String NEXT_PHASE_NAME = "nextPhaseName";
-    public static final String _ID = "_id";
+    public static final String ID1 = "_id";
     public static final String NEXT_PHASE = "nextPhase";
     public static final String DATA = "data";
     public static final String PROJECT_OPERATION = "{\"$project\":{\n" +
