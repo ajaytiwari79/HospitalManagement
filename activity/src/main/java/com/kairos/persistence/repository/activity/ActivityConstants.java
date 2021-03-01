@@ -51,11 +51,11 @@ public class ActivityConstants {
             "       \"activities\":1,\n" +
             "       \"_id\":0\n" +
             "       }}";
-    public static final String $_NAME = "$name";
-    public static final String $_DESCRIPTION = "$description";
-    public static final String $_UNIT_ID = "$unitId";
-    public static final String $_PARENT_ID = "$parentId";
-    public static final String $_ACTIVITY_PRIORITY_ID = "$activityPriorityId";
+    public static final String NAME = "$name";
+    public static final String DESCRIPTION = "$description";
+    public static final String UNIT_ID = "$unitId";
+    public static final String PARENT_ID = "$parentId";
+    public static final String ACTIVITY_PRIORITY_ID = "$activityPriorityId";
     public static final String TAGS = "tags";
     public static final String TAG = "tag";
     public static final String TIME_TYPE_ACTIVITY_CAN_BE_COPIED_FOR_ORGANIZATION_HIERARCHY = "timeType.activityCanBeCopiedForOrganizationHierarchy";
@@ -81,7 +81,7 @@ public class ActivityConstants {
     public static final String ACTIVITY_RULES_SETTINGS_SICKNESS_SETTING_VALID = "activityRulesSettings.sicknessSettingValid";
     public static final String ACTIVITY_CHILD_ACTIVITY_IDS = "activity.childActivityIds";
     public static final String ACTIVITY_ACTIVITY_PRIORITY_ID = "activity.activityPriorityId";
-    public static final String _ID = "_id";
+    public static final String ID1 = "_id";
     public static final String ACTIVITY_DESCRIPTION = "activity.description";
     public static final String ACTIVITY_COUNTRY_PARENT_ID = "activity.countryParentId";
     public static final String GROUP = "{  \n" +
@@ -176,8 +176,8 @@ public class ActivityConstants {
             "$project : { \"_id\":1,\"name\":1,\"depthField\":1,\"patharray._id\":1,\"patharray.label\":1,\"patharray.upperLevelTimeTypeId\":1,\"patharray.timeTypes\":1 }\n" +
             "}";
     public static final String CHILD_ACTIVITIES_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL = "childActivities.activityRulesSettings.eligibleForStaffingLevel";
-    public static final String $_PROJECT_ID_1_CHILD_ACTIVITIES_$_FILTER_INPUT_$_CHILD_ACTIVITIES_AS_CHILD_ACTIVITY_COND_$_EQ_$$_CHILD_ACTIVITY_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL_TRUE = "{'$project':{'_id':1,'childActivities':{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }} }}";
-    public static final String $_ACTIVITY_PHASE_SETTINGS_PHASE_TEMPLATE_VALUES = "$activityPhaseSettings.phaseTemplateValues";
+    public static final String PROJECT_ID_1_CHILD_ACTIVITIES_$_FILTER_INPUT_$_CHILD_ACTIVITIES_AS_CHILD_ACTIVITY_COND_$_EQ_$$_CHILD_ACTIVITY_ACTIVITY_RULES_SETTINGS_ELIGIBLE_FOR_STAFFING_LEVEL_TRUE = "{'$project':{'_id':1,'childActivities':{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }} }}";
+    public static final String ACTIVITY_PHASE_SETTINGS_PHASE_TEMPLATE_VALUES = "$activityPhaseSettings.phaseTemplateValues";
     public static final String CHILD_ACTIVITIES_ACTIVITY_PRIORITY = "childActivities.activityPriority";
     public static final String CHILD_ACTIVITIES_TRANSLATIONS = "childActivities.translations";
     public static final String CHILD_ACTIVITIES_NAME = "childActivities.name";
