@@ -40,6 +40,11 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.ACTIVITY_PRIORITY_ID;
+import static com.kairos.constants.AppConstants.DESCRIPTION;
+import static com.kairos.constants.AppConstants.NAME;
+import static com.kairos.constants.AppConstants.PARENT_ID;
+import static com.kairos.constants.AppConstants.UNIT_ID;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -955,7 +960,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     private CustomAggregationOperation getCustomLookUpForActivityAggregationOperation(String activityString,boolean isActivityType,Long unitId) {
-        String condition = isActivityType ? $_NE_$_CHILD_ACTIVITY_IDS : "";
+        String condition = isActivityType ? "" : "";
         return new CustomAggregationOperation("{\n" +
                 "    \"$lookup\": {\n" +
                 "      \"from\": \"activities\",\n" +
