@@ -177,14 +177,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first(ActivityConstants.UNIT_ID).as(UNIT_ID)
                         .first(ActivityConstants.PARENT_ID).as(PARENT_ID)
                         .first(GENERAL_ACTIVITY_TAB).as(GENERAL_ACTIVITY_TAB)
-<<<<<<< HEAD
-                        .push(TAGS_DATA).as("tags")
-=======
-                        .first(ActivityConstants.ACTIVITY_PRIORITY_ID).as(ACTIVITY_PRIORITY_ID)
-                        .push(TAGS_DATA).as(TAGS)
->>>>>>> 83b6b405a7d34cd24189a1c487b28755442d8bbe
-
-        );
+                        .push(TAGS_DATA).as(TAGS));
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
     }
