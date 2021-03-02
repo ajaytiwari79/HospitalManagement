@@ -185,7 +185,7 @@ public class ShiftDetailsService {
         return activity;
     }
     public void updateTimingChanges(Shift oldShift, ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO) {
-        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().stream().filter(k -> "Minimum shift’s length".equals(k.getName()) || "Maximum shift’s length".equals(k.getName())).findAny().orElse(null);
+        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().stream().filter(k -> "Minimum shift’s length".equals(k.getName()) || "Maximum shift’s length".equals(k.getName()) || "Maximum night shift’s length".equals(k.getName())).findAny().orElse(null);
         if (isNotNull(workTimeAgreementRuleViolation)) {
             Map<String, Object> map = new HashMap<>();
             if (!oldShift.getStartDate().equals(shiftDTO.getStartDate())) {
@@ -199,7 +199,6 @@ public class ShiftDetailsService {
                 map.put("endDate", endDate);
                 map.put("shiftExtend", shiftExtends);
                 map.put("minutes", getMinutesBetweenDate(startDate, endDate));
-
             } else if (!oldShift.getEndDate().equals(shiftDTO.getEndDate())) {
                 Date startDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? shiftDTO.getEndDate() : oldShift.getEndDate();
                 Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
