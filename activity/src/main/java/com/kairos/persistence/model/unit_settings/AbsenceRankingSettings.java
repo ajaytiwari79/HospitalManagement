@@ -6,8 +6,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -16,7 +15,8 @@ public class AbsenceRankingSettings extends MongoBaseEntity {
     private Long expertiseId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Map<BigInteger,Integer> activityRankings=new HashMap<>();
+    private Set<BigInteger> fullDayActivities=new LinkedHashSet<>();
+    private Set<BigInteger> fullWeekActivities=new LinkedHashSet<>();
     private Long countryId;
     private boolean published;
     // it's used to check in case of having draft copy

@@ -78,7 +78,7 @@ public class AbsenceRankingSettingsService {
 
     public AbsenceRankingDTO publishAbsenceRanking(BigInteger id, LocalDate publishedDate) {
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
-        if (absenceRankingSettings.getActivityRankings().isEmpty()) {
+        if (absenceRankingSettings.getFullDayActivities().isEmpty() && absenceRankingSettings.getFullWeekActivities().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
         }
         if (absenceRankingSettings.isPublished()) {

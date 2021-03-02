@@ -97,5 +97,4 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{countryId:?0, 'activityBalanceSettings.timeType':?1 , deleted:false}",fields ="{'_id':1,'name':1,'countryParentId':1}" )
     List<ActivityDTO> findAllAbsenceActivitiesByCountryId(Long countryId, TimeTypeEnum timeType);
-
 }
