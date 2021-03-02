@@ -755,7 +755,7 @@ public class ActivityService {
     @CacheEvict(value = "findAllActivityByCountry",allEntries = true)
     public boolean deleteCountryActivity(BigInteger activityId) {
         Activity activity =findActivityById(activityId);
-        if (activity.getState().equals(ActivityStateEnum.LIVE)) {
+        if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(EXCEPTION_ALREADYINUSE, ACTIVITY);
         }
         activity.setDeleted(true);
@@ -774,6 +774,7 @@ public class ActivityService {
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activity);
+
         return true;
     }
 
