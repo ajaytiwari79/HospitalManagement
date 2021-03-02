@@ -967,6 +967,7 @@ public class StaffService {
         staffToUpdate.setCareOfName(staffDTO.getCareOfName());
         staffToUpdate.setSignature(staffDTO.getSignature());
         Long contactId = staffToUpdate.getContactDetail().getId();
+        staffToUpdate.setCanRankTeam(staffDTO.isCanRankTeam());
         staffToUpdate.setContactDetail(ObjectMapperUtils.copyPropertiesByMapper(staffDTO.getContactDetail(), ContactDetail.class));
         staffToUpdate.getContactDetail().setId(contactId);
         staffToUpdate.getUser().setFirstName(staffDTO.getFirstName());
