@@ -16,7 +16,9 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
@@ -31,6 +33,11 @@ public class AbsenceRankingSettingsService {
 
     public AbsenceRankingDTO saveAbsenceRankingSettings(AbsenceRankingDTO absenceRankingDTO){
         AbsenceRankingSettings absenceRankingSettings= ObjectMapperUtils.copyPropertiesByMapper(absenceRankingDTO,AbsenceRankingSettings.class);
+        if(isCollectionEmpty(absenceRankingDTO.getFullDayActivities())){
+            Map<String,List<ActivityDTO>> activityMap=findAllAbsenceActivities();
+            absenceRankingSettings.setFullDayActivities(activityMap.get("fullDayActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
+            absenceRankingSettings.setFullWeekActivities(activityMap.get("fullWeekActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
+        }
         absenceRankingSettingsRepository.save(absenceRankingSettings);
         absenceRankingDTO.setId(absenceRankingSettings.getId());
         return absenceRankingDTO;

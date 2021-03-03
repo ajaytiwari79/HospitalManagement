@@ -48,9 +48,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{childActivityIds:?0, deleted:false}")
     Activity findByChildActivityId(BigInteger childActivityId);
 
-    @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
-    List<Activity> findByChildActivityIds(Collection<BigInteger> childActivityIds);
-
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'activityPhaseSettings':1 ,'activityRulesSettings':1,'name':1,'activityBalanceSettings':1,'activityTimeCalculationSettings':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Collection<BigInteger> activityIds);
 
@@ -85,9 +82,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeType':?1 , 'activityRulesSettings.approvalAllowedPhaseIds':?2, deleted:false}")
     List<Activity> findAllAbsenceActivities(Long unitId, TimeTypeEnum timeType, BigInteger phaseId);
-
-    @Query(value = "{'activityRulesSettings.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'activityRulesSettings':1,'unitId':1}")
-    List<Activity> findAllSicknessActivity(Long unitId);
 
     @Query(value = "{'activityBalanceSettings.priorityFor':?0,activityPriorityId:?1,_id:{$ne: ?2}}",exists = true)
     boolean isActivityPriorityIdIsExistOrNot(PriorityFor priorityFor,BigInteger priorityId,BigInteger activityId);
