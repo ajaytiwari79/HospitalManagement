@@ -3,6 +3,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
 import com.kairos.persistence.model.unit_settings.AbsenceRankingSettings;
@@ -14,8 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -117,7 +117,19 @@ public class AbsenceRankingSettingsService {
 
     }
 
-    public List<ActivityDTO> findAllAbsenceActivities(){
-        return activityService.findAllAbsenceActivities();
+    public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
+        List<ActivityDTO> fullDayActivities = new ArrayList<>();
+        List<ActivityDTO> fullWeekActivities = new ArrayList<>();
+        activityService.findAllAbsenceActivities().forEach(activityDTO -> {
+            if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                fullWeekActivities.add(activityDTO);
+            } else {
+                fullDayActivities.add(activityDTO);
+            }
+        });
+        Map<String,List<ActivityDTO>> resultMap = new HashMap<>();
+        resultMap.put("fullDayActivities", fullDayActivities);
+        resultMap.put("fullWeekActivities", fullWeekActivities);
+        return resultMap;
     }
 }
