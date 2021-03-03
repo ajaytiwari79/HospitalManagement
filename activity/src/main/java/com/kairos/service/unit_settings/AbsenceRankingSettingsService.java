@@ -36,6 +36,13 @@ public class AbsenceRankingSettingsService {
         return absenceRankingDTO;
     }
 
+    public AbsenceRankingDTO saveAbsenceRankingSettingsForExpertise(AbsenceRankingDTO absenceRankingDTO){
+        AbsenceRankingSettings absenceRankingSettings= ObjectMapperUtils.copyPropertiesByMapper(absenceRankingDTO,AbsenceRankingSettings.class);
+        absenceRankingSettingsRepository.save(absenceRankingSettings);
+        absenceRankingDTO.setId(absenceRankingSettings.getId());
+        return absenceRankingDTO;
+    }
+
     public AbsenceRankingDTO updateAbsenceRankingSettings(AbsenceRankingDTO absenceRankingDTO){
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(absenceRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking", absenceRankingDTO.getId())));
         if (absenceRankingSettings.getDraftId()!=null) {

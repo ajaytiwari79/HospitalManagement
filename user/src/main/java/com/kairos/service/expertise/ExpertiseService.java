@@ -539,6 +539,7 @@ public class ExpertiseService {
         }
         expertise.setPublished(true);
         expertiseGraphRepository.save(expertise);
+
         if (isNotNull(expertise.getEndDate()) && expertise.getEndDate().isBefore(getLocalDate())) {
             schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(expertise.getEndDate()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
