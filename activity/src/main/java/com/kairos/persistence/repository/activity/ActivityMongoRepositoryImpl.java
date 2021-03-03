@@ -19,6 +19,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
@@ -241,6 +242,16 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false,false));
         customAgregationForCompositeActivity.add(match(Criteria.where(TIME_TYPE_INFO_PART_OF_TEAM).is(true)));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<ActivityDTO> findAllAbsenceActivitiesByCountryId(Long countryId, TimeTypeEnum timeType) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("activityBalanceSettings.timeType").is(timeType).and(DELETED).is(false)),
+                sort(Sort.Direction.ASC, "createdAt"),
+                project("name","countryParentId","activityTimeCalculationSettings"));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }

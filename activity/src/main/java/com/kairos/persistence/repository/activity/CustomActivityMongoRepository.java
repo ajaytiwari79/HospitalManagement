@@ -118,4 +118,6 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId,Long staffId,boolean isActivityType);
     List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
+
+    List<ActivityDTO> findAllAbsenceActivitiesByCountryId(Long countryId, TimeTypeEnum timeType);
 }
