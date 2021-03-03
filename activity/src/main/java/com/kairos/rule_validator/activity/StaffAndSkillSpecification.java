@@ -48,8 +48,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
-        List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+            List<String> errorMessages = new ArrayList<>();
             for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
                 validateStaffSkills(errorMessages, childActivity);
             }
