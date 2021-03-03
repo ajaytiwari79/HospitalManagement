@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
@@ -539,7 +540,7 @@ public class ExpertiseService {
         }
         expertise.setPublished(true);
         expertiseGraphRepository.save(expertise);
-
+        activityIntegrationService.setAbsenceRankingForExpertise(new AbsenceRankingDTO(expertise.getId(),expertise.getStartDate(),expertise.getEndDate(),expertise.getCountry().getId(),true));
         if (isNotNull(expertise.getEndDate()) && expertise.getEndDate().isBefore(getLocalDate())) {
             schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(expertise.getEndDate()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
