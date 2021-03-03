@@ -134,6 +134,7 @@ public class ActivityConstants {
             "        }\n" +
             "            }\n" +
             "        }";
+    public static final String $_NE_$_CHILD_ACTIVITY_IDS = "                { \"$ne\": [ \"$childActivityIds\", [] ] },\n";
     public static final String ARRAY_ASSIGNMENT = "{\n" +
             "      \"$project\": {\n" +
             "        \"activityIds\": 1,\n" +
@@ -154,44 +155,7 @@ public class ActivityConstants {
             "        \"newRoot\": \"$activities\"\n" +
             "      }\n" +
             "    }";
-    public static final String MOST_USED_COUNT = "{\n" +
-            "      \"$lookup\": {\n" +
-            "        \"from\": \"staffActivityDetails\",\n" +
-            "        \"let\": {\n" +
-            "          \"staffId\": 2455,\n" +
-            "          \"activityId\": \"$_id\"\n" +
-            "        },\n" +
-            "        \"pipeline\": [\n" +
-            "          {\n" +
-            "            \"$match\": {\n" +
-            "              \"$expr\": {\n" +
-            "                \"$and\": [\n" +
-            "                  {\n" +
-            "                    \"$eq\": [\n" +
-            "                      \"$staffId\",\n" +
-            "                      \"$$staffId\"\n" +
-            "                    ]\n" +
-            "                  },\n" +
-            "                  {\n" +
-            "                    \"$gte\": [\n" +
-            "                      \"$activityId\",\n" +
-            "                      \"$$activityId\"\n" +
-            "                    ]\n" +
-            "                  }\n" +
-            "                ]\n" +
-            "              }\n" +
-            "            }\n" +
-            "          },\n" +
-            "          {\n" +
-            "            \"$project\": {\n" +
-            "              \"useActivityCount\": 1,\n" +
-            "              \"_id\": 0\n" +
-            "            }\n" +
-            "          }\n" +
-            "        ],\n" +
-            "        \"as\": \"useActivityCount\"\n" +
-            "      }\n" +
-            "    }";
+
     public static final String USED_COUNT = "{\n" +
             "      \"$addFields\": {\n" +
             "        \"mostlyUsedCount\": {\n" +
