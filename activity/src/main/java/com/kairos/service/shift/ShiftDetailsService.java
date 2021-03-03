@@ -188,7 +188,7 @@ public class ShiftDetailsService {
         WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().stream().filter(k -> "Minimum shift’s length".equals(k.getName()) || "Maximum shift’s length".equals(k.getName()) || "Maximum night shift’s length".equals(k.getName())).findAny().orElse(null);
         if (isNotNull(workTimeAgreementRuleViolation)) {
             Map<String, Object> map = new HashMap<>();
-            if (!oldShift.getStartDate().equals(shiftDTO.getStartDate())) {
+            if (!oldShift.getStartDate().equals(shiftDTO.getStartDate()) && oldShift.getEndDate().equals(shiftDTO.getEndDate())) {
                 Date startDate = shiftDTO.getStartDate().before(oldShift.getStartDate()) ? shiftDTO.getStartDate() : oldShift.getStartDate();
                 Date endDate = shiftDTO.getStartDate().before(oldShift.getStartDate()) ? oldShift.getStartDate() : shiftDTO.getStartDate();
                 boolean shiftExtends = shiftDTO.getStartDate().before(oldShift.getStartDate());
