@@ -12,7 +12,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsenceRankingDTO {
+public class ActivityRankingDTO {
     private BigInteger id;
     private Long expertiseId;
     private LocalDate startDate;
@@ -24,7 +24,7 @@ public class AbsenceRankingDTO {
     private Long countryId;
     private boolean published;
 
-    public AbsenceRankingDTO(Long expertiseId, LocalDate startDate, LocalDate endDate,  Long countryId, boolean published) {
+    public ActivityRankingDTO(Long expertiseId, LocalDate startDate, LocalDate endDate, Long countryId, boolean published) {
         this.expertiseId = expertiseId;
         this.startDate = startDate;
         this.endDate = endDate;

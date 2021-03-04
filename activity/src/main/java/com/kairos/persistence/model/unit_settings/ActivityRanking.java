@@ -10,7 +10,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class AbsenceRankingSettings extends MongoBaseEntity {
+public class ActivityRanking extends MongoBaseEntity {
     private static final long serialVersionUID = -3722777805221769643L;
     private Long expertiseId;
     private LocalDate startDate;

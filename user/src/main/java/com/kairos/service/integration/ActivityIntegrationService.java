@@ -16,7 +16,7 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
@@ -284,7 +284,7 @@ public class ActivityIntegrationService {
     }
 
     @Async
-    public void setAbsenceRankingForExpertise(AbsenceRankingDTO absenceRankingForExpertise) {
+    public void setAbsenceRankingForExpertise(ActivityRankingDTO absenceRankingForExpertise) {
         genericRestClient.publishRequest(absenceRankingForExpertise, null, false, IntegrationOperation.CREATE, "/expertise/{expertiseId}/absence_ranking", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){},absenceRankingForExpertise.getExpertiseId());
     }
 }
