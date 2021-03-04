@@ -17,6 +17,8 @@ public class AbsenceRankingSettings extends MongoBaseEntity {
     private LocalDate endDate;
     private Set<BigInteger> fullDayActivities=new LinkedHashSet<>();
     private Set<BigInteger> fullWeekActivities=new LinkedHashSet<>();
+    private Set<BigInteger> presenceActivities=new LinkedHashSet<>();
+    private Long unitId;
     private Long countryId;
     private boolean published;
     // it's used to check in case of having draft copy
