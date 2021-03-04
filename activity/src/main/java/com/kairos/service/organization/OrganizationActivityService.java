@@ -637,6 +637,7 @@ public class OrganizationActivityService {
             Set<BigInteger> presenceActivities=activityCopiedList.stream().filter(k->PRESENCE.equals(k.getActivityBalanceSettings().getTimeType())).map(MongoBaseEntity::getId).collect(Collectors.toSet());
             AbsenceRankingDTO absenceRankingDTO=new AbsenceRankingDTO(null,DateUtils.getCurrentLocalDate(),null,null,true);
             absenceRankingDTO.setPresenceActivities(presenceActivities);
+            absenceRankingDTO.setUnitId(unitId);
             absenceRankingSettingsService.saveAbsenceRankingSettings(absenceRankingDTO);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
