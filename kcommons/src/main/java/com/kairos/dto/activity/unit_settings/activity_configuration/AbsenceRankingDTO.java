@@ -19,6 +19,8 @@ public class AbsenceRankingDTO {
     private LocalDate endDate;
     private Set<BigInteger> fullDayActivities=new LinkedHashSet<>();
     private Set<BigInteger> fullWeekActivities=new LinkedHashSet<>();
+    private Set<BigInteger> presenceActivities=new LinkedHashSet<>();
+    private Long unitId;
     private Long countryId;
     private boolean published;
 

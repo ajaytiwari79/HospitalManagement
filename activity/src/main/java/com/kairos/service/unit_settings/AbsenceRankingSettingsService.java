@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.unit_settings.AbsenceRankingSettings;
 import com.kairos.persistence.repository.unit_settings.AbsenceRankingSettingsRepository;
 import com.kairos.service.activity.ActivityService;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.enums.TimeTypeEnum.ABSENCE;
+import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
 @Service
 public class AbsenceRankingSettingsService {
@@ -33,7 +36,7 @@ public class AbsenceRankingSettingsService {
 
     public AbsenceRankingDTO saveAbsenceRankingSettings(AbsenceRankingDTO absenceRankingDTO){
         AbsenceRankingSettings absenceRankingSettings= ObjectMapperUtils.copyPropertiesByMapper(absenceRankingDTO,AbsenceRankingSettings.class);
-        if(isCollectionEmpty(absenceRankingDTO.getFullDayActivities())){
+        if(isCollectionEmpty(absenceRankingDTO.getFullDayActivities()) && isCollectionEmpty(absenceRankingDTO.getPresenceActivities())){
             Map<String,List<ActivityDTO>> activityMap=findAllAbsenceActivities();
             absenceRankingSettings.setFullDayActivities(activityMap.get("fullDayActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
             absenceRankingSettings.setFullWeekActivities(activityMap.get("fullWeekActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
@@ -75,8 +78,15 @@ public class AbsenceRankingSettingsService {
         }
     }
 
+    public List<AbsenceRankingDTO> getPresenceRankingSettings(Long unitId){
+        return absenceRankingSettingsRepository.getAbsenceRankingSettingsByUnitIdAndDeletedFalse(unitId);
+    }
+
     public boolean deleteAbsenceRankingSettings(BigInteger id){
         AbsenceRankingSettings absenceRankingSettings=absenceRankingSettingsRepository.findOne(id);
+        if(absenceRankingSettings.isPublished()){
+            exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED);
+        }
         absenceRankingSettings.setDeleted(true);
         absenceRankingSettingsRepository.save(absenceRankingSettings);
         return true;
@@ -85,7 +95,7 @@ public class AbsenceRankingSettingsService {
 
     public AbsenceRankingDTO publishAbsenceRanking(BigInteger id, LocalDate publishedDate) {
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
-        if (absenceRankingSettings.getFullDayActivities().isEmpty() && absenceRankingSettings.getFullWeekActivities().isEmpty()) {
+        if (absenceRankingSettings.getFullDayActivities().isEmpty() && absenceRankingSettings.getFullWeekActivities().isEmpty() && absenceRankingSettings.getPresenceActivities().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
         }
         if (absenceRankingSettings.isPublished()) {
@@ -127,7 +137,7 @@ public class AbsenceRankingSettingsService {
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
         List<ActivityDTO> fullDayActivities = new ArrayList<>();
         List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        activityService.findAllAbsenceActivities().forEach(activityDTO -> {
+        activityService.findAllActivitiesByTimeType(UserContext.getUserDetails().getCountryId(), ABSENCE).forEach(activityDTO -> {
             if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 fullWeekActivities.add(activityDTO);
             } else {
@@ -138,5 +148,9 @@ public class AbsenceRankingSettingsService {
         resultMap.put("fullDayActivities", fullDayActivities);
         resultMap.put("fullWeekActivities", fullWeekActivities);
         return resultMap;
+    }
+
+    public List<ActivityDTO> findAllPresenceActivities(Long unitId){
+       return activityService.findAllActivitiesByTimeType(unitId,PRESENCE);
     }
 }

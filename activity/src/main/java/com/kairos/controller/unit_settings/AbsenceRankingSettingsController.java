@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
@@ -26,9 +27,9 @@ public class AbsenceRankingSettingsController {
     @Inject
     private AbsenceRankingSettingsService absenceRankingSettingsService;
 
-    @ApiOperation(value = "save a absence_ranking  for expertise")
-    @PostMapping(value =  "/expertise/{expertiseId}/absence_ranking")
-    public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@PathVariable Long expertiseId, @RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
+    @ApiOperation(value = "save a absence_ranking ")
+    @PostMapping(value =  "/activity_ranking")
+    public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.saveAbsenceRankingSettings(absenceRankingDTO));
     }
 
@@ -38,8 +39,14 @@ public class AbsenceRankingSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.getAbsenceRankingSettings(expertiseId, published));
     }
 
-    @ApiOperation(value = "update a absence_ranking settings for expertise")
-    @PutMapping(value = "/expertise/{expertiseId}/absence_ranking")
+    @ApiOperation(value = "get  presence_ranking settings ")
+    @GetMapping(value =   "/unit/{unitId}/presence_ranking")
+    public ResponseEntity<Map<String, Object>> getPresenceRanking(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.getPresenceRankingSettings(unitId));
+    }
+
+    @ApiOperation(value = "update a activity_ranking settings")
+    @PutMapping(value = "/activity_ranking")
     public ResponseEntity<Map<String, Object>> updateAbsenceRanking( @RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.updateAbsenceRankingSettings(absenceRankingDTO));
     }
@@ -47,22 +54,22 @@ public class AbsenceRankingSettingsController {
 
 
 
-    @ApiOperation(value = "published a absence_ranking settings for expertise")
-    @PutMapping(value =  "/expertise/{expertiseId}/absence_ranking/{id}/publish")
+    @ApiOperation(value = "published a absence_ranking settings")
+    @PutMapping(value =  "/activity_ranking/{id}/publish")
     public ResponseEntity<Map<String, Object>> publishAbsenceRanking(@PathVariable BigInteger id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.publishAbsenceRanking(id, publishedDate));
     }
 
-    @ApiOperation(value = "delete a senior days for expertise")
-    @DeleteMapping(value = "/absence_ranking/{id}")
+    @ApiOperation(value = "delete activity_ranking")
+    @DeleteMapping(value = "/activity_ranking/{id}")
     public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable BigInteger id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.deleteAbsenceRankingSettings(id));
     }
 
-    @ApiOperation(value = "get absence activities")
-    @GetMapping(value = "/absence_ranking/activities")
-    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.findAllAbsenceActivities());
+    @ApiOperation(value = "get  activities")
+    @GetMapping(value = "/activity_ranking/activities")
+    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@RequestParam(value = "unitId",required = false) Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,unitId==null? absenceRankingSettingsService.findAllAbsenceActivities():absenceRankingSettingsService.findAllPresenceActivities(unitId));
     }
 
 }

@@ -46,6 +46,7 @@ import static com.kairos.constants.AppConstants.DESCRIPTION;
 import static com.kairos.constants.AppConstants.NAME;
 import static com.kairos.constants.AppConstants.PARENT_ID;
 import static com.kairos.constants.AppConstants.UNIT_ID;
+import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -247,9 +248,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityDTO> findAllAbsenceActivitiesByCountryId(Long countryId, TimeTypeEnum timeType) {
+    public List<ActivityDTO> findAllActivitiesByTimeType(Long refId, TimeTypeEnum timeType) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("activityBalanceSettings.timeType").is(timeType).and(DELETED).is(false)),
+                match(Criteria.where(ABSENCE.equals(timeType)?COUNTRY_ID:UNIT_ID).is(refId).and("activityBalanceSettings.timeType").is(timeType).and(DELETED).is(false)),
                 sort(Sort.Direction.ASC, "createdAt"),
                 project("name","countryParentId","activityTimeCalculationSettings"));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
