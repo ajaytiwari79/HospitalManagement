@@ -137,7 +137,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);
 
     @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team{isEnabled:true}) WHERE id(staff)={0} \n" +
-            "RETURN COLLECT(team.activityId)")
+            "RETURN team.activityId")
     List<BigInteger> getTeamActivitiesOfStaff(Long staffId);
 
     @Query("MATCH(team:Team{deleted:false}) WHERE  team.activityId=toString({0}) " +
