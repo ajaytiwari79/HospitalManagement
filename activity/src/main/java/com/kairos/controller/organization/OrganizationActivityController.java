@@ -372,12 +372,6 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllAbsenceActivity(unitId));
     }
 
-    @ApiOperation("Get all children of Activity")
-    @PutMapping(value = "/activity/get_all_Children")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getAllChildren(@RequestBody Set<BigInteger> activityIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllChildren(activityIds));
-    }
 
     @ApiOperation("Get all activity ranking")
     @GetMapping(value = "/get_activity_rank")

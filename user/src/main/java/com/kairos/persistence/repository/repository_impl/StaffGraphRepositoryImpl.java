@@ -87,7 +87,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) " +
                 "OPTIONAL MATCH (staff)-[staffTeamRel:" + TEAM_HAS_MEMBER + "]-(team:Team) " +
                 "OPTIONAL MATCH(staff)-[:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail)" +
-                " WITH  collect({id:id(expertiseLine),numberOfWorkingDaysInWeek:expertiseLine.numberOfWorkingDaysInWeek,fullTimeWeeklyMinutes:expertiseLine.fullTimeWeeklyMinutes,startDate:expertiseLine.startDate,endDate:expertiseLine.endDate}) as explinew,employmentLine,payGrade,empType,employment,staff,expertise,org,user,CASE WHEN staffTeamRel IS NULL THEN [] else COLLECT( distinct {id:id(team),name:team.name,teamType:staffTeamRel.teamType,activityIds:team.activityIds}) END as teams," +
+                " WITH  collect({id:id(expertiseLine),numberOfWorkingDaysInWeek:expertiseLine.numberOfWorkingDaysInWeek,fullTimeWeeklyMinutes:expertiseLine.fullTimeWeeklyMinutes,startDate:expertiseLine.startDate,endDate:expertiseLine.endDate}) as explinew,employmentLine,payGrade,empType,employment,staff,expertise,org,user,CASE WHEN staffTeamRel IS NULL THEN [] else COLLECT( distinct {id:id(team),name:team.name,teamType:staffTeamRel.teamType,activityId:team.activityId}) END as teams," +
                 "CASE WHEN staffChildDetail IS NULL THEN [] ELSE COLLECT(distinct {id:id(staffChildDetail),name:staffChildDetail.name,cprNumber:staffChildDetail.cprNumber}) END as staffChildDetails " +
                 "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),seniorityLevel:employmentLine.seniorityLevel,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),employmentStatus:employmentLine.employmentStatus, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,employmentSubType:employment.employmentSubType,\n" +
                 "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,payGradeLevel:payGrade.payGradeLevel,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,{id:id(expertise),expertiseLines:explinew} as expertiseQueryResult,teams,staffChildDetails\n" +
@@ -628,7 +628,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" OPTIONAL MATCH (staff)-[:HAS_CHILDREN]->(staffChildDetail:StaffChildDetail) WITH staff,collect(staffChildDetail) AS  staffChildDetails,organization,employmentIds,user");
         if(isCollectionNotEmpty(notEligibleStaffDataDTO.getActivityIds())){
             //queryParameters.put("activityIds", notEligibleStaffDataDTO.getActivityIds());
-            query.append(" MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) where all(activity in").append(getBigIntegerString(notEligibleStaffDataDTO.getActivityIds().iterator())).append(" WHERE activity IN teams.activityIds)");
+            query.append(" MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) where teams.activityId in").append(getBigIntegerString(notEligibleStaffDataDTO.getActivityIds().iterator()));
         }else{
             query.append(" OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff)");
         }

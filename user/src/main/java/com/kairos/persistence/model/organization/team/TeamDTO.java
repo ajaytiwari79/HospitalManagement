@@ -38,7 +38,7 @@ public class TeamDTO {
     private String name;
     private String description;
     private boolean hasAddressOfUnit;
-    private List<BigInteger> activityIds;
+    private BigInteger activityId;
     private List<Long> skillIds;
     private Set<Long> mainTeamLeaderIds;
     private Set<Long> actingTeamLeaderIds;

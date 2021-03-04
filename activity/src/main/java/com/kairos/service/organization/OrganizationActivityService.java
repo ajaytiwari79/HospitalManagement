@@ -888,16 +888,6 @@ public class OrganizationActivityService {
         }
     }
 
-    public Set<BigInteger> getAllChildren(Set<BigInteger> activityIds) {
-        Set<BigInteger> activityIdsToSet=new HashSet<>();
-        Collection<Activity> activities =  activityMongoRepository.findAllById(activityIds);
-        activities.forEach(activity -> {
-                activityIdsToSet.add(activity.getId());
-                activityIdsToSet.addAll(activity.getChildActivityIds());
-        });
-        return activityIdsToSet;
-    }
-
     public  Map<String,Set<BigInteger>> getShowOnCallAndStandByActivityId(Long unitId,boolean showStandBy,boolean showOnCall){
         Map<String,Set<BigInteger>> showOnCallAndStandByActivityIds = new HashMap<>();
         showOnCallAndStandByActivityIds.put("showStandBy", showStandBy ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, UnityActivitySetting.STAND_BY) : newHashSet());
