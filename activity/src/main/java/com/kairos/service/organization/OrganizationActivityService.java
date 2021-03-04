@@ -26,7 +26,7 @@ import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
-import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -130,7 +130,7 @@ public class OrganizationActivityService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private AbsenceRankingSettingsService absenceRankingSettingsService;
+    private ActivityRankingService activityRankingService;
     @Inject @Lazy
     private ActivityService activityService;
     @Inject
@@ -635,10 +635,10 @@ public class OrganizationActivityService {
             }
             activityMongoRepository.saveEntities(activityCopiedList);
             Set<BigInteger> presenceActivities=activityCopiedList.stream().filter(k->PRESENCE.equals(k.getActivityBalanceSettings().getTimeType())).map(MongoBaseEntity::getId).collect(Collectors.toSet());
-            AbsenceRankingDTO absenceRankingDTO=new AbsenceRankingDTO(null,DateUtils.getCurrentLocalDate(),null,null,true);
-            absenceRankingDTO.setPresenceActivities(presenceActivities);
-            absenceRankingDTO.setUnitId(unitId);
-            absenceRankingSettingsService.saveAbsenceRankingSettings(absenceRankingDTO);
+            ActivityRankingDTO activityRankingDTO =new ActivityRankingDTO(null,DateUtils.getCurrentLocalDate(),null,null,true);
+            activityRankingDTO.setPresenceActivities(presenceActivities);
+            activityRankingDTO.setUnitId(unitId);
+            activityRankingService.saveAbsenceRankingSettings(activityRankingDTO);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             activitySchedulerJobService.registerJobForActivityCutoff(activityCopiedList);
