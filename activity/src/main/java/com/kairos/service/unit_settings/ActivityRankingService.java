@@ -3,6 +3,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
@@ -14,8 +15,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -31,6 +32,11 @@ public class ActivityRankingService {
 
     public ActivityRankingDTO saveActivityRanking(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
+        if(isCollectionEmpty(activityRankingDTO.getFullDayActivities())){
+            Map<String,List<ActivityDTO>> activityMap=findAllAbsenceActivities();
+            activityRanking.setFullDayActivities(activityMap.get("fullDayActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
+            activityRanking.setFullWeekActivities(activityMap.get("fullWeekActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
+        }
         activityRankingRepository.save(activityRanking);
         activityRankingDTO.setId(activityRanking.getId());
         return activityRankingDTO;
@@ -87,7 +93,7 @@ public class ActivityRankingService {
 
     public ActivityRankingDTO publishActivityRanking(BigInteger id, LocalDate publishedDate) {
         ActivityRanking activityRanking = activityRankingRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Activity Ranking", id)));
-        if (activityRanking.getActivityRankings().isEmpty()) {
+        if (activityRanking.getFullDayActivities().isEmpty() || activityRanking.getFullWeekActivities().isEmpty() ) {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
         }
         if (activityRanking.isPublished()) {
@@ -127,7 +133,19 @@ public class ActivityRankingService {
 
     }
 
-    public List<ActivityDTO> findAllAbsenceActivities(){
-        return activityService.findAllAbsenceActivities();
+    public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
+        List<ActivityDTO> fullDayActivities = new ArrayList<>();
+        List<ActivityDTO> fullWeekActivities = new ArrayList<>();
+        activityService.findAllAbsenceActivities().forEach(activityDTO -> {
+            if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                fullWeekActivities.add(activityDTO);
+            } else {
+                fullDayActivities.add(activityDTO);
+            }
+        });
+        Map<String,List<ActivityDTO>> resultMap = new HashMap<>();
+        resultMap.put("fullDayActivities", fullDayActivities);
+        resultMap.put("fullWeekActivities", fullWeekActivities);
+        return resultMap;
     }
 }

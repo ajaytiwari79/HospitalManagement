@@ -151,6 +151,7 @@ public class AbsenceShiftService {
         int contractualMinutesInADay = staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes() / staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek();
         ShiftActivityDTO shiftActivity = new ShiftActivityDTO(activity.getId(), activity.getName(),shiftActivityDTO.getStatus());
         shiftActivity.setRemarks(shiftActivityDTO.getRemarks());
+        shiftActivity.setBackgroundColor(shiftActivityDTO.getBackgroundColor());
         Integer startAverageMin = null;
         Date fromDate = asDate(shiftDate);
         if (shifts != null && !shifts.isEmpty() && activity.getActivityTimeCalculationSettings().getHistoryDuration() != 0) {

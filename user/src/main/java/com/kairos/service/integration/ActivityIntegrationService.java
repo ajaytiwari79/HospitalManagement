@@ -16,6 +16,7 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
@@ -33,6 +34,7 @@ import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -279,6 +281,11 @@ public class ActivityIntegrationService {
 
     public void transferReasonCode(List<ReasonCodeDTO> reasonCodeDTOS) {
         genericRestClient.publishRequest(reasonCodeDTOS, null, false, IntegrationOperation.CREATE, "/transfer_reason_code", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+    }
+
+    @Async
+    public void setAbsenceRankingForExpertise(AbsenceRankingDTO absenceRankingForExpertise) {
+        genericRestClient.publishRequest(absenceRankingForExpertise, null, false, IntegrationOperation.CREATE, "/expertise/{expertiseId}/absence_ranking", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){},absenceRankingForExpertise.getExpertiseId());
     }
 }
 
