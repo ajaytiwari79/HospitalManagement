@@ -237,9 +237,6 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
     }
 
-    public Set<BigInteger> getActivitiesWithAllChildren(Long unitId,Set<BigInteger> activityIds) {
-        return genericRestClient.publishRequest(activityIds, unitId, true, IntegrationOperation.UPDATE, "/activity/get_all_Children", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
-    }
 
     public List<CTACompensationSettingDTO> getCTACompensationSettingByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/cta_compensations", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTACompensationSettingDTO>>>(){});
