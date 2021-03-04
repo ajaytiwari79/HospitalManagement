@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
 import com.kairos.service.activity.ActivityService;
@@ -18,8 +19,11 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.enums.TimeTypeEnum.ABSENCE;
+import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
 @Service
 public class ActivityRankingService {
@@ -30,9 +34,10 @@ public class ActivityRankingService {
     @Inject
     private ActivityService activityService;
 
+
     public ActivityRankingDTO saveActivityRanking(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
-        if(isCollectionEmpty(activityRankingDTO.getFullDayActivities())){
+        if(isCollectionEmpty(activityRankingDTO.getFullDayActivities()) && isCollectionEmpty(activityRankingDTO.getPresenceActivities())){
             Map<String,List<ActivityDTO>> activityMap=findAllAbsenceActivities();
             activityRanking.setFullDayActivities(activityMap.get("fullDayActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
             activityRanking.setFullWeekActivities(activityMap.get("fullWeekActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
@@ -74,12 +79,8 @@ public class ActivityRankingService {
         }
     }
 
-    public List<ActivityRankingDTO> getActivityRanking(Boolean published, Long unitId){
-        if(isNotNull(published)){
-            return activityRankingRepository.getActivityRankingByPublishedAndUnitIdAndDeletedFalse(published, unitId);
-        } else {
-            return activityRankingRepository.getActivityRankingByUnitIdAndDeletedFalse(unitId);
-        }
+    public List<ActivityRankingDTO> getPresenceRankingSettings(Long unitId){
+        return activityRankingRepository.getAbsenceRankingSettingsByUnitIdAndDeletedFalse(unitId);
     }
 
 
@@ -93,7 +94,7 @@ public class ActivityRankingService {
 
     public ActivityRankingDTO publishActivityRanking(BigInteger id, LocalDate publishedDate) {
         ActivityRanking activityRanking = activityRankingRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Activity Ranking", id)));
-        if (activityRanking.getFullDayActivities().isEmpty() || activityRanking.getFullWeekActivities().isEmpty() ) {
+        if (activityRanking.getFullDayActivities().isEmpty() && activityRanking.getFullWeekActivities().isEmpty() && activityRanking.getPresenceActivities().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
         }
         if (activityRanking.isPublished()) {
@@ -105,38 +106,36 @@ public class ActivityRankingService {
 //        }
         activityRanking.setPublished(true);
         activityRanking.setStartDate(publishedDate); // changing
-        ActivityRanking parentActivityRanking = activityRankingRepository.findByDraftIdAndPriorityForAndDeletedFalse(activityRanking.getId(), activityRanking.getPriorityFor());
-        ActivityRanking lastActivityRanking = activityRankingRepository.findTopByExpertiseIdAndPriorityForAndDeletedFalseOrderByStartDateDesc(activityRanking.getExpertiseId(), activityRanking.getPriorityFor());
+        ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
+        ActivityRanking lastAbsenceRanking = activityRankingRepository.findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(activityRanking.getExpertiseId());
         boolean onGoingUpdated = false;
-
-        if (lastActivityRanking != null && publishedDate.isAfter(lastActivityRanking.getStartDate()) && lastActivityRanking.getEndDate() == null) {
-            lastActivityRanking.setEndDate(publishedDate.minusDays(1));
-            activityRankingRepository.save(lastActivityRanking);
+        if (lastAbsenceRanking != null && publishedDate.isAfter(lastAbsenceRanking.getStartDate()) && lastAbsenceRanking.getEndDate() == null) {
+            lastAbsenceRanking.setEndDate(publishedDate.minusDays(1));
+            activityRankingRepository.save(lastAbsenceRanking);
             activityRanking.setEndDate(null);
             onGoingUpdated = true;
         }
-        if (!onGoingUpdated && Optional.ofNullable(parentActivityRanking).isPresent()) {
-            if (parentActivityRanking.getStartDate().isEqual(publishedDate) || parentActivityRanking.getStartDate().isAfter(publishedDate)) {
+        if (!onGoingUpdated && Optional.ofNullable(parentAbsenceRanking).isPresent()) {
+            if (parentAbsenceRanking.getStartDate().isEqual(publishedDate) || parentAbsenceRanking.getStartDate().isAfter(publishedDate)) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE);
             }
-            parentActivityRanking.setEndDate(publishedDate.minusDays(1L));
-            if (lastActivityRanking == null && activityRanking.getEndDate() != null && activityRanking.getEndDate().isBefore(publishedDate)) {
+            parentAbsenceRanking.setEndDate(publishedDate.minusDays(1L));
+            if (lastAbsenceRanking == null && activityRanking.getEndDate() != null && activityRanking.getEndDate().isBefore(publishedDate)) {
                 activityRanking.setEndDate(null);
             }
         }
-        if(isNotNull(parentActivityRanking)){
-            parentActivityRanking.setDraftId(null);
-            activityRankingRepository.save(parentActivityRanking);
+        if(isNotNull(parentAbsenceRanking)){
+            parentAbsenceRanking.setDraftId(null);
+            activityRankingRepository.save(parentAbsenceRanking);
         }
         activityRankingRepository.save(activityRanking);
-        return ObjectMapperUtils.copyPropertiesByMapper(parentActivityRanking, ActivityRankingDTO.class);
-
+        return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
     }
 
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
         List<ActivityDTO> fullDayActivities = new ArrayList<>();
         List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        activityService.findAllAbsenceActivities().forEach(activityDTO -> {
+        activityService.findAllActivitiesByTimeType(UserContext.getUserDetails().getCountryId(), ABSENCE).forEach(activityDTO -> {
             if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 fullWeekActivities.add(activityDTO);
             } else {
@@ -147,5 +146,10 @@ public class ActivityRankingService {
         resultMap.put("fullDayActivities", fullDayActivities);
         resultMap.put("fullWeekActivities", fullWeekActivities);
         return resultMap;
+    }
+
+
+    public List<ActivityDTO> findAllPresenceActivities(Long unitId){
+       return activityService.findAllActivitiesByTimeType(unitId,PRESENCE);
     }
 }

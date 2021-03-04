@@ -57,7 +57,7 @@ public class CoverShiftService {
     @Inject private CoverShiftSettingMongoRepository coverShiftSettingMongoRepository;
     @Inject private ExceptionService exceptionService;
 
-    @CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
+    //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
         CoverShiftSetting coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
         coverShiftSettingMongoRepository.save(coverShiftSetting);
@@ -65,7 +65,7 @@ public class CoverShiftService {
         return coverShiftSettingDTO;
     }
 
-    @CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
+    //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO updateCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
         CoverShiftSetting coverShiftSetting = coverShiftSettingMongoRepository.findOne(coverShiftSettingDTO.getId());
         if(isNull(coverShiftSetting)){
@@ -76,7 +76,7 @@ public class CoverShiftService {
         return coverShiftSettingDTO;
     }
 
-    @Cacheable(value = "getCoverShiftSettingByUnit", key = "#unitId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getCoverShiftSettingByUnit", key = "#unitId", cacheManager = "cacheManager")
     public CoverShiftSetting getCoverShiftSettingByUnit(Long unitId) {
         return coverShiftSettingMongoRepository.getCoverShiftSettingByUnitId(unitId);
     }

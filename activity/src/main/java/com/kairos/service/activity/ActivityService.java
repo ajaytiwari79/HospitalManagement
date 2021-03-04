@@ -963,11 +963,11 @@ public class ActivityService {
         return activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(timeTypeEnum, unitIds);
     }
 
-    public List<ActivityDTO> findAllAbsenceActivities() {
-        return activityMongoRepository.findAllAbsenceActivitiesByCountryId(UserContext.getUserDetails().getCountryId(), ABSENCE);
-    }
-
     public List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds) {
         return activityMongoRepository.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
+    }
+
+    public List<ActivityDTO> findAllActivitiesByTimeType(Long refId, TimeTypeEnum timeType){
+        return activityMongoRepository.findAllActivitiesByTimeType(refId,timeType);
     }
 }

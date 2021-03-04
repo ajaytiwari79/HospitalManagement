@@ -26,6 +26,7 @@ import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -117,6 +118,7 @@ import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
+import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 import static com.kairos.enums.reason_code.ReasonCodeType.ORDER;
 
@@ -130,6 +132,8 @@ public class OrganizationActivityService {
 
     @Inject
     private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private ActivityRankingService activityRankingService;
     @Inject @Lazy
     private ActivityService activityService;
     @Inject
@@ -559,7 +563,7 @@ public class OrganizationActivityService {
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
         activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
         timeSlotSetService.createDefaultTimeSlots(unitId);
-        createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
+        //createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         periodSettingsService.createDefaultPeriodSettings(unitId);
@@ -613,6 +617,11 @@ public class OrganizationActivityService {
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }
             activityMongoRepository.saveEntities(activityCopiedList);
+            Set<BigInteger> presenceActivities=activityCopiedList.stream().filter(k->PRESENCE.equals(k.getActivityBalanceSettings().getTimeType())).map(MongoBaseEntity::getId).collect(Collectors.toSet());
+            ActivityRankingDTO activityRankingDTO =new ActivityRankingDTO(null,DateUtils.getCurrentLocalDate(),null,null,true);
+            activityRankingDTO.setPresenceActivities(presenceActivities);
+            activityRankingDTO.setUnitId(unitId);
+            activityRankingService.saveActivityRanking(activityRankingDTO);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             activitySchedulerJobService.registerJobForActivityCutoff(activityCopiedList);

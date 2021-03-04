@@ -21,14 +21,15 @@ import static com.kairos.constants.ApiConstants.API_V1;
 @RestController
 @RequestMapping(API_V1)
 @Api(value = API_V1)
-public class AbsenceRankingSettingsController {
+public class ActivityRankingController {
 
     @Inject
     private ActivityRankingService activityRankingService;
 
-    @ApiOperation(value = "save a absence_ranking  for expertise")
-    @PostMapping(value =  "/expertise/{expertiseId}/absence_ranking")
-    public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@PathVariable Long expertiseId, @RequestBody @Valid ActivityRankingDTO activityRankingDTO) {
+
+    @ApiOperation(value = "save a absence_ranking ")
+    @PostMapping(value =  "/activity_ranking")
+    public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@RequestBody @Valid ActivityRankingDTO activityRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.saveActivityRanking(activityRankingDTO));
     }
 
@@ -38,8 +39,14 @@ public class AbsenceRankingSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.getActivityRanking(expertiseId, published));
     }
 
-    @ApiOperation(value = "update a absence_ranking settings for expertise")
-    @PutMapping(value = "/expertise/{expertiseId}/absence_ranking")
+    @ApiOperation(value = "get  presence_ranking settings ")
+    @GetMapping(value =   "/unit/{unitId}/presence_ranking")
+    public ResponseEntity<Map<String, Object>> getPresenceRanking(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.getPresenceRankingSettings(unitId));
+    }
+
+    @ApiOperation(value = "update a activity_ranking settings")
+    @PutMapping(value = "/activity_ranking")
     public ResponseEntity<Map<String, Object>> updateAbsenceRanking( @RequestBody @Valid ActivityRankingDTO activityRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.updateActivityRanking(activityRankingDTO));
     }
@@ -47,14 +54,14 @@ public class AbsenceRankingSettingsController {
 
 
 
-    @ApiOperation(value = "published a absence_ranking settings for expertise")
-    @PutMapping(value =  "/expertise/{expertiseId}/absence_ranking/{id}/publish")
+    @ApiOperation(value = "published a absence_ranking settings")
+    @PutMapping(value =  "/activity_ranking/{id}/publish")
     public ResponseEntity<Map<String, Object>> publishAbsenceRanking(@PathVariable BigInteger id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.publishActivityRanking(id, publishedDate));
     }
 
-    @ApiOperation(value = "delete a senior days for expertise")
-    @DeleteMapping(value = "/absence_ranking/{id}")
+    @ApiOperation(value = "delete activity_ranking")
+    @DeleteMapping(value = "/activity_ranking/{id}")
     public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable BigInteger id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.deleteActivityRanking(id));
     }
@@ -63,6 +70,12 @@ public class AbsenceRankingSettingsController {
     @GetMapping(value = "/absence_ranking/activities")
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.findAllAbsenceActivities());
+    }
+
+    @ApiOperation(value = "get  activities")
+    @GetMapping(value = "/activity_ranking/activities")
+    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@RequestParam(value = "unitId",required = false) Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,unitId==null? activityRankingService.findAllAbsenceActivities(): activityRankingService.findAllPresenceActivities(unitId));
     }
 
 }

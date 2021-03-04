@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 
+
 @Repository
 public interface ActivityRankingRepository extends MongoBaseRepository<ActivityRanking,BigInteger> {
 
@@ -18,12 +19,10 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     List<ActivityRankingDTO> getActivityRankingByDeletedFalse();
 
-    ActivityRanking findByDraftIdAndPriorityForAndDeletedFalse(BigInteger draftId, PriorityFor priorityFor);
+    ActivityRanking findByDraftIdAndDeletedFalse(BigInteger draftId);
 
-    ActivityRanking findTopByExpertiseIdAndPriorityForAndDeletedFalseOrderByStartDateDesc(Long expertiseId, PriorityFor priorityFor);
+    ActivityRanking findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(Long expertiseId);
 
-    List<ActivityRankingDTO> getActivityRankingByPublishedAndUnitIdAndDeletedFalse(Boolean published, Long unitId);
-
-    List<ActivityRankingDTO> getActivityRankingByUnitIdAndDeletedFalse(Long unitId);
+    List<ActivityRankingDTO> getAbsenceRankingSettingsByUnitIdAndDeletedFalse(Long unitId);
 
 }
