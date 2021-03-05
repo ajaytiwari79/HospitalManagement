@@ -361,8 +361,8 @@ public class OrganizationActivityController {
     @ApiOperation("Get all unit activities with categories ")
     @GetMapping(value = "/activities_categories")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivitiesWithCategories(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithCategories(unitId));
+    public ResponseEntity<Map<String, Object>> getActivitiesWithCategories(@PathVariable Long unitId,@RequestParam("includeCountryActivity") Boolean includeCountryActivity) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithCategories(unitId,includeCountryActivity));
     }
 
     @ApiOperation("Get all absence activity")

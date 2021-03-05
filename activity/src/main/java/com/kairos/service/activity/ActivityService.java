@@ -857,9 +857,8 @@ public class ActivityService {
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
     }
 
-    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivityByUnitId(unitId, false);
-        return activityDTOS;
+    public List<ActivityDTO> getActivitiesWithCategories(long unitId, Boolean includeCountryActivity) {
+        return activityMongoRepository.findAllActivityByUnitId(unitId,includeCountryActivity);
     }
 
     public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes) {
