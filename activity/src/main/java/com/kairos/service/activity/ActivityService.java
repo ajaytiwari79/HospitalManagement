@@ -858,7 +858,7 @@ public class ActivityService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId, Boolean includeCountryActivity) {
-        return activityMongoRepository.findAllActivityByUnitId(unitId,includeCountryActivity);
+        return activityMongoRepository.findAllActivityByUnitId(includeCountryActivity?UserContext.getUserDetails().getCountryId():unitId,includeCountryActivity);
     }
 
     public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes) {
