@@ -60,6 +60,7 @@ public class ActivityTagDTO implements Serializable {
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
     private Map<String, TranslationInfo> translations=new HashMap<>();
+    private BigInteger countryParentId;
 
     public ActivityTagDTO() {
         //default constructor
