@@ -115,9 +115,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
+    public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)),
+                match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId), Criteria.where(COUNTRY_ID).is(countryId))),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 lookup(TAG, TAGS, UNDERSCORE_ID, TAGS),
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB, TAGS, ACTIVITY_PRIORITY_ID,TRANSLATIONS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)

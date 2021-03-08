@@ -119,6 +119,7 @@ import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 import static com.kairos.enums.reason_code.ReasonCodeType.ORDER;
+import static com.kairos.persistence.repository.activity.ActivityConstants.INVALID_ID;
 
 /**
  * Created by vipul on 5/12/17.
@@ -298,10 +299,10 @@ public class OrganizationActivityService {
     }
 
 
-    public Map<String, Object> getAllActivityByUnit(Long unitId, boolean includeTeamActivity) {
+    public Map<String, Object> getAllActivityByUnit(Long unitId,boolean includeTeamActivity,boolean includeCountryActivity) {
         Map<String, Object> response = new HashMap<>();
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
+        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, includeCountryActivity?UserContext.getUserDetails().getCountryId():INVALID_ID) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             boolean activityCanBeCopied = ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
