@@ -192,4 +192,5 @@ public class ActivityConstants {
     public static final String ACTIVITY_RULES_SETTINGS_LATEST_START_TIME = "activityRulesSettings.latestStartTime";
     public static final String ACTIVITY_RULES_SETTINGS_ALLOWED_AUTO_ABSENCE = "activityRulesSettings.allowedAutoAbsence";
     public static final String ACTIVITY_BALANCE_SETTINGS_TIME_TYPE_INFO_TIME_TYPES = "activityBalanceSettings.timeTypeInfo.timeTypes";
+    public static final Long INVALID_ID = -2L;
 }

@@ -62,8 +62,8 @@ public class OrganizationActivityController {
     @ApiOperation("Get all activity based on unitId")
     @GetMapping(value = "/activity_with_selected")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityByUnitId(@PathVariable Long unitId, @RequestParam(value = "includeTeamActivity",required = false) boolean includeTeamActivity) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllActivityByUnit(unitId,includeTeamActivity));
+    public ResponseEntity<Map<String, Object>> getActivityByUnitId(@PathVariable Long unitId, @RequestParam(value = "includeTeamActivity",required = false) boolean includeTeamActivity,@RequestParam(value = "includeCountryActivity",required = false) boolean includeCountryActivity) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllActivityByUnit(unitId,includeTeamActivity,includeCountryActivity));
     }
 
     @ApiOperation("Update icon  in Activity")

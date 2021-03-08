@@ -43,7 +43,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId);
 
-    List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
+    List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, Long countryId);
 
     List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
