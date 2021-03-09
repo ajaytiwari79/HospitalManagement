@@ -52,7 +52,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityPhaseSettings> findActivityIdAndStatusByUnitAndAccessGroupIds(Long unitId, List<Long> accessGroupIds);
 
-    List<ActivityDTO> findAllActivityByUnitId(Long unitId,Boolean includeCountryActivity);
+    List<ActivityDTO> findAllActivityByUnitId(Long unitId);
 
     Activity getActivityByNameAndUnitId(Long unitId,String name);
 

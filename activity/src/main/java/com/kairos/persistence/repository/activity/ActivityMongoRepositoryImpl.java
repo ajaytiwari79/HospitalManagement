@@ -235,9 +235,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public List<ActivityDTO> findAllActivityByUnitId(Long refId,Boolean includeCountryActivity) {
+    public List<ActivityDTO> findAllActivityByUnitId(Long unitId) {
         List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
-        customAgregationForCompositeActivity.add(match(Criteria.where(includeCountryActivity?COUNTRY_ID:UNIT_ID).is(refId).and(DELETED).is(false)));
+        customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO));
         customAgregationForCompositeActivity.add(lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY));
         customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false,false));
