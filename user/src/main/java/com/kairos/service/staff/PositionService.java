@@ -324,29 +324,7 @@ public class PositionService {
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit instanceof Organization) {
-            for (AccessGroup accessGroup : accessGroups) {
-                positions=new ArrayList<>();
-                QueryResult queryResult = new QueryResult();
-                queryResult.setId(unit.getId());
-                queryResult.setName(unit.getName());
-                queryResult.setTranslations(unit.getTranslations());
-                Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
-                if (employment != null && !employment.isEmpty()) {
-                    positions.add(employment);
-                    queryResult.setAccessable(true);
-                    queryResult.setStartDate((String) employment.get(START_DATE));
-                    queryResult.setEndDate((String) employment.get(END_DATE));
-                } else {
-                    queryResult.setAccessable(false);
-                }
-                Map<String, Object> workPlace = new HashMap<>();
-                workPlace.put("id", accessGroup.getId());
-                workPlace.put("name", TranslationUtil.getName(accessGroup.getTranslations(),accessGroup.getName()));
-                workPlace.put("tree", queryResult);
-                workPlace.put("positions", positions);
-                workPlace.put("translations",accessGroup.getTranslations());
-                workPlaces.add(workPlace);
-            }
+            getWorkPlaces(staffId, unit, accessGroups, workPlaces);
             return workPlaces;
         }
 
@@ -363,56 +341,9 @@ public class PositionService {
                 TranslationUtil.convertTranslationFromStringToMap(parentUnit);
                 Map<String, Object> position;
                 if (ids.contains(id)) {
-                    for (QueryResult queryResult : list) {
-                        if (queryResult.getId() == id) {
-                            List<QueryResult> childs = queryResult.getChildren();
-                            Map<String, Object> data= (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get(CHILD);
-                            TranslationUtil.convertTranslationFromStringToMap(data);
-                            QueryResult child = objectMapper.convertValue(data, QueryResult.class);
-                            child.setTranslations(unit.getTranslations());
-                            position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                            if (position != null && !position.isEmpty()) {
-                                positions.add(position);
-                                child.setAccessable(true);
-
-                                child.setStartDate((String) position.get(START_DATE));
-                                child.setEndDate((String) position.get(END_DATE));
-                            } else {
-                                child.setAccessable(false);
-                            }
-                            childs.add(child);
-                            break;
-                        }
-                    }
+                    getQueryList(staffId, unit, positions, objectMapper, list, accessGroup, unitData, id);
                 } else {
-                    List<QueryResult> queryResults = new ArrayList<>();
-                    Map<String, Object> childMap = (Map<String, Object>)((Map<String, Object>) unitData.get("data")).get(CHILD);
-                    TranslationUtil.convertTranslationFromStringToMap(childMap);
-                    QueryResult child = objectMapper.convertValue(childMap, QueryResult.class);
-                    child.setTranslations(unit.getTranslations());
-                    position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                    if (position != null && !position.isEmpty()) {
-                        positions.add(position);
-                        child.setAccessable(true);
-                        child.setStartDate((String) position.get(START_DATE));
-                        child.setEndDate((String) position.get(END_DATE));
-
-                    } else {
-                        child.setAccessable(false);
-                    }
-                    queryResults.add(child);
-                    QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
-                    queryResult.setTranslations(organization.getTranslations());
-                    position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
-                    if (position != null && !position.isEmpty()) {
-                        positions.add(position);
-                        queryResult.setAccessable(true);
-                        queryResult.setStartDate((String) position.get(START_DATE));
-                        queryResult.setEndDate((String) position.get(END_DATE));
-                    } else {
-                        queryResult.setAccessable(false);
-                    }
-                    list.add(queryResult);
+                    getQueryResults(staffId, organization, unit, positions, objectMapper, list, accessGroup, unitData, parentUnit, id);
                 }
                 ids.add(id);
             }
@@ -425,6 +356,90 @@ public class PositionService {
             workPlaces.add(workPlace);
         }
         return workPlaces;
+    }
+
+    private void getQueryResults(long staffId, Organization organization, OrganizationBaseEntity unit, List<Map<String, Object>> positions, ObjectMapper objectMapper, List<QueryResult> list, AccessGroup accessGroup, Map<String, Object> unitData, Map<String, Object> parentUnit, long id) {
+        Map<String, Object> position;
+        List<QueryResult> queryResults = new ArrayList<>();
+        Map<String, Object> childMap = (Map<String, Object>)((Map<String, Object>) unitData.get("data")).get(CHILD);
+        TranslationUtil.convertTranslationFromStringToMap(childMap);
+        QueryResult child = objectMapper.convertValue(childMap, QueryResult.class);
+        child.setTranslations(unit.getTranslations());
+        position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+        if (position != null && !position.isEmpty()) {
+            positions.add(position);
+            child.setAccessable(true);
+            child.setStartDate((String) position.get(START_DATE));
+            child.setEndDate((String) position.get(END_DATE));
+
+        } else {
+            child.setAccessable(false);
+        }
+        queryResults.add(child);
+        QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
+        queryResult.setTranslations(organization.getTranslations());
+        position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
+        if (position != null && !position.isEmpty()) {
+            positions.add(position);
+            queryResult.setAccessable(true);
+            queryResult.setStartDate((String) position.get(START_DATE));
+            queryResult.setEndDate((String) position.get(END_DATE));
+        } else {
+            queryResult.setAccessable(false);
+        }
+        list.add(queryResult);
+    }
+
+    private void getQueryList(long staffId, OrganizationBaseEntity unit, List<Map<String, Object>> positions, ObjectMapper objectMapper, List<QueryResult> list, AccessGroup accessGroup, Map<String, Object> unitData, long id) {
+        Map<String, Object> position;
+        for (QueryResult queryResult : list) {
+            if (queryResult.getId() == id) {
+                List<QueryResult> childs = queryResult.getChildren();
+                Map<String, Object> data= (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get(CHILD);
+                TranslationUtil.convertTranslationFromStringToMap(data);
+                QueryResult child = objectMapper.convertValue(data, QueryResult.class);
+                child.setTranslations(unit.getTranslations());
+                position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+                if (position != null && !position.isEmpty()) {
+                    positions.add(position);
+                    child.setAccessable(true);
+
+                    child.setStartDate((String) position.get(START_DATE));
+                    child.setEndDate((String) position.get(END_DATE));
+                } else {
+                    child.setAccessable(false);
+                }
+                childs.add(child);
+                break;
+            }
+        }
+    }
+
+    private void getWorkPlaces(long staffId, OrganizationBaseEntity unit, List<AccessGroup> accessGroups, List<Map<String, Object>> workPlaces) {
+        List<Map<String, Object>> positions;
+        for (AccessGroup accessGroup : accessGroups) {
+            positions=new ArrayList<>();
+            QueryResult queryResult = new QueryResult();
+            queryResult.setId(unit.getId());
+            queryResult.setName(unit.getName());
+            queryResult.setTranslations(unit.getTranslations());
+            Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
+            if (employment != null && !employment.isEmpty()) {
+                positions.add(employment);
+                queryResult.setAccessable(true);
+                queryResult.setStartDate((String) employment.get(START_DATE));
+                queryResult.setEndDate((String) employment.get(END_DATE));
+            } else {
+                queryResult.setAccessable(false);
+            }
+            Map<String, Object> workPlace = new HashMap<>();
+            workPlace.put("id", accessGroup.getId());
+            workPlace.put("name", TranslationUtil.getName(accessGroup.getTranslations(),accessGroup.getName()));
+            workPlace.put("tree", queryResult);
+            workPlace.put("positions", positions);
+            workPlace.put("translations",accessGroup.getTranslations());
+            workPlaces.add(workPlace);
+        }
     }
 
 

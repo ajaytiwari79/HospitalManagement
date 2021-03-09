@@ -111,6 +111,39 @@ public class ShiftServiceUnitTest {
         phase.setId(BigInteger.valueOf(69));
         Map<String,Phase> phaseMap=new HashMap<>();
         phaseMap.put(phase.getPhaseEnum().toString(),phase);
+        updateShiftActivity();
+        shiftState=new ShiftState();
+        shiftState.setActivities(Arrays.asList(activity));
+        updateShiftDTO();
+        when(userIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
+        when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
+        when(phaseService.shiftEditableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
+        try {
+            shiftValidatorService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
+        }catch (Exception e){
+            thrown=false;
+        }
+        assertTrue(thrown);
+
+    }
+
+    private void updateShiftDTO() {
+        shiftDTO=new ShiftDTO();
+        shiftDTO.setId(BigInteger.valueOf(93));
+        shiftDTO.setUnitId(958l);
+        shiftDTO.setStaffId(834l);
+        shiftDTO.setEmploymentId(1136l);
+        shiftDTO.setActivities(Arrays.asList(activity1));
+        shiftDTO.setScheduledMinutes(360);
+        shiftDTO.setDurationMinutes(360);
+        shiftDTO.setEditable(true);
+        shiftDTO.setFunctionDeleted(false);
+        shiftDTO.setShiftStatePhaseId(BigInteger.valueOf(69));
+        shiftDTO.setShiftDate(LocalDate.of(2018,11,28));
+        shiftDTO.setShiftId(BigInteger.valueOf(354));
+    }
+
+    private void updateShiftActivity() {
         activity=new ShiftActivity();
         activity.setId(new BigInteger("12"));
         activity.setActivityId(BigInteger.valueOf(47));
@@ -141,30 +174,5 @@ public class ShiftServiceUnitTest {
         status.add(ShiftStatus.UNPUBLISH);
         activity1.setStatus(status);
         activity1.setStatus(new HashSet<>());
-        shiftState=new ShiftState();
-        shiftState.setActivities(Arrays.asList(activity));
-        shiftDTO=new ShiftDTO();
-        shiftDTO.setId(BigInteger.valueOf(93));
-        shiftDTO.setUnitId(958l);
-        shiftDTO.setStaffId(834l);
-        shiftDTO.setEmploymentId(1136l);
-        shiftDTO.setActivities(Arrays.asList(activity1));
-        shiftDTO.setScheduledMinutes(360);
-        shiftDTO.setDurationMinutes(360);
-        shiftDTO.setEditable(true);
-        shiftDTO.setFunctionDeleted(false);
-        shiftDTO.setShiftStatePhaseId(BigInteger.valueOf(69));
-        shiftDTO.setShiftDate(LocalDate.of(2018,11,28));
-        shiftDTO.setShiftId(BigInteger.valueOf(354));
-        when(userIntegrationService.getTimeZoneByUnitId(unitId)).thenReturn(timeZone);
-        when(shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhase(shiftDTO.getShiftId(), phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId())).thenReturn(shiftState);
-        when(phaseService.shiftEditableInRealtime(timeZone,phaseMap,shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getEndDate())).thenReturn(realtime);
-        try {
-            shiftValidatorService.validateRealTimeShift(unitId,shiftDTO,phaseMap);
-        }catch (Exception e){
-            thrown=false;
-        }
-        assertTrue(thrown);
-
     }
 }

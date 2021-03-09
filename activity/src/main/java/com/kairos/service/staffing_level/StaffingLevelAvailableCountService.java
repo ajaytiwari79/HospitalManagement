@@ -105,11 +105,11 @@ public class StaffingLevelAvailableCountService {
                         staffingLevelActivityDetails.setRemainingOverStaffing(staffingLevelActivityDetails.getRemainingOverStaffing() + diff);
                     }
                 }
-                if(availableCount<staffingLevelActivityDetails.getInitialUnderStaffing()){
-                    staffingLevelActivityDetails.setInitialUnderStaffing(availableCount);
+                if((staffingLevelActivityDetails.getMinNoOfStaff()-availableCount)>staffingLevelActivityDetails.getInitialUnderStaffing()){
+                    staffingLevelActivityDetails.setInitialUnderStaffing(staffingLevelActivityDetails.getMinNoOfStaff()-availableCount);
                 }
-                if(availableCount>staffingLevelActivityDetails.getInitialOverStaffing()){
-                    staffingLevelActivityDetails.setInitialOverStaffing(availableCount);
+                if((availableCount - staffingLevelActivityDetails.getMaxNoOfStaff())>staffingLevelActivityDetails.getInitialOverStaffing()){
+                    staffingLevelActivityDetails.setInitialOverStaffing(availableCount - staffingLevelActivityDetails.getMaxNoOfStaff());
                 }
                 staffingLevelActivityDetails.setAvailableCount(availableCount);
                 staffingLevelActivityDetails.setMaxNoOfStaff(maxNoOfStaff);

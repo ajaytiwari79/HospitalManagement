@@ -190,29 +190,7 @@ public class StaffingLevelGenerator {
             localDates.add(localDateListEntry.getKey());
             Map<BigInteger,List<ALI>> aliByActivity = aliMapByActivityAndDate.getOrDefault(localDateListEntry.getKey(),new HashMap<>());
             for (StaffingLevelInterval staffingLevelInterval : localDateListEntry.getValue()) {
-                for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
-                    if (activityMap.containsKey(staffingLevelActivity.getActivityId()) && staffingLevelActivity.getMinNoOfStaff()>0) {
-                        Activity activity = activityMap.get(staffingLevelActivity.getActivityId());
-                        Set<BigInteger> activitiesIdsPerDayOrDefault = activitiesIdsPerDay.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
-                        if(!activitiesIdsPerDayOrDefault.contains(activity.getId())){
-                            List<Activity> activities = activitiesPerDay.getOrDefault(localDateListEntry.getKey(),new ArrayList<>());
-                            activities.add(activity);
-                            activitiesPerDay.put(localDateListEntry.getKey(),activities);
-                            activitiesIdsPerDayOrDefault.add(activity.getId());
-                            activitiesIdsPerDay.put(localDateListEntry.getKey(),activitiesIdsPerDayOrDefault);
-                        }
-                        Set<Activity> activityList = dateActivityMap.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
-                        activityList.add(activity);
-                        dateActivityMap.put(localDateListEntry.getKey(), activityList);
-                        ZonedDateTime zonedDateTime = asZonedDateTime(localDateListEntry.getKey(), staffingLevelInterval.getStaffingLevelDuration().getFrom());
-                        //Prepare DateWise Required/Demanding activities for optaplanner
-                        List<ALI> activityLineIntervals = getInterval(activity, zonedDateTime, staffingLevelInterval.getStaffingLevelDuration(), staffingLevelActivity);
-                        List<ALI> aliTreeSet = aliByActivity.getOrDefault(staffingLevelActivity.getActivityId(),new ArrayList<>());
-                        aliTreeSet.addAll(activityLineIntervals);
-                        aliByActivity.put(staffingLevelActivity.getActivityId(),aliTreeSet);
-                        activityLineIntervalList.addAll(activityLineIntervals);
-                    }
-                }
+                updateALIs(activityLineIntervalList, dateActivityMap, activityMap, activitiesPerDay, activitiesIdsPerDay, localDateListEntry, aliByActivity, staffingLevelInterval);
             }
             aliMapByActivityAndDate.put(localDateListEntry.getKey(),aliByActivity);
         }
@@ -228,6 +206,32 @@ public class StaffingLevelGenerator {
         bigIntegerListMap.values().forEach(listEntry -> staffingLevelSolution.getAliPerActivities().add(listEntry));*/
         staffingLevelSolution.setAliPerActivities(aliPerDayByActivity);
         return activityMap;
+    }
+
+    private void updateALIs(List<ALI> activityLineIntervalList, Map<LocalDate, Set<Activity>> dateActivityMap, Map<BigInteger, Activity> activityMap, Map<LocalDate, List<Activity>> activitiesPerDay, Map<LocalDate, Set<BigInteger>> activitiesIdsPerDay, Map.Entry<LocalDate, List<StaffingLevelInterval>> localDateListEntry, Map<BigInteger, List<ALI>> aliByActivity, StaffingLevelInterval staffingLevelInterval) {
+        for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
+            if (activityMap.containsKey(staffingLevelActivity.getActivityId()) && staffingLevelActivity.getMinNoOfStaff()>0) {
+                Activity activity = activityMap.get(staffingLevelActivity.getActivityId());
+                Set<BigInteger> activitiesIdsPerDayOrDefault = activitiesIdsPerDay.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
+                if(!activitiesIdsPerDayOrDefault.contains(activity.getId())){
+                    List<Activity> activities = activitiesPerDay.getOrDefault(localDateListEntry.getKey(),new ArrayList<>());
+                    activities.add(activity);
+                    activitiesPerDay.put(localDateListEntry.getKey(),activities);
+                    activitiesIdsPerDayOrDefault.add(activity.getId());
+                    activitiesIdsPerDay.put(localDateListEntry.getKey(),activitiesIdsPerDayOrDefault);
+                }
+                Set<Activity> activityList = dateActivityMap.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
+                activityList.add(activity);
+                dateActivityMap.put(localDateListEntry.getKey(), activityList);
+                ZonedDateTime zonedDateTime = asZonedDateTime(localDateListEntry.getKey(), staffingLevelInterval.getStaffingLevelDuration().getFrom());
+                //Prepare DateWise Required/Demanding activities for optaplanner
+                List<ALI> activityLineIntervals = getInterval(activity, zonedDateTime, staffingLevelInterval.getStaffingLevelDuration(), staffingLevelActivity);
+                List<ALI> aliTreeSet = aliByActivity.getOrDefault(staffingLevelActivity.getActivityId(),new ArrayList<>());
+                aliTreeSet.addAll(activityLineIntervals);
+                aliByActivity.put(staffingLevelActivity.getActivityId(),aliTreeSet);
+                activityLineIntervalList.addAll(activityLineIntervals);
+            }
+        }
     }
 
     public Object[] getMergedALI(Map<LocalDate, Map<BigInteger, List<ALI>>> aliMapByActivityAndDate) {
