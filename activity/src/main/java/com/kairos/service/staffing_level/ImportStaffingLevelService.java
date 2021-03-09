@@ -54,23 +54,11 @@ public class ImportStaffingLevelService {
 
 
     public void processStaffingLevel(MultipartFile file, long unitId) throws IOException {
-
         CSVParser csvRecords = CSVParser.parse(file.getInputStream(), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
         List<CSVRecord> timeRecords = csvRecords.getRecords();
         CSVRecord headerRecord = timeRecords.get(1);
         CSVRecord columnActivityNameRecord = timeRecords.get(2);
-        List<Map<String, String>> recordIndexes = new ArrayList<>();
-
-        Map<String, String> columnEntry = null;
-        for (int i = 2; i < headerRecord.size(); i++) {
-            if (!headerRecord.get(i).isEmpty()) {
-                columnEntry = new HashMap<>();
-                columnEntry.put(START_INDEX, String.valueOf(i));
-                columnEntry.put(SELECTED_DAY, headerRecord.get(i));
-                columnEntry.put(headerRecord.get(i), String.valueOf(i));
-                recordIndexes.add(columnEntry);
-            }
-        }
+        List<Map<String, String>> recordIndexes = getRecordIndexes(headerRecord);
 
         Map<String, String> lastIndexEntry = new HashMap<>();
         lastIndexEntry.put(START_INDEX, String.valueOf(headerRecord.size()));
@@ -91,46 +79,7 @@ public class ImportStaffingLevelService {
             fromToTimeRecord.put(FOR_DAY, dayRecord.get(SELECTED_DAY));
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>(timeRecords.size());
             for (CSVRecord csvRecord : timeRecords) {
-                if (csvRecord.getRecordNumber() > 3 && csvRecord.getRecordNumber() < 100) {
-                    fromToTimeRecord.put("from", csvRecord.get(0));
-                    fromToTimeRecord.put("to", csvRecord.get(1));
-                    min = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get(START_INDEX))));
-                    max = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get(START_INDEX)) + 1));
-                    fromToTimeRecord.put("min", csvRecord.get(Integer.parseInt(dayRecord.get(START_INDEX))));
-
-                    //setting max value as min if min > max
-                    fromToTimeRecord.put("max", String.valueOf(min > max ? min : max));
-
-                    boolean initialCountAdded = false;
-                    int startPos = 0;
-                    DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
-                            .appendValue(HOUR_OF_DAY)
-                            .appendValue(MINUTE_OF_HOUR, 2)
-                            .toFormatter();
-                    LocalTime fromTime = LocalTime.parse("0000" + (String) csvRecord.get(0), dateTimeFormatter);
-                    LocalTime toTime = LocalTime.parse("0000" + (String) csvRecord.get(1), dateTimeFormatter);
-
-                    Duration staffingLevelIntervalDuration = new Duration(fromTime, toTime);
-                    StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(new Integer(csvRecord.get(2)), new Integer(csvRecord.get(3)), staffingLevelIntervalDuration);
-
-                    if (initialCountAdded == false) {
-                        startPos = 2 + Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
-                    } else {
-                        startPos = Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
-                    }
-                    Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
-                    int runFor = Integer.parseInt(recordIndexes.get(n + 1).get(recordIndexes.get(n + 1).keySet().toArray()[0]));
-                    for (int j = startPos; j < runFor; j++) {
-                        staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j)), new Integer(csvRecord.get(j))));
-                        fromToTimeRecord.put(columnActivityNameRecord.get(j), csvRecord.get(j));
-                        activitiesNameList.add(columnActivityNameRecord.get(j));
-                    }
-                    staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
-                    staffingLevelIntervals.add(staffingLevelInterval);
-                    staffingLevelRecordByFromToTimeAndActivity.add(fromToTimeRecord);
-                    if (csvRecord.getRecordNumber() < 99)
-                        fromToTimeRecord = new HashMap<>();
-                }
+                fromToTimeRecord = updateCSVRecordMap(columnActivityNameRecord, recordIndexes, staffingLevelRecordByFromToTimeAndActivity, fromToTimeRecord, activitiesNameList, n, dayRecord, staffingLevelIntervals, csvRecord);
             }
             n++;
             if (n == allRecordsFor - 1) {
@@ -141,29 +90,83 @@ public class ImportStaffingLevelService {
         createStaffingLevelObject(staffingLevelRecordByFromToTimeAndActivity, unitId);
     }
 
-    private void createStaffingLevelObject(List<Map<String, String>> processedData, long unitId) {
+    private Map<String, String> updateCSVRecordMap(CSVRecord columnActivityNameRecord, List<Map<String, String>> recordIndexes, List<Map<String, String>> staffingLevelRecordByFromToTimeAndActivity, Map<String, String> fromToTimeRecord, Set<String> activitiesNameList, int n, Map<String, String> dayRecord, List<StaffingLevelInterval> staffingLevelIntervals, CSVRecord csvRecord) {
+        int min;
+        int max;
+        if (csvRecord.getRecordNumber() > 3 && csvRecord.getRecordNumber() < 100) {
+            fromToTimeRecord.put("from", csvRecord.get(0));
+            fromToTimeRecord.put("to", csvRecord.get(1));
+            min = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get(START_INDEX))));
+            max = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get(START_INDEX)) + 1));
+            fromToTimeRecord.put("min", csvRecord.get(Integer.parseInt(dayRecord.get(START_INDEX))));
 
+            //setting max value as min if min > max
+            fromToTimeRecord.put("max", String.valueOf(min > max ? min : max));
+
+            boolean initialCountAdded = false;
+            int startPos = 0;
+            DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
+                    .appendValue(HOUR_OF_DAY)
+                    .appendValue(MINUTE_OF_HOUR, 2)
+                    .toFormatter();
+            LocalTime fromTime = LocalTime.parse("0000" + (String) csvRecord.get(0), dateTimeFormatter);
+            LocalTime toTime = LocalTime.parse("0000" + (String) csvRecord.get(1), dateTimeFormatter);
+
+            Duration staffingLevelIntervalDuration = new Duration(fromTime, toTime);
+            StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(new Integer(csvRecord.get(2)), new Integer(csvRecord.get(3)), staffingLevelIntervalDuration);
+
+            if (initialCountAdded == false) {
+                startPos = 2 + Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
+            } else {
+                startPos = Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
+            }
+            Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
+            int runFor = Integer.parseInt(recordIndexes.get(n + 1).get(recordIndexes.get(n + 1).keySet().toArray()[0]));
+            for (int j = startPos; j < runFor; j++) {
+                staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j)), new Integer(csvRecord.get(j))));
+                fromToTimeRecord.put(columnActivityNameRecord.get(j), csvRecord.get(j));
+                activitiesNameList.add(columnActivityNameRecord.get(j));
+            }
+            staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
+            staffingLevelIntervals.add(staffingLevelInterval);
+            staffingLevelRecordByFromToTimeAndActivity.add(fromToTimeRecord);
+            if (csvRecord.getRecordNumber() < 99)
+                fromToTimeRecord = new HashMap<>();
+        }
+        return fromToTimeRecord;
+    }
+
+    private List<Map<String, String>> getRecordIndexes(CSVRecord headerRecord) {
+        List<Map<String, String>> recordIndexes = new ArrayList<>();
+        Map<String, String> columnEntry = null;
+        for (int i = 2; i < headerRecord.size(); i++) {
+            if (!headerRecord.get(i).isEmpty()) {
+                columnEntry = new HashMap<>();
+                columnEntry.put(START_INDEX, String.valueOf(i));
+                columnEntry.put(SELECTED_DAY, headerRecord.get(i));
+                columnEntry.put(headerRecord.get(i), String.valueOf(i));
+                recordIndexes.add(columnEntry);
+            }
+        }
+        return recordIndexes;
+    }
+
+    private void createStaffingLevelObject(List<Map<String, String>> processedData, long unitId) {
         List<PresenceStaffingLevelDto> staffingDtoList = new ArrayList<>();
         PresenceStaffingLevelDto staffingDTO;
         List<StaffingLevelInterval> staffingLevelTimeSlList = new ArrayList<>();
         StaffingLevelInterval staffingLevelTimeSlot;
         Duration duration;
         StaffingLevelSetting staffingLevelSetting;
-        LocalTime fromTime;
-        LocalTime toTime;
         Set<StaffingLevelActivity> activitySet;
         Map<BigInteger, Integer> activityRankMap = new HashMap<>();
-
-
         Date date = null;
-
         int i = 0;
         int seq = 0;
         DateFormat sourceFormat = new SimpleDateFormat(COMMON_DATE_FORMAT);
         Map<String, String> firstData = processedData.get(0);
         duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         staffingLevelSetting = new StaffingLevelSetting(15, duration);
-
         try {
             date = sourceFormat.parse(firstData.get(FOR_DAY));
         } catch (ParseException e) {
@@ -172,67 +175,76 @@ public class ImportStaffingLevelService {
         LocalDate dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = dateInLocal.get(weekOfYear);
-
         staffingDTO = new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
-
         for (Map<String, String> singleData : processedData) {
-
             if (singleData.containsKey(FOR_DAY) && i != 0) {
-
-                staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
-                staffingDtoList.add(staffingDTO);
-                activityRankMap = new HashMap<>();
-
-                seq = 0;
-                staffingLevelTimeSlList = new ArrayList<>();
-                duration = new Duration(LocalTime.MIN, LocalTime.MAX);
-                staffingLevelSetting = new StaffingLevelSetting(15, duration);
-                try {
-                    date = sourceFormat.parse(singleData.get(FOR_DAY));
-                } catch (ParseException e) {
-                    LOGGER.error("error {}", e.getMessage());
-                }
-                dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
-                currentWeekCount = dateInLocal.get(weekOfYear);
-                staffingDTO = new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
+                staffingDTO = createStaffingLevelDTO(staffingDTO,staffingLevelTimeSlList,staffingDtoList,sourceFormat,singleData);
             } else {
                 i++;
             }
-
-            String toTimeS = updateTimeString(singleData, "to");
-            String fromTimeS = updateTimeString(singleData, "from");
-            fromTime = LocalTime.parse(fromTimeS.substring(0, 2) + ":" + fromTimeS.substring(2, 4));
-            toTime = LocalTime.parse(toTimeS.substring(0, 2) + ":" + toTimeS.substring(2, 4));
-            duration = new Duration(fromTime, toTime);
+            duration = getDuration(singleData);
             staffingLevelTimeSlot = new StaffingLevelInterval(seq++, Integer.parseInt(singleData.get("min")), Integer.parseInt(singleData.get("max")), duration);
-
-            activitySet = new HashSet<>();
-            Iterator<String> keyFirstItr = singleData.keySet().iterator();
-
-            int rank = 0;
-
-            while (keyFirstItr.hasNext()) {
-                String keyTemp = keyFirstItr.next();
-                if (!keyTemp.equals("to") && !keyTemp.equals("from") && !keyTemp.equals("min")
-                        && !keyTemp.equals("max") && !keyTemp.equals(FOR_DAY)) {
-                    Activity activityDB = activityMongoRepository.getActivityByNameAndUnitId(unitId, keyTemp.trim());
-                    if (activityDB != null) {
-                        StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId(), keyTemp, Integer.parseInt(singleData.get(keyTemp)), Integer.parseInt(singleData.get(keyTemp)));
-                        activitySet.add(staffingLevelActivity);
-                        activityRankMap.put(activityDB.getId(), ++rank);
-                    }
-                }
-            }
+            activitySet = updateActivityRanking(unitId,  activityRankMap, singleData, singleData.keySet().iterator());
             staffingLevelTimeSlot.setStaffingLevelActivities(activitySet);
             staffingLevelTimeSlList.add(staffingLevelTimeSlot);
         }
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
         staffingDtoList.add(staffingDTO);
 
+        createStaffingLevels(unitId, staffingDtoList);
+    }
+
+    private PresenceStaffingLevelDto createStaffingLevelDTO(PresenceStaffingLevelDto staffingDTO, List<StaffingLevelInterval> staffingLevelTimeSlList, List<PresenceStaffingLevelDto> staffingDtoList, DateFormat sourceFormat, Map<String, String> singleData){
+        staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
+        staffingDtoList.add(staffingDTO);
+        Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
+        StaffingLevelSetting staffingLevelSetting = new StaffingLevelSetting(15, duration);
+        Date date = null;
+        try {
+            date = sourceFormat.parse(singleData.get(FOR_DAY));
+        } catch (ParseException e) {
+            LOGGER.error("error {}", e.getMessage());
+        }
+        LocalDate dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int currentWeekCount = dateInLocal.get(weekOfYear);
+        return new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
+    }
+
+    private Duration getDuration(Map<String, String> singleData) {
+        LocalTime fromTime;
+        LocalTime toTime;
+        Duration duration;
+        String toTimeS = updateTimeString(singleData, "to");
+        String fromTimeS = updateTimeString(singleData, "from");
+        fromTime = LocalTime.parse(fromTimeS.substring(0, 2) + ":" + fromTimeS.substring(2, 4));
+        toTime = LocalTime.parse(toTimeS.substring(0, 2) + ":" + toTimeS.substring(2, 4));
+        duration = new Duration(fromTime, toTime);
+        return duration;
+    }
+
+    private void createStaffingLevels(long unitId, List<PresenceStaffingLevelDto> staffingDtoList) {
         staffingDtoList.forEach(staffingLevelDto -> {
             staffingLevelService.createStaffingLevel(staffingLevelDto, unitId);
         });
+    }
+
+    private Set<StaffingLevelActivity> updateActivityRanking(long unitId,   Map<BigInteger, Integer> activityRankMap, Map<String, String> singleData, Iterator<String> keyFirstItr) {
+        int rank = 0;
+        Set<StaffingLevelActivity> activitySet = new HashSet<>();
+        while (keyFirstItr.hasNext()) {
+            String keyTemp = keyFirstItr.next();
+            if (!keyTemp.equals("to") && !keyTemp.equals("from") && !keyTemp.equals("min")
+                    && !keyTemp.equals("max") && !keyTemp.equals(FOR_DAY)) {
+                Activity activityDB = activityMongoRepository.getActivityByNameAndUnitId(unitId, keyTemp.trim());
+                if (activityDB != null) {
+                    StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId(), keyTemp, Integer.parseInt(singleData.get(keyTemp)), Integer.parseInt(singleData.get(keyTemp)));
+                    activitySet.add(staffingLevelActivity);
+                    activityRankMap.put(activityDB.getId(), ++rank);
+                }
+            }
+        }
+        return activitySet;
     }
 
     private String updateTimeString(Map<String, String> singleData, String time) {

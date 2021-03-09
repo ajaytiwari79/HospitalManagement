@@ -741,23 +741,7 @@ public class StaffingLevelService {
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
             for (TimeSlotDTO timeSlot : timeSlots) {
-                List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
-                AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
-                List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotIntervals, localDateAtomicReference);
-                if (timeSlot.getStartHour() > timeSlot.getEndHour()) {
-                    LocalDate nextDay = startLocalDate.plusDays(1);
-                    PresenceStaffingLevelDto nextDayStaffingLevel = staffingLevelMap.get(nextDay);
-                    localDateAtomicReference = new AtomicReference<>(nextDay);
-                    staffingLevelIntervals.addAll(getStaffingLevelInterval(activityId, unpublishedChanges, nextDayStaffingLevel, timeSlotIntervals, localDateAtomicReference));
-                }
-                int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals, true, unpublishedChanges, activityId);
-                int overStaffing = maxAndMinNoOfStaff[0];
-                int underStaffing = maxAndMinNoOfStaff[1];
-                int totalMinNoOfStaff = maxAndMinNoOfStaff[2];
-                int totalMaxNoOfStaff = maxAndMinNoOfStaff[3];
-                int totalMinimumMinutes = totalMinNoOfStaff * detailLevelMinutes;
-                int totalMaximumMinutes = totalMaxNoOfStaff * detailLevelMinutes;
-                staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing, overStaffing, underStaffing * detailLevelMinutes, overStaffing * detailLevelMinutes, timeSlot.getName(), totalMinNoOfStaff, totalMaxNoOfStaff, totalMinimumMinutes, totalMaximumMinutes));
+                getCalculationByTimeSlot(activityId, unpublishedChanges, startLocalDate, staffingLevelMap, staffingLevel, staffingLevelDetailsByTimeSlotDTOS, detailLevelMinutes, timeSlot);
             }
             int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(), false, unpublishedChanges, null);
             int overStaffing = maxAndMinNoOfStaff[0];
@@ -771,6 +755,26 @@ public class StaffingLevelService {
             startLocalDate = startLocalDate.plusDays(1);
         }
         return localDateDailyStaffingLevelDetailsDTOMap;
+    }
+
+    private void getCalculationByTimeSlot(BigInteger activityId, boolean unpublishedChanges, LocalDate startLocalDate, Map<LocalDate, PresenceStaffingLevelDto> staffingLevelMap, PresenceStaffingLevelDto staffingLevel, List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS, Integer detailLevelMinutes, TimeSlotDTO timeSlot) {
+        List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
+        AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
+        List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotIntervals, localDateAtomicReference);
+        if (timeSlot.getStartHour() > timeSlot.getEndHour()) {
+            LocalDate nextDay = startLocalDate.plusDays(1);
+            PresenceStaffingLevelDto nextDayStaffingLevel = staffingLevelMap.get(nextDay);
+            localDateAtomicReference = new AtomicReference<>(nextDay);
+            staffingLevelIntervals.addAll(getStaffingLevelInterval(activityId, unpublishedChanges, nextDayStaffingLevel, timeSlotIntervals, localDateAtomicReference));
+        }
+        int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals, true, unpublishedChanges, activityId);
+        int overStaffing = maxAndMinNoOfStaff[0];
+        int underStaffing = maxAndMinNoOfStaff[1];
+        int totalMinNoOfStaff = maxAndMinNoOfStaff[2];
+        int totalMaxNoOfStaff = maxAndMinNoOfStaff[3];
+        int totalMinimumMinutes = totalMinNoOfStaff * detailLevelMinutes;
+        int totalMaximumMinutes = totalMaxNoOfStaff * detailLevelMinutes;
+        staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing, overStaffing, underStaffing * detailLevelMinutes, overStaffing * detailLevelMinutes, timeSlot.getName(), totalMinNoOfStaff, totalMaxNoOfStaff, totalMinimumMinutes, totalMaximumMinutes));
     }
 
     private List<DateTimeInterval> getTimeSlotInterval(LocalDate startLocalDate, TimeSlotDTO timeSlot) {
