@@ -119,6 +119,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId), Criteria.where(COUNTRY_ID).is(countryId))),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
+                match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId),Criteria.where(COUNTRY_ID).is(countryId).and(TIME_TYPE_PART_OF_TEAM).is(true))),
                 lookup(TAG, TAGS, UNDERSCORE_ID, TAGS),
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB,COUNTRY_PARENT_ID, PARENT_ID, GENERAL_ACTIVITY_TAB, TAGS, ACTIVITY_PRIORITY_ID,TRANSLATIONS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
                         .and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).as(METHOD_FOR_CALCULATING_TIME)
@@ -126,6 +127,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(APPLICABLE_FOR_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_SICKNESS_SETTING).arrayElementAt(0).as(SICKNESS_SETTING)
+
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
