@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.shift.CoverShiftCriteria.STAFF_WITH_EMPLOYMENT_TYPES;
 import static com.kairos.enums.shift.CoverShiftCriteria.STAFF_WITH_TAGS;
 
@@ -59,6 +60,9 @@ public class CoverShiftService {
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
+        if(isNotNull(coverShiftSettingMongoRepository.getCoverShiftSettingByUnitId(unitId))){
+            exceptionService.actionNotPermittedException(ERROR_COVER_SHIFT_SETTING_ALREADY_EXIST_FOR_UNIT);
+        }
         CoverShiftSetting coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
         coverShiftSettingMongoRepository.save(coverShiftSetting);
         coverShiftSettingDTO.setId(coverShiftSetting.getId());
@@ -67,9 +71,15 @@ public class CoverShiftService {
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO updateCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
+        if(isNull(coverShiftSettingDTO.getId())){
+            exceptionService.actionNotPermittedException(ERROR_COVER_SHIFT_SETTING_ID_NOT_FOUND);
+        }
         CoverShiftSetting coverShiftSetting = coverShiftSettingMongoRepository.findOne(coverShiftSettingDTO.getId());
         if(isNull(coverShiftSetting)){
-            exceptionService.dataNotFoundByIdException("Cover Shift Setting Not Found");
+            exceptionService.dataNotFoundByIdException(ERROR_COVER_SHIFT_SETTING_NOT_FOUND);
+        }
+        if(unitId != coverShiftSetting.getUnitId() || unitId != coverShiftSettingDTO.getUnitId()){
+            exceptionService.dataNotFoundByIdException(ERROR_COVER_SHIFT_SETTING_UNIT_ID_INVALID);
         }
         coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
         coverShiftSettingMongoRepository.save(coverShiftSetting);

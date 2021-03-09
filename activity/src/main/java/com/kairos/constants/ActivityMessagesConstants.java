@@ -420,7 +420,10 @@ public class ActivityMessagesConstants {
     public static final String HIGHEST_RANK_ACTIVITY_ABSENT = "error.highest.team.absent";
     public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
     public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
-
+    public static final String ERROR_COVER_SHIFT_SETTING_NOT_FOUND = "error.cover.shift.setting.not.found";
+    public static final String ERROR_COVER_SHIFT_SETTING_ID_NOT_FOUND = "error.cover.shift.setting.id.not.found";
+    public static final String ERROR_COVER_SHIFT_SETTING_ALREADY_EXIST_FOR_UNIT = "error.cover.shift.setting.already.exist.for.unit";
+    public static final String ERROR_COVER_SHIFT_SETTING_UNIT_ID_INVALID = "error.cover.shift.setting.unit.id.invalid";
 
     //Ranking Error Messages
     public static final String MESSAGE_RANKING_EMPTY="ranking.absent";
