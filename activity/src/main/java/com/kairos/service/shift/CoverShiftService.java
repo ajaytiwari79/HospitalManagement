@@ -63,6 +63,9 @@ public class CoverShiftService {
         if(isNotNull(coverShiftSettingMongoRepository.getCoverShiftSettingByUnitId(unitId))){
             exceptionService.actionNotPermittedException(ERROR_COVER_SHIFT_SETTING_ALREADY_EXIST_FOR_UNIT);
         }
+        if(!unitId.equals(coverShiftSettingDTO.getUnitId())){
+            exceptionService.dataNotFoundByIdException(ERROR_COVER_SHIFT_SETTING_UNIT_ID_INVALID);
+        }
         CoverShiftSetting coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
         coverShiftSettingMongoRepository.save(coverShiftSetting);
         coverShiftSettingDTO.setId(coverShiftSetting.getId());
@@ -78,7 +81,7 @@ public class CoverShiftService {
         if(isNull(coverShiftSetting)){
             exceptionService.dataNotFoundByIdException(ERROR_COVER_SHIFT_SETTING_NOT_FOUND);
         }
-        if(unitId != coverShiftSetting.getUnitId() || unitId != coverShiftSettingDTO.getUnitId()){
+        if(!unitId.equals(coverShiftSetting.getUnitId()) || !unitId.equals(coverShiftSettingDTO.getUnitId())){
             exceptionService.dataNotFoundByIdException(ERROR_COVER_SHIFT_SETTING_UNIT_ID_INVALID);
         }
         coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
