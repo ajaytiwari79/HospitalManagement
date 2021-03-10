@@ -75,7 +75,7 @@ public class OrganizationServiceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
 
-    @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
+    //@CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
     public Map<String, Object> updateOrganizationService(long id, String name, String description, Long countryId) {
         if (isNull(name) || name.trim().isEmpty()) {
             exceptionService.actionNotPermittedException(ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY);
@@ -98,13 +98,13 @@ public class OrganizationServiceService {
         return organizationServiceRepository.findOne(id);
     }
 
-    @Cacheable(value = "getAllOrganizationService", key = "#countryId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getAllOrganizationService", key = "#countryId", cacheManager = "cacheManager")
     public Iterable<OrganizationService> getAllOrganizationService(Long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
         return organizationServiceRepository.findAllById(serviceIds);
      }
 
-    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
+    //@CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
@@ -146,7 +146,7 @@ public class OrganizationServiceService {
 
     }
 
-    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
+    //@CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public Map<String, Object> addCountrySubService(final long serviceId, OrganizationService subService) {
         OrganizationService organizationService = organizationServiceRepository.findById(serviceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         String name = "(?i)" + subService.getName();
@@ -169,7 +169,7 @@ public class OrganizationServiceService {
 
     }
 
-    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
+    //@CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName) {
 
         return unitGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
@@ -177,12 +177,12 @@ public class OrganizationServiceService {
 
     }
 
-    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
+    //@CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId, long organizationId, String customName) {
             return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
     }
 
-    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
+    //@CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     private Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
         return unitGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
@@ -215,7 +215,7 @@ public class OrganizationServiceService {
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
     }
 
-    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
+    //@CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
         OrganizationType organizationType = organizationTypeGraphRepository.findOne(orgTypeId);
         List<Object> objectList = new ArrayList<>();
@@ -255,7 +255,7 @@ public class OrganizationServiceService {
 
     }
 
-    @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
+    //@CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
     public OrganizationService createCountryOrganizationService(Long countryId, OrganizationService organizationService) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
