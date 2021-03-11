@@ -158,16 +158,16 @@ public class ActivityRankingService {
        return activityService.findAllActivitiesByTimeType(unitId,PRESENCE);
     }
 
-    @Async
-    public void addActivityInRanking(Activity activity){
-        List<ActivityRanking> activityRankings=new ArrayList<>();//=activityRankingRepository.findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(activity.getExpertises(),activity.getActivityGeneralSettings().getStartDate());
-        activityRankings.forEach(activityRanking -> {
-            if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                activityRanking.getFullWeekActivities().add(activity.getId());
-            }else if(FULL_DAY_CALCULATION.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-                activityRanking.getFullDayActivities().add(activity.getId());
-            }
-        });
-        activityRankingRepository.saveEntities(activityRankings);
-    }
+//    @Async
+//    public void addActivityInRanking(Activity activity){
+//        List<ActivityRanking> activityRankings=new ArrayList<>();//=activityRankingRepository.findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(activity.getExpertises(),activity.getActivityGeneralSettings().getStartDate());
+//        activityRankings.forEach(activityRanking -> {
+//            if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+//                activityRanking.getFullWeekActivities().add(activity.getId());
+//            }else if(FULL_DAY_CALCULATION.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+//                activityRanking.getFullDayActivities().add(activity.getId());
+//            }
+//        });
+//        activityRankingRepository.saveEntities(activityRankings);
+//    }
 }

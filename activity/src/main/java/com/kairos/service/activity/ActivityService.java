@@ -112,9 +112,10 @@ public class ActivityService {
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private DayTypeService dayTypeService;
+   // @Inject private ActivityRankingService activityRankingService;
     @Inject private ActivityPermissionService activityPermissionService;
     @Inject @Lazy private ActivityHelperService activityHelperService;
-    @Inject private ActivityRankingService activityRankingService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
@@ -775,7 +776,7 @@ public class ActivityService {
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activity);
-        activityRankingService.addActivityInRanking(activity);
+        //activityRankingService.addActivityInRanking(activity);
         return true;
     }
 
