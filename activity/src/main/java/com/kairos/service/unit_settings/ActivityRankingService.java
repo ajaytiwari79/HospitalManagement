@@ -40,11 +40,11 @@ public class ActivityRankingService {
 
     public ActivityRankingDTO saveAbsenceRankingSettings(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
-        if(isCollectionEmpty(activityRankingDTO.getFullDayActivities()) && isCollectionEmpty(activityRankingDTO.getPresenceActivities())){
-            Map<String,List<ActivityDTO>> activityMap=findAllAbsenceActivities();
-            activityRanking.setFullDayActivities(activityMap.get("fullDayActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
-            activityRanking.setFullWeekActivities(activityMap.get("fullWeekActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
-        }
+//        if(isCollectionEmpty(activityRankingDTO.getFullDayActivities()) && isCollectionEmpty(activityRankingDTO.getPresenceActivities())){
+//            Map<String,List<ActivityDTO>> activityMap=findAllAbsenceActivities();
+//            activityRanking.setFullDayActivities(activityMap.get("fullDayActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
+//            activityRanking.setFullWeekActivities(activityMap.get("fullWeekActivities").stream().map(ActivityDTO::getId).collect(Collectors.toSet()));
+//        }
         activityRankingRepository.save(activityRanking);
         activityRankingDTO.setId(activityRanking.getId());
         return activityRankingDTO;
