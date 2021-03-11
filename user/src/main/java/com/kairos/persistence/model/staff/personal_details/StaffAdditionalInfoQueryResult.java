@@ -26,7 +26,7 @@ import java.util.*;
 @NoArgsConstructor
 public class StaffAdditionalInfoQueryResult {
     private String name;
-    private long id;
+    private Long id;
     private List<Long> teams;
     private List<Long> skills;
     private String profilePic;

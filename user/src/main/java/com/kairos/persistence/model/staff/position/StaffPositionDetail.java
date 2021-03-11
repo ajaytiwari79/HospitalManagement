@@ -21,8 +21,8 @@ public class StaffPositionDetail {
     private boolean copyKariosMailToLogin;
     @NotNull(message = ERROR_STAFF_EMPLOYEDSINCE_NOTNULL)
     private String employedSince;
-    private long visitourId;
-    private long engineerTypeId;
+    private Long visitourId;
+    private Long engineerTypeId;
     private Long timeCareExternalId;
     private LocalDate dateOfBirth;
 

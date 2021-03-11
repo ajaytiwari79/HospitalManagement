@@ -368,7 +368,7 @@ public class OrganizationActivityController {
     @ApiOperation("Get all absence activity")
     @GetMapping(value = "/absence-activities")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllAbsenceActivity(unitId));
     }
 

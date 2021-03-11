@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
@@ -52,6 +53,9 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
+        if(isNull(oldShift) || isNull(shift)){
+            throwException(SHIFT_NOT_EXISTS);
+        }
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(oldShift.getActivities(), shift.getActivities());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         activityPerPhaseMap.forEach((k,v)->{

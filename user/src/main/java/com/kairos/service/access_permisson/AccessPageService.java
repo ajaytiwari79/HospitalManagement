@@ -181,7 +181,7 @@ public class AccessPageService {
     }
 
     @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
-    public void setPagePermissionToStaff(AccessPermission accessPermission,long accessGroupId) {
+    public void setPagePermissionToStaff(AccessPermission accessPermission,Long accessGroupId) {
         List<AccessPage> accessPages = accessGroupRepository.getAccessPageByGroup(accessGroupId);
         List<AccessPermissionAccessPageRelation> accessPermissionAccessPageRelations = new ArrayList<>(accessPages.size());
         for (AccessPage accessPage : accessPages) {

@@ -32,7 +32,7 @@ public class BaseRepository {
         return null;
     }
 
-    public <T> T findByExternalId(long externalId, long unitId, Class class_Name) {
+    public <T> T findByExternalId(Long externalId, Long unitId, Class class_Name) {
        /* Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.eq("externalid", externalId));
         select.where(QueryBuilder.eq("unitid", unitId));
@@ -41,7 +41,7 @@ public class BaseRepository {
         return null;
     }
 
-    public <T> List findAllByExternalId(List<Long> externalIds, long unitId, Class class_Name) {
+    public <T> List findAllByExternalId(List<Long> externalIds, Long unitId, Class class_Name) {
         /*Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.in("externalid", externalIds));
         select.where(QueryBuilder.eq("unitid", unitId));
@@ -50,7 +50,7 @@ public class BaseRepository {
         return null;
     }
 
-    public <T> List getAllByUnitId(long unitId,Class class_Name){
+    public <T> List getAllByUnitId(Long unitId,Class class_Name){
         /*Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.eq("unitid", unitId));
         select.where(QueryBuilder.eq("isDeleted", false));

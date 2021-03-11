@@ -100,7 +100,7 @@ public class TableSettingService {
      * @return
      * @auther anil maurya
      */
-    public TableConfiguration getTableConfiguration(long staffId, long unitId) {
+    public TableConfiguration getTableConfiguration(Long staffId, long unitId) {
 
         TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, ORGANIZATION_CITIZEN_TABLE_ID);
 
@@ -110,11 +110,8 @@ public class TableSettingService {
     }
 
     // TODO MIGHT refactor above query .....')
-    public TableConfiguration getTableConfigurationByTabId(long unitId, BigInteger tableId) {
-
-        TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, tableId.toString());
-
-        TableConfiguration tableConfiguration = TableSettingService.getTableConfiguration(tableSetting, tableId.toString());
+    public TableConfiguration getTableConfigurationByTabId(Long unitId, BigInteger tableId) {
+        TableConfiguration tableConfiguration = tableSettingMongoRepository.findTableConfigurationByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, tableId.toString());
         return Optional.ofNullable(tableConfiguration).orElse(new TableConfiguration());
 
     }

@@ -788,6 +788,9 @@ public class StaffingLevelService {
     private List<StaffingLevelInterval> getStaffingLevelInterval(BigInteger activityId, boolean unpublishedChanges, PresenceStaffingLevelDto staffingLevel, List<DateTimeInterval> timeSlotIntervals, AtomicReference<LocalDate> localDateAtomicReference) {
         List<StaffingLevelInterval> updatedIntervals = new ArrayList<>(96);
         for (DateTimeInterval timeSlotInterval : timeSlotIntervals) {
+            if(isNull(staffingLevel)){
+                exceptionService.duplicateDataException(STAFFINGLEVEL_NOT_FOUND, localDateAtomicReference.get());
+            }
             for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
                 if ((!unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs())) && staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getActivityIds().contains(activityId)) {
                     updatedIntervals.add(staffingLevelInterval);
