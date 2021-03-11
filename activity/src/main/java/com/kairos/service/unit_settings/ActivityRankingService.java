@@ -160,7 +160,7 @@ public class ActivityRankingService {
 
     @Async
     public void addActivityInRanking(Activity activity){
-        List<ActivityRanking> activityRankings=activityRankingRepository.findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(activity.getExpertises(),activity.getActivityGeneralSettings().getStartDate());
+        List<ActivityRanking> activityRankings=new ArrayList<>();//=activityRankingRepository.findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(activity.getExpertises(),activity.getActivityGeneralSettings().getStartDate());
         activityRankings.forEach(activityRanking -> {
             if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 activityRanking.getFullWeekActivities().add(activity.getId());
