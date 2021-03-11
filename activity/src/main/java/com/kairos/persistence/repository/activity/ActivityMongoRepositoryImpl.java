@@ -254,7 +254,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ABSENCE.equals(timeType)?COUNTRY_ID:UNIT_ID).is(refId).and("activityBalanceSettings.timeType").is(timeType).and(DELETED).is(false)),
                 sort(Sort.Direction.ASC, "createdAt"),
-                project("name","countryParentId","activityTimeCalculationSettings","expertises"));
+                project("name","countryParentId","activityTimeCalculationSettings","expertises","activityGeneralSettings"));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
