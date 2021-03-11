@@ -7,10 +7,12 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
@@ -152,5 +156,18 @@ public class ActivityRankingService {
 
     public List<ActivityDTO> findAllPresenceActivities(Long unitId){
        return activityService.findAllActivitiesByTimeType(unitId,PRESENCE);
+    }
+
+    @Async
+    public void addActivityInRanking(Activity activity){
+        List<ActivityRanking> activityRankings=activityRankingRepository.findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(activity.getExpertises(),activity.getActivityGeneralSettings().getStartDate());
+        activityRankings.forEach(activityRanking -> {
+            if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                activityRanking.getFullWeekActivities().add(activity.getId());
+            }else if(FULL_DAY_CALCULATION.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+                activityRanking.getFullDayActivities().add(activity.getId());
+            }
+        });
+        activityRankingRepository.saveEntities(activityRankings);
     }
 }

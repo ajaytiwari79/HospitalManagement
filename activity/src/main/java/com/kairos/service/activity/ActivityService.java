@@ -54,6 +54,7 @@ import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftHelperService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.staffing_level.StaffingLevelService;
+import com.kairos.service.unit_settings.ActivityRankingService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -113,6 +114,7 @@ public class ActivityService {
     @Inject private DayTypeService dayTypeService;
     @Inject private ActivityPermissionService activityPermissionService;
     @Inject @Lazy private ActivityHelperService activityHelperService;
+    @Inject private ActivityRankingService activityRankingService;
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
@@ -773,7 +775,7 @@ public class ActivityService {
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activity);
-
+        activityRankingService.addActivityInRanking(activity);
         return true;
     }
 
