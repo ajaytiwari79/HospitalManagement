@@ -35,9 +35,9 @@ public class StaffActivitySpecification extends AbstractSpecification<ShiftWithA
     public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO, RuleExecutionType ruleExecutionType) {
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
-//            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
-//                validateStaffActivity(errorMessages,childActivity);
-//            }
+            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
+                validateStaffActivity(errorMessages,childActivity);
+            }
             validateStaffActivity(errorMessages,shiftActivityDTO);
         }
     }
