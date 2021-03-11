@@ -160,6 +160,7 @@ public class AutoFillGapSettingsService {
     }
 
     public Boolean adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        Boolean skipRules=null;
         if (gapCreated(shiftDTO, shift)) {
             adjustTiming(shiftDTO, shift);
             ShiftActivityDTO[] activities = getActivitiesAroundGap(shiftDTO, shift);
@@ -189,9 +190,9 @@ public class AutoFillGapSettingsService {
                 }
             }
             shiftDTO.setActivities(shiftDTO.getActivities());
-            return shiftActivityDTO.isSkipRules();
+            skipRules = shiftActivityDTO.isSkipRules();
         }
-        return null;
+        return skipRules;
     }
 
     public void setBasicDetails(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
