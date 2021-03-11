@@ -76,7 +76,7 @@ public class ClientBatchService {
     private ExceptionService exceptionService;
 
 
-    public List<Map<String, Object>> batchAddClientsToDatabase(MultipartFile multipartFile, long unitId) {
+    public List<Map<String, Object>> batchAddClientsToDatabase(MultipartFile multipartFile, Long unitId) {
         Unit currentUnit = unitGraphRepository.findOne(unitId);
         if (currentUnit == null) {
             return null;

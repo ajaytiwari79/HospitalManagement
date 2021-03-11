@@ -114,7 +114,7 @@ public class AccessGroupService {
     @Inject private ActivityIntegrationService activityIntegrationService;
     @Inject private PermissionService permissionService;
 
-    public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+    public AccessGroupDTO createAccessGroup(Long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
@@ -168,7 +168,7 @@ public class AccessGroupService {
     }
 
 
-    public boolean deleteAccessGroup(long accessGroupId) {
+    public boolean deleteAccessGroup(Long accessGroupId) {
         AccessGroup objectToDelete = accessGroupRepository.findOne(accessGroupId);
         if (objectToDelete == null) {
             return false;
@@ -264,12 +264,12 @@ public class AccessGroupService {
         return countryAndOrgAccessGroupIdsMap;
     }
 
-    public List<AccessGroupQueryResult> getAccessGroupsForUnit(long organizationId) {
+    public List<AccessGroupQueryResult> getAccessGroupsForUnit(Long organizationId) {
         Organization organization = organizationService.fetchParentOrganization(organizationId);
         return accessGroupRepository.getAccessGroupsForUnit(organization.getId());
     }
 
-    public List<AccessGroup> getAccessGroups(long organizationId) {
+    public List<AccessGroup> getAccessGroups(Long organizationId) {
         Organization organization=organizationService.fetchParentOrganization(organizationId);
         return accessGroupRepository.getAccessGroups(organization.getId());
     }
@@ -308,11 +308,11 @@ public class AccessGroupService {
         return parentAccessPage;
     }
 
-    public List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId) {
+    public List<AccessPage> getAccessModulesForUnits(Long parentOrganizationId, Long userId) {
         return accessPageRepository.getAccessModulesForUnits(parentOrganizationId, userId);
     }
 
-    public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
+    public List<AccessPageQueryResult> getAccessPageHierarchy(Long accessGroupId, Long countryId) {
         // Check if access group is of country
         if (Optional.ofNullable(countryId).isPresent()) {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
@@ -341,7 +341,7 @@ public class AccessGroupService {
         return modules;
     }
 
-    public List<AccessPageQueryResult> getAccessPageByAccessGroup(long accessGroupId, long unitId, long staffId) {
+    public List<AccessPageQueryResult> getAccessPageByAccessGroup(Long accessGroupId, Long unitId, Long staffId) {
         Organization organization = organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> accessPages = accessPageRepository.getAccessPagePermissionOfStaff(organization.getId(), unitId, staffId, accessGroupId);
 
@@ -362,7 +362,7 @@ public class AccessGroupService {
         return modules;
     }
 
-    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds, boolean isSelected, Long countryId) {
+    public Boolean setAccessPagePermissions(Long accessGroupId, List<Long> accessPageIds, boolean isSelected, Long countryId) {
         // Check if access group is of country
         if (Optional.ofNullable(countryId).isPresent()) {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
@@ -416,7 +416,7 @@ public class AccessGroupService {
         return result.getChildren();
     }
 
-    public List<Map<String, Object>> getAccessPermissions(long staffId) {
+    public List<Map<String, Object>> getAccessPermissions(Long staffId) {
 
         return accessGroupRepository.getAccessPermissions(staffId);
     }
@@ -551,7 +551,7 @@ public class AccessGroupService {
     }
 
 
-    public CountryAccessGroupDTO createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
+    public CountryAccessGroupDTO createCountryAccessGroup(Long countryId, CountryAccessGroupDTO accessGroupDTO) {
         validateDetails(countryId, accessGroupDTO);
         List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
         if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
@@ -569,7 +569,7 @@ public class AccessGroupService {
         return accessGroupDTO;
     }
 
-    private void validateDetails(long countryId, CountryAccessGroupDTO accessGroupDTO) {
+    private void validateDetails(Long countryId, CountryAccessGroupDTO accessGroupDTO) {
         if (HUB.equals(accessGroupDTO.getOrganizationCategory()) && AccessGroupRole.STAFF.equals(accessGroupDTO.getRole())) {
             exceptionService.duplicateDataException("error.org.access.management.notnull");
         }
@@ -597,7 +597,7 @@ public class AccessGroupService {
         }
     }
 
-    public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
+    public AccessGroup updateCountryAccessGroup(Long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
         validateDetails(countryId,accessGroupDTO);
         AccessGroup accessGrpToUpdate = accessGroupRepository.findById(accessGroupId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId)));
         accessGrpToUpdate.setName(accessGroupDTO.getName());
@@ -612,7 +612,7 @@ public class AccessGroupService {
         return accessGrpToUpdate;
     }
 
-    public boolean deleteCountryAccessGroup(long accessGroupId) {
+    public boolean deleteCountryAccessGroup(Long accessGroupId) {
         AccessGroup accessGroupToDelete = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroupToDelete).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
@@ -711,7 +711,7 @@ public class AccessGroupService {
 
     }
 
-    public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
+    public CountryAccessGroupDTO copyCountryAccessGroup(Long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
         validateDayTypes(countryAccessGroupDTO.isAllowedDayTypes(), countryAccessGroupDTO.getDayTypeIds());
         if (countryAccessGroupDTO.getEndDate() != null && countryAccessGroupDTO.getEndDate().isBefore(countryAccessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);

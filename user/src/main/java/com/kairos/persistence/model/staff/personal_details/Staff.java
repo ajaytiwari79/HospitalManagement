@@ -102,7 +102,7 @@ public class Staff extends UserBaseEntity {
     private StaffStatusEnum currentStatus;
     @KPermissionField
     private Long inactiveFrom;
-    private long organizationId;
+    private Long organizationId;
     @KPermissionField
     private Language language;
     // Visitour Speed Profile

@@ -225,7 +225,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "Get CTA by Organization sub type  by using sub type Id")
     @GetMapping(value = COUNTRY_URL + "/cta/organization_sub_type/{organizationSubTypeId}")
-    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable Long countryId,@PathVariable long organizationSubTypeId) {
+    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable Long countryId,@PathVariable Long organizationSubTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(countryId,organizationSubTypeId));
     }
 
@@ -240,7 +240,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "link and unlink cta with org sub-type")
     @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable long countryId, @PathVariable BigInteger ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked)  {
+    public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable Long countryId, @PathVariable BigInteger ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable Long organizationSubTypeId, @RequestParam(value = "checked") boolean checked)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.setCTAWithOrganizationType(countryId, ctaId,collectiveTimeAgreementDTO, organizationSubTypeId, checked));
     }
 
@@ -251,7 +251,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "create default cta ruletemplate ")
     @PostMapping(value = COUNTRY_URL + "/default_cta")
-    public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable long countryId)  {
+    public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable Long countryId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.createDefaultCtaRuleTemplate(countryId));
     }
 

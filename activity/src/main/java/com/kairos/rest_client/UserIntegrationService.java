@@ -292,12 +292,12 @@ public class UserIntegrationService {
 
 
 
-    public CountryDTO getCountryById(long countryId) {
+    public CountryDTO getCountryById(Long countryId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, COUNTRY_COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
         }, countryId);
     }
 
-    public boolean isCountryExists(long countryId) {
+    public boolean isCountryExists(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
         }) != null;
     }
@@ -713,11 +713,11 @@ public class UserIntegrationService {
     }
 
 
-    public SelfRosteringMetaData getPublicHolidaysDayTypeAndReasonCodeByUnitId(long unitId){
+    public SelfRosteringMetaData getPublicHolidaysDayTypeAndReasonCodeByUnitId(Long unitId){
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SelfRosteringMetaData>>() {});
     }
 
-    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId, long unitId) {
+    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId, Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET,
                 IS_ACTIVITY_ASSIGNED, Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
@@ -729,7 +729,7 @@ public class UserIntegrationService {
         });
     }
 
-    public Boolean isUnit(long unitId) {
+    public Boolean isUnit(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/is_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }

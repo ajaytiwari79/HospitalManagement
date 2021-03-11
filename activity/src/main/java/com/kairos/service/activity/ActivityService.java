@@ -860,7 +860,7 @@ public class ActivityService {
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
     }
 
-    public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
+    public List<ActivityDTO> getActivitiesWithCategories(Long unitId) {
         return activityMongoRepository.findAllActivityByUnitId(unitId);
     }
 
