@@ -795,27 +795,23 @@ public class CostTimeAgreementService {
             Map<Long,List<CTAResponseDTO>>  ctagroup = allCTAs.stream().collect(Collectors.groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId(),Collectors.toList()));
             Set<Long> staffFilterDTOList = new HashSet<>();
             for(Long staffId:staffIds) {
-                FilterStaff(staffFilterDTO, filterTypeMap, ctagroup, staffFilterDTOList, staffId);
+                List<Long> employmentIDs=staffFilterDTO.getMapOfStaffAndEmploymentIds().get(staffId);
+                for(Long employmentID:employmentIDs) {
+                    List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
+                    for(CTAResponseDTO ctaResponseDTO:CTAs) {
+                        for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
+                            if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
+                                staffFilterDTOList.add(staffId);
+                            }
+
+                        }
+                    }
+                }
             }
             filteredStaffIds = staffFilterDTOList;
 
         }
         return filteredStaffIds;
-    }
-
-    private void FilterStaff(StaffFilterDTO staffFilterDTO, Map<FilterType, Set<String>> filterTypeMap, Map<Long, List<CTAResponseDTO>> ctagroup, Set<Long> staffFilterDTOList, Long staffId) {
-        List<Long> employmentIDs=staffFilterDTO.getMapOfStaffAndEmploymentIds().get(staffId);
-        for(Long employmentID:employmentIDs) {
-            List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
-            for(CTAResponseDTO ctaResponseDTO:CTAs) {
-                for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
-                    if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
-                        staffFilterDTOList.add(staffId);
-                    }
-
-                }
-            }
-        }
     }
 
 }

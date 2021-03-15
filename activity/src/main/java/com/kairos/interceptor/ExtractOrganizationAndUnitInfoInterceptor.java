@@ -34,6 +34,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().contains("swagger-ui")) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        getCurrentUserDetails();
         updateUserInfo(request, pathVariables);
 
         String tabId = request.getParameter("moduleId");
@@ -43,6 +44,16 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         return isNotNull(request);
     }
 
+    private void getCurrentUserDetails() {
+        try {
+            CurrentUserDetails userDetails = userIntegrationService.getCurrentUser();
+            if(isNotNull(UserContext.getUserDetails()) && isNotNull(userDetails)) {
+                UserContext.setUserDetails(userDetails);
+            }
+    } catch (Exception e) {
+             LOGGER.error("exception {}",e);
+    }
+    }
 
     private void updateUserInfo(HttpServletRequest request, Map<String, String> pathVariables) {
         String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
