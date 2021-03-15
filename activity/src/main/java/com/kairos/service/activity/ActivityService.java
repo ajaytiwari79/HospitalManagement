@@ -94,7 +94,7 @@ public class ActivityService {
     @Inject private PhaseService phaseService;
     @Inject private PlannedTimeTypeService plannedTimeTypeService;
     @Inject private TagMongoRepository tagMongoRepository;
-    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject @Lazy private OrganizationActivityService organizationActivityService;
     @Inject private ShiftHelperService shiftHelperService;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private TimeTypeService timeTypeService;
