@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.config.security.CustomDefaultTokenServices;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -135,6 +136,7 @@ public class UserService {
     private KMailService kMailService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject private CustomDefaultTokenServices customDefaultTokenServices;
 
 
     /**
@@ -557,11 +559,11 @@ public class UserService {
         return true;
     }
 
-    public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
+    public String updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
         UserContext.getUserDetails().setUserLanguage(copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
-        return true;
+        return getUpdatedUserToken(currentUser);
     }
 
     public Long getUserSelectedLanguageId(Long userId) {
@@ -649,11 +651,11 @@ public class UserService {
         return googleCalenderTokenDTO;
     }
 
-    public boolean updateAccessRoleOfUser(Long unitId, String accessGroupRole){
+    public String updateAccessRoleOfUser(Long unitId, String accessGroupRole){
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         currentUser.getUnitWiseAccessRole().put(String.valueOf(unitId),accessGroupRole);
         userGraphRepository.save(currentUser);
-        return true;
+        return getUpdatedUserToken(currentUser);
     }
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
@@ -674,15 +676,20 @@ public class UserService {
         User user = null;
         if(isNotNull(UserContext.getUserDetails())) {
             user = userRepository.findOne(UserContext.getUserDetails().getId());
-            user.setHubMember(accessPageService.isHubMember(user.getId()));
-            user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
-            SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
-            if(isNull(systemLanguage)){
-                systemLanguage = new SystemLanguage("English","en",true,true);
-            }
-            user.setUserLanguage(systemLanguage);
+            getUpdatedUserToken(user);
         }
         return user;
+    }
+
+    private String getUpdatedUserToken(User user) {
+        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
+        SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
+        if(isNull(systemLanguage)){
+            systemLanguage = new SystemLanguage("English","en",true,true);
+        }
+        user.setUserLanguage(systemLanguage);
+        return customDefaultTokenServices.updateToken(UserContext.getAuthToken(),user);
     }
 
 

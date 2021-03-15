@@ -1,5 +1,6 @@
 package com.kairos.controller.auth;
 
+import com.kairos.config.security.CustomDefaultTokenServices;
 import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
@@ -9,6 +10,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.utils.response.ResponseHandler;
 import com.twilio.sdk.TwilioRestException;
 import io.swagger.annotations.Api;
@@ -45,12 +47,13 @@ public class AuthController {
 
     @Inject
     private UserService userService;
+    @Inject private RedisService redisService;
 
     @Inject
     CountryService countryService;
 
     @Inject
-    com.kairos.service.organization.OrganizationService organizationService;
+    private com.kairos.service.organization.OrganizationService organizationService;
 
     /**
      * Calls userService and Check if user exists
@@ -202,4 +205,5 @@ public class AuthController {
     ResponseEntity<Map<String, Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailsDTO));
     }
+
 }
