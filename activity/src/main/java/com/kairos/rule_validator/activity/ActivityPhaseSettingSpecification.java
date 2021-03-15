@@ -59,29 +59,41 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(oldShift.getActivities(), shift.getActivities());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         activityPerPhaseMap.forEach((k,v)->{
-            if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
-                if(( UserContext.getUserDetails().isStaff() && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (UserContext.getUserDetails().isManagement() && !v.isEligibleForManagement() )){
-                    throwException(ERROR_SHIFT_NOT_AUTHORISED_PHASE);
-                }
-            }
-            if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
-                if(v.getAllowedSettings().getCanEdit().size()<2){
-                    if(v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.STAFF) && !UserContext.getUserDetails().isStaff() ||
-                            v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.MANAGEMENT) && !UserContext.getUserDetails().isManagement()
-                    ){
-                        throwException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
-                    }
-                }
-            }
-            if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
-                if((UserContext.getUserDetails().isManagement() && !v.isManagementCanDelete()) || (UserContext.getUserDetails().isStaff() && !v.isStaffCanDelete())){
-                    throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
-                }
-            }
+            validateForAddActivity(shiftActivityIdsDTO, k, v);
+            validateForEditActivity(shiftActivityIdsDTO, k, v);
+            validateForDeleteActivity(shiftActivityIdsDTO, k, v);
             if(!staffAdditionalInfoDTO.isCountryAdmin() && !CollectionUtils.containsAny(phase.getAccessGroupIds(),staffAdditionalInfoDTO.getUserAccessRoleDTO().getAccessGroupIds())){
                 throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
             }
         });
+    }
+
+    private void validateForDeleteActivity(ShiftActivityIdsDTO shiftActivityIdsDTO, BigInteger k, PhaseTemplateValue v) {
+        if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
+            if((UserContext.getUserDetails().isManagement() && !v.isManagementCanDelete()) || (UserContext.getUserDetails().isStaff() && !v.isStaffCanDelete())){
+                throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
+            }
+        }
+    }
+
+    private void validateForAddActivity(ShiftActivityIdsDTO shiftActivityIdsDTO, BigInteger k, PhaseTemplateValue v) {
+        if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
+            if(( UserContext.getUserDetails().isStaff() && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (UserContext.getUserDetails().isManagement() && !v.isEligibleForManagement() )){
+                throwException(ERROR_SHIFT_NOT_AUTHORISED_PHASE);
+            }
+        }
+    }
+
+    private void validateForEditActivity(ShiftActivityIdsDTO shiftActivityIdsDTO, BigInteger k, PhaseTemplateValue v) {
+        if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
+            if(v.getAllowedSettings().getCanEdit().size()<2){
+                if(v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.STAFF) && !UserContext.getUserDetails().isStaff() ||
+                        v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.MANAGEMENT) && !UserContext.getUserDetails().isManagement()
+                ){
+                    throwException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
+                }
+            }
+        }
     }
 
     private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,Collection<ActivityWrapper> activities){

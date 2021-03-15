@@ -1,6 +1,7 @@
 package com.kairos.config.security;
 
 import com.kairos.service.auth.UserService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     private RedisService redisService;
     @Autowired
     private UserService userService;
+    @Autowired private ExceptionService exceptionService;
 
     private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
 
@@ -47,9 +49,14 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
+        return getAuthorizationServerTokenServices();
+    }
+
+    @Bean
+    @Primary
+    public CustomDefaultTokenServices getAuthorizationServerTokenServices() {
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
-        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService);
-        defaultTokenServices.setTokenStore(jwtTokenStore);
+        CustomDefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService,jwtTokenStore,exceptionService);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
         defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
         defaultTokenServices.setAccessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS);
