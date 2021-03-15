@@ -34,6 +34,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -68,7 +69,7 @@ public class TimeTypeService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
-    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject @Lazy private OrganizationActivityService organizationActivityService;
     @Inject private ExecutorService executorService;
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private ReasonCodeService reasonCodeService;
