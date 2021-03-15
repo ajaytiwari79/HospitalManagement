@@ -37,6 +37,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -89,7 +90,7 @@ public class ShiftSickService {
     private ShiftBreakService shiftBreakService;
     @Inject
     private AbsenceShiftService absenceShiftService;
-    @Inject
+    @Inject @Lazy
     private OrganizationActivityService organizationActivityService;
     @Inject
     private ShiftDetailsService shiftDetailsService;

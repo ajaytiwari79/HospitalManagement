@@ -43,6 +43,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -89,7 +90,7 @@ public class WTARuleTemplateCalculationService {
     private TimeBankService timeBankService;
     @Inject
     private NightWorkerMongoRepository nightWorkerMongoRepository;
-    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject @Lazy private OrganizationActivityService organizationActivityService;
 
     public <T extends ShiftDTO> List<T> updateRestingTimeInShifts(List<T> shifts) {
         if (isCollectionNotEmpty(shifts)) {

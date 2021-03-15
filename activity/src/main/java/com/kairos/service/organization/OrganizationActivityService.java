@@ -941,7 +941,7 @@ public class OrganizationActivityService {
 
         }
     }
-    //@Async
+    @Async
     public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO,BigInteger timeTypeId) {
         List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         if (isCollectionNotEmpty(activities)) {
