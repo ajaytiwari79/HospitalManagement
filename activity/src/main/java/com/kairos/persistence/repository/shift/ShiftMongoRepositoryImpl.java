@@ -26,6 +26,7 @@ import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -670,7 +671,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                     project(STAFF_ID),
                     group().push(STAFF_ID).as("staffIds")
             );
-            return new HashSet<>(((List<Long>)mongoTemplate.aggregate(aggregation,Shift.class,Map.class).getMappedResults().get(0).get("staffIds")));
+            List<Map> results=mongoTemplate.aggregate(aggregation,Shift.class,Map.class).getMappedResults();
+            return isCollectionEmpty(results)? new HashSet<>(): new HashSet<>(((List<Long>) results.get(0).get("staffIds")));
         }
         return new HashSet<>();
     }
