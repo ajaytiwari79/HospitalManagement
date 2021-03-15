@@ -49,18 +49,13 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
-        return getAuthorizationServerTokenServices();
-    }
-
-    @Bean
-    @Primary
-    public CustomDefaultTokenServices getAuthorizationServerTokenServices() {
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
         CustomDefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService,jwtTokenStore,exceptionService);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
         defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
         defaultTokenServices.setAccessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS);
         defaultTokenServices.setSupportRefreshToken(true);
+        userService.setCustomDefaultTokenServices(defaultTokenServices);
         return defaultTokenServices;
     }
 

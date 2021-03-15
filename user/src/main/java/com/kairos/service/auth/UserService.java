@@ -54,6 +54,7 @@ import com.kairos.utils.OtpGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.Authentication;
@@ -62,6 +63,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
 import org.springframework.security.oauth2.provider.authentication.TokenExtractor;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,8 +139,12 @@ public class UserService {
     private KMailService kMailService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
-    @Inject private CustomDefaultTokenServices customDefaultTokenServices;
 
+    private CustomDefaultTokenServices customDefaultTokenServices;
+
+    public void setCustomDefaultTokenServices(CustomDefaultTokenServices customDefaultTokenServices) {
+        this.customDefaultTokenServices = customDefaultTokenServices;
+    }
 
     /**
      * Calls UserGraphRepository,
