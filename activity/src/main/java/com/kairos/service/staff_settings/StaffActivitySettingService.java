@@ -23,6 +23,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -45,7 +46,8 @@ public class StaffActivitySettingService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private LocaleService localeService;
     @Inject private ActivityService activityService;
-    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject @Lazy
+    private OrganizationActivityService organizationActivityService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private TimeTypeService timeTypeService;
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
