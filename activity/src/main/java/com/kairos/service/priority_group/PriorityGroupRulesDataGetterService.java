@@ -157,7 +157,6 @@ public class PriorityGroupRulesDataGetterService {
                 staffEmploymentQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);
                 staffEmploymentQueryResult.setPlannedHoursWeek(plannedHoursWeekly);
             }
-
         }
     }
 
