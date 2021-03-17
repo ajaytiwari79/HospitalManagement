@@ -28,7 +28,7 @@ public class CoverShiftController {
     @PostMapping(value = "/get_eligible_staffs")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEligibleStaffs(@PathVariable Long unitId, @RequestParam BigInteger shiftId, @RequestBody CoverShiftSetting coverShiftSetting) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId,coverShiftSetting).stream().map(staff -> staff.getFirstName()+" "+staff.getLastName()).collect(Collectors.toSet()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId,coverShiftSetting));
     }
 
     @ApiOperation("create cover shift setting by unit")
