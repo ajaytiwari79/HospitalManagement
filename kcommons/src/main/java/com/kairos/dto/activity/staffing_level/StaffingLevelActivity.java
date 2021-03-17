@@ -24,6 +24,13 @@ public class StaffingLevelActivity {
     private  int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;
+    private int initialUnderStaffing;
+    private int initialOverStaffing;
+    private int remainingUnderStaffing;
+    private int remainingOverStaffing;
+    private int solvedUnderStaffing;
+    private int solvedOverStaffing;
+    private  int previousAvailableNoOfStaff;
 
 
     public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
@@ -49,7 +56,16 @@ public class StaffingLevelActivity {
         this.availableNoOfStaff = Math.max(availableNoOfStaff,0);
     }
 
-
+    @JsonIgnore
+    public void resetValueOnPhaseFlip(){
+        this.remainingOverStaffing = Math.max(availableNoOfStaff - maxNoOfStaff,0);
+        this.solvedOverStaffing = 0;
+        this.initialOverStaffing = remainingOverStaffing;
+        this.remainingUnderStaffing = Math.max(minNoOfStaff - availableNoOfStaff,0);
+        this.solvedUnderStaffing = 0;
+        this.initialUnderStaffing = this.remainingUnderStaffing;
+        this.previousAvailableNoOfStaff = this.availableNoOfStaff;
+    }
 
     @Override
     public boolean equals(Object o) {
