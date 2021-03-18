@@ -222,7 +222,7 @@ public class OrganizationService {
         return organization;
     }
 
-    public boolean deleteOrganization(long organizationId) {
+    public void deleteOrganization(long organizationId) {
         OrganizationBaseEntity organization = organizationBaseRepository.findOne(organizationId);
         if(organization.isBoardingCompleted()){
             boolean union = ((Organization) organization).isUnion();
@@ -230,7 +230,6 @@ public class OrganizationService {
         }
         List<Long> organizationIdsToDelete = getAllOrganizationIdsToDelete(organization);
         unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
-        return true;
     }
 
     public OrganizationBaseEntity getOrganizationById(long id) {
