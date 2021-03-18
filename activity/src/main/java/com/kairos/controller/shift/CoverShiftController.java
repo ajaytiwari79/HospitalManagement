@@ -1,6 +1,7 @@
 package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
+import com.kairos.persistence.model.shift.CoverShift;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
 import com.kairos.utils.response.ResponseHandler;
@@ -50,5 +51,20 @@ public class CoverShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCoverShiftSettingByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftSettingByUnit(unitId));
+    }
+
+    @ApiOperation("get cover shift setting by unit")
+    @GetMapping(value = "/cover_shift_details/{shiftId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCoverShiftByShiftId(@PathVariable BigInteger shiftId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftDetails(shiftId));
+    }
+
+    @ApiOperation("get cover shift setting by unit")
+    @PutMapping(value = "/update_cover_shift_details/{shiftId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger shiftId, @RequestBody CoverShift coverShift) {
+        coverShiftService.updateCoverShiftDetails(shiftId,coverShift);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }
