@@ -146,6 +146,8 @@ public class CounterDataService {
                 if(isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException | ExecutionException ex) {
                 LOGGER.error("error while generate KPI  data",ex);
+                String[] messages = ex.getMessage().split(": ");
+                throw new RuntimeException(messages[1]);
             }
         }
         return isNotNull(kpisData) ? kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData)) : new HashMap<>();
