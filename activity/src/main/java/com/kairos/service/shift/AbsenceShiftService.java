@@ -76,6 +76,7 @@ public class AbsenceShiftService {
     private ShiftStatusService shiftStatusService;
     @Inject
     private StaffActivitySettingService staffActivitySettingService;
+    @Inject private ShiftHelperService shiftHelperService;
 
     public List<ShiftWithViolatedInfoDTO> createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Object[] shiftOverlapInfo, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
@@ -223,6 +224,7 @@ public class AbsenceShiftService {
             shift.setPlanningPeriodId(planningPeriodByShift.get().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
             shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriodByShift.get(),phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift, activityWrapperMap, staffAdditionalInfoDTO);
+            shiftHelperService.updateShiftActivityDetails(shift,shiftWithActivityDTO);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTOS.add(updatedShiftWithViolatedInfoDTO);
@@ -231,9 +233,7 @@ public class AbsenceShiftService {
         if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || !isRuleViolated(shiftWithViolatedInfoDTOS)) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
             shiftDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class);
-            shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
-            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
-            //shiftDTOS.forEach(shiftDTO -> shiftWithViolatedInfoDTOS.add(new ShiftWithViolatedInfoDTO(newArrayList(shiftDTO))));
+            timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
         }
         return shiftWithViolatedInfoDTOS;
     }

@@ -67,6 +67,10 @@ public class StaffEmploymentDetails {
     private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings;
 
 
+    public StaffEmploymentDetails(List<FunctionDTO> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
+    }
+
     public StaffEmploymentDetails(Long id, Long staffId, List<EmploymentLinesDTO> employmentLines, CTAResponseDTO costTimeAgreement) {
         this.id = id;
         this.staffId = staffId;

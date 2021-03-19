@@ -50,7 +50,6 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
 
     private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffEmploymentIterator, DateTimeInterval unitDateTimeInterval, DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
         while (staffEmploymentIterator.hasNext()) {
-
             StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
             List<Shift> shifts = shiftEmploymentsMap.get(staffEmploymentQueryResult.getEmploymentId());
             int shiftCountUnit = 0;
@@ -73,8 +72,7 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
                     }
                 }
             }
-            boolean validStaffToRemove = Optional.ofNullable(unitDateTimeInterval).isPresent() && shiftCountUnit == 0 || (Optional.ofNullable(activityDateTimeInterval).isPresent() && shiftCountActivity == 0);
-            if (validStaffToRemove) {
+            if (Optional.ofNullable(unitDateTimeInterval).isPresent() && shiftCountUnit == 0 || (Optional.ofNullable(activityDateTimeInterval).isPresent() && shiftCountActivity == 0)) {
                 staffEmploymentIterator.remove();
 
             }

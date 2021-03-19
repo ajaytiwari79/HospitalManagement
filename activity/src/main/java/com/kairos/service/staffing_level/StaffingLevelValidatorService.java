@@ -191,29 +191,35 @@ public class StaffingLevelValidatorService {
                 boolean breakValid = shift.getBreakActivities().stream().anyMatch(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && interval.overlaps(shiftActivity1.getInterval()));
                 shiftsCount = updateShiftCount(shift, shiftActivity, shiftsCount, interval, breakValid, checkOverStaffing);
                 int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
-                if (checkOverStaffing) {
-                    StaffingLevelActivityWithDuration staffingLevelActivityWithDuration = staffingLevelActivityWithDurationMap.getOrDefault(shiftActivity.getActivityId(), new StaffingLevelActivityWithDuration(shiftActivity.getActivityId()));
-                    if (totalCount > 0 && !breakValid) {
-                        staffingLevelActivityWithDuration.setOverStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getOverStaffingDurationInMinutes() + 15));
-                    } else if (!breakValid) {
-                        staffingLevelActivityWithDuration.setResolvingUnderOrOverStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getResolvingUnderOrOverStaffingDurationInMinutes() + 15));
-                    }
-                    staffingLevelActivityWithDurationMap.put(shiftActivity.getActivityId(), staffingLevelActivityWithDuration);
-                }
-                if (!checkOverStaffing) {
-                    StaffingLevelActivityWithDuration staffingLevelActivityWithDuration = staffingLevelActivityWithDurationMap.getOrDefault(shiftActivity.getActivityId(), new StaffingLevelActivityWithDuration(shiftActivity.getActivityId()));
-                    if (totalCount <= 0 && !breakValid) {
-                        staffingLevelActivityWithDuration.setUnderStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getUnderStaffingDurationInMinutes() + 15));
-                    } else if (!breakValid) {
-                        staffingLevelActivityWithDuration.setResolvingUnderOrOverStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getResolvingUnderOrOverStaffingDurationInMinutes() + 15));
-                    }
-                    staffingLevelActivityWithDurationMap.put(shiftActivity.getActivityId(), staffingLevelActivityWithDuration);
-                }
+                checkOverStaffing(checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, breakValid, totalCount);
+                checkUnderStaffing(checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, breakValid, totalCount);
             } else {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
             }
         }
 
+    }
+    private void checkUnderStaffing(boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean breakValid, int totalCount) {
+        if (!checkOverStaffing) {
+            StaffingLevelActivityWithDuration staffingLevelActivityWithDuration = staffingLevelActivityWithDurationMap.getOrDefault(shiftActivity.getActivityId(), new StaffingLevelActivityWithDuration(shiftActivity.getActivityId()));
+            if (totalCount <= 0 && !breakValid) {
+                staffingLevelActivityWithDuration.setUnderStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getUnderStaffingDurationInMinutes() + 15));
+            } else if (!breakValid) {
+                staffingLevelActivityWithDuration.setResolvingUnderOrOverStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getResolvingUnderOrOverStaffingDurationInMinutes() + 15));
+            }
+            staffingLevelActivityWithDurationMap.put(shiftActivity.getActivityId(), staffingLevelActivityWithDuration);
+        }
+    }
+    private void checkOverStaffing(boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean breakValid, int totalCount) {
+        if (checkOverStaffing) {
+            StaffingLevelActivityWithDuration staffingLevelActivityWithDuration = staffingLevelActivityWithDurationMap.getOrDefault(shiftActivity.getActivityId(), new StaffingLevelActivityWithDuration(shiftActivity.getActivityId()));
+            if (totalCount > 0 && !breakValid) {
+                staffingLevelActivityWithDuration.setOverStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getOverStaffingDurationInMinutes() + 15));
+            } else if (!breakValid) {
+                staffingLevelActivityWithDuration.setResolvingUnderOrOverStaffingDurationInMinutes((short) (staffingLevelActivityWithDuration.getResolvingUnderOrOverStaffingDurationInMinutes() + 15));
+            }
+            staffingLevelActivityWithDurationMap.put(shiftActivity.getActivityId(), staffingLevelActivityWithDuration);
+        }
     }
 
     private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity

@@ -323,9 +323,13 @@ public class ShiftValidatorService {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivityDTO, null, staffAdditionalInfoDTO.getEmployment(), false);
-            scheduledMinutes += shiftActivityDTO.getScheduledMinutes();
-            durationMinutes += shiftActivityDTO.getDurationMinutes();
+            Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
+            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, shiftActivityDTO.getActivity().getActivityTimeCalculationSettings().getDayTypes(), asLocalDate(shiftActivityDTO.getStartDate()));
+            if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivityDTO.getStartDate()).getDayOfWeek())) {
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivityDTO, null, staffAdditionalInfoDTO.getEmployment(), false);
+                scheduledMinutes += shiftActivityDTO.getScheduledMinutes();
+                durationMinutes += shiftActivityDTO.getDurationMinutes();
+            }
         }
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);

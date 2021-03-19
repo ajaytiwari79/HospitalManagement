@@ -571,15 +571,10 @@ public class StaffRetrievalService {
     }
 
     public StaffAdditionalInfoDTO getStaffEmploymentData(Long employmentId, Long unitId) {
-        List<StaffEmploymentDetails> staffEmploymentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), true);
-        StaffEmploymentDetails employmentDetails = isCollectionNotEmpty(staffEmploymentDetails) ? staffEmploymentDetails.get(0) : null;
-        if (!Optional.ofNullable(employmentDetails).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, employmentId);
-        }
+        List<com.kairos.persistence.model.country.functions.FunctionDTO> functionDTOS = employmentGraphRepository.getFunctionsByEmploymentId(employmentId);
         UserAccessRoleDTO userAccessRole = accessGroupService.findUserAccessRole(unitId);
-        List<FunctionDTO> appliedFunctionDTOS = copyCollectionPropertiesByMapper(employmentDetails.getAppliedFunctions(), FunctionDTO.class);
-        employmentDetails.setAppliedFunctions(appliedFunctionDTOS);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO( employmentDetails);
+        List<FunctionDTO> appliedFunctionDTOS = copyCollectionPropertiesByMapper(functionDTOS, FunctionDTO.class);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(new StaffEmploymentDetails(appliedFunctionDTOS));
         staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRole);
         return staffAdditionalInfoDTO;
     }
@@ -809,25 +804,13 @@ public class StaffRetrievalService {
 
         for(FilterSelection filterSelection:filterSelections){
             if(filterSelection.getName().equals(FilterType.AGE)){
-                if(age==null){
-                    age = new HashSet<>();
-                }
-                age.add(dateCompareBuilder(filterSelection));
-                filterTypeSetMap.put(filterSelection.getName(),(T) age);
+                age = addFilterFilter((Map<FilterType, T>) filterTypeSetMap, age, filterSelection, dateCompareBuilder(filterSelection));
             }
             else if(filterSelection.getName().equals(FilterType.EMPLOYED_SINCE)){
-                if(employedSince==null){
-                    employedSince = new HashSet<>();
-                }
-                employedSince.add(dateCompareBuilder(filterSelection));
-                filterTypeSetMap.put(filterSelection.getName(),(T) employedSince);
+                employedSince = addDateWiseFilter((Map<FilterType, T>) filterTypeSetMap, employedSince, filterSelection);
             }
             else if(filterSelection.getName().equals(FilterType.ORGANIZATION_EXPERIENCE)){
-                if(organizationExperience==null){
-                    organizationExperience = new HashSet<>();
-                }
-                organizationExperience.add(dateCompareBuilder(filterSelection));
-                filterTypeSetMap.put(filterSelection.getName(),(T) organizationExperience);
+                organizationExperience = addFilterFilter(filterTypeSetMap, organizationExperience, filterSelection, dateCompareBuilder(filterSelection));
             }
             //fixme should be filtered in activity microservice
             /*else if(filterSelection.getName().equals(FilterType.TIME_BANK_BALANCE)){
@@ -838,33 +821,37 @@ public class StaffRetrievalService {
                 filterTypeSetMap.put(filterSelection.getName(), (T) timeBankBalance);
             }*/
             else if(filterSelection.getName().equals(FilterType.SENIORITY)){
-                if(seniorityLevel==null){
-                    seniorityLevel = new HashSet<>();
-                }
-                seniorityLevel.add(compareBuilder(filterSelection));
-                filterTypeSetMap.put(filterSelection.getName(), (T) seniorityLevel);
+                seniorityLevel = addFilterFilter(filterTypeSetMap, seniorityLevel, filterSelection, compareBuilder(filterSelection));
             }
             else if(filterSelection.getName().equals(FilterType.PAY_GRADE_LEVEL)){
-
-                if(payGradeLevel==null){
-                    payGradeLevel = new HashSet<>();
-                }
-                payGradeLevel.add(compareBuilder(filterSelection));
-                filterTypeSetMap.put(filterSelection.getName(), (T) payGradeLevel);
+                payGradeLevel = addFilterFilter(filterTypeSetMap, payGradeLevel, filterSelection, compareBuilder(filterSelection));
             }
             else if(filterSelection.getName().equals(FilterType.BIRTHDAY)){
-                if(birthday==null){
-                    birthday = new HashSet<>();
-                }
-                birthday.add(dateCompareBuilder(filterSelection));
-                filterTypeSetMap.put(filterSelection.getName(), (T) birthday);
+                birthday = addDateWiseFilter(filterTypeSetMap, birthday, filterSelection);
             }
             else if(Optional.ofNullable(filterTypeSetMap.get(filterSelection.getName())).isPresent() ){
                 ((Set<T>) filterTypeSetMap.get(filterSelection.getName())).add((T) filterSelection.getId());
             }
         }
-
         return filterTypeSetMap;
+    }
+
+    private <T> Set<Map<String, String>> addDateWiseFilter(Map<FilterType, T> filterTypeSetMap, Set<Map<String, String>> employedSince, FilterSelection filterSelection) {
+        if (employedSince == null) {
+            employedSince = new HashSet<>();
+        }
+        employedSince.add(dateCompareBuilder(filterSelection));
+        filterTypeSetMap.put(filterSelection.getName(), (T) employedSince);
+        return employedSince;
+    }
+
+    private <T> Set<Map<String, Number>> addFilterFilter(Map<FilterType, T> filterTypeSetMap, Set<Map<String, Number>> filter, FilterSelection filterSelection, Map<String, Number> stringObjectMap) {
+        if (filter == null) {
+            filter = new HashSet<>();
+        }
+        filter.add(stringObjectMap);
+        filterTypeSetMap.put(filterSelection.getName(), (T) filter);
+        return filter;
     }
 
     private  <T> Map<String,T> compareBuilder(final FilterSelection filterSelection){
