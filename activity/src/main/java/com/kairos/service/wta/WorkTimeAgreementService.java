@@ -154,7 +154,7 @@ public class WorkTimeAgreementService{
     @Inject
     private TimeSlotSetService timeSlotSetService;
     @Inject private ActivityPermissionService activityPermissionService;
-    @Inject private ShiftHelperService shiftHelperService;
+    @Inject @Lazy private ShiftHelperService shiftHelperService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
