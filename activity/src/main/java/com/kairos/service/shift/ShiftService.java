@@ -152,7 +152,7 @@ public class ShiftService {
     private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject
     private ActivityService activityService;
-    @Inject private ShiftFunctionService shiftFunctionService;
+    @Inject @Lazy private ShiftFunctionService shiftFunctionService;
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
     @Inject
     private ReasonCodeRepository reasonCodeRepository;
@@ -162,6 +162,7 @@ public class ShiftService {
     @Inject private StaffingLevelAvailableCountService staffingLevelAvailableCountService;
     @Inject private ShiftFetchService shiftFetchService;
     @Inject private OrganizationActivityService organizationActivityService;
+    @Inject private ShiftHelperService shiftHelperService;
 
     public List<ShiftWithViolatedInfoDTO> createShifts(Long unitId, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>(shiftDTOS.size());
@@ -232,32 +233,30 @@ public class ShiftService {
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
         ShiftType shiftType = updateShiftType(activityWrapperMap,mainShift);
         shiftDTO.setShiftType(shiftType);
+        mainShift.setShiftType(shiftType);
         ShiftWithActivityDTO shiftWithActivityDTO = getShiftWithActivityDTO(shiftDTO, activityWrapperMap, null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, false);
         if(isNotNull(shiftOverlapInfo[1])){
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapWithShiftId((BigInteger) shiftOverlapInfo[1]);
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapMessage(convertMessage(MESSAGE_SHIFT_DATE_STARTANDEND,shiftDTO.getStartDate(),shiftDTO.getEndDate()));
         } else  if ((PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
-            mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId, phase, shiftActionType, null);
+            mainShift = saveShiftWithActivity(activityWrapperMap,shiftWithActivityDTO, mainShift, staffAdditionalInfoDTO, false, functionId, phase, shiftActionType, null);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(mainShift.getDraftShift()) ? mainShift.getDraftShift() : mainShift, ShiftDTO.class);
             todoService.createOrUpdateTodo(mainShift, TodoType.APPROVAL_REQUIRED);
             shiftDTO.setId(mainShift.getId());
             shiftValidatorService.validateShiftViolatedRules(mainShift, (boolean) shiftOverlapInfo[0], shiftWithViolatedInfoDTO, PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) ? ShiftActionType.SAVE_AS_DRAFT : null);
-            wtaRuleTemplateCalculationService.updateRestingHours(Arrays.asList(shiftDTO),phase,wtaQueryResultDTO);
+            shiftHelperService.updateShiftResponse(shiftDTO,staffAdditionalInfoDTO.getEmployment().getUnitTimeZone().toString(),phase);
         }
         shiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
         return shiftWithViolatedInfoDTO;
     }
 
-    public Shift saveShiftWithActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Long functionId, Phase phase, ShiftActionType shiftAction, Shift oldShift) {
+    public Shift saveShiftWithActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap,ShiftWithActivityDTO shiftWithActivityDTO, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Long functionId, Phase phase, ShiftActionType shiftAction, Shift oldShift) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(shift.getPlanningPeriodId());
-        timeBankService.updateScheduledAndDurationHours(activityWrapperMap, shift, staffAdditionalInfoDTO);
+        shiftHelperService.updateShiftActivityDetails(shift,shiftWithActivityDTO);
         if(!ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
             shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriod, phase, shift, activityWrapperMap, staffAdditionalInfoDTO);
         }
-        //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
-        ShiftType shiftType = updateShiftType(activityWrapperMap, shift);
-        shift.setShiftType(shiftType);
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
         shiftFunctionService.updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
         if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
@@ -266,14 +265,11 @@ public class ShiftService {
         if(isNull(shift.getDraftShift())) {
             if (!shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
                 Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-                ShiftType draftShiftType = updateShiftType(activityWrapperMap, draftShift);
-                draftShift.setShiftType(draftShiftType);
                 draftShift.setDraft(true);
                 shift.setDraftShift(draftShift.getDraftShift());
                 shift.setDraft(true);
             }
         }
-        updateTimeTypeDetails(activityWrapperMap,shift);
         shift.setOldShiftTimeSlot(isNotNull(oldShift) ? staffAdditionalInfoDTO.getTimeSlotByShiftStartTime(oldShift.getActivities().get(0).getStartDate()) : null);
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shift.setId(isNull(shift.getId()) ? shiftMongoRepository.nextSequence(Shift.class.getSimpleName()) : shift.getId());
@@ -357,23 +353,10 @@ public class ShiftService {
                 staffingLevelValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap,false);
             }
             staffingLevelValidatorService.verifyStaffingLevel(new HashMap<>(), staffingLevelActivityWithDurationMap,  null, null, activityWrapperMap, false, null);
-            int scheduledMinutes = 0;
-            int durationMinutes = 0;
-            for (ShiftActivity shiftActivity : shift.getActivities()) {
-                int[] scheduledAndDurationMinutes = timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
-                scheduledMinutes += scheduledAndDurationMinutes[0];
-                durationMinutes += scheduledAndDurationMinutes[1];
-                for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
-                    timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(childActivity, activityWrapperMap, staffAdditionalInfoDTO);
-                }
-            }
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());
-            shift.setScheduledMinutes(scheduledMinutes);
-            shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
             activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, false,phaseListByDate.get(shift.getActivities().get(0).getStartDate()));
-            updateTimeTypeDetails(activityWrapperMap,shift);
         }
         shifts.forEach(shift -> {
             timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
@@ -450,6 +433,9 @@ public class ShiftService {
             PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), shiftDTO.getShiftDate());
             List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shift.isShiftUpdated(isNotNull(oldShift) ? oldShift : shift), shift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), isNotNull(oldShift) ? oldShift : shift,null);
             shift.setBreakActivities(breakActivities);
+            //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
+            ShiftType shiftType = updateShiftType(activityWrapperMap, shift);
+            shift.setShiftType(shiftType);
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()), false);
             if (isIgnoredAllRuletemplate(shiftWithViolatedInfo, updatedShiftWithViolatedInfo)) {
                 if (updateWTACounterFlag && !ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
@@ -458,7 +444,7 @@ public class ShiftService {
                 }
                 shift.setPlanningPeriodId(planningPeriod.getId());
                 updateShiftViolatedOnIgnoreCounter(shift, shiftOverLappedWithNonWorkingTime, updatedShiftWithViolatedInfo);
-                shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, isNotNull(shift.getId()), functionId, phase, shiftActionType, oldShift);
+                shift = saveShiftWithActivity(activityWrapperMap,shiftWithActivityDTO, shift, staffAdditionalInfoDTO, isNotNull(shift.getId()), functionId, phase, shiftActionType, oldShift);
                 shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
                 updateTodoStatus(todoType, shift);
                 activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
@@ -468,7 +454,7 @@ public class ShiftService {
                     Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
                     shiftDTO = shiftValidatorService.validateShiftStateAfterValidatingWtaRule(shiftDTO, validatedByStaff, actualPhases);
                 }
-                wtaRuleTemplateCalculationService.updateRestingHours(Arrays.asList(shiftDTO),phase,wtaQueryResultDTO);
+                shiftHelperService.updateShiftResponse(shiftDTO,staffAdditionalInfoDTO.getEmployment().getUnitTimeZone().toString(),phase);
             } else {
                 shiftWithViolatedInfo = updatedShiftWithViolatedInfo;
             }
@@ -671,7 +657,8 @@ public class ShiftService {
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             shift.setTimeBankCTADistributions(oldShift.getTimeBankCTADistributions());
             shift.setPayoutPerShiftCTADistributions(oldShift.getPayoutPerShiftCTADistributions());
-            ShiftType shiftType =updateShiftType(activityWrapperMap, shift);
+            ShiftType shiftType = updateShiftType(activityWrapperMap, shift);
+            shift.setShiftType(shiftType);
             shift.setShiftType(shiftType);
             shift.setPhaseId(phase.getId());
             if (byTAndAView) {
@@ -686,14 +673,13 @@ public class ShiftService {
                 breakActivities.addAll(breakActivityList);
             }
             shift.setBreakActivities(breakActivities);
-
             activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, !oldStateOfShift.getShiftType().equals(shift.getShiftType()),phase);
             ShiftWithActivityDTO shiftWithActivityDTO = getShiftWithActivityDTO(null, activityWrapperMap, shift);
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateRuleCheck(ruleCheckRequired, staffAdditionalInfoDTO, activityWrapperMap, phase, wtaQueryResultDTO, shiftWithActivityDTO, oldStateOfShift,skipRules);
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapWithShiftId((BigInteger) shiftOverlapInfo[1]);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
             if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || (isNull(shiftOverlapInfo[1]) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty())) {
-                shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, true, functionId, phase, shiftAction, oldShift);
+                shift = saveShiftWithActivity(activityWrapperMap,shiftWithActivityDTO, shift, staffAdditionalInfoDTO, true, functionId, phase, shiftAction, oldShift);
                 wtaRuleTemplateCalculationService.updateWTACounter(shift, staffAdditionalInfoDTO);
                 shiftDTO = UserContext.getUserDetails().isManagement() ? ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift, ShiftDTO.class) : ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
@@ -706,7 +692,7 @@ public class ShiftService {
                     activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, !oldStateOfShift.getShiftType().equals(shift.getShiftType()),phase);
                     shiftValidatorService.validateShiftViolatedRules(shift, (boolean) shiftOverlapInfo[0], shiftWithViolatedInfoDTO, shiftAction);
                 }
-                wtaRuleTemplateCalculationService.updateRestingHours(Arrays.asList(shiftDTO),phase,wtaQueryResultDTO);
+                shiftHelperService.updateShiftResponse(shiftDTO,staffAdditionalInfoDTO.getEmployment().getUnitTimeZone().toString(),phase);
             }
             shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
             shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
@@ -872,20 +858,32 @@ public class ShiftService {
 
     private <T> void updateActivityDetails(Map<BigInteger, T> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO) {
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            T activity = activityWrapperMap.get(shiftActivityDTO.getActivityId());
-            ActivityDTO activityDTO = activity instanceof ActivityDTO ? (ActivityDTO) activity : ObjectMapperUtils.copyPropertiesByMapper(((ActivityWrapper) activity).getActivity(), ActivityDTO.class);
-            shiftActivityDTO.setActivity(activityDTO);
-            shiftActivityDTO.setTimeType(activity instanceof ActivityDTO ? ((ActivityDTO) activity).getTimeType().getTimeTypes() : ((ActivityWrapper)activity).getTimeType());
+            updateActivityAndTimeTypeDetails(activityWrapperMap, shiftActivityDTO);
             for (ShiftActivityDTO childActivityDTO : shiftActivityDTO.getChildActivities()) {
                 if(activityWrapperMap.containsKey(childActivityDTO.getActivityId())) {
-                    activity = activityWrapperMap.get(childActivityDTO.getActivityId());
-                    activityDTO = activity instanceof ActivityDTO ? (ActivityDTO) activity : ObjectMapperUtils.copyPropertiesByMapper(((ActivityWrapper) activity).getActivity(), ActivityDTO.class);
-                    childActivityDTO.setActivity(activityDTO);
-                    childActivityDTO.setTimeType(activity instanceof ActivityDTO ? ((ActivityDTO) activity).getTimeType().getTimeTypes() : ((ActivityWrapper)activity).getTimeType());
-
+                    updateActivityAndTimeTypeDetails(activityWrapperMap,childActivityDTO);
                 }
             }
         });
+    }
+
+    private <T> void updateActivityAndTimeTypeDetails(Map<BigInteger, T> activityWrapperMap, ShiftActivityDTO shiftActivityDTO) {
+        T activity = activityWrapperMap.get(shiftActivityDTO.getActivityId());
+        ActivityDTO activityDTO = activity instanceof ActivityDTO ? (ActivityDTO) activity : ObjectMapperUtils.copyPropertiesByMapper(((ActivityWrapper) activity).getActivity(), ActivityDTO.class);
+        shiftActivityDTO.setActivity(activityDTO);
+        shiftActivityDTO.setTimeType(activity instanceof ActivityDTO ? ((ActivityDTO) activity).getTimeType().getTimeTypes() : ((ActivityWrapper)activity).getTimeType());
+        shiftActivityDTO.setSecondLevelTimeType(activityDTO.getActivityBalanceSettings().getTimeType());
+        shiftActivityDTO.setBackgroundColor(activityDTO.getActivityGeneralSettings().getBackgroundColor());
+        shiftActivityDTO.setActivityName(activityDTO.getName());
+        shiftActivityDTO.setUltraShortName(activityDTO.getActivityGeneralSettings().getUltraShortName());
+        shiftActivityDTO.setShortName(activityDTO.getActivityGeneralSettings().getShortName());
+        if(activity instanceof ActivityWrapper){
+            ActivityWrapper activityWrapper = (ActivityWrapper) activity;
+            shiftActivityDTO.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
+            shiftActivityDTO.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+            shiftActivityDTO.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+        }
+        shiftActivityDTO.setMethodForCalculatingTime(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime());
     }
 
     public void deleteShiftsAfterEmploymentEndDate(Long employmentId, LocalDate employmentEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

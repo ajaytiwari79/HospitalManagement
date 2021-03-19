@@ -228,7 +228,7 @@ public  class DateUtils {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static Date asDate(@NotNull(message = "date can not be null") LocalDate localDate) {
+    public static Date asDate(LocalDate localDate) {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 

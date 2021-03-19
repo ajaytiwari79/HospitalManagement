@@ -123,27 +123,36 @@ public class TodoService {
         shift=isNotNull(shift.getDraftShift())?shift.getDraftShift():shift;
         for(ShiftActivity shiftActivity :shift.getActivities()) {
             if (shiftUpdate && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
-                if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds().contains(phase.getId())) {
-                    shiftActivity.setStatus(newHashSet(ShiftStatus.REQUEST));
-                }
-                else {
-                    shiftActivity.setStatus(new HashSet<>());
-                }
+                updateStatus(activityWrapperMap, phase, shiftActivity);
             }else{
-                boolean isPlanningPeriodPublished =planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId());
-                if(shiftUpdate&&activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds().contains(phase.getId())&&!isPlanningPeriodPublished){
-                    shiftActivity.setStatus(newHashSet(ShiftStatus.APPROVE));
-                }else if(isNull(shiftActionType)&&!isPlanningPeriodPublished){
-                    shiftActivity.setStatus(new HashSet<>());
-                }
+                updateStatusIfPlanningPeriodPublished(activityWrapperMap, shiftUpdate, shiftActionType, phase, planningPeriod, staffAdditionalInfoDTO, shiftActivity);
             }
         }
         }else{
-            for(ShiftActivity shiftActivity :shift.getActivities()){
-            if(isCollectionEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds()) && isCollectionNotEmpty(shiftActivity.getStatus())) {
+            updateStatusIfApprovalAllowed(activityWrapperMap, shift);
+        }
+    }
+    private void updateStatusIfApprovalAllowed(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            if (isCollectionEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds()) && isCollectionNotEmpty(shiftActivity.getStatus())) {
                 shiftActivity.setStatus(shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) ? newHashSet(ShiftStatus.PUBLISH) : new HashSet<>());
             }
-            }
+        }
+    }
+    private void updateStatusIfPlanningPeriodPublished(Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean shiftUpdate, ShiftActionType shiftActionType, Phase phase, PlanningPeriod planningPeriod, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivity shiftActivity) {
+        boolean isPlanningPeriodPublished =planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId());
+        if(shiftUpdate&&activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds().contains(phase.getId())&&!isPlanningPeriodPublished){
+            shiftActivity.setStatus(newHashSet(ShiftStatus.APPROVE));
+        }else if(isNull(shiftActionType)&&!isPlanningPeriodPublished){
+            shiftActivity.setStatus(new HashSet<>());
+        }
+    }
+    private void updateStatus(Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, ShiftActivity shiftActivity) {
+        if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds().contains(phase.getId())) {
+            shiftActivity.setStatus(newHashSet(ShiftStatus.REQUEST));
+        }
+        else {
+            shiftActivity.setStatus(new HashSet<>());
         }
     }
 

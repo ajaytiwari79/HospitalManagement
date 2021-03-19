@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.employment;
 
 import com.kairos.enums.EmploymentSubType;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.employment.Employment;
@@ -375,6 +376,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "return e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user,childRel,child")
     List<Employment> getEmploymentByStaffIds(List<Long> staffIds);
 
+    @Query("MATCH(employment)-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(employment)={0} return id(appliedFunction) as id,appliedFunction.name as name,appliedFunction.icon as icon,rel.appliedDates as appliedDates")
+    List<FunctionDTO> getFunctionsByEmploymentId(Long employementId);
 
 }
 
