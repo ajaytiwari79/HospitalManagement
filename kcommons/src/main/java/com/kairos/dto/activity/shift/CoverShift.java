@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.shift;
+package com.kairos.dto.activity.shift;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -33,6 +33,9 @@ public class TranslationConverter implements AttributeConverter<Map<String,Trans
     @Override
     public Map<String,TranslationInfo> toEntityAttribute(String value) {
         try {
+            if(isNull(value)){
+                return null;
+            }
             Map<String,Object> translatedMap = ObjectMapperUtils.mapper.readValue(value, Map.class);
             Map<String, TranslationInfo> infoMap = new HashMap<>();
             translatedMap.forEach((k, v) -> infoMap.put(k, new TranslationInfo(((Map)v).get(NAME).toString(),((Map)v).get(DESCRIPTION).toString())));
