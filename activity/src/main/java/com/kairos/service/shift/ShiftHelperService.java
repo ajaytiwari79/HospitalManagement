@@ -113,7 +113,7 @@ public class ShiftHelperService {
         shiftDTO.setEditable(editable);
     }
 
-    @Async
+
     public void updateRestingHoursInShiftsOnWtaUpdate(WorkingTimeAgreement workingTimeAgreement, List<DurationBetweenShiftsWTATemplate> durationBetweenShiftsWTATemplates){
         Date startDate = asDate(workingTimeAgreement.getStartDate());
         Date endDate = isNotNull(workingTimeAgreement.getEndDate()) ? asDate(workingTimeAgreement.getEndDate()): null;
