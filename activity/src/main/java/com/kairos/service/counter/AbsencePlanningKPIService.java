@@ -163,8 +163,8 @@ public class AbsencePlanningKPIService implements CounterService {
         }
         clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.REQUESTED, AppConstants.REQUESTED_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,requested)));
         clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.PENDING, AppConstants.PENDING_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.APPROVE, AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.DISAPPROVE, AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.APPROVED, AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.DISAPPROVED, AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
 
         return clusteredBarChartKpiDataUnits;
     }
