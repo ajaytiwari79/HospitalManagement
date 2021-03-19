@@ -43,7 +43,7 @@ public class ShiftHelperService {
     @Inject private PhaseService phaseService;
     @Inject private UserIntegrationService userIntegrationService;
 
-    @Async
+    //@Async
     public void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
         List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
         updateShiftActivityBackGroundColor(activity, timeType, shifts);
