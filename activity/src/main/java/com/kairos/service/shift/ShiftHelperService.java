@@ -78,7 +78,7 @@ public class ShiftHelperService {
     public void updateShiftActivityDetails(Shift shift, ShiftWithActivityDTO shiftWithActivityDTO){
         for (int i = 0; i < shift.getActivities().size(); i++) {
             ShiftActivity shiftActivity = shift.getActivities().get(i);
-            ShiftActivityDTO shiftActivityDTO = shiftWithActivityDTO.getActivities().get(0);
+            ShiftActivityDTO shiftActivityDTO = shiftWithActivityDTO.getActivities().get(i);
             updateActivityAndTimeTypeDetails(shiftActivity, shiftActivityDTO);
             for (int j = 0; j < shiftActivity.getChildActivities().size(); j++) {
                 shiftActivity = shiftActivity.getChildActivities().get(j);
