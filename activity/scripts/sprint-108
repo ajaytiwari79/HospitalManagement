@@ -1,0 +1,1 @@
+db.shifts.updateMany({"shiftType":{$in:["PRESENCE","ABSENCE"]}},{$set:{"restingMinutes":11}});
