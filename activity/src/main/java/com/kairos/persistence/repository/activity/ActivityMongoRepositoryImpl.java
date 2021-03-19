@@ -2,10 +2,8 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
@@ -19,7 +17,6 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
@@ -40,21 +37,21 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_PRIORITY_ID;
 import static com.kairos.constants.AppConstants.DESCRIPTION;
 import static com.kairos.constants.AppConstants.NAME;
 import static com.kairos.constants.AppConstants.PARENT_ID;
 import static com.kairos.constants.AppConstants.UNIT_ID;
-import static com.kairos.enums.TimeTypeEnum.*;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
+import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
-import static com.kairos.persistence.repository.activity.ActivityConstants.*;
 import static com.kairos.persistence.repository.activity.ActivityConstants.ACTIVITY_ID;
 import static com.kairos.persistence.repository.activity.ActivityConstants.ID;
 import static com.kairos.persistence.repository.activity.ActivityConstants.PARENT_ACTIVITY_ID;
 import static com.kairos.persistence.repository.activity.ActivityConstants.STAFF;
+import static com.kairos.persistence.repository.activity.ActivityConstants.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 
