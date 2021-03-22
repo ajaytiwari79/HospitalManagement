@@ -270,7 +270,7 @@ public class ShiftFetchService {
         }
         Map<Long, List<ShiftDTO>> employmentIdAndShiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(ShiftDTO::getEmploymentId, Collectors.toList()));
         //TODO Pradeep will check
-        //assignedShifts = new ArrayList<>(assignedShifts.size());
+        assignedShifts = new ArrayList<>(assignedShifts.size());
         Set<BigInteger> sickActivityIds = new HashSet<>();
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
             assignedShifts.addAll(wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue()));
