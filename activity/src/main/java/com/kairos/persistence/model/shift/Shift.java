@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.shift.CoverShift;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
 import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -84,6 +85,8 @@ public class Shift extends MongoBaseEntity {
     private boolean planningPeriodPublished;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
+    private int restingMinutes;
+    private CoverShift coverShift;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;

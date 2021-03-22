@@ -107,6 +107,13 @@ public class CounterHelperService {
         return daysOfWeek;
     }
 
-
+    public DefaultKpiDataDTO getDefaultDataForKPI(StaffEmploymentTypeDTO staffEmploymentTypeDTO){
+        DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(staffEmploymentTypeDTO);
+        defaultKpiDataDTO.setHolidayCalenders(countryCalenderRepo.getAllByCountryIdAndHolidayDateBetween(UserContext.getUserDetails().getCountryId(),LocalDate.parse(staffEmploymentTypeDTO.getStartDate()), LocalDate.parse(staffEmploymentTypeDTO.getEndDate())));
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId()));
+        List<DayTypeDTO> dayTypeDTOS = dayTypeRepository.findAllByCountryIdAndDeletedFalse(staffEmploymentTypeDTO.getOrganizationId());
+        defaultKpiDataDTO.setDayTypeDTOS(dayTypeDTOS);
+        return defaultKpiDataDTO;
+    }
 
 }

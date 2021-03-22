@@ -882,23 +882,31 @@ public class StaffingLevelService {
     public void setIntialValueOfStaffingLevel(PlanningPeriod planningPeriod){
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(planningPeriod.getUnitId(),asDate(planningPeriod.getStartDate()),asDate(planningPeriod.getEndDate()));
         for (StaffingLevel staffingLevel : staffingLevels) {
+            Set<StaffingLevelActivityDetails> staffingLevelActivityDetailsSet = new HashSet<>();
             Map<BigInteger,List<StaffingLevelActivity>> bigIntegerListMap = staffingLevel.getPresenceStaffingLevelInterval().stream().flatMap(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().stream()).collect(Collectors.groupingBy(staffingLevelActivity -> staffingLevelActivity.getActivityId()));
-            staffingLevel.setStaffingLevelActivityDetails(new LinkedHashSet<>());
             for (Map.Entry<BigInteger, List<StaffingLevelActivity>> bigIntegerListEntry : bigIntegerListMap.entrySet()) {
-                int maxNoOfStaff = 0;
-                int minNoOfStaff = 0;
-                int availableNoOfStaff = 0;
-
                 for (StaffingLevelActivity staffingLevelActivity : bigIntegerListEntry.getValue()) {
-                    maxNoOfStaff += staffingLevelActivity.getMaxNoOfStaff();
-                    minNoOfStaff += staffingLevelActivity.getMinNoOfStaff();
-                    availableNoOfStaff +=staffingLevelActivity.getAvailableNoOfStaff();
+                    staffingLevelActivity.resetValueOnPhaseFlip();
+                    Optional<StaffingLevelActivityDetails> staffingLevelActivityDetailsOptional = staffingLevelActivityDetailsSet.stream().filter(staffingLevelActivityDetails -> staffingLevelActivityDetails.getActivityId().equals(staffingLevelActivity.getActivityId())).findFirst();
+                    StaffingLevelActivityDetails staffingLevelActivityDetails;
+                    if(staffingLevelActivityDetailsOptional.isPresent()){
+                        staffingLevelActivityDetails = staffingLevelActivityDetailsOptional.get();
+                    }else {
+                        staffingLevelActivityDetails = new StaffingLevelActivityDetails(staffingLevelActivity.getActivityId());
+                    }
+                    staffingLevelActivityDetails.setInitialUnderStaffing(staffingLevelActivityDetails.getInitialUnderStaffing() + staffingLevelActivity.getInitialUnderStaffing());
+                    staffingLevelActivityDetails.setRemainingUnderStaffing(staffingLevelActivityDetails.getRemainingUnderStaffing() + staffingLevelActivity.getRemainingUnderStaffing());
+                    staffingLevelActivityDetails.setSolvedUnderStaffing(staffingLevelActivityDetails.getSolvedUnderStaffing() + staffingLevelActivity.getSolvedUnderStaffing());
+                    staffingLevelActivityDetails.setInitialOverStaffing(staffingLevelActivityDetails.getInitialOverStaffing() + staffingLevelActivity.getInitialOverStaffing());
+                    staffingLevelActivityDetails.setRemainingOverStaffing(staffingLevelActivityDetails.getRemainingOverStaffing() + staffingLevelActivity.getRemainingOverStaffing());
+                    staffingLevelActivityDetails.setSolvedOverStaffing(staffingLevelActivityDetails.getSolvedOverStaffing() + staffingLevelActivity.getSolvedOverStaffing());
+                    staffingLevelActivityDetails.setMinNoOfStaff(staffingLevelActivityDetails.getMinNoOfStaff() + staffingLevelActivity.getMinNoOfStaff());
+                    staffingLevelActivityDetails.setMaxNoOfStaff(staffingLevelActivityDetails.getMaxNoOfStaff() + staffingLevelActivity.getMaxNoOfStaff());
+                    staffingLevelActivityDetails.setAvailableCount(staffingLevelActivityDetails.getAvailableCount() + staffingLevelActivity.getAvailableNoOfStaff());
+                    staffingLevelActivityDetailsSet.add(staffingLevelActivityDetails);
                 }
-                StaffingLevelActivityDetails staffingLevelActivityDetails = new StaffingLevelActivityDetails();
-                staffingLevelActivityDetails.setActivityId(bigIntegerListEntry.getKey());
-                staffingLevelActivityDetails.resetValueOnPhaseFlip(availableNoOfStaff,minNoOfStaff,maxNoOfStaff);
-                staffingLevel.getStaffingLevelActivityDetails().add(staffingLevelActivityDetails);
             }
+            staffingLevel.setStaffingLevelActivityDetails(staffingLevelActivityDetailsSet);
         }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
     }

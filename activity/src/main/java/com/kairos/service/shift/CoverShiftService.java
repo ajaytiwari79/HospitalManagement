@@ -1,20 +1,15 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
-import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.CoverShiftSetting;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftDataHelper;
+import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.repository.shift.CoverShiftSettingMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
@@ -23,8 +18,6 @@ import com.kairos.service.phase.PhaseService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -57,6 +50,7 @@ public class CoverShiftService {
     @Inject private ExecutorService executorService;
     @Inject private CoverShiftSettingMongoRepository coverShiftSettingMongoRepository;
     @Inject private ExceptionService exceptionService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
@@ -178,6 +172,16 @@ public class CoverShiftService {
         activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         return activityIds;
+    }
+
+    public CoverShift getCoverShiftDetails(BigInteger shiftId){
+        return shiftService.findOneByShiftId(shiftId).getCoverShift();
+    }
+
+    public void updateCoverShiftDetails(BigInteger shiftId,CoverShift coverShift){
+        Shift shift= shiftService.findOneByShiftId(shiftId);
+        shift.setCoverShift(coverShift);
+        shiftMongoRepository.save(shift);
     }
 
 }

@@ -36,6 +36,7 @@ import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.wta.templates.template_types.DurationBetweenShiftsWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -54,6 +55,7 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.kpermissions.ActivityPermissionService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.shift.ShiftFilterService;
+import com.kairos.service.shift.ShiftHelperService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
@@ -143,7 +145,6 @@ public class WorkTimeAgreementService{
     private NightWorkerService nightWorkerService;
     @Inject
     private ShiftFilterService shiftFilterService;
-
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
@@ -153,6 +154,7 @@ public class WorkTimeAgreementService{
     @Inject
     private TimeSlotSetService timeSlotSetService;
     @Inject private ActivityPermissionService activityPermissionService;
+    @Inject  private ShiftHelperService shiftHelperService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -784,10 +786,15 @@ public class WorkTimeAgreementService{
         oldWta.setId(null);
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
+            List<DurationBetweenShiftsWTATemplate> durationBetweenShiftsWTATemplates = new ArrayList<>();
             for (WTABaseRuleTemplate ruleTemplate : wtaBaseRuleTemplates) {
+                if(ruleTemplate instanceof DurationBetweenShiftsWTATemplate){
+                    durationBetweenShiftsWTATemplates.add((DurationBetweenShiftsWTATemplate)ruleTemplate);
+                }
                 updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), unitId, organization.getCountryId(), true);
             }
             wtaBaseRuleTemplateRepository.saveEntities(wtaBaseRuleTemplates);
+            shiftHelperService.updateRestingHoursInShiftsOnWtaUpdate(newWta,durationBetweenShiftsWTATemplates);
             List<BigInteger> ruleTemplatesIds = wtaBaseRuleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
             newWta.setRuleTemplateIds(ruleTemplatesIds);
         }

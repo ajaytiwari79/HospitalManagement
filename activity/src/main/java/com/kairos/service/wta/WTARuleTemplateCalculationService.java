@@ -43,6 +43,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -89,7 +90,7 @@ public class WTARuleTemplateCalculationService {
     private TimeBankService timeBankService;
     @Inject
     private NightWorkerMongoRepository nightWorkerMongoRepository;
-    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject @Lazy private OrganizationActivityService organizationActivityService;
 
     public <T extends ShiftDTO> List<T> updateRestingTimeInShifts(List<T> shifts) {
         if (isCollectionNotEmpty(shifts)) {
@@ -157,31 +158,6 @@ public class WTARuleTemplateCalculationService {
             }
         }
         return restingMinutes;
-    }
-
-    public void updateRestingHours(List<ShiftDTO> shiftDTOS,Phase phase,WTAQueryResultDTO wtaQueryResultDTO){
-        if(isCollectionNotEmpty(shiftDTOS)){
-            List<DurationBetweenShiftsWTATemplate> durationBetweenShiftsWTATemplates = wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> WTATemplateType.DURATION_BETWEEN_SHIFTS.equals(wtaBaseRuleTemplate.getWtaTemplateType()) && MINIMUM.equals(((DurationBetweenShiftsWTATemplate)wtaBaseRuleTemplate).getMinMaxSetting())).map(wtaBaseRuleTemplate -> (DurationBetweenShiftsWTATemplate)wtaBaseRuleTemplate).collect(Collectors.toList());
-            int restingMinutes = 0;
-            String timeZone = userIntegrationService.getTimeZoneByUnitId(shiftDTOS.get(0).getUnitId());
-            for (ShiftDTO shiftDTO : shiftDTOS) {
-                for (DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate : durationBetweenShiftsWTATemplates) {
-                    boolean anyActivityValid = shiftDTO.getActivities().stream().filter(shiftActivityDTO -> durationBetweenShiftsWTATemplate.getTimeTypeIds().contains(shiftActivityDTO.getTimeTypeId())).findAny().isPresent();
-                    if(anyActivityValid) {
-                        Integer currentRuletemplateRestingMinutes = getValueByPhase( durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phase.getId());
-                        if(isNotNull(currentRuletemplateRestingMinutes) && restingMinutes < currentRuletemplateRestingMinutes) {
-                            restingMinutes = currentRuletemplateRestingMinutes;
-                        }
-                    }
-                }
-                if(isNotNull(shiftDTO.getShiftViolatedRules())){
-                    shiftDTO.setEscalationReasons(shiftDTO.getShiftViolatedRules().getEscalationReasons());
-                    shiftDTO.setEscalationResolved(shiftDTO.getShiftViolatedRules().isEscalationResolved());
-                }
-                boolean editable=shiftValidatorService.validateGracePeriod(shiftDTO.getStartDate(), true, shiftDTO.getUnitId(), phase,timeZone);
-                shiftDTO.setEditable(editable);
-            }
-        }
     }
 
     private Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> getIntervalWTARuletemplateMap(List<WTAQueryResultDTO> workingTimeAgreements, LocalDate endDate) {

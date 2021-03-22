@@ -255,7 +255,7 @@ public class ShiftFetchService {
         }
         Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, expertiseId);
         List<ShiftDTO> shiftDTOS = shiftMongoRepository.getAllShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId,staffFilterDTO);
-        return wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
+        return shiftDTOS;
     }
 
     private ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, ViewType viewType, StaffFilterDTO staffFilterDTO) {
@@ -265,24 +265,23 @@ public class ShiftFetchService {
         Date startDate = asDate(startLocalDate);
         Date endDate = asDate(endLocalDate);
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate,staffFilterDTO);
-        UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
         if(!staffFilterDTO.getFiltersData().stream().anyMatch(filterSelectionDTO -> INCLUDE_DRAFT_SHIFT.equals(filterSelectionDTO.getName()))){
             assignedShifts = updateDraftShiftToShift(assignedShifts);
         }
         Map<Long, List<ShiftDTO>> employmentIdAndShiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(ShiftDTO::getEmploymentId, Collectors.toList()));
-        assignedShifts = new ArrayList<>(assignedShifts.size());
+        //TODO Pradeep will check
+        //assignedShifts = new ArrayList<>(assignedShifts.size());
         Set<BigInteger> sickActivityIds = new HashSet<>();
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
-            assignedShifts.addAll(wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue()));
             sickActivityIds.addAll(employmentIdAndShiftEntry.getValue().parallelStream().filter(shiftDTO -> SICK.equals(shiftDTO.getShiftType())).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
         }
         FunctionsWithUserAccessRoleDTO functionsWithUserAccessRoleDTO = userIntegrationService.getFunctionsWithUserAccessRoleDTO(unitId, startLocalDate, endLocalDate);
-        List<OpenShift> openShifts = functionsWithUserAccessRoleDTO.getUserAccessRoleDTO().isManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
+        List<OpenShift> openShifts = functionsWithUserAccessRoleDTO.getUserAccessRoleDTO().isManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(functionsWithUserAccessRoleDTO.getUserAccessRoleDTO().getStaffId(), startDate, endDate);
         ButtonConfig buttonConfig = null;
         if (Optional.ofNullable(viewType).isPresent() && viewType.toString().equalsIgnoreCase(ViewType.WEEKLY.toString())) {
-            buttonConfig = shiftStateService.findButtonConfig(assignedShifts, userAccessRoleDTO.isManagement());
+            buttonConfig = shiftStateService.findButtonConfig(assignedShifts, functionsWithUserAccessRoleDTO.getUserAccessRoleDTO().isManagement());
         }
-        StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), getAccessGroupRole(userAccessRoleDTO));
+        StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(functionsWithUserAccessRoleDTO.getUserAccessRoleDTO().getStaffId(), getAccessGroupRole(functionsWithUserAccessRoleDTO.getUserAccessRoleDTO()));
         List<ShiftDTO> shiftDTOS = shiftDetailsService.setLayerInShifts(assignedShifts,sickActivityIds);
         return new ShiftWrapper(shiftDTOS, getOpenShiftResponceDTOS(openShifts), staffAccessRoleDTO, buttonConfig, functionsWithUserAccessRoleDTO.getFunctions());
     }
@@ -318,11 +317,10 @@ public class ShiftFetchService {
             exceptionService.actionNotPermittedException(STAFF_ID_NULL);
         }
         List<ReasonCodeDTO> reasonCodeDTOS = reasonCodeRepository.findByUnitIdAndReasonCodeTypeAndDeletedFalse(unitId, TIME_TYPE);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
         Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
         Future<Map<LocalDate, List<FunctionDTO>>> responseData = null;
         if (Optional.ofNullable(employmentId).isPresent()) {
-            staffAdditionalInfoDTO = getStaffAdditionalInfoDTO(staffId, startDate, employmentId);
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = getStaffAdditionalInfoDTO(staffId, startDate, employmentId);
             if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getAppliedFunctions()).isPresent()) {
                 List<FunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getEmployment().getAppliedFunctions();
                 functionDTOMap = shiftFunctionService.addFunction(staffAdditionalInfoDTO, appliedFunctionDTOs);
@@ -374,7 +372,6 @@ public class ShiftFetchService {
         if(!staffFilterDTO.getFiltersData().stream().anyMatch(filterSelectionDTO -> INCLUDE_DRAFT_SHIFT.equals(filterSelectionDTO.getName()))){
             shifts = updateDraftShiftToShift(shifts);
         }
-        shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);
         Set<BigInteger> sickActivityIds = shifts.parallelStream().filter(shift -> shift.getShiftType().equals(SICK)).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
         return new Object[]{shifts,sickActivityIds};
     }

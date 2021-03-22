@@ -147,7 +147,6 @@ public class FunctionService {
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByExpertiseId(long expertiseId) {
         return functionGraphRepository.getFunctionsByExpertiseLineId(expertiseId);
-
     }
 
     public Map<Long, Map<Long, Set<LocalDate>>> getEmploymentIdWithFunctionIdShiftDateMap(Set<Long> employmentIds) {
