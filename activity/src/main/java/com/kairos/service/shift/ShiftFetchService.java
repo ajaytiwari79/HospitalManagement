@@ -269,7 +269,8 @@ public class ShiftFetchService {
             assignedShifts = updateDraftShiftToShift(assignedShifts);
         }
         Map<Long, List<ShiftDTO>> employmentIdAndShiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(ShiftDTO::getEmploymentId, Collectors.toList()));
-        assignedShifts = new ArrayList<>(assignedShifts.size());
+        //TODO Pradeep will check
+        //assignedShifts = new ArrayList<>(assignedShifts.size());
         Set<BigInteger> sickActivityIds = new HashSet<>();
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
             sickActivityIds.addAll(employmentIdAndShiftEntry.getValue().parallelStream().filter(shiftDTO -> SICK.equals(shiftDTO.getShiftType())).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
