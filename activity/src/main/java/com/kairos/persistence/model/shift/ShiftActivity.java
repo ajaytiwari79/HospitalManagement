@@ -158,8 +158,7 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
         }
         return false;
     }
-
     private Integer timeInSeconds(Date date) {
-        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
+        return isNull(date) ? null : (date.getHours() * 60 * 60) + (date.getMinutes() * 60);
     }
 }
