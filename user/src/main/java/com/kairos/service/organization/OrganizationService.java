@@ -222,23 +222,14 @@ public class OrganizationService {
         return organization;
     }
 
-    public boolean deleteOrganization(long organizationId) {
+    public void deleteOrganization(long organizationId) {
         OrganizationBaseEntity organization = organizationBaseRepository.findOne(organizationId);
         if(organization.isBoardingCompleted()){
-            exceptionService.actionNotPermittedException(MESSAGE_PUBLISH_ORGANIZATION_CONNOT_DELETE);
+            boolean union = ((Organization) organization).isUnion();
+            exceptionService.actionNotPermittedException(union ? MESSAGE_PUBLISH_UNION_CONNOT_DELETE : MESSAGE_PUBLISH_ORGANIZATION_CONNOT_DELETE);
         }
-        boolean success;
-        if (organization.isBoardingCompleted()) {
-            organization.setEnable(false);
-            organization.setDeleted(true);
-            organizationBaseRepository.save(organization);
-            success = true;
-        } else {
-            List<Long> organizationIdsToDelete = getAllOrganizationIdsToDelete(organization);
-            unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
-            success = true;
-        }
-        return success;
+        List<Long> organizationIdsToDelete = getAllOrganizationIdsToDelete(organization);
+        unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
     }
 
     public OrganizationBaseEntity getOrganizationById(long id) {
