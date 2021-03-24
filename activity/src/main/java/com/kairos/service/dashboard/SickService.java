@@ -76,7 +76,7 @@ public class SickService {
         Date endDate = DateUtils.getEndOfDay(DateUtils.plusDays(asDate(startDate),21));
         shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate,activityId);
         List<ShiftDTO> threeWeeksShift =shiftMongoRepository.findAllShiftsByStaffIdsAndDateAndUnitId(staffId,asDate(startDate),endDate,unitId);
-        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(threeWeeksShift);
+        //wtaRuleTemplateCalculationService.updateRestingTimeInShifts(threeWeeksShift);
         sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);
         response.put("staffId", staffId);

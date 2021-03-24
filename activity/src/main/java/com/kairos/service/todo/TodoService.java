@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -215,7 +216,7 @@ public class TodoService {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
         List<TodoDTO> todoDTOS = new ArrayList<>();
         if (userAccessRoleDTO.isManagement()) {
-            todoDTOS = todoRepository.findAllByNotApproved(unitId, newArrayList(PENDING, VIEWED, REQUESTED));
+            todoDTOS = todoRepository.findAllByNotApproved(unitId, newArrayList(PENDING, VIEWED, REQUESTED), LocalDate.now());
         }
         return todoDTOS;
     }

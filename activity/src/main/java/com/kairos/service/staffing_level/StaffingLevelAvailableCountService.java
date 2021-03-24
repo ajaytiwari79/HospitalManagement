@@ -65,44 +65,46 @@ public class StaffingLevelAvailableCountService {
         }
         updateCount(oldShift, staffAdditionalInfoDTO, oldStartDate, oldEndDate, staffingLevelMap, true,phase);
         updateCount(shift, staffAdditionalInfoDTO, startDate, endDate, staffingLevelMap, false,phase);
-        updateStaffingActivityDetails(staffingLevelMap);
+        updateStaffingActivityDetails(staffingLevelMap,phase);
         staffingLevelMongoRepository.saveEntities(staffingLevelMap.values());
     }
 
-    private void updateStaffingActivityDetails(Map<LocalDate, StaffingLevel> staffingLevelMap){
+    private void updateStaffingActivityDetails(Map<LocalDate, StaffingLevel> staffingLevelMap, Phase phase){
         for (StaffingLevel staffingLevel : staffingLevelMap.values()) {
-            Set<StaffingLevelActivityDetails> staffingLevelActivityDetailsSet = new HashSet<>();
-            for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
-                for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
-                    updateIfShiftDeleted(staffingLevelActivity);
-                    updateIFShiftCreatedOrUpdated(staffingLevelActivity);
-                    if((staffingLevelActivity.getMinNoOfStaff()-staffingLevelActivity.getAvailableNoOfStaff())>staffingLevelActivity.getInitialUnderStaffing()){
-                        staffingLevelActivity.setInitialUnderStaffing(staffingLevelActivity.getMinNoOfStaff()-staffingLevelActivity.getAvailableNoOfStaff());
+            if (!PhaseDefaultName.REQUEST.equals(phase.getPhaseEnum())) {
+                Set<StaffingLevelActivityDetails> staffingLevelActivityDetailsSet = new HashSet<>();
+                for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
+                    for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
+                        updateIfShiftDeleted(staffingLevelActivity);
+                        updateIFShiftCreatedOrUpdated(staffingLevelActivity);
+                        if ((staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff()) > staffingLevelActivity.getInitialUnderStaffing()) {
+                            staffingLevelActivity.setInitialUnderStaffing(staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff());
+                        }
+                        if ((staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff()) > staffingLevelActivity.getInitialOverStaffing()) {
+                            staffingLevelActivity.setInitialOverStaffing(staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff());
+                        }
+                        staffingLevelActivity.setPreviousAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff());
+                        Optional<StaffingLevelActivityDetails> staffingLevelActivityDetailsOptional = staffingLevelActivityDetailsSet.stream().filter(staffingLevelActivityDetails -> staffingLevelActivityDetails.getActivityId().equals(staffingLevelActivity.getActivityId())).findFirst();
+                        StaffingLevelActivityDetails staffingLevelActivityDetails;
+                        if (staffingLevelActivityDetailsOptional.isPresent()) {
+                            staffingLevelActivityDetails = staffingLevelActivityDetailsOptional.get();
+                        } else {
+                            staffingLevelActivityDetails = new StaffingLevelActivityDetails(staffingLevelActivity.getActivityId());
+                        }
+                        staffingLevelActivityDetails.setInitialUnderStaffing(staffingLevelActivityDetails.getInitialUnderStaffing() + staffingLevelActivity.getInitialUnderStaffing());
+                        staffingLevelActivityDetails.setRemainingUnderStaffing(staffingLevelActivityDetails.getRemainingUnderStaffing() + staffingLevelActivity.getRemainingUnderStaffing());
+                        staffingLevelActivityDetails.setSolvedUnderStaffing(staffingLevelActivityDetails.getSolvedUnderStaffing() + staffingLevelActivity.getSolvedUnderStaffing());
+                        staffingLevelActivityDetails.setInitialOverStaffing(staffingLevelActivityDetails.getInitialOverStaffing() + staffingLevelActivity.getInitialOverStaffing());
+                        staffingLevelActivityDetails.setRemainingOverStaffing(staffingLevelActivityDetails.getRemainingOverStaffing() + staffingLevelActivity.getRemainingOverStaffing());
+                        staffingLevelActivityDetails.setSolvedOverStaffing(staffingLevelActivityDetails.getSolvedOverStaffing() + staffingLevelActivity.getSolvedOverStaffing());
+                        staffingLevelActivityDetails.setMinNoOfStaff(staffingLevelActivityDetails.getMinNoOfStaff() + staffingLevelActivity.getMinNoOfStaff());
+                        staffingLevelActivityDetails.setMaxNoOfStaff(staffingLevelActivityDetails.getMaxNoOfStaff() + staffingLevelActivity.getMaxNoOfStaff());
+                        staffingLevelActivityDetails.setAvailableCount(staffingLevelActivityDetails.getAvailableCount() + staffingLevelActivity.getAvailableNoOfStaff());
+                        staffingLevelActivityDetailsSet.add(staffingLevelActivityDetails);
                     }
-                    if((staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff())>staffingLevelActivity.getInitialOverStaffing()){
-                        staffingLevelActivity.setInitialOverStaffing(staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff());
-                    }
-                    staffingLevelActivity.setPreviousAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff());
-                    Optional<StaffingLevelActivityDetails> staffingLevelActivityDetailsOptional = staffingLevelActivityDetailsSet.stream().filter(staffingLevelActivityDetails -> staffingLevelActivityDetails.getActivityId().equals(staffingLevelActivity.getActivityId())).findFirst();
-                    StaffingLevelActivityDetails staffingLevelActivityDetails;
-                    if(staffingLevelActivityDetailsOptional.isPresent()){
-                        staffingLevelActivityDetails = staffingLevelActivityDetailsOptional.get();
-                    }else {
-                        staffingLevelActivityDetails = new StaffingLevelActivityDetails(staffingLevelActivity.getActivityId());
-                    }
-                    staffingLevelActivityDetails.setInitialUnderStaffing(staffingLevelActivityDetails.getInitialUnderStaffing() + staffingLevelActivity.getInitialUnderStaffing());
-                    staffingLevelActivityDetails.setRemainingUnderStaffing(staffingLevelActivityDetails.getRemainingUnderStaffing() + staffingLevelActivity.getRemainingUnderStaffing());
-                    staffingLevelActivityDetails.setSolvedUnderStaffing(staffingLevelActivityDetails.getSolvedUnderStaffing() + staffingLevelActivity.getSolvedUnderStaffing());
-                    staffingLevelActivityDetails.setInitialOverStaffing(staffingLevelActivityDetails.getInitialOverStaffing() + staffingLevelActivity.getInitialOverStaffing());
-                    staffingLevelActivityDetails.setRemainingOverStaffing(staffingLevelActivityDetails.getRemainingOverStaffing() + staffingLevelActivity.getRemainingOverStaffing());
-                    staffingLevelActivityDetails.setSolvedOverStaffing(staffingLevelActivityDetails.getSolvedOverStaffing() + staffingLevelActivity.getSolvedOverStaffing());
-                    staffingLevelActivityDetails.setMinNoOfStaff(staffingLevelActivityDetails.getMinNoOfStaff() + staffingLevelActivity.getMinNoOfStaff());
-                    staffingLevelActivityDetails.setMaxNoOfStaff(staffingLevelActivityDetails.getMaxNoOfStaff() + staffingLevelActivity.getMaxNoOfStaff());
-                    staffingLevelActivityDetails.setAvailableCount(staffingLevelActivityDetails.getAvailableCount() + staffingLevelActivity.getAvailableNoOfStaff());
-                    staffingLevelActivityDetailsSet.add(staffingLevelActivityDetails);
                 }
+                staffingLevel.setStaffingLevelActivityDetails(staffingLevelActivityDetailsSet);
             }
-            staffingLevel.setStaffingLevelActivityDetails(staffingLevelActivityDetailsSet);
         }
     }
 

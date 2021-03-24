@@ -255,7 +255,7 @@ public class ShiftFetchService {
         }
         Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, expertiseId);
         List<ShiftDTO> shiftDTOS = shiftMongoRepository.getAllShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId,staffFilterDTO);
-        return wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
+        return wtaRuleTemplateCalculationService.updateEditableShifts(shiftDTOS);
     }
 
     private ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, ViewType viewType, StaffFilterDTO staffFilterDTO) {
@@ -273,7 +273,7 @@ public class ShiftFetchService {
         assignedShifts = new ArrayList<>(assignedShifts.size());
         Set<BigInteger> sickActivityIds = new HashSet<>();
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
-            assignedShifts.addAll(wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue()));
+            assignedShifts.addAll(wtaRuleTemplateCalculationService.updateEditableShifts(employmentIdAndShiftEntry.getValue()));
             sickActivityIds.addAll(employmentIdAndShiftEntry.getValue().parallelStream().filter(shiftDTO -> SICK.equals(shiftDTO.getShiftType())).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
         }
         FunctionsWithUserAccessRoleDTO functionsWithUserAccessRoleDTO = userIntegrationService.getFunctionsWithUserAccessRoleDTO(unitId, startLocalDate, endLocalDate);
@@ -373,7 +373,7 @@ public class ShiftFetchService {
         if(!staffFilterDTO.getFiltersData().stream().anyMatch(filterSelectionDTO -> INCLUDE_DRAFT_SHIFT.equals(filterSelectionDTO.getName()))){
             shifts = updateDraftShiftToShift(shifts);
         }
-        shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);
+        shifts = wtaRuleTemplateCalculationService.updateEditableShifts(shifts);
         Set<BigInteger> sickActivityIds = shifts.parallelStream().filter(shift -> shift.getShiftType().equals(SICK)).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
         return new Object[]{shifts,sickActivityIds};
     }
