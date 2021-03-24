@@ -117,8 +117,6 @@ public class ShiftPlanningService {
         List<StaffShiftDetailsDTO> shiftWithActivityDTOS = Collections.EMPTY_LIST;
         if (anyShiftFilterExists) {
             shiftWithActivityDTOS = shiftMongoRepository.getStaffListFilteredByShiftCriteria(staffEmploymentMap.keySet(), validFilterMap, unitId, shiftSearchDTO.getStartDate(), shiftSearchDTO.getEndDate(), includeDateComparison,filteredStaffsAndRequiredDataFilterDTO.getRequiredDataForFilterDTO());
-        }
-        if(isCollectionNotEmpty(shiftWithActivityDTOS)){
             Set<Long> filteredShiftStaff = shiftWithActivityDTOS.stream().map(StaffShiftDetailsDTO::getId).collect(Collectors.toSet());
             staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spl -> filteredShiftStaff.contains(spl.getId()) && !spl.getUserId().equals(shiftSearchDTO.getLoggedInUserId())).collect(Collectors.toList());
         }
