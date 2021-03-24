@@ -181,6 +181,15 @@ public class ShiftValidatorService {
         return valid;
     }
 
+    public boolean validateGracePeriod(Long unitId, Phase phase, String timeZone,DateTimeInterval graceInterval) {
+        boolean valid = true;
+        if (TIME_AND_ATTENDANCE.equals(phase.getName())) {
+            timeZone = isNull(timeZone) ? userIntegrationService.getTimeZoneByUnitId(unitId) : timeZone;
+            valid = graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone));
+        }
+        return valid;
+    }
+
     public ShiftWithViolatedInfoDTO validateRuleCheck(boolean ruleCheckRequired, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shiftWithActivityDTO, Shift oldStateShift, Boolean skipRules) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
         if (ruleCheckRequired) {

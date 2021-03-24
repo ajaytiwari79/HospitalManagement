@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
+import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
 import static com.kairos.enums.shift.ShiftEscalationReason.WORK_TIME_AGREEMENT;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
@@ -112,6 +113,23 @@ public class WTARuleTemplateCalculationService {
         return shifts;
     }
 
+    public <T extends ShiftDTO> List<T> updateEditableShifts(List<T> shifts) {
+        if (isCollectionNotEmpty(shifts)) {
+            Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
+            Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
+            String timeZone = userIntegrationService.getTimeZoneByUnitId(shifts.get(0).getUnitId());
+            for (ShiftDTO shift : shifts) {
+                if(isNotNull(shift.getShiftViolatedRules())){
+                    shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
+                    shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
+                }
+                boolean editable = isEqualOrBefore(shift.getStartDate(),DateUtils.getDate()) ? shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()),timeZone) : true;
+                shift.setEditable(editable);
+            }
+        }
+        return shifts;
+    }
+
     private void updateRestingHours(Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap, Map<Date, Phase> phaseMapByDate, String timeZone, ShiftDTO shift) {
         Map.Entry<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> dateTimeIntervalListEntry = intervalWTARuletemplateMap.entrySet().stream().filter(dateTimeIntervalList -> dateTimeIntervalList.getKey().containsAndEqualsEndDate(asLocalDate(shift.getStartDate()))).findAny().orElse(null);
         int restingMinutes = getRestingMinutes(dateTimeIntervalListEntry, phaseMapByDate, shift.getStartDate(),shift.getActivities());
@@ -120,9 +138,11 @@ public class WTARuleTemplateCalculationService {
             shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
             shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
         }
-        boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()),timeZone);
+        boolean editable = shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()),timeZone);
         shift.setEditable(editable);
     }
+
+
 
     public <T extends ShiftDTO> List<T> updateRestingTimeInShifts(List<T> shifts, ShiftDataHelper shiftDataHelper) {
         if (isCollectionNotEmpty(shifts)) {
