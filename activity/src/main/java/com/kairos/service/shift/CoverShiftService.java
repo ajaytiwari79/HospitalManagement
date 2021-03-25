@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.staff.staff.Staff;
@@ -8,8 +9,8 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.repository.shift.CoverShiftMongoRepository;
 import com.kairos.persistence.repository.shift.CoverShiftSettingMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
@@ -50,7 +51,7 @@ public class CoverShiftService {
     @Inject private ExecutorService executorService;
     @Inject private CoverShiftSettingMongoRepository coverShiftSettingMongoRepository;
     @Inject private ExceptionService exceptionService;
-    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private CoverShiftMongoRepository coverShiftMongoRepository;
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
@@ -174,14 +175,28 @@ public class CoverShiftService {
         return activityIds;
     }
 
-    public CoverShift getCoverShiftDetails(BigInteger shiftId){
-        return shiftService.findOneByShiftId(shiftId).getCoverShift();
+    public CoverShift getCoverShiftDetails(BigInteger shiftId, Long staffId){
+        return coverShiftMongoRepository.findByShiftIdAndStaffIdDeletedFalse(shiftId,staffId);
     }
 
-    public void updateCoverShiftDetails(BigInteger shiftId,CoverShift coverShift){
-        Shift shift= shiftService.findOneByShiftId(shiftId);
-        shift.setCoverShift(coverShift);
-        shiftMongoRepository.save(shift);
+    public void updateCoverShiftDetails(CoverShiftDTO coverShiftDTO){
+        CoverShift coverShift=ObjectMapperUtils.copyPropertiesByMapper(coverShiftDTO,CoverShift.class);
+        coverShiftMongoRepository.save(coverShift);
+    }
+
+    public void cancelCoverShiftDetails(BigInteger id){
+        CoverShift coverShift= coverShiftMongoRepository.findOne(id);
+        coverShift.setDeleted(true);
+        coverShiftMongoRepository.save(coverShift);
+    }
+
+    public void showInterestInCoverShift(BigInteger id,Long staffId){
+        CoverShift coverShift= coverShiftMongoRepository.findByIdAndDeletedFalse(id);
+        if(isNull(coverShift)){
+            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
+        }
+        coverShift.getInterestedStaffs().put(staffId, DateUtils.getDate());
+        coverShiftMongoRepository.save(coverShift);
     }
 
 }

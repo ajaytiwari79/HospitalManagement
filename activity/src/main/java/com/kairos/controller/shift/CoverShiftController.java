@@ -1,7 +1,7 @@
 package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
-import com.kairos.dto.activity.shift.CoverShift;
+import com.kairos.dto.activity.shift.CoverShiftDTO;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
 import com.kairos.utils.response.ResponseHandler;
@@ -55,15 +55,31 @@ public class CoverShiftController {
     @ApiOperation("get cover shift setting by unit")
     @GetMapping(value = "/cover_shift_details/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getCoverShiftByShiftId(@PathVariable BigInteger shiftId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftDetails(shiftId));
+    public ResponseEntity<Map<String, Object>> getCoverShiftByShiftId(@PathVariable BigInteger shiftId,@RequestParam("staffId") Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftDetails(shiftId,staffId));
     }
 
-    @ApiOperation("get cover shift setting by unit")
+    @ApiOperation("update cover shift setting by unit")
     @PutMapping(value = "/update_cover_shift_details/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger shiftId, @RequestBody CoverShift coverShift) {
-        coverShiftService.updateCoverShiftDetails(shiftId,coverShift);
+    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger shiftId, @RequestBody CoverShiftDTO coverShiftDTO) {
+        coverShiftService.updateCoverShiftDetails(coverShiftDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @ApiOperation("cancel cover shift setting by unit")
+    @PutMapping(value = "/cancel_cover_shift/{id}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> cancelCoverShiftByShiftId(@PathVariable BigInteger id) {
+        coverShiftService.cancelCoverShiftDetails(id);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @ApiOperation("update cover shift setting by unit")
+    @PutMapping(value = "/show_interest/{id}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId) {
+        coverShiftService.showInterestInCoverShift(id,staffId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }
