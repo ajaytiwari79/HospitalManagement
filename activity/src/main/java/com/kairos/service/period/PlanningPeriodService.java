@@ -62,6 +62,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
@@ -157,6 +159,7 @@ public class PlanningPeriodService {
     }
 
     // To fetch list of planning periods
+    @Cacheable(value = "getPlanningPeriods", key = "#unitId", cacheManager = "cacheManager")
     public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
         // Prepare map for phases with id as key and sequence as value
@@ -212,6 +215,7 @@ public class PlanningPeriodService {
     }
 
     /// API END Point
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public List<PlanningPeriodDTO> migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
         List<PlanningPeriod> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByRequestPhaseId(unitId, AppConstants.REQUEST_PHASE_NAME);
         if (requestPlanningPeriods.isEmpty()) {
@@ -373,6 +377,7 @@ public class PlanningPeriodService {
     }
 
 
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
         Map<Long, List<PhaseDTO>> unitIdAndPhasesMap = getPhasesWithDurationInDays(Arrays.asList(unitId));
 
@@ -482,6 +487,7 @@ public class PlanningPeriodService {
         return (localDateTime.isBefore(getCurrentLocalDateTime()) || localDateTime.isEqual(getCurrentLocalDateTime()));
     }
 
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public List<PlanningPeriodDTO> updatePlanningPeriod(Long unitId, BigInteger periodId, PlanningPeriodDTO planningPeriodDTO) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(periodId);
 
@@ -543,6 +549,7 @@ public class PlanningPeriodService {
         return true;
     }
 
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public PlanningPeriodDTO setPlanningPeriodPhaseToPublishOrFlip(Long unitId, BigInteger periodId, Set<Long> employmentTypeIds, PlanningPeriodAction planningPeriodAction) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
@@ -628,6 +635,7 @@ public class PlanningPeriodService {
     }
 
     // flip phase of planning period via job
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public void updateFlippingDate(BigInteger periodId, Long unitId, BigInteger schedulerPanelId) {
         List<Shift> shifts = new ArrayList<>();
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
@@ -706,6 +714,7 @@ public class PlanningPeriodService {
     /**
      * for restore shift initial data
      */
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public boolean restoreShiftToPreviousPhase(BigInteger planningPeriodId, Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(planningPeriodId, unitId);
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
@@ -804,6 +813,7 @@ public class PlanningPeriodService {
     }
 
     //add planning period in unit via job
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     public boolean addPlanningPeriodViaJob() {
         List<PlanningPeriod> planningPeriodsViaJob = new ArrayList<>();
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findLastPlanningPeriodOfAllUnits();
@@ -824,6 +834,7 @@ public class PlanningPeriodService {
         return true;
     }
 
+    @CacheEvict(value = "getPlanningPeriods", key = "#unitId")
     private void updatePlanningPeriodByDuration(List<PlanningPeriod> planningPeriodsViaJob, Map<Long, List<PhaseDTO>> unitIdAndPhasesMap, PlanningPeriod planningPeriod) {
         try {
             LocalDate startDate = planningPeriod.getEndDate().plusDays(1);
