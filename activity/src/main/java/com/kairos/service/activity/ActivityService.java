@@ -77,6 +77,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.enums.ActivityStateEnum.PUBLISHED;
 import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 import static com.kairos.service.activity.ActivityUtil.buildActivity;
 import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
@@ -112,7 +113,7 @@ public class ActivityService {
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private DayTypeService dayTypeService;
-   // @Inject private ActivityRankingService activityRankingService;
+    @Inject private ActivityRankingService activityRankingService;
     @Inject private ActivityPermissionService activityPermissionService;
     @Inject @Lazy private ActivityHelperService activityHelperService;
 
@@ -304,7 +305,7 @@ public class ActivityService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
         if(isNotNull(activityGeneralSettingsDTO.getTimeTypeId()) && !activityGeneralSettingsDTO.getTimeTypeId().equals(activity.getActivityBalanceSettings().getTimeTypeId())){
-            if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
+            if (activity.getState().equals(PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
             }
             setDataInActivity(activity, timeType);
@@ -655,6 +656,7 @@ public class ActivityService {
         if (!isSuccess) {
             exceptionService.dataNotFoundException(MESSAGE_PARAMETERS_INCORRECT);
         }
+        List<Long> expertiseIds = activity.getExpertises();
         activity.setRegions(organizationMappingDTO.getRegions());
         activity.setExpertises(organizationMappingDTO.getExpertises());
         activity.setOrganizationSubTypes(organizationMappingDTO.getOrganizationSubTypes());
@@ -662,6 +664,16 @@ public class ActivityService {
         activity.setLevels(organizationMappingDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingDTO.getEmploymentTypes());
         activityMongoRepository.save(activity);
+        if(PUBLISHED.equals(activity.getState()) && expertiseIds.size() != activity.getExpertises().size()){
+            if(activity.getExpertises().size() > expertiseIds.size()){
+                List<Long> updateExpertiseIds = activity.getExpertises();
+                updateExpertiseIds.removeAll(expertiseIds);
+                activityRankingService.createOrUpdateAbsenceActivityRanking(activity,updateExpertiseIds);
+            } else {
+                expertiseIds.removeAll(activity.getExpertises());
+                activityRankingService.removeActivityId(activity,expertiseIds);
+            }
+        }
         if (activity.getUnitId() != null) {
             plannerSyncService.publishActivity(activity.getUnitId(), activity, IntegrationOperation.UPDATE);
         }
@@ -757,7 +769,7 @@ public class ActivityService {
     @CacheEvict(value = "findAllActivityByCountry",allEntries = true)
     public boolean deleteCountryActivity(BigInteger activityId) {
         Activity activity =findActivityById(activityId);
-        if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
+        if (activity.getState().equals(PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(EXCEPTION_ALREADYINUSE, ACTIVITY);
         }
         activity.setDeleted(true);
@@ -768,15 +780,17 @@ public class ActivityService {
     @CacheEvict(value = "findAllActivityByCountry",allEntries = true)
     public Boolean publishActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
+        if (activity.getState().equals(PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PUBLISHED, activityId);
         }
         if (activity.getActivityBalanceSettings().getTimeTypeId() == null) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_ABSENT, activity.getName());
         }
-        activity.setState(ActivityStateEnum.PUBLISHED);
+        activity.setState(PUBLISHED);
         activityMongoRepository.save(activity);
-        //activityRankingService.addActivityInRanking(activity);
+        if(isCollectionNotEmpty(activity.getExpertises()) && activity.getExpertises().size() > 0) {
+            activityRankingService.createOrUpdateAbsenceActivityRanking(activity, activity.getExpertises());
+        }
         return true;
     }
 

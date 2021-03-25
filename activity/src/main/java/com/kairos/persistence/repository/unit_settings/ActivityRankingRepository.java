@@ -13,9 +13,9 @@ import java.util.Set;
 @Repository
 public interface ActivityRankingRepository extends MongoBaseRepository<ActivityRanking,BigInteger> {
 
-    List<ActivityRankingDTO> getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(Long expertiseId);
+    List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(Long expertiseId);
 
-    List<ActivityRankingDTO> getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
+    List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
 
     List<ActivityRankingDTO> getAbsenceRankingSettingsByDeletedFalse();
 
