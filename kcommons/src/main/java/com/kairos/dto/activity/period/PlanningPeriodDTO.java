@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -25,7 +26,8 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PlanningPeriodDTO {
+public class PlanningPeriodDTO implements Serializable {
+    private static final long serialVersionUID = 1822821048829657171L;
     private BigInteger id;
     private String name;
     private String dateRange;

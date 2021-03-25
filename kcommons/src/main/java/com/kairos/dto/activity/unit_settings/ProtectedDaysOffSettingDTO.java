@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -14,7 +15,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProtectedDaysOffSettingDTO {
+public class ProtectedDaysOffSettingDTO implements Serializable {
+    private static final long serialVersionUID = 9148594489091221237L;
     private BigInteger id;
     private Long unitId;
     private ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings;

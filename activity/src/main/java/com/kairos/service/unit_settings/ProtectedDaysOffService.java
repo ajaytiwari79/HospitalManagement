@@ -15,6 +15,8 @@ import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffSettingsR
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -39,7 +41,7 @@ public class ProtectedDaysOffService {
     @Inject private ProtectedDaysOffRepository protectedDaysOffRepository;
     @Inject private CountryHolidayCalenderService countryHolidayCalenderService;
 
-
+    @CacheEvict(value = "getProtectedDaysOffByUnitId", key = "#unitId")
     public ProtectedDaysOffSettingDTO saveProtectedDaysOff(Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = new ProtectedDaysOffSettingDTO(unitId, protectedDaysOffUnitSettings);
         ProtectedDaysOffSetting protectedDaysOffSetting = protectedDaysOffSettingsRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
@@ -51,6 +53,7 @@ public class ProtectedDaysOffService {
         return protectedDaysOffSettingDTO;
     }
 
+    @CacheEvict(value = "getProtectedDaysOffByUnitId", key = "#unitId")
     public ProtectedDaysOffSettingDTO updateProtectedDaysOffByUnitId(Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO){
         ProtectedDaysOffSetting protectedDaysOffSetting = protectedDaysOffSettingsRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
@@ -61,6 +64,7 @@ public class ProtectedDaysOffService {
         return ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSetting,ProtectedDaysOffSettingDTO.class);
     }
 
+    @Cacheable(value = "getProtectedDaysOffByUnitId", key = "#unitId", cacheManager = "cacheManager")
     public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){
         ProtectedDaysOffSetting protectedDaysOffSetting = protectedDaysOffSettingsRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
