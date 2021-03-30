@@ -102,6 +102,7 @@ public class ShiftHelperService {
         shiftActivity.setSecondLevelTimeType(shiftActivityDTO.getSecondLevelTimeType());
         shiftActivity.setTimeType(shiftActivityDTO.getTimeType());
         shiftActivity.setMethodForCalculatingTime(shiftActivityDTO.getMethodForCalculatingTime());
+        shiftActivity.setId(shiftActivityDTO.getId());
     }
 
     public void updateShiftResponse(ShiftDTO shiftDTO, String timeZone, Phase phase){
