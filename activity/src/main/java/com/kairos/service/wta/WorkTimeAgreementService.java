@@ -872,7 +872,7 @@ public class WorkTimeAgreementService{
             List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(newArrayList(activityId));
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             PlanningPeriod planningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
-            DateTimeInterval dateTimeInterval = workTimeAgreementBalancesCalculationService.getIntervalByRuletemplates(activityWrapperMap, Arrays.asList(protectedDaysOffWTATemplate), localDate, planningPeriod.getEndDate(), unitId);
+            DateTimeInterval dateTimeInterval = workTimeAgreementBalancesCalculationService.getIntervalByRuletemplates(null, activityWrapperMap, Arrays.asList(protectedDaysOffWTATemplate), localDate, planningPeriod.getEndDate(), unitId);
             List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(staffAdditionalInfoDTO.getEmployment().getId(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), newHashSet(activityId));
             workTimeAgreementRuleTemplateBalancesDTO = workTimeAgreementBalancesCalculationService.getProtectedDaysOffBalance(unitId, protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, new HashMap<>(), staffAdditionalInfoDTO, localDate, localDate, planningPeriod.getEndDate());
         }
