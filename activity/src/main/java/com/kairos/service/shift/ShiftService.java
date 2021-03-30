@@ -860,8 +860,10 @@ public class ShiftService {
     private <T> void updateActivityDetails(Map<BigInteger, T> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO) {
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
             updateActivityAndTimeTypeDetails(activityWrapperMap, shiftActivityDTO);
+            shiftActivityDTO.setId(shiftMongoRepository.nextSequence(ShiftActivity.class.getSimpleName()));
             for (ShiftActivityDTO childActivityDTO : shiftActivityDTO.getChildActivities()) {
                 if(activityWrapperMap.containsKey(childActivityDTO.getActivityId())) {
+                    childActivityDTO.setId(shiftMongoRepository.nextSequence(ShiftActivity.class.getSimpleName()));
                     updateActivityAndTimeTypeDetails(activityWrapperMap,childActivityDTO);
                 }
             }
