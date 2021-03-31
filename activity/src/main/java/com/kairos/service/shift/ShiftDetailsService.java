@@ -210,8 +210,8 @@ public class ShiftDetailsService {
             Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
             boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getEndDate());
             int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
-            map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes) : asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes));
-            map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()):asZonedDateTime(oldShift.getEndDate()));
+            map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(oldShift.getEndDate()) : asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
+            map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()):asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes));
             map.put("startDate", startDate);
             map.put("endDate", endDate);
             map.put("shiftExtend", shiftExtends);

@@ -69,7 +69,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected LocalDateTime clockOut;
     protected BigInteger shiftId;
     protected AccessGroupRole accessGroupRole;
-    protected boolean editable;
+    protected boolean editable=true;
     protected boolean functionDeleted;
     protected ShiftType shiftType;
     protected BigInteger shiftStatePhaseId;
