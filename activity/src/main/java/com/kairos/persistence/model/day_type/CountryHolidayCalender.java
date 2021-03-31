@@ -14,6 +14,7 @@ import java.time.LocalTime;
 @Setter
 @Document
 public class CountryHolidayCalender extends MongoBaseEntity {
+    private static final long serialVersionUID = 2486721542637557549L;
     private String holidayTitle;
     private LocalDate holidayDate;
     private BigInteger dayTypeId;

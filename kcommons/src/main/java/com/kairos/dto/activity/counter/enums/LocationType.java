@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.counter.enums;
 
-public enum LocationType {
+import java.io.Serializable;
+
+public enum LocationType implements Serializable {
     FIX(1),
     FLOAT(100);
 

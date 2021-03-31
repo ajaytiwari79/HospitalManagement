@@ -18,6 +18,7 @@ import java.math.BigInteger;
 @Setter
 @NoArgsConstructor
 public class ReasonCode extends MongoBaseEntity {
+    private static final long serialVersionUID = -123228536841586025L;
     private String name;
     private String code;
     private String description;

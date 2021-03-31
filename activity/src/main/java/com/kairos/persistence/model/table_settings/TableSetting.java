@@ -14,7 +14,7 @@ import java.util.Optional;
 @Document
 public class TableSetting extends MongoBaseEntity {
 
-
+    private static final long serialVersionUID = -726309801611311395L;
     private Long userId;
     private Long organizationId;
     private List<TableConfiguration> tableConfigurations;

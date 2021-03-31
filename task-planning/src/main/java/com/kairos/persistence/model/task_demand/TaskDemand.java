@@ -344,7 +344,7 @@ public class TaskDemand extends MongoBaseEntity {
         this.taskCreatedTillDate = taskCreatedTillDate;
     }
 
-    public enum WeekFrequency{
+    public enum WeekFrequency implements Serializable {
 
         ONE_WEEK("One week"),
         TWO_WEEK("Two week"),
@@ -368,7 +368,7 @@ public class TaskDemand extends MongoBaseEntity {
         }
     }
 
-    public enum Status{
+    public enum Status implements Serializable {
 
         VISITATED("Visitated"), //When demand is created
         GENERATED("Generated"), //When demand dragged&dropped in planner
@@ -393,7 +393,7 @@ public class TaskDemand extends MongoBaseEntity {
         }
     }
 
-    public enum RecurrencePattern{
+    public enum RecurrencePattern implements Serializable {
 
         DAILY("Daily"),
         WEEKLY("Weekly"),

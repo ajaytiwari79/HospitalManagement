@@ -79,6 +79,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -599,6 +600,7 @@ public class OrganizationService {
         return true;
     }
 
+    @Cacheable(value = "fetchParentOrganization", key = "#unitId", cacheManager = "cacheManager")
     public Organization fetchParentOrganization(Long unitId) {
         Long parentOrgId = organizationBaseRepository.findParentOrgId(unitId);
         Organization parent=  organizationGraphRepository.findOne(parentOrgId);

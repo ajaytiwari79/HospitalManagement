@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.counter.enums;
 
-public enum KPIValidity {
+import java.io.Serializable;
+
+public enum KPIValidity implements Serializable {
     MANDATORY(1),
     OPTIONAL(1000),
     BASIC(10);

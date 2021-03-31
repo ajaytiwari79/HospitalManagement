@@ -21,6 +21,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class KPISet extends MongoBaseEntity {
+    private static final long serialVersionUID = 4051899614276154441L;
     private String name;
     private Set<BigInteger> kpiIds;
     private TimeTypeEnum timeType;

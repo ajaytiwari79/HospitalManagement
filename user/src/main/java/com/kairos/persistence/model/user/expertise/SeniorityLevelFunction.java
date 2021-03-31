@@ -11,6 +11,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_S
 @Getter
 @Setter
 public class SeniorityLevelFunction extends UserBaseEntity   {
+    private static final long serialVersionUID = 3924648720065690045L;
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;
 }

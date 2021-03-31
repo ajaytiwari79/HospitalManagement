@@ -6,6 +6,7 @@ import java.math.BigInteger;
 
 @Document
 public class StaffingLevelState extends StaffingLevel {
+    private static final long serialVersionUID = 6113337333392462906L;
     private BigInteger staffingLevelId;
     private BigInteger staffingLevelStatePhaseId;
     private BigInteger planningPeriodId;

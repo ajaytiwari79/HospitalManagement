@@ -19,6 +19,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class PayGrade extends UserBaseEntity {
 
+    private static final long serialVersionUID = 9095343891650195994L;
     private Long payGradeLevel;
     private boolean published;
 

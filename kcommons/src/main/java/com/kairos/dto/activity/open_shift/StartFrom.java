@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.open_shift;
 
-public enum StartFrom {
+import java.io.Serializable;
+
+public enum StartFrom implements Serializable {
     UNIT,HOME
 }

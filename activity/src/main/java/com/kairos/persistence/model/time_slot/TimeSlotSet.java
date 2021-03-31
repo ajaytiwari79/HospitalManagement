@@ -20,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeSlotSet extends MongoBaseEntity {
+    private static final long serialVersionUID = 6816738415988083549L;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;

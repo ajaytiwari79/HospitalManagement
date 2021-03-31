@@ -37,6 +37,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class Expertise extends UserBaseEntity {
+    private static final long serialVersionUID = 8079884125098345162L;
     @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL)
     private String name;
     private String description;

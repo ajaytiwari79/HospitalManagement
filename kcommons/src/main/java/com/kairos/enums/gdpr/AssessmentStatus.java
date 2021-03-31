@@ -1,6 +1,8 @@
 package com.kairos.enums.gdpr;
 
-public enum  AssessmentStatus {
+import java.io.Serializable;
+
+public enum  AssessmentStatus implements Serializable {
 
 
     NEW("new"), IN_PROGRESS("inProgress"), COMPLETED("completed");

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class Skill {
         return data;
     }
 
-    public enum SkillLevel {
+    public enum SkillLevel implements Serializable {
 
         BASIC("Basic"), ADVANCE("Advance"), EXPERT("Expert");
         public String value;
@@ -64,7 +65,7 @@ public class Skill {
         }
     }
 
-    public enum SkillStatus {
+    public enum SkillStatus implements Serializable {
         PENDING, APPROVED, REJECTED;
     }
 }

@@ -19,6 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeniorDays extends UserBaseEntity{
+    private static final long serialVersionUID = -1427491727211230586L;
     @Relationship(type = BELONGS_TO_EXPERTISE)
     private Expertise expertise;
     private LocalDate startDate;

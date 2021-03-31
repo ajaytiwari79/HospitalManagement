@@ -25,6 +25,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @Getter
 @Setter
 public class ReasonCode extends UserBaseEntity {
+    private static final long serialVersionUID = 5126696900810883123L;
     private String name;
     private String code;
     private String description;

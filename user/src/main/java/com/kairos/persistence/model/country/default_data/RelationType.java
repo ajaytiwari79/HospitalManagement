@@ -17,6 +17,7 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_RELATIONTYPE_NAME
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelationType extends UserBaseEntity {
+    private static final long serialVersionUID = 7881110983923799984L;
     @NotBlank(message = ERROR_RELATIONTYPE_NAME_NOTEMPTY)
     private String name;
     private String description;

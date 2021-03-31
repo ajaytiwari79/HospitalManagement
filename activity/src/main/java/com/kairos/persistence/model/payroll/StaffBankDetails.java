@@ -11,6 +11,7 @@ import java.math.BigInteger;
  */
 @Document
 public class StaffBankDetails extends MongoBaseEntity{
+    private static final long serialVersionUID = -2294879373975105462L;
     private Long staffId;
     private BigInteger bankId;
     private boolean useNemkontoAccount; //it true so use Default account of this staff

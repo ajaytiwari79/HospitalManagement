@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DayType extends MongoBaseEntity {
+    private static final long serialVersionUID = 5594442948746712580L;
     @NotBlank(message = "error.DayType.name.notEmpty")
     private String name;
     @NotNull

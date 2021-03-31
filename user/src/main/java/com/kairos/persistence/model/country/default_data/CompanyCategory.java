@@ -16,6 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class CompanyCategory extends UserBaseEntity {
+    private static final long serialVersionUID = 1420577511847681611L;
     private String name;
     private String description;
     @Relationship(type = BELONGS_TO)

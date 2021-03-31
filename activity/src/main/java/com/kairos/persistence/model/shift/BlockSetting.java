@@ -19,6 +19,7 @@ import java.util.Set;
 @Document
 @NoArgsConstructor
 public class BlockSetting extends MongoBaseEntity {
+    private static final long serialVersionUID = 6704524885848714134L;
     private Long unitId;
     private LocalDate date;
     private Map<Long, Set<BigInteger>> blockDetails;

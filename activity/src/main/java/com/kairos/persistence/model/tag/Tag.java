@@ -22,6 +22,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Tag extends MongoBaseEntity {
 
+    private static final long serialVersionUID = 184409399323717230L;
     private String name;
     @Indexed
     private MasterDataTypeEnum masterDataType;
