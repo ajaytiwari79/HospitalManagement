@@ -19,6 +19,7 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_LEVEL_N
 @Setter
 public class Level extends UserBaseEntity {
 
+    private static final long serialVersionUID = 1495484063377486532L;
     @NotBlank(message = MESSAGE_COUNTRY_LEVEL_NAME_NOTEMPTY)
     private String name;
     private String description;

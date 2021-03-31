@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class CountryTimeType extends UserBaseEntity {
 
+    private static final long serialVersionUID = 488522592910492065L;
     String name;
     String description;
 

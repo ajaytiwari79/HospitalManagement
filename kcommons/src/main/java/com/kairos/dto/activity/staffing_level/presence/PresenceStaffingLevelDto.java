@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -49,11 +50,11 @@ public class PresenceStaffingLevelDto {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public enum StaffingLevelChange{
+    public enum StaffingLevelChange implements Serializable {
         ACTIVITY_MIN_AND_MAX,ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT
     }
 
-    public enum StaffingLevelAction{
+    public enum StaffingLevelAction implements Serializable {
         ADD,UPDATE,REMOVE
     }
 

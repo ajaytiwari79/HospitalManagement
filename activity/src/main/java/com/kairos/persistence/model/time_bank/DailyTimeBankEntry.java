@@ -18,6 +18,7 @@ import java.util.*;
 @Document(collection = "dailyTimeBankEntries")
 public class DailyTimeBankEntry extends MongoBaseEntity{
 
+    private static final long serialVersionUID = -2630355561851052487L;
     private Long employmentId;
     private Long staffId;
     //It is Delta timebank

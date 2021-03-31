@@ -14,6 +14,7 @@ import java.util.Date;
 @Document(collection = "shiftState")
 public class ShiftState extends Shift {
 
+    private static final long serialVersionUID = 7363158576726436085L;
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
 

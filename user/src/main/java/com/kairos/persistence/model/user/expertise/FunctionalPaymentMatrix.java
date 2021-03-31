@@ -18,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SENIO
 @Setter
 public class FunctionalPaymentMatrix extends UserBaseEntity  {
 
+    private static final long serialVersionUID = 1912992181945955317L;
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private Set<PayGroupArea> payGroupAreas;
     @Relationship(type = SENIORITY_LEVEL_FUNCTIONS)

@@ -42,6 +42,7 @@ import static com.kairos.enums.shift.ShiftType.SICK;
 @NoArgsConstructor
 public class Shift extends MongoBaseEntity {
 
+    private static final long serialVersionUID = 2080914438098119264L;
     protected Date startDate;
     protected Date endDate;
     protected Integer shiftStartTime;//In Second

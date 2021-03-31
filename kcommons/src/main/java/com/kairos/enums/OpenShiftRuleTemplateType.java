@@ -1,6 +1,8 @@
 package com.kairos.enums;
 
-public enum OpenShiftRuleTemplateType {
+import java.io.Serializable;
+
+public enum OpenShiftRuleTemplateType implements Serializable {
     UNDERSTAFFING,
     OVERSTAFFING,
     SKILL_MISSING,

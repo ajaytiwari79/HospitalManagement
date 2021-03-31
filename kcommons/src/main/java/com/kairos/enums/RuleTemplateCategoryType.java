@@ -1,5 +1,7 @@
 package com.kairos.enums;
 
-public enum RuleTemplateCategoryType {
+import java.io.Serializable;
+
+public enum RuleTemplateCategoryType implements Serializable {
     CTA,WTA
 }

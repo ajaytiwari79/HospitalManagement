@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Document
 public class UnitPayrollSetting extends MongoBaseEntity {
+    private static final long serialVersionUID = 8248924478390637951L;
     private boolean published;
     private Long unitId;
     private BigInteger parentPayrollId;

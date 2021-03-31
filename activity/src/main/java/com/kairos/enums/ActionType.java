@@ -1,6 +1,8 @@
 package com.kairos.enums;
 
-public enum ActionType {
+import java.io.Serializable;
+
+public enum ActionType implements Serializable {
         DELETE_SHIFT,
         COPY_SHIFT,
         AVAILABILITY_SHIFT,

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProtectedDaysOff extends MongoBaseEntity {
+    private static final long serialVersionUID = 759849255789643874L;
     private BigInteger holidayId;
     private LocalDate publicHolidayDate;
     private boolean protectedDaysOff;

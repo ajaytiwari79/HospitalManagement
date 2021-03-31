@@ -25,6 +25,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 public class StaffingLevel extends MongoBaseEntity {
+    private static final long serialVersionUID = 9078681960018781377L;
     @Indexed
     private Date currentDate;
     private Integer weekCount;

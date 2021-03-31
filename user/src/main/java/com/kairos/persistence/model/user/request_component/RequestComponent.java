@@ -13,6 +13,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @Getter
 @Setter
 public class RequestComponent extends UserBaseEntity {
+    private static final long serialVersionUID = 561218928190718976L;
     private String description;
     private RequestType requestType;
     private String requestSentType;

@@ -25,6 +25,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Document(collection = "staffing_level_template")
 public class StaffingLevelTemplate extends MongoBaseEntity{
+    private static final long serialVersionUID = 8504664248659642975L;
     private String name;
     private Long unitId;
     private StaffingLevelTemplatePeriod validity;

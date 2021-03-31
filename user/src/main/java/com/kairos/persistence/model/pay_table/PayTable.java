@@ -25,6 +25,7 @@ import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 @Setter
 @NoArgsConstructor
 public class PayTable extends UserBaseEntity {
+    private static final long serialVersionUID = 4067887556205929252L;
     private String name;
     private String shortName;
     @Relationship(type = IN_ORGANIZATION_LEVEL)

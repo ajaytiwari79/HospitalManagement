@@ -12,7 +12,7 @@ import java.math.BigInteger;
 @Document
 public class OrganizationBankDetails extends MongoBaseEntity {
 
-
+    private static final long serialVersionUID = -3870362424484977925L;
     private Long organizationId;
     private BigInteger bankId;
     private Long accountNumber;

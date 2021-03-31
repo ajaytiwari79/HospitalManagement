@@ -11,6 +11,7 @@ import java.util.Set;
 
 @NodeEntity
 public class StaffPreferences extends UserBaseEntity {
+    private static final long serialVersionUID = 7520822420195102702L;
     private Set<BigInteger> activityId;
     private Set<Long> dateForDay;
     private Set<Long> dateForWeek;

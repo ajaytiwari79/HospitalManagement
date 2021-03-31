@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class FunctionalPayment extends UserBaseEntity {
+    private static final long serialVersionUID = -5919769856113230632L;
     @Relationship(type = APPLICABLE_FOR_EXPERTISE)
     private ExpertiseLine expertiseLine;
     private LocalDate startDate;
