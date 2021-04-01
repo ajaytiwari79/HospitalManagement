@@ -71,6 +71,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -225,6 +226,7 @@ public class ActivityService {
         if (Optional.ofNullable(activity.getActivityGeneralSettings().getOriginalIconName()).isPresent()) {
             generalTab.setOriginalIconName(activity.getActivityGeneralSettings().getOriginalIconName());
         }
+        LocalDate oldEndDate = activity.getActivityGeneralSettings().getEndDate();
         activity.setActivityGeneralSettings(generalTab);
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
@@ -239,6 +241,9 @@ public class ActivityService {
         updateBalanceSettingTab(generalDTO, activity);
         updateNotesTabOfActivity(generalDTO, activity);
         activityMongoRepository.save(activity);
+        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState())){
+            activityRankingService.updateEndDateOfAbsenceActivity(activity, oldEndDate);
+        }
         return getActivitySettingsWrapper(activity, checkCountryAndFindActivityCategory(countryId), generalActivityWithTagDTO);
     }
     private void validateActivityDetails(Long countryId, ActivityGeneralSettingsDTO generalDTO) {
@@ -664,14 +669,14 @@ public class ActivityService {
         activity.setLevels(organizationMappingDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingDTO.getEmploymentTypes());
         activityMongoRepository.save(activity);
-        if(PUBLISHED.equals(activity.getState()) && expertiseIds.size() != activity.getExpertises().size()){
+        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState()) && expertiseIds.size() != activity.getExpertises().size()){
             if(activity.getExpertises().size() > expertiseIds.size()){
                 List<Long> updateExpertiseIds = activity.getExpertises();
                 updateExpertiseIds.removeAll(expertiseIds);
                 activityRankingService.createOrUpdateAbsenceActivityRanking(activity,updateExpertiseIds);
             } else {
                 expertiseIds.removeAll(activity.getExpertises());
-                activityRankingService.removeActivityId(activity,expertiseIds);
+                activityRankingService.removeAbsenceActivityId(activity,expertiseIds);
             }
         }
         if (activity.getUnitId() != null) {
@@ -774,6 +779,9 @@ public class ActivityService {
         }
         activity.setDeleted(true);
         activityMongoRepository.save(activity);
+        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState()) && activity.getExpertises().size() > 0) {
+            activityRankingService.removeAbsenceActivityId(activity, activity.getExpertises());
+        }
         return true;
     }
 
@@ -788,7 +796,7 @@ public class ActivityService {
         }
         activity.setState(PUBLISHED);
         activityMongoRepository.save(activity);
-        if(isCollectionNotEmpty(activity.getExpertises()) && activity.getExpertises().size() > 0) {
+        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && isCollectionNotEmpty(activity.getExpertises()) && activity.getExpertises().size() > 0) {
             activityRankingService.createOrUpdateAbsenceActivityRanking(activity, activity.getExpertises());
         }
         return true;
