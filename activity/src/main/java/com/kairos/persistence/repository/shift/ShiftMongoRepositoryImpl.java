@@ -765,7 +765,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public <T> List<StaffShiftDetailsDTO> getStaffListFilteredByShiftCriteria(Set<Long> staffIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate, boolean includeDateComparison, RequiredDataForFilterDTO requiredDataForFilterDTO) {
-        Criteria criteria = Criteria.where(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
+        Criteria criteria = Criteria.where(START_DATE).gte(startDate);
+        if(includeDateComparison){
+            criteria.and(END_DATE).lte(endDate);
+        }
         if(isNotNull(unitId)){
             criteria.and(UNIT_ID).is(unitId);
         }
