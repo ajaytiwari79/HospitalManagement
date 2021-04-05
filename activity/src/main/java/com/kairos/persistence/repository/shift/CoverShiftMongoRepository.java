@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 public interface CoverShiftMongoRepository extends MongoBaseRepository<CoverShift, BigInteger> {
 
-    CoverShift findByShiftIdAndStaffIdDeletedFalse(BigInteger shiftId, Long staffId);
+    CoverShift findByShiftIdAndStaffIdAndDeletedFalse(BigInteger shiftId, Long staffId);
 
     CoverShift findByIdAndDeletedFalse(BigInteger id);
 }
