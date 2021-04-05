@@ -205,7 +205,7 @@ public class ShiftDetailsService {
             map.put("endDate", endDate);
             map.put("shiftExtend", shiftExtends);
             map.put("minutes", getMinutesBetweenDate(startDate, endDate));
-        } else if (!oldShift.getEndDate().equals(shiftDTO.getEndDate())) {
+        } else if (!oldShift.getEndDate().equals(shiftDTO.getEndDate()) && oldShift.getStartDate().equals(shiftDTO.getStartDate())) {
             Date startDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? shiftDTO.getEndDate() : oldShift.getEndDate();
             Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
             boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getEndDate());
