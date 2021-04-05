@@ -180,7 +180,7 @@ public class CoverShiftService {
     }
 
     public CoverShift getCoverShiftDetails(BigInteger shiftId, Long staffId){
-        return coverShiftMongoRepository.findByShiftIdAndStaffIdDeletedFalse(shiftId,staffId);
+        return coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(shiftId,staffId);
     }
 
     public void updateCoverShiftDetails(CoverShiftDTO coverShiftDTO){
