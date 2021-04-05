@@ -1,13 +1,17 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.CoverShiftCriteria;
+import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
+import com.kairos.persistence.repository.shift.CoverShiftMongoRepository;
 import com.kairos.persistence.repository.shift.CoverShiftSettingMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -50,6 +54,7 @@ public class CoverShiftService {
     @Inject private ExecutorService executorService;
     @Inject private CoverShiftSettingMongoRepository coverShiftSettingMongoRepository;
     @Inject private ExceptionService exceptionService;
+    @Inject private CoverShiftMongoRepository coverShiftMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
@@ -174,14 +179,60 @@ public class CoverShiftService {
         return activityIds;
     }
 
-    public CoverShift getCoverShiftDetails(BigInteger shiftId){
-        return shiftService.findOneByShiftId(shiftId).getCoverShift();
+    public CoverShift getCoverShiftDetails(BigInteger shiftId, Long staffId){
+        return coverShiftMongoRepository.findByShiftIdAndStaffIdDeletedFalse(shiftId,staffId);
     }
 
-    public void updateCoverShiftDetails(BigInteger shiftId,CoverShift coverShift){
-        Shift shift= shiftService.findOneByShiftId(shiftId);
-        shift.setCoverShift(coverShift);
-        shiftMongoRepository.save(shift);
+    public void updateCoverShiftDetails(CoverShiftDTO coverShiftDTO){
+        CoverShift coverShift=ObjectMapperUtils.copyPropertiesByMapper(coverShiftDTO,CoverShift.class);
+        coverShiftMongoRepository.save(coverShift);
+    }
+
+    public void cancelCoverShiftDetails(BigInteger id){
+        CoverShift coverShift= coverShiftMongoRepository.findOne(id);
+        coverShift.setDeleted(true);
+        coverShiftMongoRepository.save(coverShift);
+    }
+
+    public void showInterestInCoverShift(BigInteger id,Long staffId){
+        CoverShift coverShift= coverShiftMongoRepository.findByIdAndDeletedFalse(id);
+        if(isNull(coverShift)){
+            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
+        }
+        if(coverShift.getApprovalBy().equals(CoverShift.ApprovalBy.AUTO_PICK)){
+            assignCoverShift(staffId, null, coverShift);
+        }
+        coverShift.getInterestedStaffs().put(staffId, DateUtils.getDate());
+        coverShiftMongoRepository.save(coverShift);
+    }
+
+    public void assignCoverShiftToStaff(BigInteger id, Long staffId,Long employmentId){
+        CoverShift coverShift= coverShiftMongoRepository.findByIdAndDeletedFalse(id);
+        if(isNull(coverShift)){
+            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
+        }
+        assignCoverShift(staffId, employmentId, coverShift);
+        coverShift.setAssignedStaffId(staffId);
+        coverShiftMongoRepository.save(coverShift);
+    }
+
+    public void assignCoverShift(Long staffId, Long employmentId, CoverShift coverShift) {
+        ShiftDTO shift=shiftMongoRepository.findByIdAndDeletedFalse(coverShift.getShiftId());
+        ShiftDTO shiftDTO = new ShiftDTO(shift.getActivities(), shift.getUnitId(), staffId, employmentId);
+        shiftDTO.setStartDate(shift.getStartDate());
+        shift.setEndDate(shift.getEndDate());
+        shiftService.updateShift(shiftDTO,false,false, ShiftActionType.SAVE);
+    }
+
+    private void validateApprovalSettings(CoverShift coverShift){
+        switch (coverShift.getApprovalBy()){
+            case AUTO_PICK:
+                StaffDTO staffDTO=userIntegrationService.getStaffByUser(UserContext.getUserDetails().getId());
+
+
+
+        }
+
     }
 
 }
