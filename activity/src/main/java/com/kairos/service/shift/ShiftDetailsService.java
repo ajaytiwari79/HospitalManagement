@@ -199,8 +199,8 @@ public class ShiftDetailsService {
             Date endDate = shiftDTO.getStartDate().before(oldShift.getStartDate()) ? oldShift.getStartDate() : shiftDTO.getStartDate();
             boolean shiftExtends = shiftDTO.getStartDate().before(oldShift.getStartDate());
             int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
-            map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()) : asZonedDateTime(oldShift.getStartDate()));
-            map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes):asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
+            map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(oldShift.getEndDate()).minusMinutes(minutes) : asZonedDateTime(oldShift.getEndDate()).minusMinutes(minutes));
+            map.put("escalatedEndDate", shiftExtends?asZonedDateTime(oldShift.getStartDate()):asZonedDateTime(shiftDTO.getStartDate()));
             map.put("startDate", startDate);
             map.put("endDate", endDate);
             map.put("shiftExtend", shiftExtends);
@@ -210,8 +210,8 @@ public class ShiftDetailsService {
             Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
             boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getEndDate());
             int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
-            map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(oldShift.getEndDate()) : asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
-            map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()):asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes));
+            map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(oldShift.getEndDate()) : asZonedDateTime(shiftDTO.getEndDate()));
+            map.put("escalatedEndDate", shiftExtends?asZonedDateTime(oldShift.getStartDate()).plusMinutes(minutes):asZonedDateTime(oldShift.getStartDate()).plusMinutes(minutes));
             map.put("startDate", startDate);
             map.put("endDate", endDate);
             map.put("shiftExtend", shiftExtends);
