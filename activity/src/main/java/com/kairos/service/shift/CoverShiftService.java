@@ -186,7 +186,7 @@ public class CoverShiftService {
     public void updateCoverShiftDetails(CoverShiftDTO coverShiftDTO){
         CoverShift coverShift=ObjectMapperUtils.copyPropertiesByMapper(coverShiftDTO,CoverShift.class);
         coverShiftMongoRepository.save(coverShift);
-        if(coverShift.getId()==null){
+        if(coverShiftDTO.getId()==null){
             Shift shift=shiftMongoRepository.findOne(coverShift.getShiftId());
             shift.setCoverShiftExists(true);
             shiftMongoRepository.save(shift);
