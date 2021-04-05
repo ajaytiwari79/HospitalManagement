@@ -117,6 +117,8 @@ import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
+import static com.kairos.enums.ActivityStateEnum.PUBLISHED;
+import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 import static com.kairos.enums.reason_code.ReasonCodeType.ORDER;
@@ -256,6 +258,9 @@ public class OrganizationActivityService {
         }
         activityCopied.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activityCopied);
+        if(PRESENCE.equals(activityCopied.getActivityBalanceSettings().getTimeType())) {
+            activityRankingService.addOrRemovePresenceActivityRanking(unitId, activityCopied, checked);
+        }
         return retrieveBasicDetails(activityCopied);
     }
 
@@ -419,6 +424,7 @@ public class OrganizationActivityService {
         if (Optional.ofNullable(activity.getActivityGeneralSettings().getOriginalIconName()).isPresent()) {
             generalTab.setOriginalIconName(activity.getActivityGeneralSettings().getOriginalIconName());
         }
+        LocalDate oldEndDate = activity.getActivityGeneralSettings().getEndDate();
         activity.setActivityGeneralSettings(generalTab);
         activity.setName(generalTab.getName());
         activity.setDescription(generalTab.getDescription());
@@ -439,6 +445,9 @@ public class OrganizationActivityService {
         activityService.updateNotesTabOfActivity(generalDTO, activity);
         activitySettingsService.updateTimeTypePathInActivity(activity);
         activityMongoRepository.save(activity);
+        if(PRESENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState())){
+            activityRankingService.updateEndDateOfPresenceActivity(unitId, activity, oldEndDate);
+        }
         getGeneralActivityWithTagDTO(activity, generalActivityWithTagDTO);
         return new ActivitySettingsWrapper(generalActivityWithTagDTO, generalDTO.getActivityId(), activityCategoryRepository.findByCountryId(organizationDTO.getCountryId()));
 

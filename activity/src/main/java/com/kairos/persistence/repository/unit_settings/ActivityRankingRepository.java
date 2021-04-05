@@ -16,8 +16,11 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(Long expertiseId);
 
-    @Query("{expertiseId:?0, deleted:false, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
+    @Query("{expertiseId:?0, deleted:false, published:false, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
     List<ActivityRanking> getAbsenceRankingSettings(Long expertiseId, LocalDate endDate);
+
+    @Query("{unitId:?0, deleted:false, published:false, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
+    List<ActivityRanking> getPresenceRankingSettings(Long unitId, LocalDate endDate);
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
 
@@ -27,7 +30,9 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     ActivityRanking findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(Long expertiseId);
 
-    List<ActivityRankingDTO> getAbsenceRankingSettingsByUnitIdAndDeletedFalse(Long unitId);
+    List<ActivityRanking> getActivityRankingSettingsByUnitIdAndDeletedFalse(Long unitId);
+
+    List<ActivityRanking> getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(Long unitId);
 
     //List<ActivityRanking> findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(List<Long> expertiseIds, LocalDate startDate);
 

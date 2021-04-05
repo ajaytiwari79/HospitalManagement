@@ -36,4 +36,12 @@ public class ActivityRanking extends MongoBaseEntity {
         this.published = published;
     }
 
+    public ActivityRanking(LocalDate startDate, LocalDate endDate, Set<BigInteger> presenceActivities, Long unitId, boolean published){
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.presenceActivities = presenceActivities;
+        this.unitId = unitId;
+        this.published = published;
+    }
+
 }
