@@ -387,4 +387,4 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]-(access
 Match(ap:AccessPage) where ap.moduleId="tab_462" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Absence Ranking",isModule:false,moduleId:"tab_466",active:true,`translatedNames.english`:"Absence Ranking"});
 Match(ap:AccessPage) where ap.moduleId="tab_462" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Presence Ranking",isModule:false,moduleId:"tab_467",active:true,`translatedNames.english`:"Presence Ranking"});
 
-Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Teams Ranking",isModule:false,moduleId:"tab_468",active:true,`translatedNames.english`:"Teams Ranking"});
+Match(ap:AccessPage) where ap.moduleId="module_12" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Teams Ranking",isModule:false,moduleId:"tab_468",active:true,`translatedNames.english`:"Teams Ranking"});
