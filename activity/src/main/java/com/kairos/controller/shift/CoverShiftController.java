@@ -82,4 +82,12 @@ public class CoverShiftController {
         coverShiftService.showInterestInCoverShift(id,staffId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
+
+    @ApiOperation("move  shift to another staff")
+    @PutMapping(value = "/cover_shift/{id}/approve_request")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger id, @RequestParam Long staffId,@RequestParam Long employmentId) {
+        coverShiftService.assignCoverShiftToStaff(id, staffId,employmentId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
 }

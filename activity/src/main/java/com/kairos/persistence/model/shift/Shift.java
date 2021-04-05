@@ -166,7 +166,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public boolean isShiftUpdated(Shift shift) {
-        if (this.getActivities().size() != shift.getActivities().size()) {
+        if (this.getActivities().size() != shift.getActivities().size()  || !this.getStaffId().equals(shift.getStaffId())) {
             return true;
         }
         for (int i = 0; i < shift.getActivities().size(); i++) {
