@@ -2,6 +2,7 @@ package com.kairos.persistence.model.unit_settings;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -10,6 +11,7 @@ import java.util.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ActivityRanking extends MongoBaseEntity {
     private static final long serialVersionUID = -3722777805221769643L;
     private Long expertiseId;
@@ -23,5 +25,23 @@ public class ActivityRanking extends MongoBaseEntity {
     private boolean published;
     // it's used to check in case of having draft copy
     private BigInteger draftId;
+
+    public ActivityRanking(Long expertiseId, LocalDate startDate, LocalDate endDate, Set<BigInteger> fullDayActivities, Set<BigInteger> fullWeekActivities, Long countryId, boolean published){
+        this.expertiseId = expertiseId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.fullDayActivities = fullDayActivities;
+        this.fullWeekActivities = fullWeekActivities;
+        this.countryId = countryId;
+        this.published = published;
+    }
+
+    public ActivityRanking(LocalDate startDate, LocalDate endDate, Set<BigInteger> presenceActivities, Long unitId, boolean published){
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.presenceActivities = presenceActivities;
+        this.unitId = unitId;
+        this.published = published;
+    }
 
 }
