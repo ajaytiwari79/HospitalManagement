@@ -301,6 +301,7 @@ public class OrganizationActivityService {
         if (Optional.ofNullable(activities).isPresent() && Optional.ofNullable(activities.getActivityDTOList()).isPresent()) {
             activityDetails.setAllActivities(activities.getActivityDTOList());
         }
+        activityDetails.setSelectedActivities(activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId,INVALID_ID));
         return activityDetails;
     }
 
