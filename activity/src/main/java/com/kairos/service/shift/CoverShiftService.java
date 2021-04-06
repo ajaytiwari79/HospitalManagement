@@ -197,6 +197,9 @@ public class CoverShiftService {
         CoverShift coverShift= coverShiftMongoRepository.findOne(id);
         coverShift.setDeleted(true);
         coverShiftMongoRepository.save(coverShift);
+        Shift shift=shiftMongoRepository.findOne(coverShift.getShiftId());
+        shift.setCoverShiftExists(true);
+        shiftMongoRepository.save(shift);
     }
 
     public void showInterestInCoverShift(BigInteger id,Long staffId){
