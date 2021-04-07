@@ -23,6 +23,7 @@ public class BlockSetting extends MongoBaseEntity {
     private Long unitId;
     private LocalDate date;
     private Map<Long, Set<BigInteger>> blockDetails;
+    private Set<Long> blockedStaffForCoverShift;
 
     public BlockSetting(Long unitId, LocalDate date,Map<Long, Set<BigInteger>> blockDetails){
         this.unitId = unitId;
