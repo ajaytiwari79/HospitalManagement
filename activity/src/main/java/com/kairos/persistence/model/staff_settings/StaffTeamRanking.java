@@ -17,4 +17,12 @@ public class StaffTeamRanking extends MongoBaseEntity {
     private LocalDate endDate;
     private boolean published;
     private Set<TeamRankingInfo> teamRankingInfo;
+
+    public StaffTeamRanking(Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo){
+        this.staffId = staffId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.published = true;
+        this.teamRankingInfo = teamRankingInfo;
+    }
 }

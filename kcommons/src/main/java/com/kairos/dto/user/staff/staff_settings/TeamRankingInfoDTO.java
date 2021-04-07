@@ -12,6 +12,5 @@ public class TeamRankingInfoDTO {
     private BigInteger id;
     private Long teamId;
     private TeamType teamType;
-    private Integer rank;
     private Integer frequency;
 }
