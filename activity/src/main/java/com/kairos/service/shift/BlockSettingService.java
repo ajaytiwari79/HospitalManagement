@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
@@ -61,6 +59,21 @@ public class BlockSettingService {
         blockSettingMongoRepository.save(blockSetting);
         blockSettingDTO.setId(blockSetting.getId());
         blockSettingDTO.setBlockDetails(blockDetails);
+        return blockSettingDTO;
+    }
+
+    public BlockSettingDTO saveBlockSettingForCoverShift(Long unitId, BlockSettingDTO blockSettingDTO) {
+        List<BlockSetting> blockSettingList=new ArrayList<>();
+        List<BlockSetting> blockSettings=blockSettingMongoRepository.findAllBlockSettingByUnitIdAndDateRange(unitId,blockSettingDTO.getDate(),blockSettingDTO.getEndDate());
+        Map<LocalDate,BlockSetting> blockSettingMap=blockSettings.stream().collect(Collectors.toMap(BlockSetting::getDate, Function.identity()));
+        LocalDate startDate=blockSettingDTO.getDate();
+         while (startDate.isAfter(blockSettingDTO.getEndDate())){
+            BlockSetting blockSetting=blockSettingMap.getOrDefault(blockSettingDTO.getDate(),new BlockSetting(unitId,blockSettingDTO.getDate(),null));
+            blockSetting.getBlockedStaffForCoverShift().addAll(blockSettingDTO.getBlockedStaffForCoverShift());
+             blockSettingList.add(blockSetting);
+            startDate=startDate.plusDays(1);
+        }
+         blockSettingMongoRepository.saveEntities(blockSettingList);
         return blockSettingDTO;
     }
 
