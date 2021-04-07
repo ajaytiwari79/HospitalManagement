@@ -257,13 +257,20 @@ public class ActivityRankingService {
     }
 
     private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking temp1, ActivityRanking temp2, boolean presenceActivity) {
+        if(presenceActivity){
+            temp1.setDeleted(isCollectionEmpty(temp1.getPresenceActivities()));
+            temp2.setDeleted(isCollectionEmpty(temp2.getPresenceActivities()));
+        } else {
+            temp1.setDeleted(isCollectionEmpty(temp1.getFullWeekActivities()) && isCollectionEmpty(temp1.getFullDayActivities()));
+            temp2.setDeleted(isCollectionEmpty(temp2.getFullWeekActivities()) && isCollectionEmpty(temp2.getFullDayActivities()));
+        }
         if((presenceActivity && temp1.getPresenceActivities().equals(temp2.getPresenceActivities())) ||
                 (!presenceActivity && temp1.getFullWeekActivities().equals(temp2.getFullWeekActivities()) && temp1.getFullDayActivities().equals(temp2.getFullDayActivities()))){
             temp1.setDeleted(true);
             temp2.setStartDate(temp1.getStartDate());
-            mergeActivityRankings.put(temp1.getId(), temp1);
-            mergeActivityRankings.put(temp2.getId(), temp2);
         }
+        mergeActivityRankings.put(temp1.getId(), temp1);
+        mergeActivityRankings.put(temp2.getId(), temp2);
     }
 
     @Async
