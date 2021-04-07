@@ -16,10 +16,10 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(Long expertiseId);
 
-    @Query("{expertiseId:?0, deleted:false, published:false, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
+    @Query("{expertiseId:?0, deleted:false, published:true, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
     List<ActivityRanking> getAbsenceRankingSettings(Long expertiseId, LocalDate endDate);
 
-    @Query("{unitId:?0, deleted:false, published:false, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
+    @Query("{unitId:?0, deleted:false, published:true, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
     List<ActivityRanking> getPresenceRankingSettings(Long unitId, LocalDate endDate);
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
