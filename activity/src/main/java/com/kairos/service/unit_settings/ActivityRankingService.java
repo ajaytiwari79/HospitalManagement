@@ -243,9 +243,9 @@ public class ActivityRankingService {
         if(isCollectionNotEmpty(activityRankings) && activityRankings.size() > 1) {
             activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
             for(int index=0; index < activityRankings.size()-1; index++){
-                ActivityRanking temp1 = activityRankings.get(index);
-                ActivityRanking temp2 = activityRankings.get(index+1);
-                checkAndMerge(mergeActivityRankings, temp1, temp2, presenceActivity);
+                ActivityRanking activityRanking = activityRankings.get(index);
+                ActivityRanking nextActivityRanking = activityRankings.get(index+1);
+                checkAndMerge(mergeActivityRankings, activityRanking, nextActivityRanking, presenceActivity);
             }
         } else if(isCollectionNotEmpty(activityRankings) && ((presenceActivity && isCollectionEmpty(activityRankings.get(0).getPresenceActivities())) ||(!presenceActivity && isCollectionEmpty(activityRankings.get(0).getFullDayActivities()) && isCollectionEmpty(activityRankings.get(0).getFullWeekActivities())))){
             activityRankings.get(0).setDeleted(true);
@@ -256,21 +256,21 @@ public class ActivityRankingService {
         }
     }
 
-    private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking temp1, ActivityRanking temp2, boolean presenceActivity) {
+    private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking activityRanking, ActivityRanking nextActivityRanking, boolean presenceActivity) {
         if(presenceActivity){
-            temp1.setDeleted(isCollectionEmpty(temp1.getPresenceActivities()));
-            temp2.setDeleted(isCollectionEmpty(temp2.getPresenceActivities()));
+            activityRanking.setDeleted(isCollectionEmpty(activityRanking.getPresenceActivities()));
+            nextActivityRanking.setDeleted(isCollectionEmpty(nextActivityRanking.getPresenceActivities()));
         } else {
-            temp1.setDeleted(isCollectionEmpty(temp1.getFullWeekActivities()) && isCollectionEmpty(temp1.getFullDayActivities()));
-            temp2.setDeleted(isCollectionEmpty(temp2.getFullWeekActivities()) && isCollectionEmpty(temp2.getFullDayActivities()));
+            activityRanking.setDeleted(isCollectionEmpty(activityRanking.getFullWeekActivities()) && isCollectionEmpty(activityRanking.getFullDayActivities()));
+            nextActivityRanking.setDeleted(isCollectionEmpty(nextActivityRanking.getFullWeekActivities()) && isCollectionEmpty(nextActivityRanking.getFullDayActivities()));
         }
-        if((presenceActivity && temp1.getPresenceActivities().equals(temp2.getPresenceActivities())) ||
-                (!presenceActivity && temp1.getFullWeekActivities().equals(temp2.getFullWeekActivities()) && temp1.getFullDayActivities().equals(temp2.getFullDayActivities()))){
-            temp1.setDeleted(true);
-            temp2.setStartDate(temp1.getStartDate());
+        if((presenceActivity && activityRanking.getPresenceActivities().equals(nextActivityRanking.getPresenceActivities())) ||
+                (!presenceActivity && activityRanking.getFullWeekActivities().equals(nextActivityRanking.getFullWeekActivities()) && activityRanking.getFullDayActivities().equals(nextActivityRanking.getFullDayActivities()))){
+            activityRanking.setDeleted(true);
+            nextActivityRanking.setStartDate(activityRanking.getStartDate());
         }
-        mergeActivityRankings.put(temp1.getId(), temp1);
-        mergeActivityRankings.put(temp2.getId(), temp2);
+        mergeActivityRankings.put(activityRanking.getId(), activityRanking);
+        mergeActivityRankings.put(nextActivityRanking.getId(), nextActivityRanking);
     }
 
     @Async
