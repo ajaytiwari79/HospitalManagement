@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ public class CoverShiftDTO {
     private Map<Long, Date> interestedStaffs;
     private Long staffId;
     private BigInteger shiftId;
+    private LocalDate date;
 
     private enum ApprovalBy{
         SELF,AUTO_PICK,PLANNER
