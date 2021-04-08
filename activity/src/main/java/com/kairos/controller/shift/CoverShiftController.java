@@ -95,7 +95,7 @@ public class CoverShiftController {
     }
 
     @ApiOperation("get details for cover shift")
-    @PutMapping(value = "/cover_shift/staff_details/{staffId}")
+    @GetMapping(value = "/cover_shift/staff_details/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId,@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftStaffDetails(startDate,endDate,staffId));
