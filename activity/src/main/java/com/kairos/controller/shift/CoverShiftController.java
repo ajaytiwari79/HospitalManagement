@@ -2,7 +2,6 @@ package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
 import com.kairos.dto.activity.shift.CoverShiftDTO;
-import com.kairos.persistence.model.shift.CoverShift;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
 import com.kairos.utils.response.ResponseHandler;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -31,7 +29,7 @@ public class CoverShiftController {
     @PostMapping(value = "/get_eligible_staffs")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEligibleStaffs(@PathVariable Long unitId, @RequestParam BigInteger shiftId, @RequestBody CoverShiftSetting coverShiftSetting) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId,coverShiftSetting));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId));
     }
 
     @ApiOperation("create cover shift setting by unit")
