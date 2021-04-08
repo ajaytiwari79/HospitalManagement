@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.persistence.model.shift.CoverShift;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -13,5 +14,6 @@ public interface CoverShiftMongoRepository extends MongoBaseRepository<CoverShif
 
     CoverShift findByIdAndDeletedFalse(BigInteger id);
 
+    @Query("{deleted:false,date:{$gte:?0,$lte:?1}}")
     List<CoverShift> findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(LocalDate startDate, LocalDate endDate);
 }
