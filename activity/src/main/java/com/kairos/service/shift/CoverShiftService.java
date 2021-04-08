@@ -35,6 +35,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.shift.CoverShiftCriteria.STAFF_WITH_EMPLOYMENT_TYPES;
@@ -188,7 +189,7 @@ public class CoverShiftService {
         coverShiftMongoRepository.save(coverShift);
         if(coverShiftDTO.getId()==null){
             Shift shift=shiftMongoRepository.findOne(coverShift.getShiftId());
-            shift.setCoverShiftExists(true);
+            shift.setCoverShiftDate(getCurrentLocalDate());
             shiftMongoRepository.save(shift);
         }
     }
@@ -198,7 +199,7 @@ public class CoverShiftService {
         coverShift.setDeleted(true);
         coverShiftMongoRepository.save(coverShift);
         Shift shift=shiftMongoRepository.findOne(coverShift.getShiftId());
-        shift.setCoverShiftExists(false);
+        shift.setCoverShiftDate(null);
         shiftMongoRepository.save(shift);
     }
 
