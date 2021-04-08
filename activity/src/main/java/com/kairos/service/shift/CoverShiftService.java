@@ -243,4 +243,13 @@ public class CoverShiftService {
 
     }
 
+    public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long staffId) {
+        List<CoverShift> coverShifts=coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate,endDate);
+        int totalRequests= (int) coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).count();
+        int totalInterests= (int) coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).count();
+        int totalDeclined= (int) coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).count();
+        int totalEligibleShifts=5;
+        return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
+
+    }
 }
