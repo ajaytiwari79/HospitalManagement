@@ -215,7 +215,7 @@ public class CoverShiftService {
     }
 
     public void assignCoverShiftToStaff(BigInteger id, Long staffId,Long employmentId){
-        CoverShift coverShift= coverShiftMongoRepository.findByIdAndDeletedFalse(id);
+        CoverShift coverShift= coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(id,staffId);
         if(isNull(coverShift)){
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
         }
