@@ -88,8 +88,8 @@ public class CoverShiftController {
     @PutMapping(value = "/cover_shift/{id}/approve_request")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger id, @RequestParam Long staffId,@RequestParam Long employmentId) {
-        coverShiftService.assignCoverShiftToStaff(id, staffId,employmentId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.assignCoverShiftToStaff(id, staffId,employmentId));
     }
 
     @ApiOperation("get details for cover shift")

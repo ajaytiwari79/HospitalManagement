@@ -214,23 +214,27 @@ public class CoverShiftService {
         coverShiftMongoRepository.save(coverShift);
     }
 
-    public void assignCoverShiftToStaff(BigInteger id, Long staffId,Long employmentId){
+    public List<ShiftWithViolatedInfoDTO> assignCoverShiftToStaff(BigInteger id, Long staffId,Long employmentId){
         CoverShift coverShift= coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(id,staffId);
         if(isNull(coverShift)){
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
         }
-        assignCoverShift(staffId, employmentId, coverShift);
-        coverShift.setAssignedStaffId(staffId);
-        coverShiftMongoRepository.save(coverShift);
+        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = assignCoverShift(staffId, employmentId, coverShift);
+        if(shiftWithViolatedInfoDTOS.get(0).getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTOS.get(0).getViolatedRules().getWorkTimeAgreements().isEmpty()){
+            coverShift.setAssignedStaffId(staffId);
+            coverShiftMongoRepository.save(coverShift);
+        }
+        return shiftWithViolatedInfoDTOS;
+
     }
 
-    public void assignCoverShift(Long staffId, Long employmentId, CoverShift coverShift) {
+    public List<ShiftWithViolatedInfoDTO> assignCoverShift(Long staffId, Long employmentId, CoverShift coverShift) {
         ShiftDTO shift=shiftMongoRepository.findByIdAndDeletedFalse(coverShift.getShiftId());
         ShiftDTO shiftDTO = new ShiftDTO(shift.getActivities(), shift.getUnitId(), staffId, employmentId);
         shiftDTO.setId(shift.getId());
         shiftDTO.setStartDate(shift.getStartDate());
         shift.setEndDate(shift.getEndDate());
-        shiftService.updateShift(shiftDTO,false,false, ShiftActionType.SAVE);
+       return shiftService.updateShift(shiftDTO,false,false, ShiftActionType.SAVE);
     }
 
     private void validateApprovalSettings(CoverShift coverShift){
