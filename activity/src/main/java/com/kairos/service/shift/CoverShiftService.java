@@ -227,6 +227,7 @@ public class CoverShiftService {
     public void assignCoverShift(Long staffId, Long employmentId, CoverShift coverShift) {
         ShiftDTO shift=shiftMongoRepository.findByIdAndDeletedFalse(coverShift.getShiftId());
         ShiftDTO shiftDTO = new ShiftDTO(shift.getActivities(), shift.getUnitId(), staffId, employmentId);
+        shiftDTO.setId(shift.getId());
         shiftDTO.setStartDate(shift.getStartDate());
         shift.setEndDate(shift.getEndDate());
         shiftService.updateShift(shiftDTO,false,false, ShiftActionType.SAVE);
