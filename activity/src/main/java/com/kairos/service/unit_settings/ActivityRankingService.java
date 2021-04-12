@@ -187,7 +187,7 @@ public class ActivityRankingService {
     }
 
     private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity){
-        ActivityRanking newActivityRanking=null;
+        ActivityRanking newActivityRanking = null;
         for (ActivityRanking activityRanking : activityRankings) {
             if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate())) {
                 newActivityRanking = createNewAbsenceRanking(activity, presenceActivity, activityRanking);
@@ -211,6 +211,7 @@ public class ActivityRankingService {
     private ActivityRanking createNewAbsenceRanking(Activity activity, boolean presenceActivity, ActivityRanking activityRanking) {
         ActivityRanking newActivityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRanking, ActivityRanking.class);
         newActivityRanking.setStartDate(activity.getActivityGeneralSettings().getStartDate());
+        newActivityRanking.setId(null);
         activityRanking.setEndDate(activity.getActivityGeneralSettings().getStartDate().minusDays(1));
         if (presenceActivity) {
             newActivityRanking.getPresenceActivities().add(activity.getId());
