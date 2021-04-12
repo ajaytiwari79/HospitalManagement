@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class StaffTeamRanking extends MongoBaseEntity {
     private LocalDate endDate;
     private boolean published;
     private Set<TeamRankingInfo> teamRankingInfo;
+    private BigInteger draftId;
 
     public StaffTeamRanking(Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo){
         this.staffId = staffId;

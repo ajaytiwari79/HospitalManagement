@@ -7,6 +7,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
@@ -23,11 +24,11 @@ import java.util.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
-import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
 @Service
 public class ActivityRankingService {
+    private final String ABSENCE = "Absence";
     @Inject
     private ActivityRankingRepository activityRankingRepository;
     @Inject
@@ -65,7 +66,7 @@ public class ActivityRankingService {
     }
 
     public List<ActivityRankingDTO> getAbsenceRankingSettings(Long expertiseId, Boolean published){
-        List<ActivityRanking> activityRankings;
+        List<ActivityRanking> activityRankings,abs;
         if(isNotNull(published)){
             activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, published);
         } else {
@@ -82,7 +83,7 @@ public class ActivityRankingService {
     public boolean deleteAbsenceRankingSettings(BigInteger id){
         ActivityRanking activityRanking = activityRankingRepository.findOne(id);
         if(activityRanking.isPublished()){
-            exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED);
+            exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED, ABSENCE);
         }
         activityRanking.setDeleted(true);
         activityRankingRepository.save(activityRanking);
@@ -96,7 +97,7 @@ public class ActivityRankingService {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
         }
         if (activityRanking.isPublished()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_RANKING_ALREADY_PUBLISHED);
+            exceptionService.dataNotFoundByIdException(MESSAGE_RANKING_ALREADY_PUBLISHED, ABSENCE);
         }
         activityRanking.setPublished(true);
         activityRanking.setStartDate(publishedDate); // changing
@@ -130,7 +131,7 @@ public class ActivityRankingService {
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
         List<ActivityDTO> fullDayActivities = new ArrayList<>();
         List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        activityService.findAllActivitiesByTimeType(UserContext.getUserDetails().getCountryId(), ABSENCE).forEach(activityDTO -> {
+        activityService.findAllActivitiesByTimeType(UserContext.getUserDetails().getCountryId(), TimeTypeEnum.ABSENCE).forEach(activityDTO -> {
             if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 fullWeekActivities.add(activityDTO);
             } else {

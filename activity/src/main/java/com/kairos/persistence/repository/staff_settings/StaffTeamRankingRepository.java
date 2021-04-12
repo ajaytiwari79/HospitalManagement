@@ -14,6 +14,10 @@ public interface StaffTeamRankingRepository extends MongoBaseRepository<StaffTea
 
     List<StaffTeamRanking> getStaffTeamRankingByStaffIdAndDeletedFalse(Long staffId);
 
+    List<StaffTeamRanking> getStaffTeamRankingByStaffIdAndPublishedTrueAndDeletedFalse(Long staffId);
+
+    StaffTeamRanking getStaffTeamRankingByDraftIdAndDeletedFalse(BigInteger draftId);
+
     @Query("{staffId:?0, deleted:false, published:true,'startDate':{$lte:?1}, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
     StaffTeamRanking getStaffTeamRanking(Long staffId, LocalDate endDate);
 }
