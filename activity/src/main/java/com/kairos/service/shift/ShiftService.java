@@ -295,13 +295,13 @@ public class ShiftService extends MongoBaseService {
             ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
             shiftActivity.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
             shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
-            shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+            shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toString());
             shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
             shiftActivity.getChildActivities().forEach(shiftActivity1 -> {
                 ActivityWrapper wrapper = activityWrapperMap.get(shiftActivity1.getActivityId());
                 shiftActivity1.setTimeTypeId(wrapper.getTimeTypeInfo().getId());
                 shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
-                shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+                shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toString());
                 shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
             });
         }
