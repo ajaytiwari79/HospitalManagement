@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -28,7 +29,7 @@ public class CoverShiftController {
     @PostMapping(value = "/get_eligible_staffs")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEligibleStaffs(@PathVariable Long unitId, @RequestParam BigInteger shiftId, @RequestBody CoverShiftSetting coverShiftSetting) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId,coverShiftSetting));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId));
     }
 
     @ApiOperation("create cover shift setting by unit")
@@ -87,7 +88,14 @@ public class CoverShiftController {
     @PutMapping(value = "/cover_shift/{id}/approve_request")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateRemarkInShiftActivity(@PathVariable BigInteger id, @RequestParam Long staffId,@RequestParam Long employmentId) {
-        coverShiftService.assignCoverShiftToStaff(id, staffId,employmentId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.assignCoverShiftToStaff(id, staffId,employmentId));
+    }
+
+    @ApiOperation("get details for cover shift")
+    @GetMapping(value = "/cover_shift/staff_details/{staffId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId,@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftStaffDetails(startDate,endDate,staffId));
     }
 }

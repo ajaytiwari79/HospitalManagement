@@ -294,13 +294,14 @@ public class OrganizationActivityService {
 
     }
 
-    @Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId);
         if (Optional.ofNullable(activities).isPresent() && Optional.ofNullable(activities.getActivityDTOList()).isPresent()) {
             activityDetails.setAllActivities(activities.getActivityDTOList());
         }
+        activityDetails.setSelectedActivities(activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId,INVALID_ID));
         return activityDetails;
     }
 

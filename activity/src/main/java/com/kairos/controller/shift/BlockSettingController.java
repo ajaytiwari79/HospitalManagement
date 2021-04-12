@@ -34,6 +34,15 @@ public class BlockSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.saveBlockSetting(unitId, blockSettingDTO));
     }
 
+    @ApiOperation("create or update block setting")
+    @PutMapping(value = "/block_setting/cover_shift")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveBlockSettingForCoverShift(@PathVariable Long unitId, @RequestBody BlockSettingDTO blockSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.saveBlockSettingForCoverShift(unitId, blockSettingDTO));
+    }
+
+
+
     @ApiOperation("get block settings")
     @GetMapping(value = "/block_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

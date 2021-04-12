@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @Getter
 @Setter
@@ -20,7 +18,9 @@ public class CoverShift extends MongoBaseEntity {
     private ApprovalBy approvalBy;
     private Map<Long, Date> requestedStaffs=new LinkedHashMap<>();
     private Map<Long, Date> interestedStaffs=new LinkedHashMap<>();
+    private Set<Long> declinedStaffIds=new HashSet<>();
     private Long assignedStaffId;
+    private LocalDate date;
 
     public enum ApprovalBy{
         SELF,AUTO_PICK,PLANNER

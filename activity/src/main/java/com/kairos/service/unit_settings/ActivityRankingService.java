@@ -161,7 +161,7 @@ public class ActivityRankingService {
                 }
                 activityRankingRepository.save(newActivityRanking);
             } else {
-                this.modifyActivityRanking(activityRankings, activity, expertiseId, false);
+                this.modifyActivityRanking(activityRankings, activity, false);
             }
         }
     }
@@ -173,7 +173,7 @@ public class ActivityRankingService {
             if (isCollectionEmpty(activityRankings)) {
                 activityRankingRepository.save(new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newHashSet(activity.getId()), unitId, true));
             } else {
-                this.modifyActivityRanking(activityRankings, activity, unitId, true);
+                this.modifyActivityRanking(activityRankings, activity, true);
             }
         } else {
             for (ActivityRanking activityRanking : activityRankings) {
@@ -187,36 +187,41 @@ public class ActivityRankingService {
         }
     }
 
-    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity, long unitOrExpertiseId, boolean presenceActivity){
-        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
+    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity){
+        ActivityRanking newActivityRanking = null;
         for (ActivityRanking activityRanking : activityRankings) {
-            if (presenceActivity) {
-                activityRanking.getPresenceActivities().add(activity.getId());
-            } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-                activityRanking.getFullWeekActivities().add(activity.getId());
-            } else {
-                activityRanking.getFullDayActivities().add(activity.getId());
+            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate())) {
+                newActivityRanking = createNewAbsenceRanking(activity, presenceActivity, activityRanking);
+            } else if(!activity.getActivityGeneralSettings().getStartDate().isAfter(activityRanking.getStartDate())) {
+                if (presenceActivity) {
+                    activityRanking.getPresenceActivities().add(activity.getId());
+                } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+                    activityRanking.getFullWeekActivities().add(activity.getId());
+                } else {
+                    activityRanking.getFullDayActivities().add(activity.getId());
+                }
             }
         }
-        if(isNotNull(activityRankings.get(activityRankings.size()-1).getEndDate())){
-            ActivityRanking newActivityRanking = new ActivityRanking();
-            newActivityRanking.setPublished(true);
-            newActivityRanking.setStartDate(activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1));
-            newActivityRanking.setEndDate(activity.getActivityGeneralSettings().getEndDate());
-            if (presenceActivity) {
-                newActivityRanking.setPresenceActivities(newHashSet(activity.getId()));
-                newActivityRanking.setUnitId(unitOrExpertiseId);
-            } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-                newActivityRanking.setFullWeekActivities(newHashSet(activity.getId()));
-                newActivityRanking.setExpertiseId(unitOrExpertiseId);
-            } else {
-                newActivityRanking.setFullDayActivities(newHashSet(activity.getId()));
-                newActivityRanking.setExpertiseId(unitOrExpertiseId);
-            }
+        if(isNotNull(newActivityRanking)){
             activityRankings.add(newActivityRanking);
         }
         activityRankingRepository.saveEntities(activityRankings);
         this.mergeActivityRanking(activityRankings, presenceActivity);
+    }
+
+    private ActivityRanking createNewAbsenceRanking(Activity activity, boolean presenceActivity, ActivityRanking activityRanking) {
+        ActivityRanking newActivityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRanking, ActivityRanking.class);
+        newActivityRanking.setStartDate(activity.getActivityGeneralSettings().getStartDate());
+        newActivityRanking.setId(null);
+        activityRanking.setEndDate(activity.getActivityGeneralSettings().getStartDate().minusDays(1));
+        if (presenceActivity) {
+            newActivityRanking.getPresenceActivities().add(activity.getId());
+        } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+            newActivityRanking.getFullWeekActivities().add(activity.getId());
+        } else {
+            newActivityRanking.getFullDayActivities().add(activity.getId());
+        }
+        return  newActivityRanking;
     }
 
     @Async
@@ -244,9 +249,9 @@ public class ActivityRankingService {
         if(isCollectionNotEmpty(activityRankings) && activityRankings.size() > 1) {
             activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
             for(int index=0; index < activityRankings.size()-1; index++){
-                ActivityRanking temp1 = activityRankings.get(index);
-                ActivityRanking temp2 = activityRankings.get(index+1);
-                checkAndMerge(mergeActivityRankings, temp1, temp2, presenceActivity);
+                ActivityRanking activityRanking = activityRankings.get(index);
+                ActivityRanking nextActivityRanking = activityRankings.get(index+1);
+                checkAndMerge(mergeActivityRankings, activityRanking, nextActivityRanking, presenceActivity);
             }
         } else if(isCollectionNotEmpty(activityRankings) && ((presenceActivity && isCollectionEmpty(activityRankings.get(0).getPresenceActivities())) ||(!presenceActivity && isCollectionEmpty(activityRankings.get(0).getFullDayActivities()) && isCollectionEmpty(activityRankings.get(0).getFullWeekActivities())))){
             activityRankings.get(0).setDeleted(true);
@@ -257,14 +262,21 @@ public class ActivityRankingService {
         }
     }
 
-    private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking temp1, ActivityRanking temp2, boolean presenceActivity) {
-        if((presenceActivity && temp1.getPresenceActivities().equals(temp2.getPresenceActivities())) ||
-                (!presenceActivity && temp1.getFullWeekActivities().equals(temp2.getFullWeekActivities()) && temp1.getFullDayActivities().equals(temp2.getFullDayActivities()))){
-            temp1.setDeleted(true);
-            temp2.setStartDate(temp1.getStartDate());
-            mergeActivityRankings.put(temp1.getId(), temp1);
-            mergeActivityRankings.put(temp2.getId(), temp2);
+    private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking activityRanking, ActivityRanking nextActivityRanking, boolean presenceActivity) {
+        if(presenceActivity){
+            activityRanking.setDeleted(isCollectionEmpty(activityRanking.getPresenceActivities()));
+            nextActivityRanking.setDeleted(isCollectionEmpty(nextActivityRanking.getPresenceActivities()));
+        } else {
+            activityRanking.setDeleted(isCollectionEmpty(activityRanking.getFullWeekActivities()) && isCollectionEmpty(activityRanking.getFullDayActivities()));
+            nextActivityRanking.setDeleted(isCollectionEmpty(nextActivityRanking.getFullWeekActivities()) && isCollectionEmpty(nextActivityRanking.getFullDayActivities()));
         }
+        if((presenceActivity && activityRanking.getPresenceActivities().equals(nextActivityRanking.getPresenceActivities())) ||
+                (!presenceActivity && activityRanking.getFullWeekActivities().equals(nextActivityRanking.getFullWeekActivities()) && activityRanking.getFullDayActivities().equals(nextActivityRanking.getFullDayActivities()))){
+            activityRanking.setDeleted(true);
+            nextActivityRanking.setStartDate(activityRanking.getStartDate());
+        }
+        mergeActivityRankings.put(activityRanking.getId(), activityRanking);
+        mergeActivityRankings.put(nextActivityRanking.getId(), nextActivityRanking);
     }
 
     @Async
@@ -362,7 +374,21 @@ public class ActivityRankingService {
     private void updateRankingOnSetActivityEndDate(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity) {
         if(isCollectionNotEmpty(activityRankings)) {
             activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
-            ActivityRanking newActivityRanking = createActivityRanking(activity, activityRankings.get(0), presenceActivity);
+            ActivityRanking newActivityRanking = null;
+            if (isNull(activityRankings.get(0).getEndDate()) || activityRankings.get(0).getEndDate().isAfter(activity.getActivityGeneralSettings().getEndDate())) {
+                newActivityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankings.get(0), ActivityRanking.class);
+                newActivityRanking.setId(null);
+                newActivityRanking.setStartDate(activity.getActivityGeneralSettings().getEndDate().plusDays(1));
+                activityRankings.get(0).setEndDate(activity.getActivityGeneralSettings().getEndDate());
+                if(presenceActivity) {
+                    newActivityRanking.getPresenceActivities().remove(activity.getId());
+                } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+                    newActivityRanking.getFullWeekActivities().remove(activity.getId());
+                } else {
+                    newActivityRanking.getFullDayActivities().remove(activity.getId());
+                }
+                activityRankingRepository.saveEntities(newArrayList(newActivityRanking,activityRankings.get(0)));
+            }
             removeActivityFromRanking(activity, activityRankings, presenceActivity);
             if (isNotNull(newActivityRanking)) {
                 activityRankings.add(newActivityRanking);
@@ -385,22 +411,4 @@ public class ActivityRankingService {
         }
     }
 
-    private ActivityRanking createActivityRanking(Activity activity, ActivityRanking activityRanking, boolean presenceActivity) {
-        ActivityRanking newActivityRanking = null;
-        if (isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getEndDate())) {
-            newActivityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRanking, ActivityRanking.class);
-            newActivityRanking.setId(null);
-            newActivityRanking.setStartDate(activity.getActivityGeneralSettings().getEndDate().plusDays(1));
-            activityRanking.setEndDate(activity.getActivityGeneralSettings().getEndDate());
-            if(presenceActivity) {
-                newActivityRanking.getPresenceActivities().remove(activity.getId());
-            } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-                newActivityRanking.getFullWeekActivities().remove(activity.getId());
-            } else {
-                newActivityRanking.getFullDayActivities().remove(activity.getId());
-            }
-            activityRankingRepository.saveEntities(newArrayList(newActivityRanking,activityRanking));
-        }
-        return newActivityRanking;
-    }
 }
