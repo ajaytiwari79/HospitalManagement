@@ -737,6 +737,7 @@ public class StaffingLevelService {
             PresenceStaffingLevelDto staffingLevel = staffingLevelMap.get(startLocalDate);
             if(isNull(staffingLevel)){
                 staffingLevel=ObjectMapperUtils.copyPropertiesByMapper(createDefaultStaffingLevel(unitId,asDate(startLocalDate)),PresenceStaffingLevelDto.class);
+                staffingLevelMap.put(startLocalDate,staffingLevel);
             }
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
