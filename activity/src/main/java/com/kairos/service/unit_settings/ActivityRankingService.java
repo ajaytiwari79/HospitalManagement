@@ -71,11 +71,13 @@ public class ActivityRankingService {
         } else {
             activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(expertiseId);
         }
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(activityRankings, ActivityRankingDTO.class);
     }
 
     public List<ActivityRankingDTO> getPresenceRankingSettings(Long unitId){
         List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndDeletedFalse(unitId);
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         return isCollectionEmpty(activityRankings) ? new ArrayList<>() : ObjectMapperUtils.copyCollectionPropertiesByMapper(activityRankings, ActivityRankingDTO.class);
     }
 
