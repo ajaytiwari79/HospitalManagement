@@ -300,7 +300,7 @@ public class ActivityRankingService {
                     updateRankingOnSetActivityEndDate(activityRankings, activity, false);
                 } else {
                     List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, true);
-                    updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, false);
+                    updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, expertiseId, false);
                 }
             }
         }
@@ -313,12 +313,13 @@ public class ActivityRankingService {
             updateRankingOnSetActivityEndDate(activityRankings, activity, true);
         } else {
             List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(unitId);
-            updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, true);
+            updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, unitId, true);
         }
     }
 
-    private void updateRankingOnResetActivityEndDate(List<ActivityRanking> activityRankings, Activity activity, LocalDate oldEndDate, boolean presenceActivity) {
+    private void updateRankingOnResetActivityEndDate(List<ActivityRanking> activityRankings, Activity activity, LocalDate oldEndDate,long unitOrexpertiseId, boolean presenceActivity) {
         List<ActivityRanking> updateActivityRankings = new ArrayList<>();
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         for (ActivityRanking activityRanking : activityRankings) {
             if (isNull(activity.getActivityGeneralSettings().getEndDate())) {
                 if(!activityRanking.getStartDate().isBefore(oldEndDate)) {
@@ -337,10 +338,22 @@ public class ActivityRankingService {
                 updateActivityEndDateBefor(activity, oldEndDate, updateActivityRankings, activityRanking, presenceActivity);
             }
         }
+        if(isCollectionNotEmpty(activityRankings) && isNotNull(activityRankings.get(activityRankings.size()-1).getEndDate())){
+            ActivityRanking newActivityRanking;
+            if(presenceActivity){
+                newActivityRanking = new ActivityRanking(activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newHashSet(activity.getId()), unitOrexpertiseId, true);
+            } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+            } else {
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId,activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+            }
+            activityRankingRepository.save(newActivityRanking);
+            activityRankings.add(newActivityRanking);
+        }
         if(isCollectionNotEmpty(updateActivityRankings)) {
             activityRankingRepository.saveEntities(updateActivityRankings);
-            this.mergeActivityRanking(activityRankings, presenceActivity);
         }
+        this.mergeActivityRanking(activityRankings, presenceActivity);
     }
 
     private void updateActivityEndDateBefor(Activity activity, LocalDate oldEndDate, List<ActivityRanking> updateActivityRankings, ActivityRanking activityRanking, boolean presenceActivity) {
