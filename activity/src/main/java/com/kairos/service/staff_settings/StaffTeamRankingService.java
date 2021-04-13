@@ -188,7 +188,6 @@ public class StaffTeamRankingService {
             if(oldEndDate.isBefore(newEndDate)){
                 modifiedStaffTeamRankings = staffTeamRankings.stream().filter(staffTeamRanking -> isNull(staffTeamRanking.getEndDate()) || staffTeamRanking.getEndDate().isAfter(oldEndDate)).collect(Collectors.toList());
                 for (StaffTeamRanking modifiedStaffTeamRanking : modifiedStaffTeamRankings) {
-
                     modifiedStaffTeamRanking.getTeamRankingInfo().add(new TeamRankingInfo(teamId, teamType, 0));
                 }
             } else {
