@@ -71,8 +71,12 @@ public class BlockSettingService {
         LocalDate startDate=blockSettingDTO.getDate();
          while (startDateIsEqualsOrBeforeEndDate(startDate,blockSettingDTO.getEndDate())){
             BlockSetting blockSetting=blockSettingMap.getOrDefault(blockSettingDTO.getDate(),new BlockSetting(unitId,blockSettingDTO.getDate(),null));
-            blockSetting.getBlockedStaffForCoverShift().addAll(blockSettingDTO.getBlockedStaffForCoverShift());
-             blockSettingList.add(blockSetting);
+            if(blockSettingDTO.isUnblockStaffs()){
+                blockSetting.getBlockedStaffForCoverShift().removeAll(blockSettingDTO.getBlockedStaffForCoverShift());
+            }else {
+                blockSetting.getBlockedStaffForCoverShift().addAll(blockSettingDTO.getBlockedStaffForCoverShift());
+            }
+            blockSettingList.add(blockSetting);
             startDate=startDate.plusDays(1);
         }
          blockSettingMongoRepository.saveEntities(blockSettingList);
