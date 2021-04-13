@@ -160,7 +160,7 @@ public class ActivityRankingService {
                 }
                 activityRankingRepository.save(newActivityRanking);
             } else {
-                this.modifyActivityRanking(activityRankings, activity, false);
+                this.modifyActivityRanking(activityRankings, activity, expertiseId, false);
             }
         }
     }
@@ -172,7 +172,7 @@ public class ActivityRankingService {
             if (isCollectionEmpty(activityRankings)) {
                 activityRankingRepository.save(new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newHashSet(activity.getId()), unitId, true));
             } else {
-                this.modifyActivityRanking(activityRankings, activity, true);
+                this.modifyActivityRanking(activityRankings, activity, unitId, true);
             }
         } else {
             for (ActivityRanking activityRanking : activityRankings) {
@@ -186,11 +186,24 @@ public class ActivityRankingService {
         }
     }
 
-    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity){
-        ActivityRanking newActivityRanking = null;
+    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity,long unitOrexpertiseId, boolean presenceActivity){
+        List<ActivityRanking> newActivityRankings = new ArrayList<>();
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
+        if(activity.getActivityGeneralSettings().getStartDate().isBefore(activityRankings.get(0).getStartDate())){
+            ActivityRanking newActivityRanking;
+            if(presenceActivity){
+                newActivityRanking = new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newHashSet(activity.getId()), unitOrexpertiseId, true);
+            } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+            } else {
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+            }
+            activityRankingRepository.save(newActivityRanking);
+            newActivityRankings.add(newActivityRanking);
+        }
         for (ActivityRanking activityRanking : activityRankings) {
-            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate())) {
-                newActivityRanking = createNewAbsenceRanking(activity, presenceActivity, activityRanking);
+            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && (isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate()))) {
+                newActivityRankings.add(createNewAbsenceRanking(activity, presenceActivity, activityRanking));
             } else if(!activity.getActivityGeneralSettings().getStartDate().isAfter(activityRanking.getStartDate())) {
                 if (presenceActivity) {
                     activityRanking.getPresenceActivities().add(activity.getId());
@@ -201,8 +214,8 @@ public class ActivityRankingService {
                 }
             }
         }
-        if(isNotNull(newActivityRanking)){
-            activityRankings.add(newActivityRanking);
+        if(isCollectionNotEmpty(newActivityRankings)){
+            activityRankings.addAll(newActivityRankings);
         }
         activityRankingRepository.saveEntities(activityRankings);
         this.mergeActivityRanking(activityRankings, presenceActivity);
