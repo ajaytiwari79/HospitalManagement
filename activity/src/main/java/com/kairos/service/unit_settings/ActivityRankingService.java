@@ -241,19 +241,17 @@ public class ActivityRankingService {
     @Async
     public void removeAbsenceActivityId(Activity activity, List<Long> expertiseIds){
         for (Long expertiseId : expertiseIds) {
-            List<ActivityRanking> removeActivityRanking = new ArrayList<>();
             List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, true);
             for (ActivityRanking activityRanking : activityRankings) {
                 if(activityRanking.getFullDayActivities().remove(activity.getId()) || activityRanking.getFullWeekActivities().remove(activity.getId())){
                     if(isCollectionEmpty(activityRanking.getFullDayActivities()) && isCollectionEmpty(activityRanking.getFullWeekActivities())){
                         activityRanking.setDeleted(true);
                     }
-                    removeActivityRanking.add(activityRanking);
                 }
             }
-            if(isCollectionNotEmpty(removeActivityRanking)) {
-                activityRankingRepository.saveEntities(removeActivityRanking);
-                this.mergeActivityRanking(removeActivityRanking, false);
+            if(isCollectionNotEmpty(activityRankings)) {
+                activityRankingRepository.saveEntities(activityRankings);
+                this.mergeActivityRanking(activityRankings, false);
             }
         }
     }
