@@ -762,6 +762,7 @@ public class StaffingLevelService {
                 staffingLevel=ObjectMapperUtils.copyPropertiesByMapper(createDefaultStaffingLevel(unitId,asDate(startLocalDate)),PresenceStaffingLevelDto.class);
                 staffingLevelMap.put(startLocalDate,staffingLevel);
             }
+            startLocalDate = startLocalDate.plusDays(1);
         }
     }
 
