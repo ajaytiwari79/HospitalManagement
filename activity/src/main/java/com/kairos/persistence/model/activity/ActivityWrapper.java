@@ -14,7 +14,7 @@ public class ActivityWrapper implements Serializable {
     private Activity activity;
     private String timeType;
     private TimeType timeTypeInfo;
-    private ActivityPriority activityPriority;
+    private Integer ranking;
 
     public ActivityWrapper(Activity activity, String timeType) {
         this.activity = activity;

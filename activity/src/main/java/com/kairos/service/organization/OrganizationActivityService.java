@@ -41,7 +41,6 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -62,7 +61,10 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.*;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivitySettingsService;
+import com.kairos.service.activity.PlannedTimeTypeService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
@@ -124,6 +126,7 @@ import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 import static com.kairos.enums.reason_code.ReasonCodeType.ORDER;
 import static com.kairos.persistence.repository.activity.ActivityConstants.INVALID_ID;
 
+
 /**
  * Created by vipul on 5/12/17.
  */
@@ -177,8 +180,6 @@ public class OrganizationActivityService {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject
-    private ActivityPriorityService activityPriorityService;
     @Inject
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
     @Inject
@@ -289,7 +290,6 @@ public class OrganizationActivityService {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         activityDTO.setActivityBalanceSettings(ObjectMapperUtils.copyPropertiesByMapper(activity.getActivityBalanceSettings(), ActivityBalanceSettingDTO.class));
         BeanUtils.copyProperties(activity, activityDTO);
-        activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
         return activityDTO;
 
     }
@@ -391,22 +391,6 @@ public class OrganizationActivityService {
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
-
-//        if (isNotNull(timeType.getActivityPriorityId())) {
-//            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
-//            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
-//            if (isNotNull(unitActivityPriority)) {
-//                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
-//            }
-//        }
-
-        if (isNotNull(timeType.getActivityPriorityId())) {
-            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
-            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
-            if (isNotNull(unitActivityPriority)) {
-                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
-            }
-        }
         updateSkills(activityCopied);
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
@@ -591,10 +575,9 @@ public class OrganizationActivityService {
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
         activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
         timeSlotSetService.createDefaultTimeSlots(unitId);
-        createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
+        //createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-        activityPriorityService.createActivityPriorityForNewOrganization(unitId, orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
@@ -650,7 +633,7 @@ public class OrganizationActivityService {
             ActivityRankingDTO activityRankingDTO =new ActivityRankingDTO(null,DateUtils.getCurrentLocalDate(),null,null,true);
             activityRankingDTO.setPresenceActivities(presenceActivities);
             activityRankingDTO.setUnitId(unitId);
-            activityRankingService.saveAbsenceRankingSettings(activityRankingDTO);
+            activityRankingService.saveActivityRanking(activityRankingDTO);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             activitySchedulerJobService.registerJobForActivityCutoff(activityCopiedList);

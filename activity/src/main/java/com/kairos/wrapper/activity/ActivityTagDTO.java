@@ -52,7 +52,6 @@ public class ActivityTagDTO implements Serializable {
     private Long parentId;
     private ActivityStateEnum state;
     private List<CompositeShiftActivityDTO> compositeActivities;
-    private BigInteger activityPriorityId;
     private boolean allowChildActivities;
     private boolean applicableForChildActivities;
     private boolean sicknessSettingValid;

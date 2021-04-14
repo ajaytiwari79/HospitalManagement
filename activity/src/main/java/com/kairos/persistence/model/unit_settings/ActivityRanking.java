@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.unit_settings;
 
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class ActivityRanking extends MongoBaseEntity {
     private boolean published;
     // it's used to check in case of having draft copy
     private BigInteger draftId;
+    private PriorityFor priorityFor;
 
     public ActivityRanking(Long expertiseId, LocalDate startDate, LocalDate endDate, Set<BigInteger> fullDayActivities, Set<BigInteger> fullWeekActivities, Long countryId, boolean published){
         this.expertiseId = expertiseId;

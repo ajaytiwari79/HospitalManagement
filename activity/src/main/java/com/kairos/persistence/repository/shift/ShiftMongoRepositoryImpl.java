@@ -72,6 +72,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public static final String ACTIVITY = "activity";
     public static final String TIME_TYPE = "timeType";
     public static final String DRAFT ="draft";
+    public static final String MOSTLY_USED_COUNT = "mostlyUsedCount";
     public static final String SHIFTS ="shifts";
     public static final String REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME = "requestAbsence.methodForCalculatingTime";
     public static final String ACTIVITIES_SECOND_LEVEL_TIME_TYPE = "activities.secondLevelTimeType";
