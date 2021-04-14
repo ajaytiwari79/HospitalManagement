@@ -60,10 +60,6 @@ public class ActivityRankingService {
         return activityRankingDTO;
     }
 
-    public List<ActivityRankingDTO> getAbsenceRankingSettings(){
-        return activityRankingRepository.getActivityRankingByDeletedFalse();
-    }
-
     public List<ActivityRankingDTO> getAbsenceRankingSettings(Long expertiseId, Boolean published){
         List<ActivityRanking> activityRankings;
         if(isNotNull(published)){

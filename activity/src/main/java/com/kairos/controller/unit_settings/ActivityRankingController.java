@@ -26,17 +26,16 @@ public class ActivityRankingController {
     @Inject
     private ActivityRankingService activityRankingService;
 
-
     @ApiOperation(value = "save a absence_ranking ")
     @PostMapping(value =  "/activity_ranking")
     public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@RequestBody @Valid ActivityRankingDTO activityRankingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.saveActivityRanking(activityRankingDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.saveAbsenceRankingSettings(activityRankingDTO));
     }
 
     @ApiOperation(value = "get  absence_ranking settings of expertise")
     @GetMapping(value =   "/expertise/{expertiseId}/absence_ranking")
     public ResponseEntity<Map<String, Object>> getAbsenceRanking(@PathVariable Long expertiseId, @RequestParam(value = "published", required = false) Boolean published) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.getActivityRanking(expertiseId, published));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.getAbsenceRankingSettings(expertiseId, published));
     }
 
     @ApiOperation(value = "get  presence_ranking settings ")
@@ -48,7 +47,7 @@ public class ActivityRankingController {
     @ApiOperation(value = "update a activity_ranking settings")
     @PutMapping(value = "/activity_ranking")
     public ResponseEntity<Map<String, Object>> updateAbsenceRanking( @RequestBody @Valid ActivityRankingDTO activityRankingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.updateActivityRanking(activityRankingDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.updateAbsenceRankingSettings(activityRankingDTO));
     }
 
 
@@ -57,19 +56,13 @@ public class ActivityRankingController {
     @ApiOperation(value = "published a absence_ranking settings")
     @PutMapping(value =  "/activity_ranking/{id}/publish")
     public ResponseEntity<Map<String, Object>> publishAbsenceRanking(@PathVariable BigInteger id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.publishActivityRanking(id, publishedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.publishAbsenceRanking(id, publishedDate));
     }
 
     @ApiOperation(value = "delete activity_ranking")
     @DeleteMapping(value = "/activity_ranking/{id}")
     public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.deleteActivityRanking(id));
-    }
-
-    @ApiOperation(value = "get absence activities")
-    @GetMapping(value = "/absence_ranking/activities")
-    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.findAllAbsenceActivities());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.deleteAbsenceRankingSettings(id));
     }
 
     @ApiOperation(value = "get  activities")
