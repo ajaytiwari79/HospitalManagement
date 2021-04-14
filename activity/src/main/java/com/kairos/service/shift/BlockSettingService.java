@@ -70,7 +70,7 @@ public class BlockSettingService {
         Map<LocalDate,BlockSetting> blockSettingMap=blockSettings.stream().collect(Collectors.toMap(BlockSetting::getDate, Function.identity()));
         LocalDate startDate=blockSettingDTO.getDate();
          while (startDateIsEqualsOrBeforeEndDate(startDate,blockSettingDTO.getEndDate())){
-            BlockSetting blockSetting=blockSettingMap.getOrDefault(blockSettingDTO.getDate(),new BlockSetting(unitId,startDate,null));
+            BlockSetting blockSetting=blockSettingMap.getOrDefault(startDate,new BlockSetting(unitId,startDate,null));
             if(blockSettingDTO.isUnblockStaffs()){
                 blockSetting.getBlockedStaffForCoverShift().removeAll(blockSettingDTO.getBlockedStaffForCoverShift());
             }else {
