@@ -731,13 +731,10 @@ public class StaffingLevelService {
         Set<BigInteger> breakActivityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
         activityIds.addAll(breakActivityIds);
         Map<LocalDate, PresenceStaffingLevelDto> staffingLevelMap = (Map<LocalDate, PresenceStaffingLevelDto>) staffingLevelMapAndActivityIds[1];
+        updateEmptyDayStaffingLevel(staffingLevelMap,startLocalDate,endLocalDate,unitId);
         Map<LocalDate, DailyStaffingLevelDetailsDTO> localDateDailyStaffingLevelDetailsDTOMap = new HashMap<>();
         while (startLocalDate.isBefore(endLocalDate)) {
             PresenceStaffingLevelDto staffingLevel = staffingLevelMap.get(startLocalDate);
-            if(isNull(staffingLevel)){
-                staffingLevel=ObjectMapperUtils.copyPropertiesByMapper(createDefaultStaffingLevel(unitId,asDate(startLocalDate)),PresenceStaffingLevelDto.class);
-                staffingLevelMap.put(startLocalDate,staffingLevel);
-            }
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
             for (TimeSlotDTO timeSlot : timeSlots) {
@@ -756,6 +753,18 @@ public class StaffingLevelService {
         }
         return localDateDailyStaffingLevelDetailsDTOMap;
     }
+
+    private void updateEmptyDayStaffingLevel(Map<LocalDate, PresenceStaffingLevelDto> staffingLevelMap, LocalDate startLocalDate, LocalDate endLocalDate, Long unitId) {
+        while (startDateIsEqualsOrBeforeEndDate(startLocalDate,endLocalDate)) {
+            PresenceStaffingLevelDto staffingLevel = staffingLevelMap.get(startLocalDate);
+            if(isNull(staffingLevel)){
+                staffingLevel=ObjectMapperUtils.copyPropertiesByMapper(createDefaultStaffingLevel(unitId,asDate(startLocalDate)),PresenceStaffingLevelDto.class);
+                staffingLevelMap.put(startLocalDate,staffingLevel);
+            }
+            startLocalDate = startLocalDate.plusDays(1);
+        }
+    }
+
 
     private void getCalculationByTimeSlot(BigInteger activityId, boolean unpublishedChanges, LocalDate startLocalDate, Map<LocalDate, PresenceStaffingLevelDto> staffingLevelMap, PresenceStaffingLevelDto staffingLevel, List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS, Integer detailLevelMinutes, TimeSlotDTO timeSlot) {
         List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
