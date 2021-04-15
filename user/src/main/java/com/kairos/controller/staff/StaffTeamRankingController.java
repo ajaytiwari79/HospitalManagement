@@ -1,8 +1,7 @@
-package com.kairos.controller.staff_settings;
+package com.kairos.controller.staff;
 
-import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
-import com.kairos.dto.user.staff.staff_settings.StaffTeamRankingDTO;
-import com.kairos.service.staff_settings.StaffTeamRankingService;
+import com.kairos.dto.user.staff.staff.StaffTeamRankingDTO;
+import com.kairos.service.staff.StaffTeamRankingService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,30 +12,26 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 @RestController
-@RequestMapping(API_UNIT_URL)
-@Api(API_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(value = API_ORGANIZATION_UNIT_URL)
 public class StaffTeamRankingController {
-    @Inject
-    private StaffTeamRankingService staffTeamRankingService;
-
+    @Inject private StaffTeamRankingService staffTeamRankingService;
 
     @ApiOperation(value = "update a activity_ranking settings")
     @PutMapping(value = "/staff_team_ranking")
-    public ResponseEntity<Map<String, Object>> updateStaffTeamRanking( @RequestBody @Valid StaffTeamRankingDTO staffTeamRankingDTO) {
+    public ResponseEntity<Map<String, Object>> updateStaffTeamRanking(@RequestBody @Valid StaffTeamRankingDTO staffTeamRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.updateStaffTeamRanking(staffTeamRankingDTO));
     }
 
     @ApiOperation(value = "published a absence_ranking settings")
     @PutMapping(value =  "staff/{staffId}/staff_team_ranking/{id}/publish")
-    public ResponseEntity<Map<String, Object>> publishStaffTeamRanking(@PathVariable Long staffId, @PathVariable BigInteger id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
+    public ResponseEntity<Map<String, Object>> publishStaffTeamRanking(@PathVariable Long staffId, @PathVariable Long id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.publishStaffTeamRanking(id, staffId, publishedDate));
     }
 
@@ -46,4 +41,5 @@ public class StaffTeamRankingController {
     public ResponseEntity<Map<String, Object>> getStaffTeamRankings(@PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.getStaffTeamRankings(staffId));
     }
+
 }

@@ -33,6 +33,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffTeamRankingService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +79,7 @@ public class TeamService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject private CommonRepository commonRepository;
+    @Inject private StaffTeamRankingService staffTeamRankingService;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
         OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
@@ -175,6 +177,7 @@ public class TeamService {
 //                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
+            staffTeamRankingService.addStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship);
         }
         return staffTeamDTOs;
     }

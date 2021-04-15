@@ -1,9 +1,8 @@
-package com.kairos.dto.user.staff.staff_settings;
+package com.kairos.dto.user.staff.staff;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
@@ -11,7 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class StaffTeamRankingDTO {
-    private BigInteger id;
+    private Long id;
     private Long staffId;
     private LocalDate startDate;
     private LocalDate endDate;
