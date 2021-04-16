@@ -96,7 +96,7 @@ public class CoverShiftService {
     public List<Staff> getEligibleStaffs(BigInteger shiftId){
         Shift shift = shiftService.findOneByShiftId(shiftId);
         CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(shift.getUnitId());
-        Set<BigInteger> activityIds = getActivityIdsByShift(shift);
+        Set<BigInteger> activityIds = getActivityIdsByShift(Arrays.asList(shift));
         List[] nonProductiveTypeActivityIdsAndAssignedStaffIds = activityService.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
         List<BigInteger> nonProductiveTypeActivityIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[0];
         List<Long> staffIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[1];
@@ -172,10 +172,12 @@ public class CoverShiftService {
         return shiftDataHelper;
     }
 
-    private Set<BigInteger> getActivityIdsByShift(Shift shift) {
+    private Set<BigInteger> getActivityIdsByShift(List<Shift> shifts) {
         Set<BigInteger> activityIds = new HashSet<>();
-        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-        activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        for(Shift shift:shifts){
+            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        }
         return activityIds;
     }
 
@@ -249,13 +251,34 @@ public class CoverShiftService {
 
     }
 
-    public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long staffId) {
+    public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long unitId, Long staffId) {
         List<CoverShift> coverShifts=coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate,endDate);
+        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(startDate,endDate,unitId,staffId);
         int totalRequests= (int) coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).count();
         int totalInterests= (int) coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).count();
         int totalDeclined= (int) coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).count();
-        int totalEligibleShifts=5;
+        int totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId);
         return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
 
+    }
+
+    public int getEligibleShifts(List<Shift> shifts,  Long unitId,Long staffId){
+//        CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(unitId);
+//        Set<BigInteger> activityIds = getActivityIdsByShift(shifts);
+//        List[] nonProductiveTypeActivityIdsAndAssignedStaffIds = activityService.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
+//        List<BigInteger> nonProductiveTypeActivityIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[0];
+//        List<Long> staffIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[1];
+//        if(isCollectionNotEmpty(nonProductiveTypeActivityIds)){
+//            staffIds = new ArrayList<>();
+//        }
+//        List<BigInteger> productiveTypeActivityIds = isCollectionNotEmpty(nonProductiveTypeActivityIds) ? (List<BigInteger>) CollectionUtils.removeAll(activityIds,nonProductiveTypeActivityIds) : new ArrayList<>(activityIds);
+//        Set<Long> notEligibleStaffIdsForCoverShifts = shiftService.getNotEligibleStaffsForCoverShifts(shift.getStartDate(),shift.getEndDate(), coverShiftSetting,staffIds);
+//        Set<Long> employmentTypeIds = coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYMENT_TYPES) ? coverShiftSetting.getEmploymentTypeIds() : new HashSet<>();
+//        Set<Long> tagIds = coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_TAGS) ? coverShiftSetting.getTagIds() : new HashSet<>();
+//        notEligibleStaffIdsForCoverShifts.add(shift.getStaffId());
+//        NotEligibleStaffDataDTO notEligibleStaffDataDTO = new NotEligibleStaffDataDTO(employmentTypeIds,tagIds, notEligibleStaffIdsForCoverShifts,asLocalDate(shift.getStartDate()),new HashSet<>(productiveTypeActivityIds), coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION));
+//        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getEligibleStaffsForCoverShifts(notEligibleStaffDataDTO, coverShiftSetting.getUnitId());
+//        removeStaffWhichHaveWTAViolation(coverShiftSetting,shift,staffAdditionalInfoDTOS,activityIds, UserContext.getUserDetails().getCountryId(),UserContext.getUserDetails().isManagement());
+        return 0;
     }
 }
