@@ -411,25 +411,19 @@ public class PhaseService {
         return new Map[]{phaseMap,phaseEnumMap};
     }
 
-    /**
-     *
-     * @param startDateTime
-     * @param phaseMap
-     * @param untilTentativeDate
-     * @return phase
-     */
+
     private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,ZoneId timeZone){
         Phase phase=null;
         int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
         LocalDateTime realTimeStartDate=DateUtils.getLocalDateTimeFromZoneId(timeZone).minusMinutes(minutesToCalculate+1);
+        if (startDateTime.isBefore(realTimeStartDate)) {
+            return phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString());
+        }
         LocalDateTime realTimeEndDate=DateUtils.getLocalDateTimeFromZoneId(timeZone).plusMinutes(minutesToCalculate+1);
-        boolean realTime= new DateTimeInterval(asDate(realTimeStartDate),asDate(realTimeEndDate)).contains(asDate(startDateTime));
-         if(realTime){
-            phase= phaseMap.get(PhaseDefaultName.REALTIME.toString());
-        }else if (startDateTime.isBefore(realTimeStartDate)) {
-            phase= phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString());
+         if(new DateTimeInterval(asDate(realTimeStartDate),asDate(realTimeEndDate)).contains(asDate(startDateTime))){
+            return phaseMap.get(PhaseDefaultName.REALTIME.toString());
         }else if ((startDateTime).isBefore(untilTentativeDate) && startDateTime.isAfter(realTimeEndDate)) {
-            phase=phaseMap.get(PhaseDefaultName.TENTATIVE.toString());
+            return phaseMap.get(PhaseDefaultName.TENTATIVE.toString());
         }
         return phase;
     }

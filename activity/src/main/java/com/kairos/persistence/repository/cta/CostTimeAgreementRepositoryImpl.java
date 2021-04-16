@@ -231,7 +231,9 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(endDate).and(END_DATE).gte(startDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
+                lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
+                unwind(RULE_TEMPLATES,true),
+                group(EMPLOYMENT_ID).push(RULE_TEMPLATES).as(RULE_TEMPLATES)
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults();

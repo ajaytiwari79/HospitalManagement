@@ -150,6 +150,7 @@ public final class ApiConstants {
     public static final String GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE = "/holiday_day_type_reason_code";
 
     public static final String STAFF_EMPLOYMENT_BY_EMPLOYMENT_ID = STAFF_URL + "/staff_employment/{employmentId}";
+    public static final String STAFF_EMPLOYMENT_DETAILS_BY_EMPLOYMENT_ID = STAFF_URL + "/staff_employment_details/{employmentId}";
 
     public static final String UNIT_LOCATION = "/unit_location";
     public static final String GET_UNIT_BY_EMPLOYMENT = GET_EMPLOYMENT + "/get_unit";

@@ -732,8 +732,7 @@ public class CostTimeAgreementService {
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplatesByEmploymentId(Long employmentId, Date startDate, Date endDate) {
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdBetweenDate(employmentId, startDate, endDate);
-        List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(toList());
-        ruleTemplates = ruleTemplates.stream().filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
+        List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
         return ruleTemplates;
     }
 
