@@ -83,9 +83,12 @@ public class ActivityRankingService {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED);
         }
         activityRanking.setDeleted(true);
+        activityRankingRepository.save(activityRanking);
         ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
-        parentAbsenceRanking.setDraftId(null);
-        activityRankingRepository.saveEntities(newArrayList(activityRanking,parentAbsenceRanking));
+        if(isNotNull(parentAbsenceRanking)) {
+            parentAbsenceRanking.setDraftId(null);
+            activityRankingRepository.save(parentAbsenceRanking);
+        }
         return true;
     }
 
