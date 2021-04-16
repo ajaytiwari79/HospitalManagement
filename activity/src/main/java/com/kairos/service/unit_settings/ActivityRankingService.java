@@ -52,16 +52,12 @@ public class ActivityRankingService {
             activityRankingCopy.setPublished(false);
             activityRankingCopy.setId(null);
             activityRankingRepository.save(activityRankingCopy);
-
+            activityRanking.setDraftId(activityRankingCopy.getId());
         } else {
             activityRanking =ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
-            activityRankingRepository.save(activityRanking);
         }
+        activityRankingRepository.save(activityRanking);
         return activityRankingDTO;
-    }
-
-    public List<ActivityRankingDTO> getAbsenceRankingSettings(){
-        return activityRankingRepository.getAbsenceRankingSettingsByDeletedFalse();
     }
 
     public List<ActivityRankingDTO> getAbsenceRankingSettings(Long expertiseId, Boolean published){
@@ -126,7 +122,6 @@ public class ActivityRankingService {
         }
         activityRankingRepository.save(activityRanking);
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
-
     }
 
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
