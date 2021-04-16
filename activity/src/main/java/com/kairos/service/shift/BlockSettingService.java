@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.BlockSettingDTO;
 import com.kairos.persistence.model.shift.BlockSetting;
@@ -17,6 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_BLOCK_SETTING_NOT_FOUND;
 
@@ -67,10 +69,14 @@ public class BlockSettingService {
         List<BlockSetting> blockSettings=blockSettingMongoRepository.findAllBlockSettingByUnitIdAndDateRange(unitId,blockSettingDTO.getDate(),blockSettingDTO.getEndDate());
         Map<LocalDate,BlockSetting> blockSettingMap=blockSettings.stream().collect(Collectors.toMap(BlockSetting::getDate, Function.identity()));
         LocalDate startDate=blockSettingDTO.getDate();
-         while (startDate.isAfter(blockSettingDTO.getEndDate())){
-            BlockSetting blockSetting=blockSettingMap.getOrDefault(blockSettingDTO.getDate(),new BlockSetting(unitId,blockSettingDTO.getDate(),null));
-            blockSetting.getBlockedStaffForCoverShift().addAll(blockSettingDTO.getBlockedStaffForCoverShift());
-             blockSettingList.add(blockSetting);
+         while (startDateIsEqualsOrBeforeEndDate(startDate,blockSettingDTO.getEndDate())){
+            BlockSetting blockSetting=blockSettingMap.getOrDefault(startDate,new BlockSetting(unitId,startDate,null));
+            if(blockSettingDTO.isUnblockStaffs()){
+                blockSetting.getBlockedStaffForCoverShift().removeAll(blockSettingDTO.getBlockedStaffForCoverShift());
+            }else {
+                blockSetting.getBlockedStaffForCoverShift().addAll(blockSettingDTO.getBlockedStaffForCoverShift());
+            }
+            blockSettingList.add(blockSetting);
             startDate=startDate.plusDays(1);
         }
          blockSettingMongoRepository.saveEntities(blockSettingList);

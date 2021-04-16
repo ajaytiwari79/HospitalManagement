@@ -71,11 +71,13 @@ public class ActivityRankingService {
         } else {
             activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(expertiseId);
         }
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(activityRankings, ActivityRankingDTO.class);
     }
 
     public List<ActivityRankingDTO> getPresenceRankingSettings(Long unitId){
         List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndDeletedFalse(unitId);
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         return isCollectionEmpty(activityRankings) ? new ArrayList<>() : ObjectMapperUtils.copyCollectionPropertiesByMapper(activityRankings, ActivityRankingDTO.class);
     }
 
@@ -160,7 +162,14 @@ public class ActivityRankingService {
                 }
                 activityRankingRepository.save(newActivityRanking);
             } else {
-                this.modifyActivityRanking(activityRankings, activity, false);
+                LocalDate activityEndDate = activity.getActivityGeneralSettings().getEndDate();
+                activity.getActivityGeneralSettings().setEndDate(null);
+                this.modifyActivityRanking(activityRankings, activity, expertiseId, false);
+                if(isNotNull(activityEndDate)){
+                    activity.getActivityGeneralSettings().setEndDate(activityEndDate);
+                    activityRankings = activityRankingRepository.getAbsenceRankingSettings(expertiseId, activity.getActivityGeneralSettings().getEndDate());
+                    updateRankingOnSetActivityEndDate(activityRankings, activity, false);
+                }
             }
         }
     }
@@ -172,7 +181,14 @@ public class ActivityRankingService {
             if (isCollectionEmpty(activityRankings)) {
                 activityRankingRepository.save(new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newHashSet(activity.getId()), unitId, true));
             } else {
-                this.modifyActivityRanking(activityRankings, activity, true);
+                LocalDate activityEndDate = activity.getActivityGeneralSettings().getEndDate();
+                activity.getActivityGeneralSettings().setEndDate(null);
+                this.modifyActivityRanking(activityRankings, activity, unitId, true);
+                if(isNotNull(activityEndDate)){
+                    activity.getActivityGeneralSettings().setEndDate(activityEndDate);
+                    activityRankings = activityRankingRepository.getPresenceRankingSettings(unitId, activity.getActivityGeneralSettings().getEndDate());
+                    updateRankingOnSetActivityEndDate(activityRankings, activity, true);
+                }
             }
         } else {
             for (ActivityRanking activityRanking : activityRankings) {
@@ -186,11 +202,24 @@ public class ActivityRankingService {
         }
     }
 
-    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity){
-        ActivityRanking newActivityRanking = null;
+    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity,long unitOrexpertiseId, boolean presenceActivity){
+        List<ActivityRanking> newActivityRankings = new ArrayList<>();
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
+        if(activity.getActivityGeneralSettings().getStartDate().isBefore(activityRankings.get(0).getStartDate())){
+            ActivityRanking newActivityRanking;
+            if(presenceActivity){
+                newActivityRanking = new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newHashSet(activity.getId()), unitOrexpertiseId, true);
+            } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+            } else {
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+            }
+            activityRankingRepository.save(newActivityRanking);
+            newActivityRankings.add(newActivityRanking);
+        }
         for (ActivityRanking activityRanking : activityRankings) {
-            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate())) {
-                newActivityRanking = createNewAbsenceRanking(activity, presenceActivity, activityRanking);
+            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && (isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate()))) {
+                newActivityRankings.add(createNewAbsenceRanking(activity, presenceActivity, activityRanking));
             } else if(!activity.getActivityGeneralSettings().getStartDate().isAfter(activityRanking.getStartDate())) {
                 if (presenceActivity) {
                     activityRanking.getPresenceActivities().add(activity.getId());
@@ -201,8 +230,8 @@ public class ActivityRankingService {
                 }
             }
         }
-        if(isNotNull(newActivityRanking)){
-            activityRankings.add(newActivityRanking);
+        if(isCollectionNotEmpty(newActivityRankings)){
+            activityRankings.addAll(newActivityRankings);
         }
         activityRankingRepository.saveEntities(activityRankings);
         this.mergeActivityRanking(activityRankings, presenceActivity);
@@ -226,19 +255,17 @@ public class ActivityRankingService {
     @Async
     public void removeAbsenceActivityId(Activity activity, List<Long> expertiseIds){
         for (Long expertiseId : expertiseIds) {
-            List<ActivityRanking> removeActivityRanking = new ArrayList<>();
             List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, true);
             for (ActivityRanking activityRanking : activityRankings) {
                 if(activityRanking.getFullDayActivities().remove(activity.getId()) || activityRanking.getFullWeekActivities().remove(activity.getId())){
                     if(isCollectionEmpty(activityRanking.getFullDayActivities()) && isCollectionEmpty(activityRanking.getFullWeekActivities())){
                         activityRanking.setDeleted(true);
                     }
-                    removeActivityRanking.add(activityRanking);
                 }
             }
-            if(isCollectionNotEmpty(removeActivityRanking)) {
-                activityRankingRepository.saveEntities(removeActivityRanking);
-                this.mergeActivityRanking(removeActivityRanking, false);
+            if(isCollectionNotEmpty(activityRankings)) {
+                activityRankingRepository.saveEntities(activityRankings);
+                this.mergeActivityRanking(activityRankings, false);
             }
         }
     }
@@ -280,14 +307,22 @@ public class ActivityRankingService {
 
     @Async
     public void updateEndDateOfAbsenceActivity(Activity activity, LocalDate oldEndDate) {
+        LocalDate newEndDate = activity.getActivityGeneralSettings().getEndDate();
         if(isCollectionNotEmpty(activity.getExpertises())){
             for (Long expertiseId : activity.getExpertises()) {
                 if (isNull(oldEndDate)) {
                     List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettings(expertiseId, activity.getActivityGeneralSettings().getEndDate());
                     updateRankingOnSetActivityEndDate(activityRankings, activity, false);
-                } else {
+                } else if(isNull(newEndDate)) {
                     List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, true);
-                    updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, false);
+                    updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, expertiseId, false);
+                } else {
+                    activity.getActivityGeneralSettings().setEndDate(null);
+                    List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, true);
+                    updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, expertiseId, false);
+                    activity.getActivityGeneralSettings().setEndDate(newEndDate);
+                    activityRankings = activityRankingRepository.getAbsenceRankingSettings(expertiseId, activity.getActivityGeneralSettings().getEndDate());
+                    updateRankingOnSetActivityEndDate(activityRankings, activity, false);
                 }
             }
         }
@@ -295,17 +330,27 @@ public class ActivityRankingService {
 
     @Async
     public void updateEndDateOfPresenceActivity(Long unitId, Activity activity, LocalDate oldEndDate) {
+        LocalDate newEndDate = activity.getActivityGeneralSettings().getEndDate();
         if (isNull(oldEndDate)) {
             List<ActivityRanking> activityRankings = activityRankingRepository.getPresenceRankingSettings(unitId, activity.getActivityGeneralSettings().getEndDate());
             updateRankingOnSetActivityEndDate(activityRankings, activity, true);
-        } else {
+        } else if(isNull(newEndDate)) {
             List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(unitId);
-            updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, true);
+            updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, unitId, true);
+        } else {
+            activity.getActivityGeneralSettings().setEndDate(null);
+
+            List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(unitId);
+            updateRankingOnResetActivityEndDate(activityRankings, activity, oldEndDate, unitId, true);
+            activity.getActivityGeneralSettings().setEndDate(newEndDate);
+            activityRankings = activityRankingRepository.getPresenceRankingSettings(unitId, activity.getActivityGeneralSettings().getEndDate());
+            updateRankingOnSetActivityEndDate(activityRankings, activity, true);
         }
     }
 
-    private void updateRankingOnResetActivityEndDate(List<ActivityRanking> activityRankings, Activity activity, LocalDate oldEndDate, boolean presenceActivity) {
+    private void updateRankingOnResetActivityEndDate(List<ActivityRanking> activityRankings, Activity activity, LocalDate oldEndDate,long unitOrexpertiseId, boolean presenceActivity) {
         List<ActivityRanking> updateActivityRankings = new ArrayList<>();
+        activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         for (ActivityRanking activityRanking : activityRankings) {
             if (isNull(activity.getActivityGeneralSettings().getEndDate())) {
                 if(!activityRanking.getStartDate().isBefore(oldEndDate)) {
@@ -318,56 +363,24 @@ public class ActivityRankingService {
                     }
                     updateActivityRankings.add(activityRanking);
                 }
-            } else if (activity.getActivityGeneralSettings().getEndDate().isAfter(oldEndDate)) {
-                updateActivityEndDateAfter(activity, oldEndDate, updateActivityRankings, activityRanking, presenceActivity);
-            } else {
-                updateActivityEndDateBefor(activity, oldEndDate, updateActivityRankings, activityRanking, presenceActivity);
             }
+        }
+        if(isCollectionNotEmpty(activityRankings) && isNotNull(activityRankings.get(activityRankings.size()-1).getEndDate())){
+            ActivityRanking newActivityRanking;
+            if(presenceActivity){
+                newActivityRanking = new ActivityRanking(activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newHashSet(activity.getId()), unitOrexpertiseId, true);
+            } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+            } else {
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId,activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+            }
+            activityRankingRepository.save(newActivityRanking);
+            activityRankings.add(newActivityRanking);
         }
         if(isCollectionNotEmpty(updateActivityRankings)) {
             activityRankingRepository.saveEntities(updateActivityRankings);
-            this.mergeActivityRanking(activityRankings, presenceActivity);
         }
-    }
-
-    private void updateActivityEndDateBefor(Activity activity, LocalDate oldEndDate, List<ActivityRanking> updateActivityRankings, ActivityRanking activityRanking, boolean presenceActivity) {
-        if(activityRanking.getStartDate().isBefore(oldEndDate) && isNotNull(activityRanking.getEndDate()) && !activityRanking.getEndDate().isAfter(oldEndDate)) {
-            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getEndDate()) && isNotNull(activityRanking.getEndDate()) && activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getEndDate())){
-                ActivityRanking newActivityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRanking, ActivityRanking.class);
-                newActivityRanking.setId(null);
-                newActivityRanking.setEndDate(activity.getActivityGeneralSettings().getEndDate());
-                activityRanking.setStartDate(activity.getActivityGeneralSettings().getEndDate().plusDays(1));
-                updateActivityRankings.add(newActivityRanking);
-            }
-            if(presenceActivity) {
-                activityRanking.getPresenceActivities().remove(activity.getId());
-            } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-                activityRanking.getFullWeekActivities().remove(activity.getId());
-            } else {
-                activityRanking.getFullDayActivities().remove(activity.getId());
-            }
-            updateActivityRankings.add(activityRanking);
-        }
-    }
-
-    private void updateActivityEndDateAfter(Activity activity, LocalDate oldEndDate, List<ActivityRanking> updateActivityRankings, ActivityRanking activityRanking, boolean presenceActivity) {
-        if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getEndDate()) && isNotNull(activityRanking.getEndDate()) && !activityRanking.getEndDate().isBefore(oldEndDate)) {
-            if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getEndDate()) && (isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isBefore(activity.getActivityGeneralSettings().getEndDate()))){
-                ActivityRanking newActivityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRanking, ActivityRanking.class);
-                newActivityRanking.setId(null);
-                activityRanking.setEndDate(activity.getActivityGeneralSettings().getEndDate());
-                newActivityRanking.setStartDate(activity.getActivityGeneralSettings().getEndDate().plusDays(1));
-                updateActivityRankings.add(newActivityRanking);
-            }
-            if(presenceActivity) {
-                activityRanking.getPresenceActivities().add(activity.getId());
-            } else if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-                activityRanking.getFullWeekActivities().add(activity.getId());
-            } else {
-                activityRanking.getFullDayActivities().add(activity.getId());
-            }
-            updateActivityRankings.add(activityRanking);
-        }
+        this.mergeActivityRanking(activityRankings, presenceActivity);
     }
 
     private void updateRankingOnSetActivityEndDate(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity) {
