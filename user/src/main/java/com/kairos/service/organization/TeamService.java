@@ -141,6 +141,7 @@ public class TeamService {
         Team team = teamGraphRepository.findOne(teamId);
         team.setActivityId(activityId);
         teamGraphRepository.save(team);
+        staffTeamRankingService.updateActivityIdInTeamRanking(teamId, activityId);
         return true;
     }
 
@@ -411,6 +412,7 @@ public class TeamService {
             } else {
                 validStaffIds.add(staffId);
             }
+            staffTeamRankingService.removeStaffTeamInfo(staffId, teamId);
         }
         if(isCollectionNotEmpty(onlyTeamLeader)) {
             teamGraphRepository.assignStaffAsTeamLeaderOnly(onlyTeamLeader, teamId);
