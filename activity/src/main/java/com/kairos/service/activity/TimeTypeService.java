@@ -201,7 +201,6 @@ public class TimeTypeService {
         timeType.setLabel(timeTypeDTO.getLabel());
         timeType.setDescription(timeTypeDTO.getDescription());
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-//        timeType.setActivityPriorityId(timeTypeDTO.getActivityPriorityId());
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setPriorityFor(timeTypeDTO.getPriorityFor());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());

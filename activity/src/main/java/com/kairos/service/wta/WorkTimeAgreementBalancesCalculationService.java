@@ -332,7 +332,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             String timetypeColor = timeTypeMap.containsKey(activityWrapper.getActivity().getActivityBalanceSettings().getTimeTypeId()) ? timeTypeMap.get(activityWrapper.getActivity().getActivityBalanceSettings().getTimeTypeId()).getBackgroundColor() : "";
             getProtectedDaysOffIntervalbalance(protectedDaysOffWTATemplate, shiftWithActivityDTOS, staffAdditionalInfoDTO, startDate, endDate, planningPeriodEndDate, protectedDaysOffSettingOfUnit, intervalBalances, activityWrapper, cutOffIntervalUnit, protectedDaysOffSettings);
             if (isCollectionNotEmpty(intervalBalances)) {
-                int sequence = activityWrapper.getActivityPriority()==null?Integer.MAX_VALUE:activityWrapper.getActivityPriority().getSequence();
+                int sequence = activityWrapper.getRanking()==null?Integer.MAX_VALUE:activityWrapper.getRanking();
                 workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityWrapper.getActivity().getId(), activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, false,activityWrapper.getActivity().getActivityBalanceSettings().getTimeType().toString(),sequence);
             }
         }
@@ -403,7 +403,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             getVetoIntervalBalance(vetoAndStopBricksWTATemplate, shiftWithActivityDTOS, startDate, endDate, planningPeriodEndDate, intervalBalances);
         }
         if (isCollectionNotEmpty(intervalBalances)) {
-            int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
+            int sequence = activityWrapperMap.get(activityId).getRanking()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getRanking();
             workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, CutOffIntervalUnit.WEEKS, borrowLeave,activityWrapperMap.get(activityId).getActivity().getActivityBalanceSettings().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
@@ -476,7 +476,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             getSeniorDayIntevalBalance(seniorDaysPerYearWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, staffAdditionalInfoDTO, planningPeriodEndDate, intervalBalances);
         }
         if (isCollectionNotEmpty(intervalBalances)) {
-            int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
+            int sequence = activityWrapperMap.get(activityId).getRanking()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getRanking();
             workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getActivity().getActivityBalanceSettings().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
@@ -526,7 +526,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             getChildCareIntervalBalance(childCareDaysCheckWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, staffAdditionalInfoDTO, planningPeriodEndDate, intervalBalances);
         }
         if (isCollectionNotEmpty(intervalBalances)) {
-            int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
+            int sequence = activityWrapperMap.get(activityId).getRanking()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getRanking();
             workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getActivity().getActivityBalanceSettings().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
@@ -576,7 +576,9 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             }
         }
         if (isCollectionNotEmpty(intervalBalances)) {
-            int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
+
+
+            int sequence = activityWrapperMap.get(activityId).getRanking()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getRanking();
             workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getActivity().getActivityBalanceSettings().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;

@@ -38,4 +38,8 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     List<StaffingLevel> findByUnitIdBetweenDates(Long unitId, LocalDate startDate, LocalDate endDate);
 
     List<StaffingLevel> findAllByDeletedFalse();
+
+
+    @Query(value = "{deleted:false,unitId:?0,$or':[{presenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?1}}}}},{absenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?1}}}}}]}",exists = true)
+    boolean activityExistsInStaffingLevel(Long unitId,BigInteger activityId);
 }

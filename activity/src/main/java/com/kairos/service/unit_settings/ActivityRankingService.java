@@ -35,7 +35,7 @@ public class ActivityRankingService {
     @Inject
     private ActivityService activityService;
 
-    public ActivityRankingDTO saveAbsenceRankingSettings(ActivityRankingDTO activityRankingDTO){
+    public ActivityRankingDTO saveActivityRanking(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
         activityRankingRepository.save(activityRanking);
         activityRankingDTO.setId(activityRanking.getId());
@@ -52,16 +52,12 @@ public class ActivityRankingService {
             activityRankingCopy.setPublished(false);
             activityRankingCopy.setId(null);
             activityRankingRepository.save(activityRankingCopy);
-
+            activityRanking.setDraftId(activityRankingCopy.getId());
         } else {
             activityRanking =ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
-            activityRankingRepository.save(activityRanking);
         }
+        activityRankingRepository.save(activityRanking);
         return activityRankingDTO;
-    }
-
-    public List<ActivityRankingDTO> getAbsenceRankingSettings(){
-        return activityRankingRepository.getAbsenceRankingSettingsByDeletedFalse();
     }
 
     public List<ActivityRankingDTO> getAbsenceRankingSettings(Long expertiseId, Boolean published){
@@ -88,6 +84,11 @@ public class ActivityRankingService {
         }
         activityRanking.setDeleted(true);
         activityRankingRepository.save(activityRanking);
+        ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
+        if(isNotNull(parentAbsenceRanking)) {
+            parentAbsenceRanking.setDraftId(null);
+            activityRankingRepository.save(parentAbsenceRanking);
+        }
         return true;
     }
 
@@ -126,7 +127,6 @@ public class ActivityRankingService {
         }
         activityRankingRepository.save(activityRanking);
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
-
     }
 
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){

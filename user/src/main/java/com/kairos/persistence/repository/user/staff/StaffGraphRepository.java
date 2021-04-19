@@ -497,5 +497,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (staff:Staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) where id(staff) in {0} return id(staff) as id,COLLECT(id(skills)) as skillIds")
     List<StaffPersonalDetailQueryResult> getSkillIdsByStaffIds(Collection<Long> staffIds);
+
+    @Query("MATCH (staff:Staff) WHERE id(staff)={0} " +
+            "SET staff.canRankTeam={1}")
+    void allowPersonalRanking(Long staffId, boolean canRankTeam);
 }
 

@@ -478,5 +478,6 @@ public class UserMessagesConstants {
     public static final String SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED ="shift.percentage.can.not.be.less.then.zero";
     public static final String STAFF_EMPLOYMENT_NOT_MATCH ="staff.employment.not_matched";
     public static final String MESSAGE_DATA_NOTFOUND = "message.data.notFound";
+    public static final String MESSAGE_RANKING_ALREADY_PUBLISHED="ranking.already.published";
 
 }

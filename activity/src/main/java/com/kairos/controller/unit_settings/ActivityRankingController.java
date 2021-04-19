@@ -29,7 +29,7 @@ public class ActivityRankingController {
     @ApiOperation(value = "save a absence_ranking ")
     @PostMapping(value =  "/activity_ranking")
     public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@RequestBody @Valid ActivityRankingDTO activityRankingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.saveAbsenceRankingSettings(activityRankingDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.saveActivityRanking(activityRankingDTO));
     }
 
     @ApiOperation(value = "get  absence_ranking settings of expertise")

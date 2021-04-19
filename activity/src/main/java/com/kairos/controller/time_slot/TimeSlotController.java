@@ -138,6 +138,13 @@ public class TimeSlotController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
+    @ApiOperation(value = "Get current time slots of organization")
+    @GetMapping("/time_slots_in_existing_unit/{unitId}")
+    public ResponseEntity<Map<String, Object>> createTimeSlotsInUnit(@PathVariable Long unitId) {
+        timeSlotService.createDefaultTimeSlots(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
 
 
 
