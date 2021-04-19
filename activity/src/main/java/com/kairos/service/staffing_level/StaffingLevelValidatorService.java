@@ -113,7 +113,7 @@ public class StaffingLevelValidatorService {
                     shiftActivityToCheck = dbShift.getActivities().get(i);
                     maxValue = overLapDuration;
                 } else {
-                    shiftActivityToCheck = activityWrapperMap.get(dbShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence() < activityWrapperMap.get(dbShift.getActivities().get(i - 1).getActivityId()).getActivityPriority().getSequence() ? dbShift.getActivities().get(i) : shiftActivityToCheck;
+                    shiftActivityToCheck = activityWrapperMap.get(dbShift.getActivities().get(i).getActivityId()).getRanking() < activityWrapperMap.get(dbShift.getActivities().get(i - 1).getActivityId()).getRanking() ? dbShift.getActivities().get(i) : shiftActivityToCheck;
                 }
             }
         }
@@ -123,8 +123,8 @@ public class StaffingLevelValidatorService {
     private void isHigherActivity(Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftActivityDTO replacedActivity) {
         ShiftActivity[] shiftActivities = replacedActivity == null ? null : activityReplaced(oldShift, replacedActivity, activityWrapperMap);
         if (shiftActivities != null) {
-            int rankOfOld = activityWrapperMap.get(shiftActivities[0].getActivityId()).getActivityPriority().getSequence();
-            int rankOfNew = activityWrapperMap.get(shiftActivities[1].getActivityId()).getActivityPriority().getSequence();
+            int rankOfOld = activityWrapperMap.get(shiftActivities[0].getActivityId()).getRanking();
+            int rankOfNew = activityWrapperMap.get(shiftActivities[1].getActivityId()).getRanking();
             if (rankOfNew > rankOfOld) {
                 exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE);
             }

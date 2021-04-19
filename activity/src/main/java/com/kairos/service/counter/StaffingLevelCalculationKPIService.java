@@ -25,7 +25,6 @@ import static com.kairos.enums.FilterType.TEAM_TYPE;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
-
 /**
  * Created By G.P.Ranjan on 24/12/19
  **/

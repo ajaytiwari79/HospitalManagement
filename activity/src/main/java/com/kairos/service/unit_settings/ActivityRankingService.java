@@ -35,7 +35,7 @@ public class ActivityRankingService {
     @Inject
     private ActivityService activityService;
 
-    public ActivityRankingDTO saveAbsenceRankingSettings(ActivityRankingDTO activityRankingDTO){
+    public ActivityRankingDTO saveActivityRanking(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
         activityRankingRepository.save(activityRanking);
         activityRankingDTO.setId(activityRanking.getId());

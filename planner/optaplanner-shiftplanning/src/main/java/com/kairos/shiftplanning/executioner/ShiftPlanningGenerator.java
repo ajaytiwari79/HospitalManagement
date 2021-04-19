@@ -117,7 +117,7 @@ public class ShiftPlanningGenerator {
         List<Employee> employees= generateEmployeeList(planningDays,unit,timeTypes);
         unresolvedSolution.setEmployees(employees);
         unresolvedSolution.setShifts(generateShiftForAssignments( employees));
-        int[] activitiesRank=activities.stream().mapToInt(a->a.getActivityPrioritySequence()).toArray();
+        int[] activitiesRank=activities.stream().mapToInt(a->a.getRanking()).toArray();
         unresolvedSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(unresolvedSolution.getWeekDates(),unresolvedSolution.getActivityLineIntervals(),INTERVAL_MINS,unresolvedSolution.getActivities()), activitiesRank));
         return unresolvedSolution;
     }

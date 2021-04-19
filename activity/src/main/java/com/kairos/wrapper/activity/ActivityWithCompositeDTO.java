@@ -62,11 +62,9 @@ public class ActivityWithCompositeDTO implements Serializable {
     private Set<BigInteger> childActivityIds=new HashSet<>();
     private Set<BigInteger> availableChildActivityIds =new HashSet<>();
     private BigInteger parentActivityId;
-    private String activityPriorityName;
-    private int activityPriority;
+    private int ranking;
     private TimeTypeEnum secondLevelTimtype;
     private int mostlyUsedCount;
-    private BigInteger activityPriorityId;
     private Map<String, TranslationInfo> translations;
 
     public String getName(){

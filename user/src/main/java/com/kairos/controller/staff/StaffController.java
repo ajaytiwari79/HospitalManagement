@@ -699,6 +699,10 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getEligibleStaffsForCoverShifts(unitId,notEligibleStaffData));
     }
 
-
+    @PutMapping(value ="/{staffId}/allow_personal_ranking" )
+    @ApiOperation("update staff child translation data")
+    public ResponseEntity<Map<String, Object>>  allowPersonalRanking(@PathVariable Long staffId,@RequestParam boolean canRankTeam){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.allowPersonalRanking(staffId,canRankTeam));
+    }
 
 }

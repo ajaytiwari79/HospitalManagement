@@ -33,6 +33,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffTeamRankingService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +79,7 @@ public class TeamService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject private CommonRepository commonRepository;
+    @Inject private StaffTeamRankingService staffTeamRankingService;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
         OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
@@ -139,6 +141,7 @@ public class TeamService {
         Team team = teamGraphRepository.findOne(teamId);
         team.setActivityId(activityId);
         teamGraphRepository.save(team);
+        staffTeamRankingService.updateActivityIdInTeamRanking(teamId, activityId);
         return true;
     }
 
@@ -160,8 +163,12 @@ public class TeamService {
                   }
             }
             StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
-            StaffTeamRelationship staffTeamRelationship = isNull(staffTeamRelationShipQueryResult) ? new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType()) :
-                    new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            StaffTeamRelationship staffTeamRelationship;
+            if(isNull(staffTeamRelationShipQueryResult)){
+                staffTeamRelationship = new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType());
+            } else {
+                staffTeamRelationship = new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            }
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
             if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
@@ -175,6 +182,7 @@ public class TeamService {
 //                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
+            staffTeamRankingService.addOrUpdateStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship, staffTeamRelationShipQueryResult);
         }
         return staffTeamDTOs;
     }
@@ -408,6 +416,7 @@ public class TeamService {
             } else {
                 validStaffIds.add(staffId);
             }
+            staffTeamRankingService.removeStaffTeamInfo(staffId, teamId);
         }
         if(isCollectionNotEmpty(onlyTeamLeader)) {
             teamGraphRepository.assignStaffAsTeamLeaderOnly(onlyTeamLeader, teamId);

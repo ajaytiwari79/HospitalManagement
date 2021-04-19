@@ -39,7 +39,6 @@ public class TimeTypeDTO implements Serializable {
     private List<TimeTypeDTO> parent = new ArrayList<>();
     private boolean allowedConflicts;
     private boolean breakNotHeldValid;
-    private BigInteger activityPriorityId;
     private PriorityFor priorityFor;
     private boolean sicknessSettingValid;
     private ActivityRulesSettingsDTO activityRulesSettings;
