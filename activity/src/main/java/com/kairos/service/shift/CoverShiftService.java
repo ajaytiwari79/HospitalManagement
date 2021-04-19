@@ -128,16 +128,9 @@ public class CoverShiftService {
             Iterator<StaffAdditionalInfoDTO> staffAdditionalInfoDTOIterator = staffAdditionalInfoDTOS.iterator();
             Set<LocalDate> localDates = shiftDataHelper.getPlanningPeriods().stream().flatMap(planningPeriod -> planningPeriod.getLocalDates().stream()).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseMapByDate = phaseService.getPhasesByDates(localDates,shiftDataHelper);
-            List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationByEmploymentIds(staffAdditionalInfoDTOS.stream().map(k->k.getEmployment().getId()).collect(Collectors.toList()), shift.getStartDate(),shift.getEndDate());
-            Map<Long,List<Shift>> shiftsMap=shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId));
-            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap=staffingLevelValidatorService.validateStaffingLevel()
             shiftDataHelper.setPhaseMap(phaseMapByDate);
             while (staffAdditionalInfoDTOIterator.hasNext()){
                 StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoDTOIterator.next();
-                if(checkStaffingLevel(shiftsMap,staffAdditionalInfoDTO,shift)){
-                    staffAdditionalInfoDTOIterator.remove();
-                    continue;
-                }
                 if(shiftDataHelper.getWtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null || shiftDataHelper.getCtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null){
                     staffAdditionalInfoDTOIterator.remove();
                     continue;
@@ -167,10 +160,6 @@ public class CoverShiftService {
             }
 
         }
-    }
-
-    private boolean checkStaffingLevel(Map<Long, List<Shift>> shiftsMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
-
     }
 
     private ShiftDataHelper getShiftDataHelperForCoverShift(CoverShiftSetting coverShiftSetting, Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Set<BigInteger> activityIds, Long countryId, boolean userAccessRole) {
