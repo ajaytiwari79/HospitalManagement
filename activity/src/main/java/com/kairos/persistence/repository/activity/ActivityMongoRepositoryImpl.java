@@ -598,7 +598,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(AppConstants.ID).in(activityIds).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID,
-                        TIME_TYPE1), project().and(AppConstants.ID).as(ACTIVITY_ID)
+                        TIME_TYPE1), project().and(AppConstants.ID).as(ActivityConstants.ACTIVITY_ID)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1));
         AggregationResults<TimeTypeAndActivityIdDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, TimeTypeAndActivityIdDTO.class);
         return result.getMappedResults();
