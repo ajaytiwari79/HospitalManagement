@@ -14,8 +14,10 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamRankingInfoDTO {
+    private Long id;
     private Long teamId;
     private TeamType teamType;
     private BigInteger activityId;
+    private int rank;
     private Integer frequency;
 }

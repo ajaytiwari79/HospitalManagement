@@ -23,16 +23,22 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 public class StaffTeamRankingController {
     @Inject private StaffTeamRankingService staffTeamRankingService;
 
-    @ApiOperation(value = "update a activity_ranking settings")
+    @ApiOperation(value = "update a staff_team_ranking")
     @PutMapping(value = "/staff_team_ranking")
     public ResponseEntity<Map<String, Object>> updateStaffTeamRanking(@RequestBody @Valid StaffTeamRankingDTO staffTeamRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.updateStaffTeamRanking(staffTeamRankingDTO));
     }
 
-    @ApiOperation(value = "published a absence_ranking settings")
+    @ApiOperation(value = "published a staff_team_ranking")
     @PutMapping(value =  "staff/{staffId}/staff_team_ranking/{id}/publish")
     public ResponseEntity<Map<String, Object>> publishStaffTeamRanking(@PathVariable Long staffId, @PathVariable Long id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.publishStaffTeamRanking(id, staffId, publishedDate));
+    }
+
+    @ApiOperation(value = "delete staff_team_ranking")
+    @DeleteMapping(value = "/staff_team_ranking/{id}")
+    public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable Long id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.deleteStaffTeamRanking(id));
     }
 
     @ApiOperation("Get Staff Personalized team ranking")

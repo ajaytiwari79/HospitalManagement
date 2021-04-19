@@ -1015,4 +1015,9 @@ public class StaffService {
     public Long getStaffIdByUserId(Long userId, Long parentOrganizationId) {
         return staffGraphRepository.getStaffIdByUserId(userId, parentOrganizationId);
     }
+
+    public Boolean allowPersonalRanking(Long staffId, boolean canRankTeam) {
+        staffGraphRepository.allowPersonalRanking(staffId, canRankTeam);
+        return true;
+    }
 }

@@ -19,5 +19,6 @@ public class TeamRankingInfo extends UserBaseEntity {
     private Long teamId;
     private TeamType teamType;
     private BigInteger activityId;
+    private int rank;
     private Integer frequency;
 }

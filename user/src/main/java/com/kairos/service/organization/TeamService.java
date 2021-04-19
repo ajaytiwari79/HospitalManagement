@@ -163,8 +163,12 @@ public class TeamService {
                   }
             }
             StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
-            StaffTeamRelationship staffTeamRelationship = isNull(staffTeamRelationShipQueryResult) ? new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType()) :
-                    new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            StaffTeamRelationship staffTeamRelationship;
+            if(isNull(staffTeamRelationShipQueryResult)){
+                staffTeamRelationship = new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType());
+            } else {
+                staffTeamRelationship = new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            }
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
             if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
@@ -178,7 +182,7 @@ public class TeamService {
 //                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
-            staffTeamRankingService.addStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship);
+            staffTeamRankingService.addOrUpdateStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship, staffTeamRelationShipQueryResult);
         }
         return staffTeamDTOs;
     }
