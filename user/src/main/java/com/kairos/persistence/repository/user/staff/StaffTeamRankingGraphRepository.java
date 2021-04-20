@@ -29,9 +29,6 @@ public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<Sta
             "SET teamRankingInfo.activityId={1}")
     void updateActivityIdInTeamRanking(Long teamId, BigInteger activityId);
 
-    @Query("MATCH (staffTeamRanking:StaffTeamRanking) WHERE staffTeamRanking.staffId={0} AND ")
-    StaffTeamRanking getStaffTeamRanking(Long staffId, LocalDate date);
-
     @Query("MATCH (staffTeamRanking:StaffTeamRanking)-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.staffId = {0} AND teamRankingInfo.teamId={1} " +
             "SET teamRankingInfo.teamType={2}")
     void updateTeamType(Long staffId, Long teamId, TeamType newTeamType);

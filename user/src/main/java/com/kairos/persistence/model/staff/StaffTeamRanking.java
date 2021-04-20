@@ -21,11 +21,11 @@ public class StaffTeamRanking extends UserBaseEntity {
     private Set<TeamRankingInfo> teamRankingInfo;
     private Long draftId;
 
-    public StaffTeamRanking(Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo){
+    public StaffTeamRanking(Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo, boolean published){
         this.staffId = staffId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.published = true;
+        this.published = published;
         this.teamRankingInfo = teamRankingInfo;
     }
 }
