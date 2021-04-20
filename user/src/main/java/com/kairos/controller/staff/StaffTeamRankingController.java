@@ -31,8 +31,8 @@ public class StaffTeamRankingController {
 
     @ApiOperation(value = "published a staff_team_ranking")
     @PutMapping(value =  "staff/{staffId}/staff_team_ranking/{id}/publish")
-    public ResponseEntity<Map<String, Object>> publishStaffTeamRanking(@PathVariable Long staffId, @PathVariable Long id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.publishStaffTeamRanking(id, staffId, publishedDate));
+    public ResponseEntity<Map<String, Object>> publishStaffTeamRanking(@PathVariable Long id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.publishStaffTeamRanking(id, publishedDate));
     }
 
     @ApiOperation(value = "delete staff_team_ranking")
@@ -44,8 +44,8 @@ public class StaffTeamRankingController {
     @ApiOperation("Get Staff Personalized team ranking")
     @GetMapping("staff/{staffId}/staff_team_ranking")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffTeamRankings(@PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.getStaffTeamRankings(staffId));
+    public ResponseEntity<Map<String, Object>> getStaffTeamRankings(@PathVariable Long staffId, @RequestParam(value = "includeDraft", required = false) boolean includeDraft) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.getStaffTeamRankings(staffId, includeDraft));
     }
 
 }
