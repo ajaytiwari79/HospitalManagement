@@ -31,7 +31,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
             "MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
             "return et.translations as translations,\n" +
-            "id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories, \n" +
+            "id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories,et.canRankTeam as canRankTeam, \n" +
             "CASE WHEN r IS null THEN et.paymentFrequency ELSE r.paymentFrequency END as paymentFrequency, \n" +
             "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
             "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
