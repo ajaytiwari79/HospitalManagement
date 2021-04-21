@@ -703,7 +703,7 @@ public class OrganizationController {
     @GetMapping(UNIT_URL + "/cta/default-data")
     @ApiOperation("get default data for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(null, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTA(null, unitId));
     }
 
     @GetMapping(UNIT_URL + "/activity-mapping-details")

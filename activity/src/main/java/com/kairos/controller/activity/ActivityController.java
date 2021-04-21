@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.enums.kpermissions.PermissionAction.DELETE;
 
 
@@ -391,5 +392,4 @@ public class ActivityController {
     ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable Long countryId,@PathVariable BigInteger activityId, @RequestParam boolean removeNotes){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity( activityId, removeNotes, countryId));
     }
-
 }

@@ -173,7 +173,7 @@ public class ActivityService {
         return activityMongoRepository.findAllActivityWithCtaWtaSettingByCountry(countryId);
     }
 
-    public List<ActivityCategory> findAllActivityCategoriesByCountry(List<BigInteger> activityCategoriesIds) {
+    public List<ActivityCategory> findAllActivityCategoriesByCountry(Collection<BigInteger> activityCategoriesIds) {
         return activityCategoryRepository.findAllByIdsIn(activityCategoriesIds);
     }
 
