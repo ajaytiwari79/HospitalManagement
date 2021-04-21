@@ -713,5 +713,4 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.allowPersonalRanking(staffId,canRankTeam));
     }
 
-
 }
