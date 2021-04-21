@@ -27,6 +27,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.GdprMessagesConstants.*;
 
 
@@ -368,4 +369,8 @@ public class QuestionnaireTemplateService {
         return true;
     }
 
+    public QuestionnaireTemplateResponseDTO getProcessingActivityQuestionnaireTemplate(Long unitId) {
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateRepository.findPublishedQuestionnaireTemplateByProcessingActivityAndByUnitId(unitId, QuestionnaireTemplateType.PROCESSING_ACTIVITY, QuestionnaireTemplateType.PROCESSING_ACTIVITY, QuestionnaireTemplateStatus.PUBLISHED);
+        return isNull(questionnaireTemplate) ? null : prepareQuestionnaireTemplateResponseData(questionnaireTemplate);
+    }
 }

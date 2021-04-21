@@ -3,6 +3,7 @@ package com.kairos.controller.questionnaire_template;
 
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
+import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -96,6 +97,11 @@ class QuestionnaireTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(unitId, questionnaireTemplateId, true));
     }
 
+    @ApiOperation(value = "get questionnaire template of processing activity")
+    @GetMapping(UNIT_URL + "/processing_activity_questionnaire")
+    public ResponseEntity<Object> getProcessingActivityQuestionnaireTemplate(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, questionnaireTemplateService.getProcessingActivityQuestionnaireTemplate(unitId));
+    }
 
     @ApiOperation(value = "get all questionnaire template of unit ")
     @GetMapping(UNIT_URL + "/questionnaire_template")
