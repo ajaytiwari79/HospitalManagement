@@ -6,9 +6,7 @@ import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.persistence.model.country.default_data.CurrencyDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +14,18 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class CTARuleTemplateDefaultDataWrapper {
-    private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
-    private List<DayTypeDTO> dayTypes=new ArrayList<>();
-    private List<PhaseResponseDTO> phases=new ArrayList<>();
-    private List<TimeTypeDTO> timeTypes=new ArrayList<>();
-    private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
+    @Builder.Default
     private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
-    private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
+    @Builder.Default
     private List<CurrencyDTO>currencies=new ArrayList<>();
+    @Builder.Default
     private List<CountryHolidayCalenderDTO> holidayMapList=new ArrayList<>();
+    @Builder.Default
     private List<FunctionDTO> functions = new ArrayList<FunctionDTO>();
-    List<ActivityCategoryDTO> activityCategories;
+
 
 
 }

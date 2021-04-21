@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,5 +37,5 @@ public interface ActivityCategoryRepository extends MongoRepository<ActivityCate
     boolean existsByNameIgnoreCaseAndDeleted(String name, boolean status );
 
     @Query("{'deleted': false,  _id : {'$in': ?0} }")
-    List<ActivityCategory> findAllByIdsIn(List<BigInteger> activityCategoriesIds);
+    List<ActivityCategory> findAllByIdsIn(Collection<BigInteger> activityCategoriesIds);
 }

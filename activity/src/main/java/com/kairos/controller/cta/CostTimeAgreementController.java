@@ -353,5 +353,18 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCtaRuleTranslations(id,translations));
     }
 
+    @GetMapping(value = COUNTRY_URL+"/cta/default-data")
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTAByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultDataForCTATemplate(countryId,null));
+    }
+
+    @GetMapping(value = UNIT_URL+"/cta/default-data")
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTAByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultDataForCTATemplate(null,unitId));
+    }
+
+
 }
 

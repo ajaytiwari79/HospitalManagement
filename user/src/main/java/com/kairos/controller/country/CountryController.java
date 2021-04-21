@@ -398,7 +398,7 @@ public class CountryController {
     @GetMapping(value = COUNTRY_URL + "/cta/default-data")
     @ApiOperation("get default data for cta rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId, null));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTA(countryId, null));
     }
 
     // API to get Union And Levels

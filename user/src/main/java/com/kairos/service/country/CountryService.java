@@ -10,6 +10,7 @@ import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
@@ -51,6 +52,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -427,39 +429,16 @@ public class CountryService {
         return vehicalGraphRepository.save(vehicleToUpdate);
     }
 
-    /**
-     * @param countryId
-     * @return
-     * @auther anil maurya
-     */
-    //TODO Reduce web service calls/multiple calls
-    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId) {
-        List<ActivityTypeDTO> activityTypeDTOS;
-        List<PhaseResponseDTO> phases;
-        if (Optional.ofNullable(unitId).isPresent()) {
-            countryId = getCountryIdByUnitId(unitId);
-            activityTypeDTOS = activityTypesRestClient.getActivitiesForUnit(unitId);
-            phases = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, API_ALL_PHASES_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {
-            });
-        } else {
-            activityTypeDTOS = activityTypesRestClient.getActivitiesForCountry(countryId);
-            phases = phaseRestClient.getPhases(countryId);
 
+    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTA(Long countryId, Long unitId) {
+        if(isNull(countryId)){
+            countryId = UserContext.getUserDetails().getCountryId();
         }
-        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(ActivityTypeDTO::getCategoryId).collect(Collectors.toSet());
-        List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
         List<CurrencyDTO> currencies = currencyService.getCurrencies(countryId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
-        List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
-        List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayTypeDTO> dayTypes = activityIntegrationService.getDayTypesByCountryId(countryId);
         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
-
-        //wrap data into wrapper class
-        CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper = new CTARuleTemplateDefaultDataWrapper();
         List<EmploymentTypeDTO> employmentTypeDTOS = getEmploymentTypeDTOS(employmentTypes);
-        setDefaultData(countryId, activityTypeDTOS, phases, activityCategories, currencies, timeType, plannedTime, functions, ctaRuleTemplateDefaultDataWrapper, employmentTypeDTOS, dayTypes);
-        return ctaRuleTemplateDefaultDataWrapper;
+        return CTARuleTemplateDefaultDataWrapper.builder().functions(functions).employmentTypes(employmentTypeDTOS).currencies(currencies).build();
     }
 
 
@@ -469,19 +448,6 @@ public class CountryService {
                 BeanUtils.copyProperties(employmentType, employmentTypeDTO);
                 return employmentTypeDTO;
             }).collect(Collectors.toList());
-    }
-
-    private void setDefaultData(Long countryId, List<ActivityTypeDTO> activityTypeDTOS, List<PhaseResponseDTO> phases, List<ActivityCategoryDTO> activityCategories, List<CurrencyDTO> currencies, List<TimeTypeDTO> timeTypes, List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper, List<EmploymentTypeDTO> employmentTypeDTOS, List<DayTypeDTO> dayTypeDTOS) {
-        ctaRuleTemplateDefaultDataWrapper.setDayTypes(dayTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setActivityTypes(activityTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setActivityCategories(activityCategories);
-        ctaRuleTemplateDefaultDataWrapper.setHolidayMapList(this.getAllCountryAllHolidaysByCountryId(countryId));
-        ctaRuleTemplateDefaultDataWrapper.setEmploymentTypes(employmentTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setTimeTypes(timeTypes);
-        ctaRuleTemplateDefaultDataWrapper.setPlannedTime(plannedTime);
-        ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
-        ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
-        ctaRuleTemplateDefaultDataWrapper.setFunctions(functions);
     }
 
     // For getting all OrganizationLevel and Unions

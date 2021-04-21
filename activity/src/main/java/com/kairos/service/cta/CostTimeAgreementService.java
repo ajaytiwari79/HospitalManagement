@@ -1,15 +1,21 @@
 package com.kairos.service.cta;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.cta.*;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
@@ -19,9 +25,11 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -34,15 +42,19 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.PlannedTimeTypeService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,6 +110,9 @@ public class CostTimeAgreementService {
     private DayTypeService dayTypeService;
     @Inject
     private ProtectedDaysOffService protectedDaysOffService;
+    @Inject private PhaseService phaseService;
+    @Inject private TimeTypeService timeTypeService;
+    @Inject private PlannedTimeTypeService plannedTimeTypeService;
 
 
     /**
@@ -817,5 +832,30 @@ public class CostTimeAgreementService {
         }
     }
 
+    public Map<String,Object> getDefaultDataForCTATemplate(Long countryId,Long unitId) {
+        List<ActivityWithCTAWTASettingsDTO> activityTypeDTOS;
+        List<PhaseDTO> phases;
+        if (Optional.ofNullable(unitId).isPresent()) {
+            countryId = UserContext.getUserDetails().getCountryId();
+            activityTypeDTOS = activityService.findAllActivityWithCtaWtaSettingByUnit(unitId);
+            phases = phaseService.getDefaultPhasesByUnit(unitId);
+        } else {
+            activityTypeDTOS = activityService.findAllActivityWithCtaWtaSettingByCountry(countryId);
+            phases = phaseService.getPhasesByCountryId(countryId);
+        }
+        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(ActivityWithCTAWTASettingsDTO::getCategoryId).collect(Collectors.toSet());
+        List<ActivityCategory> activityCategories = activityService.findAllActivityCategoriesByCountry(activityCategoriesIds);
+        List<TimeTypeDTO> timeType = timeTypeService.getAllTimeType(null,countryId);
+        List<PresenceTypeDTO> plannedTime = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
+        Map<String,Object> response = new HashMap();
+        response.put("phases",phases);
+        response.put("dayTypes",dayTypes);
+        response.put("plannedTime",plannedTime);
+        response.put("timeTypes",timeType);
+        response.put("activityTypes",activityTypeDTOS);
+        response.put("activityCategories",activityCategories);
+        return response;
+    }
 }
 
