@@ -186,7 +186,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     @Override
-    public List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates) {
+    public List<PlanningPeriodDTO> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates) {
         Criteria[] criteriaList = new Criteria[localDates.size()];
         int i = 0;
         for (LocalDate localDate : localDates) {
@@ -194,7 +194,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         }
         Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(ACTIVE).is(true).orOperator(criteriaList);
         Query query = new Query(criteria);
-        return mongoTemplate.find(query, PlanningPeriod.class);
+        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
+        return mongoTemplate.find(query, PlanningPeriodDTO.class,"planningPeriod");
     }
 
     @Override

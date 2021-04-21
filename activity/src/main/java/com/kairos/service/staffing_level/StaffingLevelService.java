@@ -466,27 +466,12 @@ public class StaffingLevelService {
                 }
                 presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
                 presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
-                System.out.println(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD));
-                printMap(staffingLevel.getStaffingLevelActivityDetails());
+
             }
             AbsenceStaffingLevelDto absenceStaffingLevelDto = getAbsenceStaffingLevelDto(staffingLevel);
             absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
         }
         return startDate;
-    }
-
-    //todo pradeep will remove it after testing
-    private void printMap(Set<StaffingLevelActivityDetails> staffingLevelActivityDetails) {
-        for (StaffingLevelActivityDetails staffingLevelActivityDetail : staffingLevelActivityDetails) {
-            System.out.println("Activity Id "+staffingLevelActivityDetail.getActivityId());
-            System.out.println("available Count "+staffingLevelActivityDetail.getAvailableCount());
-            System.out.println("remaining "+staffingLevelActivityDetail.getRemainingUnderStaffing());
-            System.out.println("solved "+staffingLevelActivityDetail.getSolvedUnderStaffing());
-            System.out.println("intial "+staffingLevelActivityDetail.getInitialUnderStaffing());
-            System.out.println("overRemaining "+staffingLevelActivityDetail.getRemainingOverStaffing());
-            System.out.println("overSolved "+staffingLevelActivityDetail.getSolvedOverStaffing());
-            System.out.println("overintial "+staffingLevelActivityDetail.getInitialOverStaffing());
-        }
     }
 
     private AbsenceStaffingLevelDto getAbsenceStaffingLevelDto(StaffingLevel staffingLevel) {

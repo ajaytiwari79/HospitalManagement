@@ -4,7 +4,6 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
-import com.kairos.scheduler.queue.producer.KafkaProducer;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +29,6 @@ public class IntegrationJobsExecutorService {
     private UnitGraphRepository unitGraphRepository;
     @Inject private UserSchedulerJobService userSchedulerJobService;
     private static Logger logger = LoggerFactory.getLogger(IntegrationJobsExecutorService.class);
-
-    @Inject
-    private KafkaProducer kafkaProducer;
 
     public void runJob(KairosSchedulerExecutorDTO job) {
         String plainClientCredentials = "cluster:cluster";

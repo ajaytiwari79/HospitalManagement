@@ -946,7 +946,7 @@ public class PlanningPeriodService {
         return planningPeriodDTO;
     }
 
-    public List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates) {
+    public List<PlanningPeriodDTO> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates) {
         return planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId, localDates);
     }
 
