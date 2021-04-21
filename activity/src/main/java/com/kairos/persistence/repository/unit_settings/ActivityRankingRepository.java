@@ -9,10 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
+
 
 @Repository
 public interface ActivityRankingRepository extends MongoBaseRepository<ActivityRanking,BigInteger> {
+
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(Long expertiseId);
 
@@ -24,7 +25,11 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
 
-    List<ActivityRankingDTO> getAbsenceRankingSettingsByDeletedFalse();
+    List<ActivityRankingDTO> getActivityRankingByExpertiseIdAndDeletedFalse(Long expertiseId);
+
+    List<ActivityRankingDTO> getActivityRankingByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
+
+    List<ActivityRankingDTO> getActivityRankingByDeletedFalse();
 
     ActivityRanking findByDraftIdAndDeletedFalse(BigInteger draftId);
 

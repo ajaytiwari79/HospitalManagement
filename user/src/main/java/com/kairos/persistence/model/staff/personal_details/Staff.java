@@ -124,6 +124,7 @@ public class Staff extends UserBaseEntity {
     @Relationship(type = BELONGS_TO_TAGS)
     @KPermissionField
     private List<Tag> tags;
+    private boolean canRankTeam;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
         this.email = email;

@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
@@ -41,8 +42,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, List<Long> unitIds);
 
 
-    @Query("{'deleted':false,'unitId':?2, 'disabled':false, '_id':{'$ne':?3},'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
-    List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(Date startDate, Date endDate, Long unitId,BigInteger shiftId);
+    @Query("{'deleted':false,'unitId':?2, 'disabled':false,'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
+    List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(LocalDate startDate, LocalDate endDate, Long unitI);
 
     List<Shift> findAllByIdInAndDeletedFalseOrderByStartDateAsc(List<BigInteger> shiftIds);
 

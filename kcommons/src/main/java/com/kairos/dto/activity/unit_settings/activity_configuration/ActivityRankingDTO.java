@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.unit_settings.activity_configuration;
 
+import com.kairos.enums.PriorityFor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,9 +21,11 @@ public class ActivityRankingDTO {
     private Set<BigInteger> fullDayActivities=new LinkedHashSet<>();
     private Set<BigInteger> fullWeekActivities=new LinkedHashSet<>();
     private Set<BigInteger> presenceActivities=new LinkedHashSet<>();
-    private Long unitId;
     private Long countryId;
     private boolean published;
+    private Long unitId;
+    private PriorityFor priorityFor;
+
 
     public ActivityRankingDTO(Long expertiseId, LocalDate startDate, LocalDate endDate, Long countryId, boolean published) {
         this.expertiseId = expertiseId;

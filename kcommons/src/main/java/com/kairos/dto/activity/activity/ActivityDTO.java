@@ -63,13 +63,12 @@ public class ActivityDTO implements Serializable {
     private SkillActivityDTO activitySkillSettings;
     @Builder.Default
     private Boolean activityCanBeCopied=false;
-    private ActivityPriorityDTO activityPriority;
+    private Integer ranking;
     private List<ShiftStatus> activityStatus;
     @Builder.Default
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
-    private BigInteger activityPriorityId;
     private int activitySequence;
     private int staffTeamSequence;
     private boolean mainTeam;

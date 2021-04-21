@@ -1,8 +1,11 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelActivityDetails;
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -19,6 +22,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.staffing_level.StaffingLevelValidatorService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +60,7 @@ public class CoverShiftService {
     @Inject private ExceptionService exceptionService;
     @Inject private CoverShiftMongoRepository coverShiftMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private StaffingLevelValidatorService staffingLevelValidatorService;
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
@@ -96,7 +101,7 @@ public class CoverShiftService {
     public List<Staff> getEligibleStaffs(BigInteger shiftId){
         Shift shift = shiftService.findOneByShiftId(shiftId);
         CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(shift.getUnitId());
-        Set<BigInteger> activityIds = getActivityIdsByShift(shift);
+        Set<BigInteger> activityIds = getActivityIdsByShift(Arrays.asList(shift));
         List[] nonProductiveTypeActivityIdsAndAssignedStaffIds = activityService.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
         List<BigInteger> nonProductiveTypeActivityIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[0];
         List<Long> staffIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[1];
@@ -144,7 +149,7 @@ public class CoverShiftService {
                 try {
                     if(isNotNull(data)){
                         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = data.get();
-                        if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())){
+                        if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
                             staffAdditionalInfoDTOS.removeIf(staffAdditionalInfoDTO -> shiftWithViolatedInfoDTO.getShifts().get(0).getStaffId().equals(staffAdditionalInfoDTO.getId()));
                         }
                         withViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
@@ -172,10 +177,12 @@ public class CoverShiftService {
         return shiftDataHelper;
     }
 
-    private Set<BigInteger> getActivityIdsByShift(Shift shift) {
+    private Set<BigInteger> getActivityIdsByShift(List<Shift> shifts) {
         Set<BigInteger> activityIds = new HashSet<>();
-        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-        activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        for(Shift shift:shifts){
+            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        }
         return activityIds;
     }
 
@@ -215,7 +222,8 @@ public class CoverShiftService {
     }
 
     public List<ShiftWithViolatedInfoDTO> assignCoverShiftToStaff(BigInteger id, Long staffId,Long employmentId){
-        CoverShift coverShift= coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(id,staffId);
+        ShiftDTO shift=shiftMongoRepository.findByIdAndDeletedFalse(id);
+        CoverShift coverShift= coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(id,shift.getStaffId());
         if(isNull(coverShift)){
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
         }
@@ -248,13 +256,36 @@ public class CoverShiftService {
 
     }
 
-    public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long staffId) {
+    public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long unitId, Long staffId) {
         List<CoverShift> coverShifts=coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate,endDate);
+        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
         int totalRequests= (int) coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).count();
         int totalInterests= (int) coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).count();
         int totalDeclined= (int) coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).count();
-        int totalEligibleShifts=5;
+        int totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId);
         return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
 
+    }
+
+    public int getEligibleShifts(List<Shift> shifts,  Long unitId,Long staffId){
+//        List<DateTimeInterval> dateTimeIntervals=shifts.stream().filter(k->k.getStaffId().equals(staffId)).map(Shift::getInterval).collect(Collectors.toList());
+//        shifts=shifts.stream().filter(k->!dateTimeIntervals.contains(k.getInterval())).collect(Collectors.toList());
+//        CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(unitId);
+//        Set<BigInteger> activityIds = getActivityIdsByShift(shifts);
+//        List[] nonProductiveTypeActivityIdsAndAssignedStaffIds = activityService.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
+//        List<BigInteger> nonProductiveTypeActivityIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[0];
+//        List<Long> staffIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[1];
+//        if(isCollectionNotEmpty(nonProductiveTypeActivityIds)){
+//            staffIds = new ArrayList<>();
+//        }
+//        List<BigInteger> productiveTypeActivityIds = isCollectionNotEmpty(nonProductiveTypeActivityIds) ? (List<BigInteger>) CollectionUtils.removeAll(activityIds,nonProductiveTypeActivityIds) : new ArrayList<>(activityIds);
+//        Set<Long> notEligibleStaffIdsForCoverShifts = shiftService.getNotEligibleStaffsForCoverShifts(shift.getStartDate(),shift.getEndDate(), coverShiftSetting,staffIds);
+//        Set<Long> employmentTypeIds = coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYMENT_TYPES) ? coverShiftSetting.getEmploymentTypeIds() : new HashSet<>();
+//        Set<Long> tagIds = coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_TAGS) ? coverShiftSetting.getTagIds() : new HashSet<>();
+//        notEligibleStaffIdsForCoverShifts.add(shift.getStaffId());
+//        NotEligibleStaffDataDTO notEligibleStaffDataDTO = new NotEligibleStaffDataDTO(employmentTypeIds,tagIds, notEligibleStaffIdsForCoverShifts,asLocalDate(shift.getStartDate()),new HashSet<>(productiveTypeActivityIds), coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION));
+//        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getEligibleStaffsForCoverShifts(notEligibleStaffDataDTO, coverShiftSetting.getUnitId());
+//        removeStaffWhichHaveWTAViolation(coverShiftSetting,shift,staffAdditionalInfoDTOS,activityIds, UserContext.getUserDetails().getCountryId(),UserContext.getUserDetails().isManagement());
+        return 0;
     }
 }

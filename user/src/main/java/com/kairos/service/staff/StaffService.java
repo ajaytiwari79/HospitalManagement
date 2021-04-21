@@ -967,6 +967,7 @@ public class StaffService {
         staffToUpdate.setCareOfName(staffDTO.getCareOfName());
         staffToUpdate.setSignature(staffDTO.getSignature());
         Long contactId = staffToUpdate.getContactDetail().getId();
+        staffToUpdate.setCanRankTeam(staffDTO.isCanRankTeam());
         staffToUpdate.setContactDetail(ObjectMapperUtils.copyPropertiesByMapper(staffDTO.getContactDetail(), ContactDetail.class));
         staffToUpdate.getContactDetail().setId(contactId);
         staffToUpdate.getUser().setFirstName(staffDTO.getFirstName());
@@ -1013,5 +1014,10 @@ public class StaffService {
 
     public Long getStaffIdByUserId(Long userId, Long parentOrganizationId) {
         return staffGraphRepository.getStaffIdByUserId(userId, parentOrganizationId);
+    }
+
+    public Boolean allowPersonalRanking(Long staffId, boolean canRankTeam) {
+        staffGraphRepository.allowPersonalRanking(staffId, canRankTeam);
+        return true;
     }
 }

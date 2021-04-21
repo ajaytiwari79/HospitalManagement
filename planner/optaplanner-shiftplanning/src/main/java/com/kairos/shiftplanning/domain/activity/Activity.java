@@ -47,7 +47,7 @@ public class Activity {
     private Set<BigInteger> validDayTypeIds;
     private TimeType timeType;
     private int order;
-    private int activityPrioritySequence;
+    private int ranking;
     private List<Long> expertises;
     private Set<Tag> tags;
     private Long teamId;
@@ -64,13 +64,13 @@ public class Activity {
 
 
 
-    public Activity(BigInteger id, List<Skill> skills, String name, TimeType timeType, int order, int activityPrioritySequence, List<Long> expertises, Set<Tag> tags) {
+    public Activity(BigInteger id, List<Skill> skills, String name, TimeType timeType, int order, int ranking, List<Long> expertises, Set<Tag> tags) {
         this.id = id;
         this.skills = skills;
         this.name = name;
         this.timeType=timeType;
         this.order = order;
-        this.activityPrioritySequence = activityPrioritySequence;
+        this.ranking = ranking;
         this.expertises = expertises;
         this.tags = tags;
         this.validDayTypeIds = new HashSet<>();

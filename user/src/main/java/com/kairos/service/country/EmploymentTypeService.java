@@ -124,6 +124,7 @@ public class EmploymentTypeService {
         EmploymentType employmentTypeToCreate = new EmploymentType(null,employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
                 employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency(),employmentTypeDTO.isEditableAtEmployment());
         employmentTypeToCreate.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
+        employmentTypeToCreate.setCanRankTeam(employmentTypeDTO.isCanRankTeam());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
 
@@ -153,6 +154,7 @@ public class EmploymentTypeService {
                 employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency(),
                 employmentTypeDTO.isEditableAtEmployment());
         employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
+        employmentType.setCanRankTeam(employmentTypeDTO.isCanRankTeam());
         return employmentTypeGraphRepository.save(employmentType);
     }
 
@@ -233,7 +235,7 @@ public class EmploymentTypeService {
         return employmentSettingForOrganization;
     }
 
-    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId,String selectedDate) {
+    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(countryGraphRepository.getEmploymentTypeByCountry(countryId,false));
@@ -298,7 +300,6 @@ public class EmploymentTypeService {
             updateTagsDetails(filterValues,staffKpiFilterQueryResult);
             updateHourlyCostDetails(staffKpiFilterQueryResult,filterValues,staffEmploymentTypeDTO.getOrganizationId());
             updateSkillsDetails(filterValues,staffKpiFilterQueryResult);
-            //updateDayTypeDetails(filterValues,staffEmploymentTypeDTO.getOrganizationId(),staffKpiFilterQueryResult);
         }
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(staffKpiFilterQueryResult, StaffKpiFilterDTO.class);
     }
@@ -343,18 +344,6 @@ public class EmploymentTypeService {
             }
         }
     }
-
-
-    //TODO Integrated
-//    private void updateDayTypeDetails(Set<String> filterValues, Long organizationId, List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult) {
-//        if(filterValues.contains(XAxisConfig.VARIABLE_COST.toString())) {
-//            List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeGraphRepository.getDayTypeByOrganizationById(organizationId), DayTypeDTO.class);
-//            for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
-//                kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
-//            }
-//        }
-//    }
-
 
     public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
