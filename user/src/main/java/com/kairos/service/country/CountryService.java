@@ -429,42 +429,7 @@ public class CountryService {
         return vehicalGraphRepository.save(vehicleToUpdate);
     }
 
-    /**
-     * @param countryId
-     * @return
-     * @auther anil maurya
-     */
-    //TODO Reduce web service calls/multiple calls
-    /*public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId) {
-        List<ActivityTypeDTO> activityTypeDTOS;
-        List<PhaseResponseDTO> phases;
-        if (Optional.ofNullable(unitId).isPresent()) {
-            countryId = getCountryIdByUnitId(unitId);
-            activityTypeDTOS = activityTypesRestClient.getActivitiesForUnit(unitId);
-            phases = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, API_ALL_PHASES_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {
-            });
-        } else {
-            activityTypeDTOS = activityTypesRestClient.getActivitiesForCountry(countryId);
-            phases = phaseRestClient.getPhases(countryId);
 
-        }
-        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(ActivityTypeDTO::getCategoryId).collect(Collectors.toSet());
-        List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
-        List<CurrencyDTO> currencies = currencyService.getCurrencies(countryId);
-        List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
-        List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
-        List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayTypeDTO> dayTypes = activityIntegrationService.getDayTypesByCountryId(countryId);
-        List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
-
-        //wrap data into wrapper class
-        CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper = new CTARuleTemplateDefaultDataWrapper();
-        List<EmploymentTypeDTO> employmentTypeDTOS = getEmploymentTypeDTOS(employmentTypes);
-        setDefaultData(countryId, activityTypeDTOS, phases, activityCategories, currencies, timeType, plannedTime, functions, ctaRuleTemplateDefaultDataWrapper, employmentTypeDTOS, dayTypes);
-        return ctaRuleTemplateDefaultDataWrapper;
-    }*/
-
-    //TODO Reduce web service calls/multiple calls
     public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTA(Long countryId, Long unitId) {
         if(isNull(countryId)){
             countryId = UserContext.getUserDetails().getCountryId();
@@ -484,19 +449,6 @@ public class CountryService {
                 return employmentTypeDTO;
             }).collect(Collectors.toList());
     }
-
-    /*private void setDefaultData(Long countryId, List<ActivityTypeDTO> activityTypeDTOS, List<PhaseResponseDTO> phases, List<ActivityCategoryDTO> activityCategories, List<CurrencyDTO> currencies, List<TimeTypeDTO> timeTypes, List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper, List<EmploymentTypeDTO> employmentTypeDTOS, List<DayTypeDTO> dayTypeDTOS) {
-        ctaRuleTemplateDefaultDataWrapper.setDayTypes(dayTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setActivityTypes(activityTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setActivityCategories(activityCategories);
-        ctaRuleTemplateDefaultDataWrapper.setHolidayMapList(this.getAllCountryAllHolidaysByCountryId(countryId));
-        ctaRuleTemplateDefaultDataWrapper.setEmploymentTypes(employmentTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setTimeTypes(timeTypes);
-        ctaRuleTemplateDefaultDataWrapper.setPlannedTime(plannedTime);
-        ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
-        ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
-        ctaRuleTemplateDefaultDataWrapper.setFunctions(functions);
-    }*/
 
     // For getting all OrganizationLevel and Unions
     public OrganizationLevelAndUnionWrapper getUnionAndOrganizationLevels(Long countryId) {
