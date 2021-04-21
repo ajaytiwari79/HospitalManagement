@@ -10,10 +10,8 @@ import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.getHourByMinutes;
 import static com.kairos.commons.utils.DateUtils.getHoursByMinutes;
@@ -22,6 +20,7 @@ import static com.kairos.dto.activity.counter.enums.XAxisConfig.AVERAGE_PER_DAY;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 import static com.kairos.enums.FilterType.EMPLOYMENT_SUB_TYPE;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class ActualTimebankKPIService implements KPIService {
@@ -106,11 +105,12 @@ public class ActualTimebankKPIService implements KPIService {
                 return this;
             }else {
                 List<DailyTimeBankEntry> dailyTimeBankEntries = (List) kpiCalculationRelatedInfo.getEmploymentIdAndDailyTimebankEntryMap().getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
+                Map<LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(DailyTimeBankEntry::getDate, v -> v));
                 if (AVERAGE_PER_DAY.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
-                    actualTimeBankDetails = timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), dailyTimeBankEntries, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate(),null);
+                    actualTimeBankDetails = timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), dateDailyTimeBankEntryMap, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate(),null);
                     actualTimeBankPerDay += Math.round(getHourByMinutes(actualTimeBankDetails) / numberOfDaysInWeekOfAStaff);
                 } else {
-                    actualTimeBankDetails += timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), dailyTimeBankEntries, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate(),null);
+                    actualTimeBankDetails += timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), dateDailyTimeBankEntryMap, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate(),null);
                 }
             }
             return this;

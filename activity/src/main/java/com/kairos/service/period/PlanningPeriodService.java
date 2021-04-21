@@ -85,6 +85,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.PLANNING_PERIOD_NAME;
+import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 
 /**
  * Created by prerna on 6/4/18.
@@ -618,14 +619,12 @@ public class PlanningPeriodService {
 
     public List<PeriodDTO> getPeriodOfInterval(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<PeriodDTO> periodDTOS=planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
-        Set<LocalDateTime> localDateTimes=periodDTOS.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
-        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
+        Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
         if(isCollectionEmpty(periodDTOS)){
             exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         for (PeriodDTO planningPeriod : periodDTOS) {
-            Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
-            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+            if(LocalDate.now().isAfter(planningPeriod.getEndDate())){
                 planningPeriod.setCurrentPhaseName(phase.getName());
                 planningPeriod.setPhaseEnum(phase.getPhaseEnum().toString());
                 planningPeriod.setPhaseColor(phase.getColor());

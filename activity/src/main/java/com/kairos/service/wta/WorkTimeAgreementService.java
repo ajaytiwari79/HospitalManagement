@@ -532,11 +532,8 @@ public class WorkTimeAgreementService{
 
     }
 
-    public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
-        /*List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-        wtaResponseDTOS.addAll();*/
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class);
+    public List<WTAQueryResultDTO> getWTAOfEmployment(Long employmentId) {
+        return wtaRepository.getAllParentWTAByIds(newArrayList(employmentId));
     }
 
 

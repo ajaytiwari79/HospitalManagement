@@ -829,6 +829,12 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_WITH_ACCESS_ROLE, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FunctionsWithUserAccessRoleDTO>>() {
         }, employmentId);
     }
+
+    public StaffEmploymentDetails getEmploymentDetailsOfStaffByEmploymentId(Long unitId, Long employmentId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_EMPLOYMENT_DETAILS_BY_EMPLOYMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
+        }, employmentId);
+    }
 }
 
 

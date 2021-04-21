@@ -481,6 +481,16 @@ public class StaffRetrievalService {
         return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, reasonCodeIds,activityCutOffEndDate);
     }
 
+    public StaffEmploymentDetails getStaffEmploymentDatailsByEmploymentId(Long employmentId, long organizationId) {
+        Unit unit = unitGraphRepository.findOne(organizationId);
+        List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), true);
+        StaffEmploymentDetails employment = isCollectionNotEmpty(employmentDetails) ? employmentDetails.get(0) : null;
+        if (Optional.ofNullable(employment).isPresent()) {
+            employment.setUnitTimeZone(unit.getTimeZone());
+        }
+        return employment;
+    }
+
     /**
      * @param startDate
      * @param staffId
@@ -543,23 +553,6 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), shiftDate));
         }
     }
-
-    //TODO Integrated
-//    private void setReasonCode(Set<Long> reasonCodeIds, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-//        if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
-//            List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(reasonCodeIds);
-//            staffAdditionalInfoDTO.setReasonCodes(copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeDTO.class));
-//        }
-//    }
-//
-//    private List<DayTypeDTO> getDayTypeDTOS(Long countryId) {
-//        List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-//        Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get(DAY_TYPE_ID) != null).collect(Collectors.groupingBy(k -> ((Long) k.get(DAY_TYPE_ID)), Collectors.toList()));
-//        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-//        return dayTypes.stream().map(dayType ->
-//                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
-//        ).collect(Collectors.toList());
-//    }
 
     public void setRequiredDataForShiftCreationInWrapper(StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper, Unit unit, Long countryId, Long expertiseId) {
         staffEmploymentUnitDataWrapper.setUnitTimeZone(unit.getTimeZone());

@@ -296,7 +296,7 @@ public class TimeTypeService {
     }
 
     public List<TimeTypeDTO> getAllTimeType(BigInteger timeTypeId, Long countryId) {
-        List<TimeType> topLevelTimeTypes = timeTypeMongoRepository.getTopLevelTimeType(countryId);
+        List<TimeTypeDTO> topLevelTimeTypes = timeTypeMongoRepository.getTopLevelTimeType(countryId);
         List<TimeTypeDTO> timeTypeDTOS = new ArrayList<>(2);
         TimeTypeDTO workingTimeTypeDTO = new TimeTypeDTO(TimeTypes.WORKING_TYPE.toValue(), AppConstants.WORKING_TYPE_COLOR);
         TimeTypeDTO nonWorkingTimeTypeDTO = new TimeTypeDTO(TimeTypes.NON_WORKING_TYPE.toValue(), AppConstants.NON_WORKING_TYPE_COLOR);
@@ -305,10 +305,10 @@ public class TimeTypeService {
             timeTypeDTOS.add(nonWorkingTimeTypeDTO);
             return timeTypeDTOS;
         }
-        List<TimeType> timeTypes = timeTypeMongoRepository.findAllLowerLevelTimeType(countryId);
+        List<TimeTypeDTO> timeTypes = timeTypeMongoRepository.findAllLowerLevelTimeType(countryId);
         List<TimeTypeDTO> parentOfWorkingTimeType = new ArrayList<>();
         List<TimeTypeDTO> parentOfNonWorkingTimeType = new ArrayList<>();
-        for (TimeType timeType : topLevelTimeTypes) {
+        for (TimeTypeDTO timeType : topLevelTimeTypes) {
             updateChildTimeTypeDetailsBeforeResponse(timeTypeId, timeTypes, parentOfWorkingTimeType, parentOfNonWorkingTimeType, timeType);
         }
         workingTimeTypeDTO.setChildren(parentOfWorkingTimeType);
@@ -318,13 +318,13 @@ public class TimeTypeService {
         return timeTypeDTOS;
     }
 
-    private void updateChildTimeTypeDetailsBeforeResponse(BigInteger timeTypeId, List<TimeType> timeTypes, List<TimeTypeDTO> parentOfWorkingTimeType, List<TimeTypeDTO> parentOfNonWorkingTimeType, TimeType timeType) {
-        TimeTypeDTO timeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
+    private void updateChildTimeTypeDetailsBeforeResponse(BigInteger timeTypeId, List<TimeTypeDTO> timeTypes, List<TimeTypeDTO> parentOfWorkingTimeType, List<TimeTypeDTO> parentOfNonWorkingTimeType, TimeTypeDTO timeType) {
+        TimeTypeDTO timeTypeDTO = timeType;
         timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
         if ( timeType.getId().equals(timeTypeId)) {
             timeTypeDTO.setSelected(true);
         }
-        timeTypeDTO.setTimeTypes(timeType.getTimeTypes().toValue());
+        timeTypeDTO.setTimeTypes(timeType.getTimeTypes());
         timeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
         if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
             parentOfWorkingTimeType.add(timeTypeDTO);
@@ -378,16 +378,16 @@ public class TimeTypeService {
         return timeTypeDTOS;
     }
 
-    private List<TimeTypeDTO> getLowerLevelTimeTypeDTOs(BigInteger timeTypeId, BigInteger upperlevelTimeTypeId, List<TimeType> timeTypes) {
+    private List<TimeTypeDTO> getLowerLevelTimeTypeDTOs(BigInteger timeTypeId, BigInteger upperlevelTimeTypeId, List<TimeTypeDTO> timeTypes) {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
             if (timeType.getUpperLevelTimeTypeId().equals(upperlevelTimeTypeId)) {
-                TimeTypeDTO levelTwoTimeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
+                TimeTypeDTO levelTwoTimeTypeDTO = timeType;
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
                 levelTwoTimeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
-                levelTwoTimeTypeDTO.setTimeTypes(timeType.getTimeTypes().toValue());
+                levelTwoTimeTypeDTO.setTimeTypes(timeType.getTimeTypes());
                 levelTwoTimeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
                 levelTwoTimeTypeDTO.setUpperLevelTimeTypeId(upperlevelTimeTypeId);
                 lowerLevelTimeTypeDTOS.add(levelTwoTimeTypeDTO);

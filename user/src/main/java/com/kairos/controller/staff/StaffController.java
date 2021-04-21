@@ -699,6 +699,14 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getEligibleStaffsForCoverShifts(unitId,notEligibleStaffData));
     }
 
+    @GetMapping(value = "/staff_employment_details/{employmentId}")
+    @ApiOperation("get staff Employement by employmentId")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentDatailsByEmploymentId(@PathVariable long unitId,
+                                                                                     @PathVariable Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDatailsByEmploymentId(employmentId, unitId));
+    }
+
     @PutMapping(value ="/{staffId}/allow_personal_ranking" )
     @ApiOperation("update staff child translation data")
     public ResponseEntity<Map<String, Object>>  allowPersonalRanking(@PathVariable Long staffId,@RequestParam boolean canRankTeam){
