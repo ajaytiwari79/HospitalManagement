@@ -41,7 +41,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -70,7 +69,6 @@ public class TimeTypeService {
     private UserIntegrationService userIntegrationService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject @Lazy private OrganizationActivityService organizationActivityService;
-    @Inject private ExecutorService executorService;
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private ReasonCodeService reasonCodeService;
     @Inject private PhaseService phaseService;

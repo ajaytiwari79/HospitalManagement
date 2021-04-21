@@ -306,7 +306,7 @@ public class PhaseService {
         ZoneId timeZone = ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId));
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Set<LocalDate> localDates = dates.stream().map(localDateTime -> localDateTime.toLocalDate()).collect(Collectors.toSet());
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
+        List<PlanningPeriodDTO> planningPeriods = planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
         Map<Date,Phase> localDatePhaseStatusMap=new HashMap<>();
         Map[] phaseDetailsMap=getPhaseMap(phases);
         Map<BigInteger,Phase> phaseAndIdMap=(Map<BigInteger,Phase>)phaseDetailsMap[0];
@@ -317,10 +317,8 @@ public class PhaseService {
             for (LocalDateTime requestedDate : dates) {
                 Phase phase = null;
                 if (requestedDate.isAfter(untilTentative)) {
-                    Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
-                    if (planningPeriodOptional.isPresent()) {
-                        phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
-                    }
+                    PlanningPeriodDTO planningPeriodOptional = findElementPlanningPeriodByDate(planningPeriods,requestedDate.toLocalDate());
+                    phase = phaseAndIdMap.get(planningPeriodOptional.getCurrentPhaseId());
                 } else {
                     phase = getActualPhaseApplicableForDate(requestedDate, phaseMap, untilTentative, timeZone);
                 }
@@ -347,22 +345,43 @@ public class PhaseService {
         while (!startDate.isAfter(endDate)){
             Phase phase = null;
             LocalDateTime requestedDate = asLocalDateTime(startDate);
-            Optional<PlanningPeriodDTO> planningPeriodOptional = planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
+            PlanningPeriodDTO planningPeriodOptional = findElementPlanningPeriodByDate(planningPeriods,requestedDate.toLocalDate());//planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
             if (requestedDate.isAfter(untilTentative)) {
-                if (planningPeriodOptional.isPresent()) {
-                    phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
-                }
+                //if (planningPeriodOptional.isPresent()) {
+                    phase = phaseAndIdMap.get(planningPeriodOptional.getCurrentPhaseId());
+                //}
             } else {
                 phase = getActualPhaseApplicableForDate(requestedDate, phaseMap, untilTentative, timeZone);
             }
-            if (isNull(phase) || !planningPeriodOptional.isPresent()) {
+            if (isNull(phase)) {
                 exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE, unitId, requestedDate);
             }
-            publishEmployementType.put(startDate,planningPeriodOptional.get().getPublishEmploymentIds().contains(employementTypeId));
+            publishEmployementType.put(startDate,planningPeriodOptional.getPublishEmploymentIds().contains(employementTypeId));
             localDatePhaseStatusMap.put(asDate(requestedDate), phase);
             startDate = startDate.plusDays(1);
         }
         return new Map[]{localDatePhaseStatusMap,publishEmployementType};
+    }
+
+    private PlanningPeriodDTO findElementPlanningPeriodByDate(List<PlanningPeriodDTO> planningPeriodDTOS,LocalDate localDate){
+        int left = 0, right = planningPeriodDTOS.size() - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            // Check if x is present at mid
+            if (planningPeriodDTOS.get(mid).contains(localDate)) {
+                return planningPeriodDTOS.get(mid);
+            }
+            // If x greater, ignore left half
+            if (planningPeriodDTOS.get(mid).getEndDate().isBefore(localDate)) {
+                left = mid + 1;
+            }
+            // If x is smaller, ignore right half
+            else {
+                right = mid - 1;
+            }
+        }
+        exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE, UserContext.getUserDetails().getLastSelectedOrganizationId(), localDate);
+        return null;
     }
 
     //Please Use this method For Future dates

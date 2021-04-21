@@ -15,7 +15,6 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
-import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.scheduler.SchedulerToUserQueueService;
@@ -47,8 +46,6 @@ public class EmploymentJobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
-    @Inject
-    private KafkaProducer kafkaProducer;
     @Inject
     private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
     @Inject

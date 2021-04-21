@@ -30,7 +30,7 @@ public interface CustomPlanningPeriodMongoRepository {
     PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate);
     Phase getCurrentPhaseByDateUsingPlanningPeriod(Long unitId, LocalDate date);
     PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId);
-    List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
+    List<PlanningPeriodDTO> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
     List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate, Date requestedEndDate);
     List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
     PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId);

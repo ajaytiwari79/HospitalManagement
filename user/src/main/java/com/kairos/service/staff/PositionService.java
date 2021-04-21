@@ -40,7 +40,6 @@ import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepositor
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.rest_client.priority_group.GenericRestClient;
-import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -117,8 +116,6 @@ public class PositionService {
     private ExceptionService exceptionService;
     @Inject
     private UserGraphRepository userGraphRepository;
-    @Inject
-    private KafkaProducer kafkaProducer;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject

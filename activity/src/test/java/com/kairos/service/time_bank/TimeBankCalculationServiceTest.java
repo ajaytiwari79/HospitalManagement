@@ -254,7 +254,6 @@ public class TimeBankCalculationServiceTest {
                     } catch (IOException e) {
                         logger.error(e.getMessage());
                     }
-                    System.out.println(key);
                 }
             });
             bufferedWriter.close();
