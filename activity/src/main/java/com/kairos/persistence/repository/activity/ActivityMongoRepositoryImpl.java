@@ -758,7 +758,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return Aggregation.newAggregation(
                     match(criteria),
                     lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
-                    lookup(ACTIVITIES, UNDERSCORE_ID, CHILD_ACTIVITY_IDS, PARENT_ACTIVITY),
+                    lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID,PARENT_ACTIVITY),
                     project(AppConstants.ID, NAME, GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,
                             PHASE_SETTINGS_ACTIVITY_TAB,
                             BALANCE_SETTINGS_ACTIVITY_TAB,
