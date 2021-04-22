@@ -464,20 +464,6 @@ public class UserIntegrationService {
         });
     }
 
-//    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-//        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, GET_WTA_TEMPLATE_DEFAULT_DATA_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
-//        });
-//    }
-
-//    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId() {
-//        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
-//        });
-//    }
-
-    public List<TimeSlotDTO> getDefaultTimeSlot(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/get_default_timeSlot", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {
-        });
-    }
 
     //OrganizationRestClient
     public OrganizationDTO getOrganization() {

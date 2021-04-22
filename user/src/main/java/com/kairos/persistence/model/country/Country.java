@@ -47,14 +47,6 @@ public class Country extends UserBaseEntity {
     @NotBlank(message = "error.Country.code.notEmpty")
     private String code;
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     @Relationship(type = COUNTRY_HAS_TAG)
     private List<Tag> tags;
 

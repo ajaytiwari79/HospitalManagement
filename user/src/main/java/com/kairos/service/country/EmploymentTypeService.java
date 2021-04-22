@@ -353,7 +353,7 @@ public class EmploymentTypeService {
 
     public DefaultKpiDataDTO getKpiFilterDefaultData(Long unitId) {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        Long staffId =staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
+        Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
         List<TagQueryResult> tags = new ArrayList<>();
         if(isNotNull(unitId)){
             Long organizationId = organizationBaseRepository.findParentOrgId(unitId);
@@ -361,7 +361,7 @@ public class EmploymentTypeService {
         }
         List<com.kairos.dto.user.country.tag.TagDTO> tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags,com.kairos.dto.user.country.tag.TagDTO.class);
         List<OrganizationCommonDTO>  organizationCommonDTO=ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getAllOrganizaionByStaffid(staffId),OrganizationCommonDTO.class);
-        List<Long> unitIds=organizationCommonDTO.stream().map(organizationCommonDto -> organizationCommonDto.getId()).collect(Collectors.toList());
+        List<Long> unitIds=organizationCommonDTO.stream().map(OrganizationCommonDTO::getId).collect(Collectors.toList());
         List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(countryGraphRepository.getEmploymentTypes(countryId,false),EmploymentTypeKpiDTO.class);
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffGraphRepository.getAllStaffIdAndNameByUnitId(isNull(staffId)?Arrays.asList(unitId):unitIds), StaffKpiFilterDTO.class);
         return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, new ArrayList<>(),organizationCommonDTO,employmentTypeKpiDTOS,tagDTOS);
