@@ -104,7 +104,7 @@ public class ActivityRankingService {
         activityRanking.setPublished(true);
         activityRanking.setStartDate(publishedDate); // changing
         ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
-        ActivityRanking lastAbsenceRanking = activityRankingRepository.findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(activityRanking.getExpertiseId());
+        ActivityRanking lastAbsenceRanking = activityRankingRepository.findTopByExpertiseIdAndDeletedFalseAndPublishedTrueOrderByStartDateDesc(activityRanking.getExpertiseId());
         boolean onGoingUpdated = false;
         if (lastAbsenceRanking != null && publishedDate.isAfter(lastAbsenceRanking.getStartDate()) && lastAbsenceRanking.getEndDate() == null) {
             lastAbsenceRanking.setEndDate(publishedDate.minusDays(1));

@@ -33,7 +33,7 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     ActivityRanking findByDraftIdAndDeletedFalse(BigInteger draftId);
 
-    ActivityRanking findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(Long expertiseId);
+    ActivityRanking findTopByExpertiseIdAndDeletedFalseAndPublishedTrueOrderByStartDateDesc(Long expertiseId);
 
     List<ActivityRanking> getActivityRankingSettingsByUnitIdAndDeletedFalse(Long unitId);
 
