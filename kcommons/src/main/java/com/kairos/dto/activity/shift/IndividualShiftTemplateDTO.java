@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
 
 @Getter
 @Setter
-public class IndividualShiftTemplateDTO {
+public class IndividualShiftTemplateDTO implements Serializable {
     private BigInteger id;
     private String name;
     private String remarks;

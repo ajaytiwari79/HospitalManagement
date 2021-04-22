@@ -78,7 +78,7 @@ public class ActivityRankingService {
     }
 
     public boolean deleteAbsenceRankingSettings(BigInteger id){
-        ActivityRanking activityRanking = activityRankingRepository.findOne(id);
+        ActivityRanking activityRanking = activityRankingRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
         if(activityRanking.isPublished()){
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED);
         }

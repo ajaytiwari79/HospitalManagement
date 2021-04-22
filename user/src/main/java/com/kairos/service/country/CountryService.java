@@ -1,17 +1,14 @@
 package com.kairos.service.country;
 
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.LevelDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.*;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
@@ -43,7 +40,6 @@ import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +49,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -173,111 +168,10 @@ public class CountryService {
         return FormatUtil.formatNeoResponse(countryGraphRepository.findAllCountriesMinimum());
     }
 
-
-    //TODO already moved to activity
-//    public List<Object> getAllCountryHolidaysByCountryIdAndYear(int year, Long countryId) {
-//        Long start = new DateTime().withYear(year).withDayOfYear(1).getMillis();
-//        List<Object> objectList = new ArrayList<>();
-//        Long end;
-//        GregorianCalendar cal = new GregorianCalendar();
-//        if (cal.isLeapYear(year)) {
-//            logger.info("Leap Year found");
-//            end = new DateTime().withYear(year).withDayOfYear(366).getMillis();
-//        } else {
-//            logger.info("No Leap Year found");
-//            end = new DateTime().withYear(year).withDayOfYear(365).getMillis();
-//        }
-//        logger.info("Year Start:{}  Year end:{}" , start , end);
-//        List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidaysByYear(countryId, start, end);
-//        if (!data.isEmpty()) {
-//            for (Map<String, Object> map : data) {
-//                Object o = map.get("result");
-//                objectList.add(o);
-//            }
-//        }
-//
-//
-//        return objectList;
-//    }
-
-
-//    private void fetchHolidaysFromGoogleCalender(Long countryId) {
-//        List<CountryHolidayCalender> calenderList = new ArrayList<>();
-//        Country country = countryGraphRepository.findOne(countryId, 2);
-//        if (country == null) {
-//            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-//
-//        }
-//        try {
-//            List<Event> eventList = CountryCalenderService.getEventsFromGoogleCalender();
-//            if (eventList != null) {
-//                logger.info("No. of Events received are: {}" , eventList.size());
-//            }
-//            CountryHolidayCalender holidayCalender = null;
-//            for (Event event : eventList) {
-//                holidayCalender = new CountryHolidayCalender();
-//                holidayCalender.setHolidayTitle(event.getSummary() != null ? event.getSummary() : "");
-//                holidayCalender.setHolidayDate(DateUtils.asLocalDate(DateTime.parse(event.getStart().get("date").toString()).getMillis()));
-//                holidayCalender.setHolidayType(event.getVisibility() != null ? event.getSummary() : "");
-//                holidayCalender.setGoogleCalId(event.getId());
-//                validateAndSaveHolidayCalender(countryId, calenderList, country, holidayCalender, event);
-//            }
-//        } catch (Exception e) {
-//            logger.info("Exception occured: {}" , e.getCause());
-//            logger.error(e.getMessage());
-//        }
-//
-//    }
-
-//    private void validateAndSaveHolidayCalender(Long countryId, List<CountryHolidayCalender> calenderList, Country country, CountryHolidayCalender holidayCalender, Event event) {
-//        if (countryHolidayGraphRepository.checkIfHolidayExist(event.getId(), countryId) > 0) {
-//            logger.info("Duplicate Holiday");
-//        } else {
-//            logger.info("Unique Holiday");
-//            holidayCalender.setGoogleCalId(event.getId());
-//            calenderList.add(holidayCalender);
-//        }
-//
-//        // Setting holiday to Country
-//        if (country.getCountryHolidayCalenderList() == null) {
-//            logger.info("Adding holidays");
-//            country.setCountryHolidayCalenderList(calenderList);
-//        } else {
-//            logger.info("Adding holidays again");
-//            List<CountryHolidayCalender> currentHolidayList = country.getCountryHolidayCalenderList();
-//            currentHolidayList.addAll(calenderList);
-//            country.setCountryHolidayCalenderList(currentHolidayList);
-//        }
-//        countryGraphRepository.save(country);
-//    }
-
-
     public List<CountryHolidayCalenderDTO> getAllCountryAllHolidaysByCountryId(Long countryId) {
        return activityIntegrationService.getCountryHolidaysByCountryId(countryId);
 
     }
-
-//    public List<Map<String, Object>> getAllUnitAllHolidaysByUnitId(Long unitId) {
-//        return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryGraphRepository.getCountryIdByUnitId(unitId)));
-//
-//    }
-
-//    public boolean triggerGoogleCalenderService(Long countryId) {
-//        try {
-//
-//            if (DateTime.now().getYear() == 2017) {
-//                logger.info("Running google service in 2017");
-//                fetchHolidaysFromGoogleCalender(countryId);
-//                return true;
-//            }
-//
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//        }
-//        return false;
-//
-//
-//    }
 
     public List<Map> getCountryNameAndCodeList() {
         return countryGraphRepository.getCountryNameAndCodeList();

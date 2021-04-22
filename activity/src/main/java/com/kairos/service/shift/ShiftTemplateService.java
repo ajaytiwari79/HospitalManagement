@@ -12,6 +12,8 @@ import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,14 +44,10 @@ public class ShiftTemplateService{
     private ActivityMongoRepository activityMongoRepository;
 
 
+    @CacheEvict(value = "getAllShiftTemplates", key = "#unitId")
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO) {
-
-        //Check for activity is absence type or not
-        Set<BigInteger> activityIds = shiftTemplateDTO.getShiftList().stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
-
         //Check for validating duplicate by name
-        boolean alreadyExistsByName = shiftTemplateRepository.
-                existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(), unitId, UserContext.getUserDetails().getId());
+        boolean alreadyExistsByName = shiftTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(), unitId, UserContext.getUserDetails().getId());
         if (alreadyExistsByName) {
             exceptionService.duplicateDataException(MESSAGE_SHIFTTEMPLATE_EXISTS, shiftTemplateDTO.getName());
         }
@@ -72,15 +70,15 @@ public class ShiftTemplateService{
         return shiftTemplateDTO;
     }
 
+    @Cacheable(value = "getAllShiftTemplates", key = "#unitId", cacheManager = "cacheManager")
     public List<ShiftTemplateDTO> getAllShiftTemplates(Long unitId) {
-        List<ShiftTemplate> shiftTemplates = shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId, UserContext.getUserDetails().getId());
-        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftTemplates, ShiftTemplateDTO.class);
+        List<ShiftTemplateDTO> shiftTemplates = shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId, UserContext.getUserDetails().getId());
         Set<BigInteger> individualShiftTemplateIds = shiftTemplates.stream().flatMap(e -> e.getIndividualShiftTemplateIds().stream()).collect(Collectors.toSet());
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         Set<BigInteger> activityIds = individualShiftTemplateDTOS.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
         Map<BigInteger, String> timeTypeMap = activityMongoRepository.findAllTimeTypeByActivityIds(activityIds).stream().collect(Collectors.toMap(k -> k.getActivityId(), v -> v.getTimeType()));
         Map<BigInteger, IndividualShiftTemplateDTO> individualShiftTemplateDTOMap = individualShiftTemplateDTOS.stream().collect(Collectors.toMap(IndividualShiftTemplateDTO::getId, Function.identity()));
-        shiftTemplateDTOS.forEach(shiftTemplateDTO -> {
+        shiftTemplates.forEach(shiftTemplateDTO -> {
             shiftTemplateDTO.getIndividualShiftTemplateIds().forEach(individualShiftTemplateId -> {
                 IndividualShiftTemplateDTO individualShiftTemplateDTO = individualShiftTemplateDTOMap.get(individualShiftTemplateId);
                 individualShiftTemplateDTO.getActivities().forEach(shiftActivity -> {
@@ -89,9 +87,10 @@ public class ShiftTemplateService{
                 shiftTemplateDTO.getShiftList().add(individualShiftTemplateDTO);
             });
         });
-        return shiftTemplateDTOS;
+        return shiftTemplates;
     }
 
+    @CacheEvict(value = "getAllShiftTemplates", key = "#unitId")
     public ShiftTemplateDTO updateShiftTemplate(Long unitId, BigInteger shiftTemplateId, ShiftTemplateDTO shiftTemplateDTO) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
@@ -107,7 +106,8 @@ public class ShiftTemplateService{
         return shiftTemplateDTO;
     }
 
-    public boolean deleteShiftTemplate(BigInteger shiftTemplateId) {
+    @CacheEvict(value = "getAllShiftTemplates", key = "#unitId")
+    public boolean deleteShiftTemplate(BigInteger shiftTemplateId, Long unitId) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_SHIFTTEMPLATE_ABSENT, shiftTemplateId);
@@ -120,9 +120,9 @@ public class ShiftTemplateService{
         shiftTemplate.setDeleted(true);
         shiftTemplateRepository.save(shiftTemplate);
         return true;
-
     }
 
+    @CacheEvict(value = "getAllShiftTemplates", key = "#unitId")
     public IndividualShiftTemplateDTO updateIndividualShiftTemplate(BigInteger individualShiftTemplateId, IndividualShiftTemplateDTO individualShiftTemplateDTO) {
         Optional<IndividualShiftTemplate> shiftDayTemplate = individualShiftTemplateRepository.findById(individualShiftTemplateId);
         if (!shiftDayTemplate.isPresent() || shiftDayTemplate.get().isDeleted()) {
@@ -135,6 +135,7 @@ public class ShiftTemplateService{
         return individualShiftTemplateDTO;
     }
 
+    @CacheEvict(value = "getAllShiftTemplates", key = "#unitId")
     public IndividualShiftTemplateDTO addIndividualShiftTemplate(BigInteger shiftTemplateId, IndividualShiftTemplateDTO individualShiftTemplateDTO) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
@@ -148,6 +149,7 @@ public class ShiftTemplateService{
         return individualShiftTemplateDTO;
     }
 
+    @CacheEvict(value = "getAllShiftTemplates", key = "#unitId")
     public boolean deleteIndividualShiftTemplate(BigInteger shiftTemplateId, BigInteger individualShiftTemplateId) {
         IndividualShiftTemplate individualShiftTemplate = individualShiftTemplateRepository.findOneById(individualShiftTemplateId);
         if (!Optional.ofNullable(individualShiftTemplate).isPresent()) {

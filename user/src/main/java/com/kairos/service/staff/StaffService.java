@@ -232,25 +232,7 @@ public class StaffService {
     public StaffDTO savePersonalDetail(long staffId, StaffDTO staffDTO, long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
-
-        Staff staffToUpdate = staffGraphRepository.findOne(staffId);
-        if (StaffStatusEnum.ACTIVE.equals(staffDTO.getCurrentStatus()) && StringUtils.isBlank(staffDTO.getUserName())) {
-            exceptionService.dataNotFoundByIdException(ERROR_STAFF_USERNAME_NOTNULL);
-        }
-        if (staffToUpdate == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
-        }
-        if (isNotNull(staffToUpdate) && isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffDTO.getContactDetail().getPrivateEmail())) {
-            if (staffGraphRepository.findStaffByEmailIdInOrganization(staffDTO.getContactDetail().getPrivateEmail(), parentUnit.getId()) != null) {
-                exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", staffDTO.getContactDetail().getPrivateEmail());
-            }
-        }
-        if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffDTO.getCurrentStatus())) {
-            exceptionService.actionNotPermittedException(MESSAGE_EMPLOY_NOTCONVERT_FICTIVE);
-        }
-        if(!validTeamDetails(staffDTO.getTeams())){
-            exceptionService.actionNotPermittedException(MESSAGE_TEAM_DETAIL_NOT_VALID);
-        }
+        Staff staffToUpdate = findAndValidateStaff(staffId, staffDTO, parentUnit);
         //todo we might create a job to inactive user from particular date
         if (StaffStatusEnum.INACTIVE.equals(staffDTO.getCurrentStatus())) {
             redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
@@ -287,6 +269,27 @@ public class StaffService {
         staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         teamService.assignStaffInTeams(staff, staffDTO.getTeams(), unitId);
         return staffRetrievalService.getPersonalInfo(staffId, unitId);
+    }
+    private Staff findAndValidateStaff(long staffId, StaffDTO staffDTO, Organization parentUnit) {
+        Staff staffToUpdate = staffGraphRepository.findOne(staffId);
+        if (StaffStatusEnum.ACTIVE.equals(staffDTO.getCurrentStatus()) && StringUtils.isBlank(staffDTO.getUserName())) {
+            exceptionService.dataNotFoundByIdException(ERROR_STAFF_USERNAME_NOTNULL);
+        }
+        if (staffToUpdate == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
+        }
+        if (isNotNull(staffToUpdate) && isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffDTO.getContactDetail().getPrivateEmail())) {
+            if (staffGraphRepository.findStaffByEmailIdInOrganization(staffDTO.getContactDetail().getPrivateEmail(), parentUnit.getId()) != null) {
+                exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", staffDTO.getContactDetail().getPrivateEmail());
+            }
+        }
+        if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffDTO.getCurrentStatus())) {
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOY_NOTCONVERT_FICTIVE);
+        }
+        if(!validTeamDetails(staffDTO.getTeams())){
+            exceptionService.actionNotPermittedException(MESSAGE_TEAM_DETAIL_NOT_VALID);
+        }
+        return staffToUpdate;
     }
 
     private boolean validTeamDetails(List<TeamDTO> teams) {
@@ -405,6 +408,11 @@ public class StaffService {
         staffUploadBySheetQueryResult.setStaffList(staffList);
         Organization organization = organizationService.fetchParentOrganization(unitId);
         Random random = new Random();
+        if (addStaff(unitId, multipartFile, accessGroupId, staffList, staffErrorList, staffUploadBySheetQueryResult, organization, random))
+            return staffUploadBySheetQueryResult;
+        return staffUploadBySheetQueryResult;
+    }
+    private boolean addStaff(Long unitId, MultipartFile multipartFile, Long accessGroupId, List<StaffDTO> staffList, List<StaffDTO> staffErrorList, StaffUploadBySheetQueryResult staffUploadBySheetQueryResult, Organization organization, Random random) {
         try (InputStream stream = multipartFile.getInputStream()) {
             //Get the workbook instance for XLS file
             XSSFWorkbook workbook = new XSSFWorkbook(stream);
@@ -441,7 +449,6 @@ public class StaffService {
                     staffDTO.setFirstName(firstName);
                     staffDTO.setLastName(lastName);
                     staffDTO.setErrorMessage("Missing field(s) : " + StringUtils.join(missingMandatoryFields, ", "));
-
                     if (isNotNull(cprAsLong)) {
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
                     }
@@ -453,11 +460,11 @@ public class StaffService {
             if (isCollectionNotEmpty(staffList)) {
                 activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())), unitId);
             }
-            return staffUploadBySheetQueryResult;
+            return true;
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
         }
-        return staffUploadBySheetQueryResult;
+        return false;
     }
 
     private String getUserName(List<StaffDTO> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName, Random rand) {
