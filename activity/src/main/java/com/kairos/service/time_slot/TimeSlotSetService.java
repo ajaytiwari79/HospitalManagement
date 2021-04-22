@@ -203,9 +203,9 @@ public class TimeSlotSetService {
 
     public List<TimeSlotDTO> getDefaultTimeSlot() {
         List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
-        timeSlotDTOS.add(new TimeSlotDTO(DAY, DAY_START_HOUR, 00, DAY_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(EVENING, EVENING_START_HOUR, 00, EVENING_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(NIGHT, NIGHT_START_HOUR, 00, NIGHT_END_HOUR, 00));
+        timeSlotDTOS.add(new TimeSlotDTO(DAY, DAY_START_HOUR, 0, DAY_END_HOUR, 0));
+        timeSlotDTOS.add(new TimeSlotDTO(EVENING, EVENING_START_HOUR, 0, EVENING_END_HOUR, 0));
+        timeSlotDTOS.add(new TimeSlotDTO(NIGHT, NIGHT_START_HOUR, 0, NIGHT_END_HOUR, 0));
         return timeSlotDTOS;
     }
 

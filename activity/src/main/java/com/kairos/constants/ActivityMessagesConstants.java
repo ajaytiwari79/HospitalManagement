@@ -10,6 +10,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY = "activity";
     public static final String ACTION = "action";
     public static final String EXCEPTION_INVALIDREQUEST = "exception.invalidRequest";
+    public static final String EXCEPTION_INVALID_USER  ="exception.invalidUser";
     public static final String EXCEPTION_ALREADYINUSE = "exception.alreadyInUse";
     public static final String ERROR_WTA_INVALID  = "error.wta.invalid";
     public static final String PRIORITY_GROUP = "priority-group";

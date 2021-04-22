@@ -68,9 +68,6 @@ public class CountryService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private UnitGraphRepository unitGraphRepository;
-    @Inject
-    private
-    OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Inject
     CurrencyService currencyService;
     private @Inject
@@ -97,13 +94,8 @@ public class CountryService {
     private GenericRestClient genericRestClient;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
-    @Inject
-    private PermissionService permissionService;
 
-    /**
-     * @param country
-     * @return
-     */
+
     public Map<String, Object> createCountry(Country country) {
         String name = "(?i)" + country.getName();
         List<Country> countryFound = countryGraphRepository.checkDuplicateCountry(name);
@@ -118,10 +110,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param id
-     * @return
-     */
+
     public CountryDTO getCountryById(Long id) {
         Country country = findById(id);
         CountryDTO countryDTO = new CountryDTO(country.getId(), country.getName());
@@ -131,10 +120,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param country
-     * @return
-     */
+
     public Map<String, Object> updateCountry(Country country) {
         List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry("(?i)" + country.getName(), country.getId());
         if (!duplicateCountryList.isEmpty()) {
@@ -150,9 +136,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param id
-     */
+
     public boolean deleteCountry(Long id) {
         Country currentCountry = countryGraphRepository.findOne(id);
         if (currentCountry != null) {
@@ -163,119 +147,15 @@ public class CountryService {
         return false;
     }
 
-
-    /**
-     * @return
-     */
     public List<Map<String, Object>> getAllCountries() {
         return FormatUtil.formatNeoResponse(countryGraphRepository.findAllCountriesMinimum());
     }
-
-
-    //TODO already moved to activity
-//    public List<Object> getAllCountryHolidaysByCountryIdAndYear(int year, Long countryId) {
-//        Long start = new DateTime().withYear(year).withDayOfYear(1).getMillis();
-//        List<Object> objectList = new ArrayList<>();
-//        Long end;
-//        GregorianCalendar cal = new GregorianCalendar();
-//        if (cal.isLeapYear(year)) {
-//            logger.info("Leap Year found");
-//            end = new DateTime().withYear(year).withDayOfYear(366).getMillis();
-//        } else {
-//            logger.info("No Leap Year found");
-//            end = new DateTime().withYear(year).withDayOfYear(365).getMillis();
-//        }
-//        logger.info("Year Start:{}  Year end:{}" , start , end);
-//        List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidaysByYear(countryId, start, end);
-//        if (!data.isEmpty()) {
-//            for (Map<String, Object> map : data) {
-//                Object o = map.get("result");
-//                objectList.add(o);
-//            }
-//        }
-//
-//
-//        return objectList;
-//    }
-
-
-//    private void fetchHolidaysFromGoogleCalender(Long countryId) {
-//        List<CountryHolidayCalender> calenderList = new ArrayList<>();
-//        Country country = countryGraphRepository.findOne(countryId, 2);
-//        if (country == null) {
-//            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-//
-//        }
-//        try {
-//            List<Event> eventList = CountryCalenderService.getEventsFromGoogleCalender();
-//            if (eventList != null) {
-//                logger.info("No. of Events received are: {}" , eventList.size());
-//            }
-//            CountryHolidayCalender holidayCalender = null;
-//            for (Event event : eventList) {
-//                holidayCalender = new CountryHolidayCalender();
-//                holidayCalender.setHolidayTitle(event.getSummary() != null ? event.getSummary() : "");
-//                holidayCalender.setHolidayDate(DateUtils.asLocalDate(DateTime.parse(event.getStart().get("date").toString()).getMillis()));
-//                holidayCalender.setHolidayType(event.getVisibility() != null ? event.getSummary() : "");
-//                holidayCalender.setGoogleCalId(event.getId());
-//                validateAndSaveHolidayCalender(countryId, calenderList, country, holidayCalender, event);
-//            }
-//        } catch (Exception e) {
-//            logger.info("Exception occured: {}" , e.getCause());
-//            logger.error(e.getMessage());
-//        }
-//
-//    }
-
-//    private void validateAndSaveHolidayCalender(Long countryId, List<CountryHolidayCalender> calenderList, Country country, CountryHolidayCalender holidayCalender, Event event) {
-//        if (countryHolidayGraphRepository.checkIfHolidayExist(event.getId(), countryId) > 0) {
-//            logger.info("Duplicate Holiday");
-//        } else {
-//            logger.info("Unique Holiday");
-//            holidayCalender.setGoogleCalId(event.getId());
-//            calenderList.add(holidayCalender);
-//        }
-//
-//        // Setting holiday to Country
-//        if (country.getCountryHolidayCalenderList() == null) {
-//            logger.info("Adding holidays");
-//            country.setCountryHolidayCalenderList(calenderList);
-//        } else {
-//            logger.info("Adding holidays again");
-//            List<CountryHolidayCalender> currentHolidayList = country.getCountryHolidayCalenderList();
-//            currentHolidayList.addAll(calenderList);
-//            country.setCountryHolidayCalenderList(currentHolidayList);
-//        }
-//        countryGraphRepository.save(country);
-//    }
-
 
     public List<CountryHolidayCalenderDTO> getAllCountryAllHolidaysByCountryId(Long countryId) {
        return activityIntegrationService.getCountryHolidaysByCountryId(countryId);
 
     }
 
-//    public List<Map<String, Object>> getAllUnitAllHolidaysByUnitId(Long unitId) {
-//        return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryGraphRepository.getCountryIdByUnitId(unitId)));
-//
-//    }
-
-//    public boolean triggerGoogleCalenderService(Long countryId) {
-//        try {
-//
-//            if (DateTime.now().getYear() == 2017) {
-//                logger.info("Running google service in 2017");
-//                fetchHolidaysFromGoogleCalender(countryId);
-//                return true;
-//            }
-//
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//        }
-//        return false;
-//
-//
-//    }
 
     public List<Map> getCountryNameAndCodeList() {
         return countryGraphRepository.getCountryNameAndCodeList();
@@ -324,11 +204,7 @@ public class CountryService {
 
     public List<LevelDTO> getLevels(long countryId) {
         List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
-        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
-//        for(LevelDTO level :levelDTOS){
-//            level.setTranslations(level.getTranslatedData());
-//        }
-        return levelDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
     }
 
     public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
@@ -489,15 +365,6 @@ public class CountryService {
         List<UnionQueryResult> unions = unitGraphRepository.findAllUnionsByCountryId(countryId);
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         return new OrganizationLevelAndUnionWrapper(unions, organizationLevels);
-    }
-
-
-    public List<TimeSlotDTO> getDefaultTimeSlot() {
-        List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
-        timeSlotDTOS.add(new TimeSlotDTO(DAY, DAY_START_HOUR, 00, DAY_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(EVENING, EVENING_START_HOUR, 00, EVENING_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(NIGHT, NIGHT_START_HOUR, 00, NIGHT_END_HOUR, 00));
-        return timeSlotDTOS;
     }
 
 
