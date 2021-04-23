@@ -67,7 +67,7 @@ public class StaffTeamRankingService {
         }
         staffTeamRanking.setDeleted(true);
         staffTeamRankingGraphRepository.save(staffTeamRanking);
-        StaffTeamRanking parent = staffTeamRankingGraphRepository.findByDraftIdAndDeletedFalse(staffTeamRanking.getId());
+        StaffTeamRanking parent = staffTeamRankingGraphRepository.findByDraftIdAndDeletedFalse(staffTeamRanking.getId().toString());
         if(isNotNull(parent)) {
             parent.setDraftId(null);
             staffTeamRankingGraphRepository.save(parent);
@@ -79,9 +79,9 @@ public class StaffTeamRankingService {
         List<StaffTeamRankingDTO> staffTeamRankingDTOList = new ArrayList<>();
         List<StaffTeamRanking> staffTeamRankings;
         if(includeDraft) {
-            staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
+            staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId.toString());
         } else {
-            staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
+            staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId.toString());
         }
         if(isCollectionNotEmpty(staffTeamRankings)) {
             staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate).thenComparing(StaffTeamRanking::getCreationDate));
@@ -95,7 +95,7 @@ public class StaffTeamRankingService {
         if (staffTeamRanking.isPublished()) {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED, "Staff team");
         }
-        StaffTeamRanking parent = staffTeamRankingGraphRepository.findByDraftIdAndDeletedFalse(id);
+        StaffTeamRanking parent = staffTeamRankingGraphRepository.findByDraftIdAndDeletedFalse(id.toString());
         if(!parent.getStartDate().isBefore(publishedDate) || (isNotNull(parent.getEndDate()) && parent.getEndDate().isBefore(publishedDate))){
             exceptionService.actionNotPermittedException("Invalid publish date");
         }
@@ -134,7 +134,7 @@ public class StaffTeamRankingService {
 
     @Async
     public void addStaffTeamRanking(Long staffId, Team team, StaffTeamRelationship staffTeamRelationship){
-        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
+        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId.toString());
         if(isCollectionEmpty(staffTeamRankings)){
             StaffTeamRanking staffTeamRanking = new StaffTeamRanking(staffId, staffTeamRelationship.getStartDate(), staffTeamRelationship.getEndDate(), newHashSet(new TeamRankingInfo(team.getId(), staffTeamRelationship.getTeamType(), team.getActivityId(), TOP_RANK, 0)), true);
             staffTeamRankingGraphRepository.save(staffTeamRanking);
@@ -190,7 +190,7 @@ public class StaffTeamRankingService {
 
     @Async
     public void removeStaffTeamInfo(Long staffId, Long teamId){
-        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
+        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId.toString());
         Set<Long> removeTeamRankingInfoIds = new HashSet<>();
         for (StaffTeamRanking staffTeamRanking : staffTeamRankings) {
             removeTeamRankingInfo(teamId, removeTeamRankingInfoIds, staffTeamRanking);
@@ -243,7 +243,7 @@ public class StaffTeamRankingService {
 
     @Async
     public void updateStartDate(Long staffId, Team team, StaffTeamRelationship staffTeamRelationship, LocalDate oldStartDate){
-        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
+        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId.toString());
         if(isCollectionNotEmpty(staffTeamRankings)) {
             staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate));
             StaffTeamRanking newStaffTeamRanking;
@@ -311,7 +311,7 @@ public class StaffTeamRankingService {
 
     @Async
     public void updateEndDate(Long staffId, Team team, StaffTeamRelationship staffTeamRelationship, LocalDate oldEndDate){
-        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
+        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId.toString());
         if(isCollectionNotEmpty(staffTeamRankings)) {
             LocalDate newEndDate = staffTeamRelationship.getEndDate();
             if (isNull(newEndDate) && isNotNull(oldEndDate)) {
@@ -398,7 +398,7 @@ public class StaffTeamRankingService {
     @Async
     private void updateTeamType(Long staffId, Long teamId, TeamType newTeamType) {
         if(MAIN.equals(newTeamType)) {
-            List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
+            List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId.toString());
             for (StaffTeamRanking staffTeamRanking : staffTeamRankings) {
                 TeamRankingInfo teamRank = staffTeamRanking.getTeamRankingInfo().stream().filter(teamRankingInfo -> teamRankingInfo.getTeamId().equals(teamId)).findAny().orElse(null);
                 if(isNotNull(teamRank)) {
