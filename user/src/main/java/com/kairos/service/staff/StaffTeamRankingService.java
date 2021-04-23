@@ -76,14 +76,18 @@ public class StaffTeamRankingService {
     }
 
     public List<StaffTeamRankingDTO> getStaffTeamRankings(Long staffId, boolean includeDraft){
+        List<StaffTeamRankingDTO> staffTeamRankingDTOList = new ArrayList<>();
         List<StaffTeamRanking> staffTeamRankings;
         if(includeDraft) {
             staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
         } else {
             staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
         }
-        staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate).thenComparing(StaffTeamRanking::getCreationDate));
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRankings, StaffTeamRankingDTO.class);
+        if(isCollectionNotEmpty(staffTeamRankings)) {
+            staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate).thenComparing(StaffTeamRanking::getCreationDate));
+            staffTeamRankingDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRankings, StaffTeamRankingDTO.class);
+        }
+        return staffTeamRankingDTOList;
     }
 
     public StaffTeamRankingDTO publishStaffTeamRanking(Long id, LocalDate publishedDate) {
