@@ -7,11 +7,9 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FILTERS;
 
 @Repository
 public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<StaffTeamRanking,Long> {
