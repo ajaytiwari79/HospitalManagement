@@ -763,7 +763,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                             PHASE_SETTINGS_ACTIVITY_TAB,
                             BALANCE_SETTINGS_ACTIVITY_TAB,
                             UNIT_ID,
-                            CHILD_ACTIVITY_IDS,"countryParentId").and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES));
+                            CHILD_ACTIVITY_IDS).and("parentActivity._id").as(AppConstants.PARENT_ACTIVITY_ID).and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES));
     }
 
     @Override
