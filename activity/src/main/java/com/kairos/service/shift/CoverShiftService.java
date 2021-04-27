@@ -12,6 +12,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
@@ -258,22 +259,22 @@ public class CoverShiftService {
     public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long unitId, Long staffId, Long employmentId) {
         List<CoverShift> coverShifts=coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate,endDate);
         List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
-        int totalRequests= (int) coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).count();
-        int totalInterests= (int) coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).count();
-        int totalDeclined= (int) coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).count();
-        int totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId,employmentId);
+        Set<BigInteger> totalRequests= coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
+        Set<BigInteger> totalInterests=  coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
+        Set<BigInteger> totalDeclined=  coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).map(k->k.getId()).collect(Collectors.toSet());
+        Set<BigInteger> totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId,employmentId);
         return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
 
     }
 
-    public int getEligibleShifts(List<Shift> shifts, Long unitId, Long staffId, Long employmentId){
+    public Set<BigInteger> getEligibleShifts(List<Shift> shifts, Long unitId, Long staffId, Long employmentId){
         List<DateTimeInterval> dateTimeIntervals=shifts.stream().filter(k->k.getStaffId().equals(staffId)).map(Shift::getInterval).collect(Collectors.toList());
         shifts=shifts.stream().filter(k->!dateTimeIntervals.contains(k.getInterval())).collect(Collectors.toList());
         CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(unitId);
-        int noOfEligibleShifts=0;
+        Set<BigInteger> shiftList=new HashSet<>();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO=userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId,employmentId);
         if(coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYMENT_TYPES) && coverShiftSetting.getEmploymentTypeIds().contains(employmentId)){
-            return 0;
+            return shiftList;
         }
         Set<BigInteger> activityIds = getActivityIdsByShift(shifts);
         Map<Date,Phase> datePhaseMap=phaseService.getPhasesByDates(unitId,shifts.stream().map(k->asLocalDateTime(k.getStartDate())).collect(Collectors.toSet()));
@@ -286,10 +287,10 @@ public class CoverShiftService {
             shift1.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO= shiftValidatorService.validateShiftWithActivity(datePhaseMap.get(shift.getStartDate()), shift1, staffAdditionalInfoDTO, shiftDataHelper);
             if(isCollectionEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) && isCollectionEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
-                noOfEligibleShifts+=1;
+                shiftList.add(shift.getId());
             }
         }
-        return noOfEligibleShifts;
+        return shiftList;
     }
 
 }
