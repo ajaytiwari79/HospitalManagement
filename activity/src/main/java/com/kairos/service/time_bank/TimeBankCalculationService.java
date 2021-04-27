@@ -778,7 +778,7 @@ public class TimeBankCalculationService {
 
     public TreeMap<java.time.LocalDate, TimeBankIntervalDTO> getAccumulatedTimebankDTO(LocalDate firstRequestPhasePlanningPeriodEndDate, DateTimeInterval planningPeriodInterval, Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, LocalDate startDate, LocalDate endDate, long actualTimebankMinutes, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, ShiftDataHelper shiftDataHelper) {
         long expectedTimebankMinutes = actualTimebankMinutes;
-        java.time.LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
+        java.time.LocalDate employmentStartDate = planningPeriodInterval.getStartLocalDate().isAfter(employmentWithCtaDetailsDTO.getStartDate()) ? planningPeriodInterval.getStartLocalDate() : employmentWithCtaDetailsDTO.getStartDate();
         TreeMap<java.time.LocalDate, TimeBankIntervalDTO> localDateTimeBankByDateDTOMap = new TreeMap<>();
         endDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : endDate.isBefore(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
         Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = shiftDataHelper.getDateAndPhaseDefaultName();

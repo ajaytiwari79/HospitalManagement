@@ -283,7 +283,8 @@ public class CountryController {
     @DeleteMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteParentOrganization(@PathVariable long parentOrganizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.deleteOrganization(parentOrganizationId));
+        organizationService.deleteOrganization(parentOrganizationId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
     @ApiOperation(value = "Create Expertise")
