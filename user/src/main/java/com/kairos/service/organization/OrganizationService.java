@@ -274,6 +274,7 @@ public class OrganizationService {
         }
         Optional<OrganizationType> organizationTypes = organizationTypeGraphRepository.findById(organizationGeneral.getOrganizationTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationGeneral.getOrganizationSubTypeId());
+        organizationBaseRepository.removeVatTypeRelation(organizationBaseEntity.getId());
         setDetailsInOrganization(organizationGeneral, organizationBaseEntity, ownershipType, businessTypes, contractType, industryType, vatType, kairosStatus, contactAddress, organizationTypes, organizationSubTypes);
         if (organizationBaseEntity instanceof Organization) {
             ((Organization) organizationBaseEntity).setKairosHub(organizationGeneral.isKairosHub());
