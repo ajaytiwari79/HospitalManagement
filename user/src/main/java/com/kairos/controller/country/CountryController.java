@@ -283,7 +283,8 @@ public class CountryController {
     @DeleteMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteParentOrganization(@PathVariable long parentOrganizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.deleteOrganization(parentOrganizationId));
+        organizationService.deleteOrganization(parentOrganizationId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
     @ApiOperation(value = "Create Expertise")
@@ -426,12 +427,6 @@ public class CountryController {
 
     }
 
-    @ApiOperation(value = "get Default TimeSlot of Country")
-    @GetMapping(value = COUNTRY_URL + "/get_default_timeSlot")
-    public ResponseEntity<Map<String, Object>> mappingPayRollListToCountry(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultTimeSlot());
-
-    }
 
     @ApiOperation(value = "get all units of Country")
     @GetMapping(value = COUNTRY_URL + "/get_all_units")

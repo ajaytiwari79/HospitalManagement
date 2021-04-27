@@ -52,7 +52,7 @@ public class ExpertiseNightWorkerSettingService{
 
     public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long countryId, Long expertiseId) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
-        TimeSlotDTO timeSlot = userIntegrationService.getDefaultTimeSlot(countryId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
+        TimeSlotDTO timeSlot = timeSlotSetService.getDefaultTimeSlot().stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, XAxisConfig.HOURS,countryId,expertiseId);
         }
@@ -62,7 +62,7 @@ public class ExpertiseNightWorkerSettingService{
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
-        TimeSlotDTO timeSlot = userIntegrationService.getDefaultTimeSlot(countryId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
+        TimeSlotDTO timeSlot = timeSlotSetService.getDefaultTimeSlot().stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, XAxisConfig.HOURS,countryId,expertiseId);
         }

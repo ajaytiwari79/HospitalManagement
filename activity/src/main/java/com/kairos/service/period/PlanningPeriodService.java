@@ -985,7 +985,7 @@ public class PlanningPeriodService {
             });
         }
         if(isCollectionNotEmpty(schedulerPanelIds)) {
-            schedulerRestClient.publishRequest(schedulerPanelIds, -1l, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+            schedulerRestClient.publishRequest(schedulerPanelIds, -1L, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
         }
         createScheduleJobOfPanningPeriod(planningPeriods);
         return true;

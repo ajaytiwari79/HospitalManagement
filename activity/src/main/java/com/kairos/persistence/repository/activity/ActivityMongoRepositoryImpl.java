@@ -201,13 +201,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId),Criteria.where(COUNTRY_ID).is(countryId).and(TIME_TYPE_PART_OF_TEAM).is(true))),
                 lookup(TAG, TAGS, UNDERSCORE_ID, TAGS),
-                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB, TAGS,TRANSLATIONS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
+                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, COUNTRY_PARENT_ID, PARENT_ID, GENERAL_ACTIVITY_TAB, TAGS,TRANSLATIONS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
                         .and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).as(METHOD_FOR_CALCULATING_TIME)
                         .and(TIME_TYPE_ACTIVITY_CAN_BE_COPIED_FOR_ORGANIZATION_HIERARCHY).arrayElementAt(0).as(ACTIVITY_CAN_BE_COPIED_FOR_ORGANIZATION_HIERARCHY)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(APPLICABLE_FOR_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_SICKNESS_SETTING).arrayElementAt(0).as(SICKNESS_SETTING)
-
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
@@ -758,12 +757,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return Aggregation.newAggregation(
                     match(criteria),
                     lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
-                    lookup(ACTIVITIES, UNDERSCORE_ID, CHILD_ACTIVITY_IDS, PARENT_ACTIVITY),
-                    project(AppConstants.ID, NAME, GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,
+                    lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID,PARENT_ACTIVITY),
+                    project(NAME, GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,
                             PHASE_SETTINGS_ACTIVITY_TAB,
                             BALANCE_SETTINGS_ACTIVITY_TAB,
                             UNIT_ID,
-                            CHILD_ACTIVITY_IDS).and(PARENT_ACTIVITY_ID).as(AppConstants.PARENT_ACTIVITY_ID).and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES));
+                            CHILD_ACTIVITY_IDS).and("parentActivity._id").as(AppConstants.PARENT_ACTIVITY_ID).and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES));
     }
 
     @Override

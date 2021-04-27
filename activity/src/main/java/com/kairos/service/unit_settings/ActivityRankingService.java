@@ -104,10 +104,13 @@ public class ActivityRankingService {
         activityRanking.setPublished(true);
         activityRanking.setStartDate(publishedDate); // changing
         ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
-        ActivityRanking lastAbsenceRanking = activityRankingRepository.findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(activityRanking.getExpertiseId());
+        ActivityRanking lastAbsenceRanking = activityRankingRepository.findTopByExpertiseIdAndDeletedFalseAndPublishedTrueOrderByStartDateDesc(activityRanking.getExpertiseId());
         boolean onGoingUpdated = false;
         if (lastAbsenceRanking != null && publishedDate.isAfter(lastAbsenceRanking.getStartDate()) && lastAbsenceRanking.getEndDate() == null) {
             lastAbsenceRanking.setEndDate(publishedDate.minusDays(1));
+            if(parentAbsenceRanking.getId().equals(lastAbsenceRanking.getId())){
+                lastAbsenceRanking.setDraftId(null);
+            }
             activityRankingRepository.save(lastAbsenceRanking);
             activityRanking.setEndDate(null);
             onGoingUpdated = true;
@@ -121,7 +124,7 @@ public class ActivityRankingService {
                 activityRanking.setEndDate(null);
             }
         }
-        if(isNotNull(parentAbsenceRanking)){
+        if(isNotNull(parentAbsenceRanking) && !parentAbsenceRanking.getId().equals(lastAbsenceRanking.getId())){
             parentAbsenceRanking.setDraftId(null);
             activityRankingRepository.save(parentAbsenceRanking);
         }
@@ -421,6 +424,10 @@ public class ActivityRankingService {
                 }
             }
         }
+    }
+
+    public ActivityRanking getCurrentlyActiveActivityRankingSettings(Long unitId,LocalDate shiftDate){
+        return activityRankingRepository.getCurrentlyActiveActivityRankingSettings(unitId,shiftDate);
     }
 
 }

@@ -79,8 +79,8 @@ public class CoverShiftController {
     @ApiOperation("update cover shift setting by unit")
     @PutMapping(value = "/show_interest/{id}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId) {
-        coverShiftService.showInterestInCoverShift(id,staffId);
+    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId,@RequestParam(value = "employmentId",required = false) Long employmentId) {
+        coverShiftService.showInterestInCoverShift(id,staffId,employmentId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
@@ -95,7 +95,7 @@ public class CoverShiftController {
     @ApiOperation("get details for cover shift")
     @GetMapping(value = "/cover_shift/staff_details/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId,@PathVariable Long unitId,@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftStaffDetails(startDate,endDate,unitId,staffId));
+    public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId,@PathVariable Long unitId,@RequestParam("employmentId") Long employmentId,@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftStaffDetails(startDate,endDate,unitId,staffId,employmentId));
     }
 }

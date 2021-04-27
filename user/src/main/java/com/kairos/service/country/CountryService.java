@@ -65,9 +65,6 @@ public class CountryService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private UnitGraphRepository unitGraphRepository;
-    @Inject
-    private
-    OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Inject
     CurrencyService currencyService;
     private @Inject
@@ -94,13 +91,8 @@ public class CountryService {
     private GenericRestClient genericRestClient;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
-    @Inject
-    private PermissionService permissionService;
 
-    /**
-     * @param country
-     * @return
-     */
+
     public Map<String, Object> createCountry(Country country) {
         String name = "(?i)" + country.getName();
         List<Country> countryFound = countryGraphRepository.checkDuplicateCountry(name);
@@ -115,10 +107,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param id
-     * @return
-     */
+
     public CountryDTO getCountryById(Long id) {
         Country country = findById(id);
         CountryDTO countryDTO = new CountryDTO(country.getId(), country.getName());
@@ -128,10 +117,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param country
-     * @return
-     */
+
     public Map<String, Object> updateCountry(Country country) {
         List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry("(?i)" + country.getName(), country.getId());
         if (!duplicateCountryList.isEmpty()) {
@@ -147,9 +133,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param id
-     */
+
     public boolean deleteCountry(Long id) {
         Country currentCountry = countryGraphRepository.findOne(id);
         if (currentCountry != null) {
@@ -160,10 +144,6 @@ public class CountryService {
         return false;
     }
 
-
-    /**
-     * @return
-     */
     public List<Map<String, Object>> getAllCountries() {
         return FormatUtil.formatNeoResponse(countryGraphRepository.findAllCountriesMinimum());
     }
@@ -220,11 +200,7 @@ public class CountryService {
 
     public List<LevelDTO> getLevels(long countryId) {
         List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
-        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
-//        for(LevelDTO level :levelDTOS){
-//            level.setTranslations(level.getTranslatedData());
-//        }
-        return levelDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
     }
 
     public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
@@ -349,15 +325,6 @@ public class CountryService {
         List<UnionQueryResult> unions = unitGraphRepository.findAllUnionsByCountryId(countryId);
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         return new OrganizationLevelAndUnionWrapper(unions, organizationLevels);
-    }
-
-
-    public List<TimeSlotDTO> getDefaultTimeSlot() {
-        List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
-        timeSlotDTOS.add(new TimeSlotDTO(DAY, DAY_START_HOUR, 00, DAY_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(EVENING, EVENING_START_HOUR, 00, EVENING_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(NIGHT, NIGHT_START_HOUR, 00, NIGHT_END_HOUR, 00));
-        return timeSlotDTOS;
     }
 
 

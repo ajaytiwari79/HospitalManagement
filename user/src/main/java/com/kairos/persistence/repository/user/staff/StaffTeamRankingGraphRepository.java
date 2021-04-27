@@ -7,20 +7,18 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FILTERS;
 
 @Repository
 public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<StaffTeamRanking,Long> {
 
-    List<StaffTeamRanking> findByStaffIdAndDeletedFalse(Long staffId);
+    List<StaffTeamRanking> findByStaffIdAndDeletedFalse(String staffId);
 
-    List<StaffTeamRanking> findByStaffIdAndPublishedTrueAndDeletedFalse(Long staffId);
+    List<StaffTeamRanking> findByStaffIdAndPublishedTrueAndDeletedFalse(String staffId);
 
-    StaffTeamRanking findByDraftIdAndDeletedFalse(Long draftId);
+    StaffTeamRanking findByDraftIdAndDeletedFalse(String draftId);
 
     @Query("MATCH (staffTeamRanking:StaffTeamRanking)-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE id(teamRankingInfo) IN {0} DETACH DELETE teamRankingInfo")
     void removeTeamRankingInfo(Set<Long> removeTeamRankingInfoIds);
