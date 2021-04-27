@@ -52,8 +52,6 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-aop') 
     compile('org.springframework.boot:spring-boot-starter-cache') 
-    compile group: 'javax.inject', name: 'javax.inject', version: '1'
-    compile 'de.danielbechler:java-object-diff:0.95'
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
@@ -62,19 +60,15 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.0.0.RELEASE'
     compile('redis.clients:jedis:2.9.0')
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-mongodb
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+
 
     compile('org.springframework.boot:spring-boot-starter-websocket')
-
     compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'
 
     // use in import sheet
     compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
 
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
-    compile group: 'org.json', name: 'json', version: '20160810'
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swaggerVersion}"
 
