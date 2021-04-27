@@ -39,6 +39,9 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     List<ActivityRanking> getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(Long unitId);
 
+    @Query("{unitId:?0, deleted:false, published:true,'startDate':{$lte:?1}, '$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
+    ActivityRanking getCurrentlyActiveActivityRankingSettings(Long unitId, LocalDate shiftDate);
+
     //List<ActivityRanking> findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(List<Long> expertiseIds, LocalDate startDate);
 
 }

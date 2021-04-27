@@ -168,4 +168,9 @@ public class ObjectUtils {
             }
         }
     }
+
+    public static <T> int indexOf(Set<T> set, T element){
+        List<T> list = new ArrayList<>(set);
+        return list.indexOf(element);
+    }
 }
