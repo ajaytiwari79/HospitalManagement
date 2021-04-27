@@ -4,6 +4,7 @@ package com.kairos.service.activity;
  *
  */
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -17,9 +18,11 @@ import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
+import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,6 +35,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.indexOf;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_GLIDETIME_NOTFOUND_COUNTRY;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_COUNTRY_PHASE_NOTFOUND;
 import static com.kairos.constants.AppConstants.*;
@@ -277,6 +281,20 @@ public class ActivityUtil {
             }
         }
         return allActivities;
+    }
+
+    public static void updateRanking(ActivityRanking activityRanking, List<ActivityWrapper> activityWrappers){
+        if(activityRanking!=null) {
+            for (ActivityWrapper activityWrapper : activityWrappers) {
+                if (activityRanking.getPresenceActivities().contains(activityWrapper.getActivity().getId())) {
+                    activityWrapper.setRanking(indexOf(activityRanking.getPresenceActivities(), activityWrapper.getActivity().getId()));
+                } else if (activityRanking.getFullDayActivities().contains(activityWrapper.getActivity().getId())) {
+                    activityWrapper.setRanking(indexOf(activityRanking.getFullDayActivities(), activityWrapper.getActivity().getId()));
+                } else if (activityRanking.getFullWeekActivities().contains(activityWrapper.getActivity().getId())) {
+                    activityWrapper.setRanking(indexOf(activityRanking.getFullWeekActivities(), activityWrapper.getActivity().getId()));
+                }
+            }
+        }
     }
 
 

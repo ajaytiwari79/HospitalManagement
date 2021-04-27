@@ -426,4 +426,8 @@ public class ActivityRankingService {
         }
     }
 
+    public ActivityRanking getCurrentlyActiveActivityRankingSettings(Long unitId,LocalDate shiftDate){
+        return activityRankingRepository.getCurrentlyActiveActivityRankingSettings(unitId,shiftDate);
+    }
+
 }

@@ -51,6 +51,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -61,10 +62,7 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.ActivitySettingsService;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.activity.*;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
@@ -901,19 +899,26 @@ public class OrganizationActivityService {
     }
 
     public Map<BigInteger, ActivityWrapper> getActivityWrapperMap(List<Shift> shifts, ShiftDTO shiftDTO) {
+        Long unitId=null;
         Set<BigInteger> activityIds = new HashSet<>();
         for (Shift shift : shifts) {
+            if(unitId==null){
+                unitId=shift.getUnitId();
+            }
             getActivityIdsByShift(activityIds, shift);
             if(isNotNull(shift.getDraftShift())){
                 getActivityIdsByShift(activityIds, shift.getDraftShift());
             }
         }
         if (isNotNull(shiftDTO)) {
+            unitId=shiftDTO.getUnitId();
             activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
             activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
             activityIds.addAll(shiftDTO.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         }
         List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        ActivityRanking activityRanking= activityRankingService.getCurrentlyActiveActivityRankingSettings(unitId,shiftDTO==null?DateUtils.getLocalDate():DateUtils.asLocalDate(shiftDTO.getStartDate()));
+        ActivityUtil.updateRanking(activityRanking,activities);
         return activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
     }
 
