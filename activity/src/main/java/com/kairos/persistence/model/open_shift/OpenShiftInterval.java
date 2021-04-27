@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 //Domain name can be changed
 @Document
 public class OpenShiftInterval extends MongoBaseEntity implements Comparable<OpenShiftInterval> {
+    private static final long serialVersionUID = 6638408127661382597L;
     private int from;
     private int to;
     private Long countryId;

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -36,8 +37,9 @@ public class SickController {
     @GetMapping("/fine")
     public ResponseEntity<Map<String, Object>> markUserAsFine(@RequestParam(value = "unitId", required = false) Long unitId,
                                                               @RequestParam Long staffId,
-                                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(staffId, unitId,startDate));
+                                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                              @RequestParam(value = "activityId", required = false) BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(staffId, unitId,startDate,activityId));
     }
 
     @ApiOperation("API is used to call the user as fine")

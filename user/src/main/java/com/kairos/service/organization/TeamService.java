@@ -3,10 +3,8 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -35,6 +33,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffTeamRankingService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,6 +79,7 @@ public class TeamService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject private CommonRepository commonRepository;
+    @Inject private StaffTeamRankingService staffTeamRankingService;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
         OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
@@ -137,11 +137,11 @@ public class TeamService {
         return teamDTO;
     }
 
-    public boolean updateActivitiesOfTeam(Long unitId , Long teamId, Set<BigInteger> activityIds) {
+    public boolean updateActivitiesOfTeam(Long unitId , Long teamId, BigInteger activityId) {
         Team team = teamGraphRepository.findOne(teamId);
-        Set<BigInteger> activityIdsToSet=activityIntegrationService.getActivitiesWithAllChildren(unitId,activityIds);
-        team.setActivityIds(activityIdsToSet);
+        team.setActivityId(activityId);
         teamGraphRepository.save(team);
+        staffTeamRankingService.updateActivityIdInTeamRanking(teamId, activityId);
         return true;
     }
 
@@ -163,8 +163,12 @@ public class TeamService {
                   }
             }
             StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
-            StaffTeamRelationship staffTeamRelationship = isNull(staffTeamRelationShipQueryResult) ? new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType()) :
-                    new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            StaffTeamRelationship staffTeamRelationship;
+            if(isNull(staffTeamRelationShipQueryResult)){
+                staffTeamRelationship = new StaffTeamRelationship(null, team, staff, staffTeamDTO.getLeaderType(), staffTeamDTO.getTeamType());
+            } else {
+                staffTeamRelationship = new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
+            }
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
             if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
@@ -172,11 +176,13 @@ public class TeamService {
             }else {
                 if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),teamId)) {
                     staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
-                } else {
-                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
                 }
+//                } else {
+//                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+//                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
+            staffTeamRankingService.addOrUpdateStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship, staffTeamRelationShipQueryResult);
         }
         return staffTeamDTOs;
     }
@@ -187,17 +193,11 @@ public class TeamService {
 
 
     public TeamDTO getTeamDetails(Long teamId) {
-        TeamDTO teamDTO = teamGraphRepository.getTeamDetailsById(teamId);
-        teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
-        return teamDTO;
+        return teamGraphRepository.getTeamDetailsById(teamId);
     }
 
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
         List<TeamDTO> teams = teamGraphRepository.getTeams(unitId);
-        teams.forEach(teamDTO -> {
-            teamDTO.setUnitId(unitId);
-            teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
-        });
         Map<String, Object> map = new HashMap<>();
         map.put("teams", (isCollectionNotEmpty(teams)) ? teams : Collections.emptyList());
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
@@ -350,14 +350,6 @@ public class TeamService {
 
     }
 
-    public boolean assignChildActivitiesToTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
-        List<Team> teamList= teamGraphRepository.findAllTeamByActivityId(activityId);
-        teamList.forEach(team-> team.getActivityIds().addAll(childActivityIds));
-        teamGraphRepository.saveAll(teamList);
-        return true;
-
-    }
-
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
@@ -424,6 +416,7 @@ public class TeamService {
             } else {
                 validStaffIds.add(staffId);
             }
+            staffTeamRankingService.removeStaffTeamInfo(staffId, teamId);
         }
         if(isCollectionNotEmpty(onlyTeamLeader)) {
             teamGraphRepository.assignStaffAsTeamLeaderOnly(onlyTeamLeader, teamId);
@@ -436,19 +429,5 @@ public class TeamService {
 
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
         return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfOrganizationTeams(Long teamId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Team team =teamGraphRepository.findOne(teamId);
-        team.setTranslatedNames(translatedNames);
-        team.setTranslatedDescriptions(translatedDescriptios);
-        teamGraphRepository.save(team);
-        return team.getTranslatedData();
     }
 }

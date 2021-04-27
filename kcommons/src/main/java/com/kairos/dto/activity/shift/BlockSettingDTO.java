@@ -18,4 +18,7 @@ public class BlockSettingDTO {
     private Long unitId;
     private LocalDate date;
     private Map<Long, Set<BigInteger>> blockDetails;
+    private Set<Long> blockedStaffForCoverShift;
+    private LocalDate endDate;
+    private boolean unblockStaffs;
 }

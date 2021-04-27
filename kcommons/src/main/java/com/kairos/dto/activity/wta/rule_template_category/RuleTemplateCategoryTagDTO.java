@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
-import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.Setter;
 

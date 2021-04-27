@@ -23,7 +23,7 @@ public class GraphHopperService {
         try {
             response = api.matrixGet(appConfig.getGraphhoperkey(), point, fromPoint, toPoint, requiredFields, vehicle);
         } catch (ApiException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return response;
     }
@@ -171,7 +171,7 @@ public class GraphHopperService {
             response = api.matrixGet(appConfig.getKeyAfterExpires(), point, fromPoint, toPoint, requiredFields, vehicle);
         } catch (ApiException e) {
             appConfig.setGraphhoperKeyExpireCount(appConfig.graphhoperKeyExpireCount+1);
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return getdistance(planningLocation1,planningLocation2,vehicle);
         }
         return response;
@@ -202,7 +202,7 @@ public class GraphHopperService {
                 isAddressVerfied = true;
             }
         } catch (ApiException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         optaLocationDTO.setAddressVerified(isAddressVerfied);
         return optaLocationDTO;

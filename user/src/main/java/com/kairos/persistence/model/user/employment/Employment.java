@@ -3,7 +3,6 @@ package com.kairos.persistence.model.user.employment;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -13,6 +12,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 public class Employment extends UserBaseEntity {
 
+    private static final long serialVersionUID = 1387806326762328484L;
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
 
@@ -42,8 +43,7 @@ public class Employment extends UserBaseEntity {
     @Relationship(type = IN_UNIT)
     private Unit unit;
 
-    @Relationship(type = HAS_REASON_CODE)
-    private ReasonCode reasonCode;
+    private BigInteger reasonCodeId;
 
 
     private LocalDate startDate;
@@ -91,7 +91,7 @@ public class Employment extends UserBaseEntity {
                 ", staff=" + staff +
                 ", union=" + union +
                 ", unit=" + unit +
-                ", reasonCode=" + reasonCode +
+                ", reasonCodeId=" + reasonCodeId +
                 ", timeCareExternalId=" + timeCareExternalId +
                 ", published=" + published +
                 '}';

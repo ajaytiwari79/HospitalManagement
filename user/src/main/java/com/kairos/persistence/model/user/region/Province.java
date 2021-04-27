@@ -22,6 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.REGIO
 @Getter
 @Setter
 public class Province extends UserBaseEntity {
+    private static final long serialVersionUID = -6436738867715576005L;
     @NotBlank(message = ERROR_PROVINCE_NAME_NOTEMPTY)
     private String name;
     @NotBlank(message = ERROR_PROVINCE_GEOFENCE_NOTEMPTY)

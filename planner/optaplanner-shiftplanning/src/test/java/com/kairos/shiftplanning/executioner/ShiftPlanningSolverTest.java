@@ -1,14 +1,8 @@
 
 package com.kairos.shiftplanning.executioner;
 
-import com.kairos.dto.planner.solverconfig.ConstraintDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanningNewVersion.entity.ALI;
 import com.kairos.shiftplanningNewVersion.generator.StaffingLevelGenerator;
 import com.kairos.shiftplanningNewVersion.solver.StaffingLevelSolver;
@@ -19,13 +13,10 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
-import java.util.*;
-
-import static com.kairos.enums.constraint.ConstraintSubType.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftPlanningSolverTest {
@@ -44,7 +35,6 @@ public class ShiftPlanningSolverTest {
         java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
         System.setProperty("user.timezone", "UTC");
         CurrentUserDetails currentUserDetails  = new CurrentUserDetails();
-        currentUserDetails.setUserLanguage(new SystemLanguageDTO("English"));
         UserContext.setUserDetails(currentUserDetails);
     }
 
@@ -53,7 +43,7 @@ public class ShiftPlanningSolverTest {
         try {
             new StaffingLevelSolver().run();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

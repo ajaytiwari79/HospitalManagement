@@ -22,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PayOutPerShift extends MongoBaseEntity{
 
+    private static final long serialVersionUID = -6003055850572997875L;
     private Long employmentId;
     private Long staffId;
     private BigInteger shiftId;

@@ -17,11 +17,11 @@ import static com.kairos.enums.shift.ShiftType.PRESENCE;
 @Service
 public class WorkOnPublicHolidayKPICalculationService implements KPIService {
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getWorkedOnPublicHolidayCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
     }
 
-    public long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         int workedOnPublicHolidayCount = 0;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, false);
         shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shift -> PRESENCE.equals(shift.getShiftType())).collect(Collectors.toList());

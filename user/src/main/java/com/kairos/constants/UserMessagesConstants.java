@@ -121,7 +121,6 @@ public class UserMessagesConstants {
     public static final String ERROR_CLINICTYPE_NAME_NOTEMPTY  = "error.ClinicType.name.notEmpty ";
     public static final String ERROR_CLINICTYPE_NOTFOUND  = "error.ClinicType.notfound ";
     public static final String ERROR_CLINICTYPE_NAME_EXIST  = "error.ClinicType.name.exist ";
-    public static final String ERROR_DAYTYPE_NAME_NOTEMPTY  = "error.DayType.name.notEmpty ";
     public static final String ERROR_COUNTRY_NAME_NOTEMPTY  = "error.Country.name.notEmpty ";
     public static final String ERROR_COUNTRY_CODE_NOTEMPTY  = "error.Country.code.notEmpty ";
     public static final String ERROR_SKILLCATEGORY_NAME_NOTEMPTY  = "error.SkillCategory.name.notEmpty ";
@@ -232,9 +231,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_PRESENCETYPE_NAME_ALREADYEXIST = "message.presenceType.name.alreadyExist";
     public static final String MESSAGE_PRESENCETYPE_ID_NOTFOUND = "message.presenceType.id.notFound";
     public static final String MESSAGE_REASONCODE_NAME_NOTEMPTY = "message.reasonCode.name.notEmpty";
-    public static final String MESSAGE_REASONCODE_NAME_ALREADYEXIST = "message.reasonCode.name.alreadyExist";
-    public static final String MESSAGE_REASONCODE_ID_NOTFOUND = "message.reasonCode.id.notFound";
-    public static final String ERROR_TIMETYPE_UNSELECTED = "error.timetype.unselected";
+
     public static final String MESSAGE_TIMETYPE_EXCEPTIONOCCURRED = "message.timeType.exceptionOccurred";
     public static final String MESSAGE_EXPERTISE_SENIORITYLEVEL_PRESENT = "message.expertise.seniorityLevel.present";
     public static final String MESSAGE_EXPERTISE_SENIORITYLEVEL_GREATERTHAN = "message.expertise.seniorityLevel.greaterThan";
@@ -481,5 +478,7 @@ public class UserMessagesConstants {
     public static final String UNIT_IS_MANDATORY = "error.unit.mandatory";
     public static final String SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED ="shift.percentage.can.not.be.less.then.zero";
     public static final String STAFF_EMPLOYMENT_NOT_MATCH ="staff.employment.not_matched";
+    public static final String MESSAGE_DATA_NOTFOUND = "message.data.notFound";
+    public static final String MESSAGE_RANKING_ALREADY_PUBLISHED="ranking.already.published";
 
 }

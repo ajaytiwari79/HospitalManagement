@@ -19,7 +19,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Service
 public class PayLevelKPIService implements KPIService{
 
-    public double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
             LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
             return getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,startDate);
@@ -28,7 +28,7 @@ public class PayLevelKPIService implements KPIService{
         }
     }
 
-    public double getPayLevelOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,LocalDate selectedDate){
+    public double getPayLevelOfMainEmploymentOfStaff(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo,LocalDate selectedDate){
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
         double payLevel=0.0d;
         for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
@@ -49,7 +49,7 @@ public class PayLevelKPIService implements KPIService{
         return payLevel;
     }
 
-    private double getPayLevel(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, double payLevel, EmploymentLinesDTO currentEmploymentLine) {
+    private double getPayLevel(KPICalculationRelatedInfo kpiCalculationRelatedInfo, double payLevel, EmploymentLinesDTO currentEmploymentLine) {
         if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.MAIN.name()) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size()<2) {
             payLevel = getPayLevelByCurrentEmploymentline(payLevel, currentEmploymentLine);
         } else if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.SECONDARY.name())&& kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size()<2) {
@@ -88,7 +88,7 @@ public class PayLevelKPIService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
     }
 }

@@ -1,5 +1,7 @@
 package com.kairos.enums.task_type;
 
+import java.io.Serializable;
+
 /**
  * Created by prabjot on 7/10/16.
  */
@@ -29,7 +31,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeCreation {
+    public enum TaskTypeCreation implements Serializable {
         CLIENTS("Clients"), RELATIVES("Relatives"), CONTACT_PERSONS("Contract_Persons"),
         MANAGERS("Managers"), PLANNERS("Planners"), VISITATORS("Visitators"), ADMINS("Admins");
 
@@ -49,7 +51,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeStatus {
+    public enum TaskTypeStatus implements Serializable {
         ACTIVE("Active"), INACTIVE("Inactive");
         public String value;
 
@@ -67,7 +69,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum GenderRestrictions {
+    public enum GenderRestrictions implements Serializable {
 
         MEN("Men"), WOMEN("Women"), BOTH("Both");
         public String value;
@@ -86,7 +88,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum PreplanStatus {
+    public enum PreplanStatus implements Serializable {
         NORMAL("Normal"), CONFIRMED("Confirmed"), FIXED("Fixed");
 
         public String value;
@@ -96,7 +98,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum ShiftPlanningPhase {
+    public enum ShiftPlanningPhase implements Serializable {
         SIMULATION("Simulation"), LONG_TERM_ABSENCE("Long_term_absence"), REQUEST("Request"), DRAFT("Draft"), CONSTRUCTION("Construction"), FINAL("Final"), SHORT_TERM("Short_term"), PAST("Past"), PAYROLL("Payroll");
 
         public String value;
@@ -115,7 +117,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum Points {
+    public enum Points implements Serializable {
         FIXED_POINT_PER_TIME_SLOT("Fixed_point_per_timeslot"), SUPPLY_DEMAND("Supply_demand"), FIXED_POINTS("Fixed_points"), GAMIFICATION_MODEL("Gamification_model");
         public String value;
 
@@ -133,7 +135,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum Resource {
+    public enum Resource implements Serializable {
         VAN("Van"), CAR("Car"), MINIVAN("Minivan"), BICYCLE("Bicycle"), SMALL_BUS("Small_bus");
         public String value;
 
@@ -151,7 +153,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeStaff {
+    public enum TaskTypeStaff implements Serializable {
         FIXED_EMPLOYEES("Fixed_employees"), HOURLY_PAID_EMPLOYEES("Hourly_paid_employees"), SUB_CONTRACTORS("Sub_contractors"), VOLUNTEERS("Volunteers"), TASKERS("Taskers"), PREFERRED_EMPLOYEES("Preferred_employees"),
         EXCLUDED_EMPLOYEES("Excluded_employees"), FIXED("Fixed"), PREFERRED_1_EMPLOYEES("Preferred1_employees"), PREFERRED_2_EMPLOYEES("Preferred2_employees"), EXPERIENCE_RESTRICTIONS("Experience_restrictions"),
         ALLOWED_EMPLOYEES("Allowed_employees");
@@ -172,7 +174,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeDays {
+    public enum TaskTypeDays implements Serializable {
         MONDAYS("Mondays"), TUESDAYS("Tuesdays"), WEDNESDAYS("Wednesdays"), THURSDAYS("Thursdays"), FRIDAYS("Fridays"),
         SATURDAYS("Saturdays"), SUNDAYS("Sundays"), FULL_PUBLIC_HOLIDAYS("Full_public_holidays"), OUTSIDE_OPENING_HOURS("Outside_opening_hours_of_organization"),
         HALF_PUBLIC_HOLIDAYS("Half_public_holidays");
@@ -194,7 +196,7 @@ public enum TaskTypeEnum {
 
     }
 
-    public enum CauseGroup {
+    public enum CauseGroup implements Serializable {
         PICK_UP("Pick_up"), DELIVERY("Delivery"), TRANSPORTATION("Transportation"), ASSESSOR("Assessor"), CONSULTING("Consulting"), FULL_SERVICE("Full_service"),
         PERSONAL_ASSISTANCE("Personal_assistance"), VIRTUAL("Virtual"), WARRANTY("Warranty"), OFFICE("Office"), TRAINING("Training"), QUALITY("Quality"),
         PERSONAL("Personal"), MAINTENANCE("Maintenance"), PROJECT("Project"), MEETING("Meeting"), BREAK("Break");
@@ -217,7 +219,7 @@ public enum TaskTypeEnum {
 
     }
 
-    public enum SequenceGroup {
+    public enum SequenceGroup implements Serializable {
         FIRST_CLIENT("First_client"), FRONT_CLIENT("Front_client"), MIDDLE_CLIENT("Middle_client"), BACK_CLIENT("Back_client"), LAST_CLIENT("Last_client"),
         FRONT_OR_BACK("Front_or_back");
         public String value;
@@ -238,7 +240,7 @@ public enum TaskTypeEnum {
 
     }
 
-    public enum TimeTypes {
+    public enum TimeTypes implements Serializable {
         PRE_PROCESSING_TIME("Pre_processing_time"), POST_PROCESSING_TIME("Post_processing_time"), SETUP_TIME("Setup_time");
         public String value;
 
@@ -256,7 +258,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum DurationType {
+    public enum DurationType implements Serializable {
         YES("Yes"), NO("No"), VISITATION_ONLY("Visitation_only");
         public String value;
 
@@ -274,7 +276,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeCount {
+    public enum TaskTypeCount implements Serializable {
         POSITIVE("Positive"),NEGATIVE("Negative");
         public String value;
 
@@ -292,7 +294,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeInclude {
+    public enum TaskTypeInclude implements Serializable {
         TIME_BANK("Time bank"),ANNUAL_DUTY_CALCULATION("Annual duty calculation");
         public String value;
 
@@ -311,7 +313,7 @@ public enum TaskTypeEnum {
 
     }
 
-    public enum TaskTypeDate {
+    public enum TaskTypeDate implements Serializable {
         WEEKDAYS("Weekdays"),SATURDAYS("Saturdays"),SUNDAYS("Sundays"),PUBLIC_HOLIDAYS("Public holidays"),HALF_PUBLIC_HOLIDAYS("Half public holidays"),
         APPROVED_VACATION_PERIOD("Approved vacation period"),COMPENSATION_DAYS("Compensation days");
         public String value;
@@ -330,7 +332,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskOriginator {
+    public enum TaskOriginator implements Serializable {
         TIMECARE("TimeCare"),PRE_KAIROS("Pre Kairos"),KAIROS("Kairos"),PRE_PLANNING("Pre Planning"),ACTUAL_PLANNING("Actual planner");
 
         public String value;
@@ -349,7 +351,7 @@ public enum TaskTypeEnum {
         }
     }
 
-    public enum TaskTypeSlaDay {
+    public enum TaskTypeSlaDay implements Serializable {
         MONDAY("Monday"),TUESDAY("Tuesday"),WEDNESDAY("Wednesday"),THURSDAY("Thursday"),FRIDAY("Friday"),SATURDAY("Saturday"),SUNDAY("Sunday"),PUBLIC_HOLIDAY("Public Holiday");
         public String value;
 

@@ -22,7 +22,7 @@ public class SkillKPIService implements KPIService{
 
 
 
-    public double getCountOfSkillOfStaffIdOnSelectedDate(Long staffId, LocalDate selectedFromDate, LocalDate selectedToDate, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+    public double getCountOfSkillOfStaffIdOnSelectedDate(Long staffId, LocalDate selectedFromDate, LocalDate selectedToDate, KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         StaffKpiFilterDTO staffKpiFilterDTO = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
         int count=0;
         if(selectedFromDate.equals(selectedToDate)) {
@@ -35,7 +35,7 @@ public class SkillKPIService implements KPIService{
         return count;
     }
 
-    private int getCountOfSkillByDay(StaffKpiFilterDTO staffKpiFilterDTO, LocalDate selectedFromDate, LocalDate selectedToDate, int count, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    private int getCountOfSkillByDay(StaffKpiFilterDTO staffKpiFilterDTO, LocalDate selectedFromDate, LocalDate selectedToDate, int count, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if(ObjectUtils.isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())) {
             selectedFromDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
             selectedToDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
@@ -94,7 +94,7 @@ public class SkillKPIService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getCountOfSkillOfStaffIdOnSelectedDate(staffId, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()), kpiCalculationRelatedInfo);
     }
 }

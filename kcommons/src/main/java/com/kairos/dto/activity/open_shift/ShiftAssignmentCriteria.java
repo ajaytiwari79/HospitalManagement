@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.open_shift;
 
-public enum ShiftAssignmentCriteria {
+import java.io.Serializable;
+
+public enum ShiftAssignmentCriteria implements Serializable {
     PICKABLE,
     FREE_DAY_OFFER,
     SHOW_INTEREST_AUTO_SELECT,

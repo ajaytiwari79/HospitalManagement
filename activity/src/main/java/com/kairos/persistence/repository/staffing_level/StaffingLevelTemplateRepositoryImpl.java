@@ -32,7 +32,7 @@ public class StaffingLevelTemplateRepositoryImpl implements CustomStaffingLevelT
     }
 
     @Override
-    public List<StaffingLevelTemplateDTO> findByUnitIdDayTypeAndDate(Long unitID, Date proposedStartDate, Date proposedEndDate, List<Long> dayTypeIds, List<String> days){
+    public List<StaffingLevelTemplateDTO> findByUnitIdAndDayTypeAndDate(Long unitID, Date proposedStartDate, Date proposedEndDate, List<BigInteger> dayTypeIds, List<String> days){
         Criteria criteria = Criteria.where("unitId").is(unitID).and("disabled").is(false).and("deleted").is(false).and("dayType").in(dayTypeIds);
         if(isNotNull(days)){
             criteria.and("validDays").in(days);

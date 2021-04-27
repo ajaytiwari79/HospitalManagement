@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_F
 @NodeEntity
 public class StaffFavouriteFilter extends UserBaseEntity {
 
+    private static final long serialVersionUID = -331064172937304486L;
     @Relationship(type = HAS_FILTER_GROUP)
     private FilterGroup filterGroup;
 

@@ -26,6 +26,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class EmploymentType extends UserBaseEntity {
 
+    private static final long serialVersionUID = 4110466717999127870L;
     @NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
@@ -37,6 +38,7 @@ public class EmploymentType extends UserBaseEntity {
     //Added By Pavan
     private boolean editableAtEmployment;
     private Short weeklyMinutes;
+    private boolean canRankTeam;
 
 
     public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtEmployment) {

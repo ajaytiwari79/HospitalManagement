@@ -42,7 +42,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static org.optaplanner.core.config.solver.SolverConfig.createFromXmlFile;
 
@@ -322,7 +321,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         try {
             ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS, solvedSolution.getUnit().getId());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -409,7 +408,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             unSolvedsolution = shiftPlanningSolver.runSolverOnRequest(unSolvedsolution);
             //writeSolutionToFile(unSolvedsolution);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
             File file = new File(System.getProperty(USER_HOME) + "/" + "exception.text");
             if(!file.exists()){
                 file.createNewFile();

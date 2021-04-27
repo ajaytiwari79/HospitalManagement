@@ -1,6 +1,8 @@
 package com.kairos.enums;
 
-public enum PriorityGroupName {
+import java.io.Serializable;
+
+public enum PriorityGroupName implements Serializable {
     PRIORITY_GROUP1,
     PRIORITY_GROUP2,
     PRIORITY_GROUP3,

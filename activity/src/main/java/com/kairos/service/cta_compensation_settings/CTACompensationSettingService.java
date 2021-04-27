@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationConfiguration;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.shift.Expertise;
-import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.cta.CompensationType;
 import com.kairos.persistence.cta_compensation_setting.CTACompensationSetting;
@@ -18,17 +17,14 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_EXPERTISE_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_OVERLAP_INTERVAL;
 
 @Service
 public class CTACompensationSettingService {

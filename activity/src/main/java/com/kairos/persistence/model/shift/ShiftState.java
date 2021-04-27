@@ -14,22 +14,14 @@ import java.util.Date;
 @Document(collection = "shiftState")
 public class ShiftState extends Shift {
 
+    private static final long serialVersionUID = 7363158576726436085L;
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
 
     public ShiftState() {
 
     }
-    public ShiftState(BigInteger shiftId,AccessGroupRole accessGroupRole,String actualPhaseState, LocalDate validated,Date startDate,Date endDate,Long unitId,Long staffId) {
-        this.shiftId = shiftId;
-        this.accessGroupRole = accessGroupRole;
-        this.validated = validated;
-        super.setStartDate(startDate) ;
-        super.setEndDate(endDate);
-        super.setUnitId(unitId);
-        super.setStaffId(staffId);
 
-    }
     public BigInteger getShiftId() {
         return shiftId;
     }

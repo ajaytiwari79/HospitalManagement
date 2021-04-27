@@ -14,7 +14,7 @@ import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 @Service
 public class CareBubbleKPICalculationService implements KPIService{
 
-    public int calculateCareBubble(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Long staffId) {
+    public int calculateCareBubble(KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Long staffId) {
         int calculateValue = 0;
         List<AuditShiftDTO> shifts = kpiCalculationRelatedInfo.getShiftAuditByStaffIdAndInterval(staffId, dateTimeInterval);
         Optional<TagDTO> optionalTagDTO = kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId).stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getTags().stream()).filter(tagDTO -> kpiCalculationRelatedInfo.getTagIds().contains(tagDTO.getId())).findFirst();
@@ -30,7 +30,7 @@ public class CareBubbleKPICalculationService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return calculateCareBubble(kpiCalculationRelatedInfo, dateTimeInterval, staffId);
     }
 }

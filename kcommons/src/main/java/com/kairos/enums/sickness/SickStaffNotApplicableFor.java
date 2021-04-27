@@ -1,5 +1,7 @@
 package com.kairos.enums.sickness;
 
-public enum SickStaffNotApplicableFor {
-    SELLING,SWAPPING,OPEN_SHIFT,EVENT
+import java.io.Serializable;
+
+public enum SickStaffNotApplicableFor implements Serializable {
+    SELLING, SWAPPING, OPEN_SHIFT, EVENT
 }

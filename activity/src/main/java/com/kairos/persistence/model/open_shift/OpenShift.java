@@ -12,6 +12,7 @@ import java.util.Optional;
 @Document
 public class OpenShift extends MongoBaseEntity {
 
+    private static final long serialVersionUID = -7849757680541748854L;
     private Date startDate;
     private Date endDate;
     private Integer noOfPersonRequired;

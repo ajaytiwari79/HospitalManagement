@@ -27,6 +27,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.RESOU
 public class Resource extends UserBaseEntity {
 
 
+    private static final long serialVersionUID = 6221846714139173141L;
     private Vehicle vehicleType;
     private String registrationNumber;
     private String number;

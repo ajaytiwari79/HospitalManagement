@@ -79,7 +79,7 @@ public class TasksMergingService extends MongoBaseService {
             try {
                 startDate = executionDateFormat.parse(taskData.get("resource").toString());
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
         LOGGER.debug("taskIds <><><><><><><><>" + taskIds);
@@ -155,77 +155,37 @@ public class TasksMergingService extends MongoBaseService {
 
 
     public Task mergeTasksWithIds(List<String> taskIds, long unitId, long citizenId, String mainTaskName, boolean isActualPlanningScreen, String uniqueID, TaskAddress taskAddress, Long loggedInUserId, List<Long> preferredStaffIds, List<Long> forbiddenStaffIds, Map<String, String> flsCredentials) throws CloneNotSupportedException {
-
         Date mainTaskStartTime = null;
         Date mainTaskEndTime = null;
         Date startDate = null;
         Task firstTask = null;
         Date startBoundaryDate = null;
         Date endBoundaryDate = null;
-
-
         int mainTaskDuration = 0;
-
         Task mainTask = new Task();
-
         List<BigInteger> subTaskIdsList = new ArrayList<>();
         List<BigInteger> responseSubTaskIdsList = new ArrayList<>();
-
         List<Task> tasksToDelete = new ArrayList<>();
-
         Set<String> skillIds = new HashSet<>();
-
         List<String> jointEventsIds = new ArrayList<>();
-
         List<Task> tasksToMergeList = taskMongoRepository.getAllTasksByIdsIn(taskIds);
         for (Task task : tasksToMergeList) {
-
             jointEventsIds.add(task.getJoinEventId());
-            LOGGER.info("isActualPlanningScreen " +isActualPlanningScreen);
+            LOGGER.info("isActualPlanningScreen " + isActualPlanningScreen);
             if (isActualPlanningScreen) {
-                if (TaskTypeEnum.TaskOriginator.PRE_PLANNING.equals(task.getTaskOriginator()) && !task.isHasActualTask()) {
-                    Task actualPlanningTask = new Task();
-                    BeanUtils.copyProperties(task, actualPlanningTask);
-                    actualPlanningTask.setId(null);
-                    actualPlanningTask.setParentTaskId(task.getId());
-                    actualPlanningTask.setTaskOriginator(TaskTypeEnum.TaskOriginator.ACTUAL_PLANNING);
-                    actualPlanningTask.setSubTask(true);
-                    taskService.save(actualPlanningTask);
-                    task.setHasActualTask(true);
-                    taskService.save(task);
-                    Task cloneObject = Task.copyProperties(actualPlanningTask, Task.getInstance());
-                    cloneObject.setId(task.getId());
-                    responseSubTaskIdsList.add(cloneObject.getId());
-                    subTaskIdsList.add(actualPlanningTask.getId());
-                    task = cloneObject;
-                } else if (TaskTypeEnum.TaskOriginator.PRE_PLANNING.equals(task.getTaskOriginator()) && task.isHasActualTask()) {
-                    Task actualPlanningTask = taskMongoRepository.findByParentTaskId(task.getId());
-                    actualPlanningTask.setSubTask(true);
-                    taskService.save(actualPlanningTask);
-                    Task cloneObject = Task.copyProperties(actualPlanningTask, Task.getInstance());
-                    cloneObject.setId(task.getId());
-                    responseSubTaskIdsList.add(cloneObject.getId());
-                    subTaskIdsList.add(actualPlanningTask.getId());
-                    task = cloneObject;
-                }
+                task = getTask(subTaskIdsList, responseSubTaskIdsList, task);
             }
             task.setSubTask(true);
             subTaskIdsList.add(task.getId());
             responseSubTaskIdsList.add(task.getId());
-
             if (task.getVisitourId() != null && task.getVisitourId() > 0) {
                 tasksToDelete.add(task);
             }
-
             taskService.save(task);
-
             mainTaskDuration = mainTaskDuration + task.getDuration();
-
             startDate = task.getDateFrom();
             startBoundaryDate = task.getTaskStartBoundary();
             endBoundaryDate = task.getTaskEndBoundary();
-
-
             if (mainTaskStartTime == null && mainTaskEndTime == null) {
                 mainTaskStartTime = task.getTimeFrom();
                 mainTaskEndTime = task.getTimeTo();
@@ -239,70 +199,72 @@ public class TasksMergingService extends MongoBaseService {
                     mainTaskEndTime = task.getTimeTo();
                 }
             }
-
             if (task.getSkills() != null && !task.getSkills().isEmpty())
                 skillIds.addAll(Arrays.asList(task.getSkills().split(",")));
         }
-
         mainTask.setTaskOriginator(isActualPlanningScreen ? TaskTypeEnum.TaskOriginator.ACTUAL_PLANNING : TaskTypeEnum.TaskOriginator.PRE_PLANNING);
-
         mainTask.setSkills(String.join(",", skillIds));
-
         mainTaskEndTime = DateUtils.getDate(mainTaskStartTime.getTime() + (mainTaskDuration * 60000));
-
         mainTask.setSubTaskIds(subTaskIdsList);
-
         mainTask.setDateFrom(startDate); //Main task's start date and end date is same. (as all subtasks will be of same day)
         mainTask.setDateTo(startDate); //Main task's start date and end date is same. (as all subtasks will be of same day)
         mainTask.setTaskStartBoundary(startBoundaryDate);
         mainTask.setTaskEndBoundary(endBoundaryDate);
-
         mainTask.setTimeFrom(mainTaskStartTime);
         mainTask.setTimeTo(mainTaskEndTime);
-
         //mainTask.setDuration((int) TimeUnit.MILLISECONDS.toMinutes(mainTaskEndTime.getTime() - mainTaskStartTime.getTime()));
         mainTask.setDuration(mainTaskDuration);
-
         mainTask.setSlaStartDuration(firstTask.getSlaStartDuration() > 0 ? firstTask.getSlaStartDuration() : 0);
-
         LocalDate localDate = startDate.toInstant().atZone(systemDefault()).toLocalDate();
         mainTask.setJoinEventId(localDate.getDayOfWeek().name() + "_" + uniqueID);
-
         mainTask.setUnitId(unitId);
         mainTask.setCitizenId(citizenId);
         mainTask.setStaffCount(1); //Setting Staff count to 1, as main task has be to delivered by individual.
         mainTask.setPriority(2); //Setting Priority to 2, as it's default priority is fls visitour.
         mainTask.setVisitourTaskTypeID("37"); //Setting TaskType id 37 for Merged Tasks.
         mainTask.setName(mainTaskName);
-
         mainTask.setPrefferedStaffIdsList(preferredStaffIds);
         mainTask.setForbiddenStaffIdsList(forbiddenStaffIds);
-
         mainTask.setTaskStatus(TaskStatus.GENERATED);
-
         mainTask.setAddress(taskAddress);
-
         mainTask.setCreatedByStaffId(loggedInUserId);
-
         mainTask.setSubTask(false);
         if (isActualPlanningScreen) {
             mainTask.setSingleTask(true);
         }
         taskService.save(mainTask);
-
-        /*for (Task task : tasksToDelete) {
-            Map<String, Object> callMetaData = new HashMap<>();
-            callMetaData.put("functionCode", 4);
-            callMetaData.put("extID", task.getId());
-            callMetaData.put("vtid", task.getVisitourId());
-            scheduler.deleteCall(callMetaData, flsCredentials);
-        }*/
-
         Task responseMainTask = Task.copyProperties(mainTask, Task.getInstance());
         responseMainTask.setSubTaskIds(responseSubTaskIdsList);
         return responseMainTask;
     }
-
+    private Task getTask(List<BigInteger> subTaskIdsList, List<BigInteger> responseSubTaskIdsList, Task task) {
+        if (TaskTypeEnum.TaskOriginator.PRE_PLANNING.equals(task.getTaskOriginator()) && !task.isHasActualTask()) {
+            Task actualPlanningTask = new Task();
+            BeanUtils.copyProperties(task, actualPlanningTask);
+            actualPlanningTask.setId(null);
+            actualPlanningTask.setParentTaskId(task.getId());
+            actualPlanningTask.setTaskOriginator(TaskTypeEnum.TaskOriginator.ACTUAL_PLANNING);
+            actualPlanningTask.setSubTask(true);
+            taskService.save(actualPlanningTask);
+            task.setHasActualTask(true);
+            taskService.save(task);
+            Task cloneObject = Task.copyProperties(actualPlanningTask, Task.getInstance());
+            cloneObject.setId(task.getId());
+            responseSubTaskIdsList.add(cloneObject.getId());
+            subTaskIdsList.add(actualPlanningTask.getId());
+            task = cloneObject;
+        } else if (TaskTypeEnum.TaskOriginator.PRE_PLANNING.equals(task.getTaskOriginator()) && task.isHasActualTask()) {
+            Task actualPlanningTask = taskMongoRepository.findByParentTaskId(task.getId());
+            actualPlanningTask.setSubTask(true);
+            taskService.save(actualPlanningTask);
+            Task cloneObject = Task.copyProperties(actualPlanningTask, Task.getInstance());
+            cloneObject.setId(task.getId());
+            responseSubTaskIdsList.add(cloneObject.getId());
+            subTaskIdsList.add(actualPlanningTask.getId());
+            task = cloneObject;
+        }
+        return task;
+    }
 
     public List<TaskGanttDTO> unMergeMultipleTasks( long unitId, long citizenId, Map<String, Object> tasksData, boolean isActualPlanningScreen) throws CloneNotSupportedException, ParseException {
         long startTime = System.currentTimeMillis();

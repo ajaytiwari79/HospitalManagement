@@ -30,7 +30,7 @@ public class StaffEmploymentDetails {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long lastModificationDate;
-    private long id;
+    private Long id;
     private WTAResponseDTO workingTimeAgreement;
     private CTAResponseDTO costTimeAgreement;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
@@ -129,11 +129,11 @@ public class StaffEmploymentDetails {
         this.lastModificationDate = lastModificationDate;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

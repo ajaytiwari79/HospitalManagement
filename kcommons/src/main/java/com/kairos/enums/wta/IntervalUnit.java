@@ -1,6 +1,8 @@
 package com.kairos.enums.wta;
 
-public enum IntervalUnit {
+import java.io.Serializable;
+
+public enum IntervalUnit implements Serializable {
     DAYS("Days"),WEEKS("Weeks"), MONTHS("Months"),YEARS("Years"),NEXT("Next"), CURRENT("Current"), LAST("Last");
     private String value;
     IntervalUnit(String value){

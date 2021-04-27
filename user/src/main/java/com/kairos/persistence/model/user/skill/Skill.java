@@ -30,6 +30,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class Skill extends UserBaseEntity {
+    private static final long serialVersionUID = -8985963690316400116L;
     @NotBlank(message = "error.Skill.name.notEmpty")
     private String name;
     private String description;

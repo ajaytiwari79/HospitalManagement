@@ -6,6 +6,8 @@ import com.kairos.enums.TimeCalaculationType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -16,8 +18,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class TimeCalculationActivityDTO {
+public class TimeCalculationActivityDTO implements Serializable {
 
+
+    private static final long serialVersionUID = 8745825684079591322L;
     private Long activityId;
     private String methodForCalculatingTime;
     private TimeCalaculationType fullDayCalculationType;
@@ -31,7 +35,7 @@ public class TimeCalculationActivityDTO {
     private Boolean multiplyByVacationFactor;
     private Boolean multiplyByFinalSchedule;
     private String breakTemplates;
-    private List<Long> dayTypes;
+    private List<BigInteger> dayTypes;
     private DayOfWeek fullWeekStart;
     private DayOfWeek fullWeekEnd;
     private int historyDuration;
@@ -173,11 +177,11 @@ public class TimeCalculationActivityDTO {
         this.activityId = activityId;
     }
 
-    public List<Long> getDayTypes() {
+    public List<BigInteger> getDayTypes() {
         return dayTypes;
     }
 
-    public void setDayTypes(List<Long> dayTypes) {
+    public void setDayTypes(List<BigInteger> dayTypes) {
         this.dayTypes = dayTypes;
     }
 

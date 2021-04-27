@@ -15,6 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 @RelationshipEntity(type=HAS_ACCESS_PAGE_PERMISSION)
 public class AccessPermissionAccessPageRelation extends UserBaseEntity {
 
+    private static final long serialVersionUID = -6232935034558392413L;
     @StartNode
     private AccessPermission accessPermission;
     @EndNode

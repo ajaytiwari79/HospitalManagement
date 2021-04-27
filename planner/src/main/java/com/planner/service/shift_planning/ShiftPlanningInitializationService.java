@@ -41,7 +41,7 @@ public class ShiftPlanningInitializationService {
         try {
             new ShiftPlanningSolver().run(null);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return null;
     }
@@ -65,7 +65,7 @@ public class ShiftPlanningInitializationService {
             printWriter.write(objectString);
             printWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

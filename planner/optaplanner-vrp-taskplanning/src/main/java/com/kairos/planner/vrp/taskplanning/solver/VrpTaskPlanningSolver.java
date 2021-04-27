@@ -100,7 +100,7 @@ public class VrpTaskPlanningSolver {
             solution = solver.solve(problem);
 
         }catch (Exception e){
-            //e.printStackTrace();
+            //logger.error(e.getMessage());
             throw  e;
         }
         getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
@@ -202,7 +202,7 @@ public class VrpTaskPlanningSolver {
             //getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
             return new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()};
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
             //throw  e;
         }
         return null;

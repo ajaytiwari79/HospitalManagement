@@ -1,5 +1,7 @@
 package com.kairos.enums.reason_code;
 
-public enum ReasonCodeRequiredState {
-    OPTIONAL,MANDATORY
+import java.io.Serializable;
+
+public enum ReasonCodeRequiredState implements Serializable {
+    OPTIONAL, MANDATORY
 }

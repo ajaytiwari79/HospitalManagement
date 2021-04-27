@@ -2,7 +2,6 @@ package com.kairos.dto.user.organization;
 
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user_context.UserContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +10,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 /**
  * Created by prerna on 15/11/17.
@@ -38,16 +34,6 @@ public class OrganizationServiceDTO {
     private Long unitId;
     private List<OrganizationServiceDTO> children;
     private boolean isEnabled;
-
-    public Map<String, TranslationInfo> getTranslatedData() {
-        if(isNotNull(translatedNames) && isNotNull(translatedDescriptions)) {
-            Map<String, TranslationInfo> infoMap = new HashMap<>();
-            translatedNames.forEach((k, v) -> infoMap.put(k, new TranslationInfo(v, translatedDescriptions.get(k))));
-            return infoMap;
-        }else {
-            return new HashMap<>();
-        }
-    }
 
     public List<OrganizationServiceDTO> getOrganizationSubService() {
         if(this.organizationSubService==null){

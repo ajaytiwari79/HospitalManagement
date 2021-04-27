@@ -1,9 +1,7 @@
 package com.kairos.service.country;
+
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.ClinicType;
 import com.kairos.persistence.model.country.default_data.OwnershipType;
 import com.kairos.persistence.model.country.default_data.OwnershipTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -13,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -53,12 +49,7 @@ public class OwnershipTypeService {
 
     public List<OwnershipTypeDTO> getOwnershipTypeByCountryId(long countryId){
         List<OwnershipType> ownershipTypes = ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
-        List<OwnershipTypeDTO> ownershipTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ownershipTypes,OwnershipTypeDTO.class);
-        for(OwnershipTypeDTO ownershipTypeDTO :ownershipTypeDTOS){
-            ownershipTypeDTO.setCountryId(countryId);
-            ownershipTypeDTO.setTranslations(TranslationUtil.getTranslatedData(ownershipTypeDTO.getTranslatedNames(),ownershipTypeDTO.getTranslatedDescriptions()));
-        }
-        return ownershipTypeDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(ownershipTypes, OwnershipTypeDTO.class);
     }
 
     public OwnershipTypeDTO updateOwnershipType(long countryId, OwnershipTypeDTO ownershipTypeDTO){
@@ -84,16 +75,5 @@ public class OwnershipTypeService {
             exceptionService.dataNotFoundByIdException("error.OwnershipType.notfound");
         }
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long ownershipTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        OwnershipType ownershipType =ownershipTypeGraphRepository.findOne(ownershipTypeId);
-        ownershipType.setTranslatedNames(translatedNames);
-        ownershipType.setTranslatedDescriptions(translatedDescriptios);
-        ownershipTypeGraphRepository.save(ownershipType);
-        return ownershipType.getTranslatedData();
     }
 }

@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -23,11 +25,13 @@ public class PresenceStaffingLevelDto {
     private BigInteger id;
     private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @NotNull(message = "message.staffingLevel.currentDate.not.exists")
     private Date currentDate;
     private Integer weekCount;
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
+    private Set<StaffingLevelActivityDetails> staffingLevelActivityDetails =new LinkedHashSet<>();
     private Date updatedAt;
     private boolean draft;
 
@@ -46,11 +50,11 @@ public class PresenceStaffingLevelDto {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public enum StaffingLevelChange{
-        ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT
+    public enum StaffingLevelChange implements Serializable {
+        ACTIVITY_MIN_AND_MAX,ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT
     }
 
-    public enum StaffingLevelAction{
+    public enum StaffingLevelAction implements Serializable {
         ADD,UPDATE,REMOVE
     }
 

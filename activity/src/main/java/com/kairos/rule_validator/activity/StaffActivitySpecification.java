@@ -4,6 +4,7 @@ import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
@@ -31,12 +32,12 @@ public class StaffActivitySpecification extends AbstractSpecification<ShiftWithA
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO) {
+    public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO, RuleExecutionType ruleExecutionType) {
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
-            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
-                validateStaffActivity(errorMessages,childActivity);
-            }
+//            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
+//                validateStaffActivity(errorMessages,childActivity);
+//            }
             validateStaffActivity(errorMessages,shiftActivityDTO);
         }
     }

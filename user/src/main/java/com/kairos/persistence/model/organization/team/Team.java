@@ -34,6 +34,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 @AllArgsConstructor
 public class Team extends UserBaseEntity {
 
+    private static final long serialVersionUID = -7287662943308577836L;
     private String name;
     private String description;
 
@@ -44,7 +45,7 @@ public class Team extends UserBaseEntity {
     private ContactAddress contactAddress;
 
     private boolean isEnabled = true;
-    private Set<BigInteger> activityIds=new HashSet<>();
+    private BigInteger activityId;
 
 
     public Team(String name, String description,  ContactAddress contactAddress) {

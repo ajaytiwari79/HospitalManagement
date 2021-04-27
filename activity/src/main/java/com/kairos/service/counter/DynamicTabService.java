@@ -10,7 +10,6 @@ import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class DynamicTabService extends MongoBaseService {
+public class DynamicTabService {
     @Inject
     private ExceptionService exceptionService;
     @Inject

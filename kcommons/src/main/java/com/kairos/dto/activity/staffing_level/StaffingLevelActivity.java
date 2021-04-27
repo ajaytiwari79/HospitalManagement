@@ -1,11 +1,11 @@
 package com.kairos.dto.activity.staffing_level;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.annotation.Transient;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -21,14 +21,23 @@ public class StaffingLevelActivity {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    @Transient
     private  int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;
     private int initialUnderStaffing;
     private int initialOverStaffing;
+    private int remainingUnderStaffing;
+    private int remainingOverStaffing;
+    private int solvedUnderStaffing;
+    private int solvedOverStaffing;
+    private  int previousAvailableNoOfStaff;
 
 
+    public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
+        this.activityId = activityId;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+    }
 
     public StaffingLevelActivity(String name, int minNoOfStaff, int maxNoOfStaff) {
         this.name = name;
@@ -43,33 +52,20 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
-        this.activityId = activityId;
-        this.minNoOfStaff = minNoOfStaff;
-        this.maxNoOfStaff = maxNoOfStaff;
+    public void setAvailableNoOfStaff(int availableNoOfStaff) {
+        this.availableNoOfStaff = Math.max(availableNoOfStaff,0);
     }
 
-    public void setInitialStaffingLevelDetails(){
-        this.initialUnderStaffing = Math.max(this.minNoOfStaff-this.availableNoOfStaff,0);
-        this.initialOverStaffing =  Math.max(this.availableNoOfStaff-this.maxNoOfStaff,0);
+    @JsonIgnore
+    public void resetValueOnPhaseFlip(){
+        this.remainingOverStaffing = Math.max(availableNoOfStaff - maxNoOfStaff,0);
+        this.solvedOverStaffing = 0;
+        this.initialOverStaffing = remainingOverStaffing;
+        this.remainingUnderStaffing = Math.max(minNoOfStaff - availableNoOfStaff,0);
+        this.solvedUnderStaffing = 0;
+        this.initialUnderStaffing = this.remainingUnderStaffing;
+        this.previousAvailableNoOfStaff = this.availableNoOfStaff;
     }
-
-    public int getRemainingUnderStaffingToResolve(){
-        return Math.max(minNoOfStaff-availableNoOfStaff,0);
-    }
-
-    public int getRemainingOverStaffingToResolve(){
-        return Math.max(availableNoOfStaff-maxNoOfStaff,0);
-    }
-
-    public int getResolvedUnderStaffingAfterPublish(){
-        return Math.min(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
-    }
-
-    public int getResolvedOverStaffingAfterPublish(){
-        return Math.min(maxNoOfStaff+initialOverStaffing-availableNoOfStaff,initialOverStaffing);
-    }
-
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
@@ -24,5 +26,7 @@ public interface CustomStaffGraphRepository {
     <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType, Set<T>> filters, Long unitId, LocalDate today, String searchText, Long loggedInUserId,String imagePath);
 
     StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId,String imagePath);
+
+    List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShift(Long unitId, NotEligibleStaffDataDTO notEligibleStaffDataDTO);
 
 }

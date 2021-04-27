@@ -1,17 +1,15 @@
 package com.kairos.service.region;
-import com.kairos.dto.TranslationInfo;
+
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.ProvinceQueryResult;
 import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,20 +71,6 @@ public class ProvinceService {
     public List<ProvinceQueryResult> getProvinceToRegion(Long regionId) {
         return provinceGraphRepository.findAllProvinceByRegionId(regionId);
 
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfProvince(Long provinceId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Province province =provinceGraphRepository.findOne(provinceId);
-        province.setTranslatedNames(translatedNames);
-        province.setTranslatedDescriptions(translatedDescriptios);
-        provinceGraphRepository.save(province);
-        return province.getTranslatedData();
     }
 
 

@@ -1,5 +1,7 @@
 package com.kairos.enums.user;
 
-public enum UserType {
+import java.io.Serializable;
+
+public enum UserType implements Serializable {
     SYSTEM_ACCOUNT,USER_ACCOUNT
 }

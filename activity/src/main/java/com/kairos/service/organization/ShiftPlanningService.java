@@ -3,7 +3,6 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.filter_utils.FilterUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -16,6 +15,7 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,7 +29,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 
@@ -46,8 +45,8 @@ public class ShiftPlanningService {
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
-    @Inject
-    private NightWorkerMongoRepository nightWorkerMongoRepository;
+    @Inject private NightWorkerService nightWorkerService;
+    @Inject private NightWorkerMongoRepository nightWorkerMongoRepository;
 
 
     public <T> List<StaffShiftDetailsDTO> getShiftPlanningDetailsForUnit(final Long unitId, final ShiftSearchDTO shiftSearchDTO, boolean showAllStaffs) {
@@ -101,7 +100,6 @@ public class ShiftPlanningService {
          Object[] validFilterObjectsAndExistShiftFilter = FilterUtils.filterOutEmptyQueriesAndPrepareMap(shiftSearchDTO);
         Map<FilterType, Set<T>> validFilterMap = (Map<FilterType, Set<T>>)validFilterObjectsAndExistShiftFilter[0];
          boolean anyShiftFilterExists = (boolean)validFilterObjectsAndExistShiftFilter[1];
-        LOGGER.debug(" shift filters present are {}", anyShiftFilterExists);
         FilteredStaffsAndRequiredDataFilterDTO filteredStaffsAndRequiredDataFilterDTO = getAllStaffEligibleForPlanning(unitId, shiftSearchDTO,showAllStaffs);
         List<StaffShiftDetailsDTO> staffListWithPersonalDetails = filteredStaffsAndRequiredDataFilterDTO.getStaffShiftDetailsDTOS();
         if (CollectionUtils.isEmpty(staffListWithPersonalDetails)) {

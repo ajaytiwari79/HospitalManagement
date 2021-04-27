@@ -1,5 +1,7 @@
 package com.kairos.enums.cta;
 
-public enum CompensationType {
+import java.io.Serializable;
+
+public enum CompensationType implements Serializable {
     HOURS,CURRENCY
 }

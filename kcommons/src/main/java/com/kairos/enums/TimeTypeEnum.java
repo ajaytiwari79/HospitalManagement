@@ -4,7 +4,9 @@ package com.kairos.enums;
  *
  */
 
-public enum TimeTypeEnum {
+import java.io.Serializable;
+
+public enum TimeTypeEnum implements Serializable {
     PRESENCE,
     ABSENCE,
     PAID_BREAK,

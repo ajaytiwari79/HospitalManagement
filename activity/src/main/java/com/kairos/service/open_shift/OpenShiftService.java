@@ -21,7 +21,6 @@ import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRe
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
@@ -36,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,9 +47,9 @@ import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
 
 @Service
 @Transactional
-public class OpenShiftService extends MongoBaseService {
+public class OpenShiftService  {
 
-    private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhaseService.class);
     @Inject
     private OpenShiftMongoRepository openShiftMongoRepository;
     @Inject
@@ -77,7 +77,7 @@ public class OpenShiftService extends MongoBaseService {
 
         OpenShift openShift = new OpenShift();
         ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
-        save(openShift);
+        openShiftMongoRepository.save(openShift);
         openShiftResponseDTO.setId(openShift.getId());
         return openShiftResponseDTO;
     }
@@ -104,7 +104,7 @@ public class OpenShiftService extends MongoBaseService {
             openShifts.add(openShift);
 
         }
-        save(openShifts);
+        openShiftMongoRepository.saveEntities(openShifts);
         int currentElement = 0;
         OpenShift openShiftCurrent;
         for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
@@ -128,7 +128,7 @@ public class OpenShiftService extends MongoBaseService {
             openShifts.add(openShift);
 
         }
-        save(openShifts);
+        openShiftMongoRepository.saveEntities(openShifts);
     }
 
     public void deleteOpenShift(BigInteger openShiftId) {
@@ -137,7 +137,7 @@ public class OpenShiftService extends MongoBaseService {
             throw new DataNotFoundByIdException("OpenShift does not exist by id" + openShiftId);
         }
         openShift.setDeleted(true);
-        save(openShift);
+        openShiftMongoRepository.save(openShift);
     }
 
 
@@ -168,7 +168,7 @@ public class OpenShiftService extends MongoBaseService {
 
             }
         }
-        save(openShift);
+        openShiftMongoRepository.save(openShift);
         return openShiftAction;
     }
 
@@ -237,7 +237,7 @@ public class OpenShiftService extends MongoBaseService {
             sendGridMailService.sendMailWithAttachment(recievers, SHIFT_NOTIFICATION, SHIFT_NOTIFICATION_MESSAGE, null);
             List<OpenShiftNotification> openShiftNotifications = new ArrayList<>();
             staffIds.forEach(staffId -> openShiftNotifications.add(new OpenShiftNotification(openShiftId, staffId)));
-            save(openShiftNotifications);
+            openShiftNotificationMongoRepository.saveEntities(openShiftNotifications);
         }
         return true;
     }
@@ -257,8 +257,20 @@ public class OpenShiftService extends MongoBaseService {
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired() - 1);
             openShift.getAssignedStaff().add(employmentDetail.getStaffId());
         });
-        save(openShift);
+        openShiftMongoRepository.save(openShift);
         return true;
+    }
+
+    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate) {
+        shiftMongoRepository.deleteShiftsAfterDate(staffId, employmentEndDate);
+        List<OpenShift> openShifts = openShiftMongoRepository.findAllOpenShiftsByInterestedStaff(staffId, employmentEndDate);
+        if (!openShifts.isEmpty()) {
+            for (OpenShift openShift : openShifts) {
+                openShift.getInterestedStaff().remove(staffId);
+                openShift.getAssignedStaff().remove(staffId);
+            }
+            openShiftMongoRepository.saveEntities(openShifts);
+        }
     }
 
 }

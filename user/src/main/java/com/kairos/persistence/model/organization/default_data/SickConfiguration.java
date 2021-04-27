@@ -20,6 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UN
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SickConfiguration extends UserBaseEntity {
 
+    private static final long serialVersionUID = -7378824239801714975L;
     private Set<BigInteger> timeTypes;
 
     @Relationship(type = IN_UNIT)

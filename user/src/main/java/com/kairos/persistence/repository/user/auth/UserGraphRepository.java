@@ -129,4 +129,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (user:User)-[:BELONGS_TO_SUPER_ADMIN]-(ag:AccessGroup) WHERE id(user)={0} AND ag.name='SUPER_ADMIN' RETURN COUNT(user)>0")
     boolean isSystemAdmin(Long id);
+
+    @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(staff)={0} RETURN id(user)")
+    Long getUserIdByStaffId(Long staffId);
 }

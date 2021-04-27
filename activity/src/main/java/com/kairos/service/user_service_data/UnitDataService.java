@@ -4,7 +4,6 @@ import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
 import com.kairos.persistence.repository.user_service_data.UnitAndParentOrganizationAndCountryIdsMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UnitDataService extends MongoBaseService {
+public class UnitDataService {
 
     @Inject
     private UserIntegrationService userIntegrationService;
@@ -25,7 +24,7 @@ public class UnitDataService extends MongoBaseService {
 
     public void addParentOrganizationAndCountryIdForUnit(Long unitId, Long parentOrganizationId, Long countryId){
         UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = new UnitAndParentOrganizationAndCountryIds(unitId, parentOrganizationId, countryId);
-        save(unitAndParentOrganizationAndCountryIds);
+        unitAndParentOrganizationAndCountryIdsMongoRepository.save(unitAndParentOrganizationAndCountryIds);
     }
 
     public boolean addParentOrganizationAndCountryIdForAllUnits(){
@@ -35,7 +34,7 @@ public class UnitDataService extends MongoBaseService {
             unitAndParentOrganizationAndCountryIds.add(new UnitAndParentOrganizationAndCountryIds(unitDetailsDTO.getUnitId(),
                     unitDetailsDTO.getParentOrganizationId(), unitDetailsDTO.getCountryId()));
         });
-        save(unitAndParentOrganizationAndCountryIds);
+        unitAndParentOrganizationAndCountryIdsMongoRepository.saveEntities(unitAndParentOrganizationAndCountryIds);
         return true;
     }
 

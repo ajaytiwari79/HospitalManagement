@@ -8,12 +8,11 @@ import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
-import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.dto.ShiftDTO;
-import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
-
-import com.kairos.shiftplanning.utils.*;
+import com.kairos.shiftplanning.utils.LocalDateConverter;
+import com.kairos.shiftplanning.utils.LocalTimeConverter;
+import com.kairos.shiftplanning.utils.ZonedDateTimeConverter;
 import com.kairos.shiftplanningNewVersion.entity.ALI;
 import com.kairos.shiftplanningNewVersion.entity.Shift;
 import com.kairos.shiftplanningNewVersion.entity.Staff;
@@ -21,7 +20,6 @@ import com.kairos.shiftplanningNewVersion.generator.StaffingLevelGenerator;
 import com.kairos.shiftplanningNewVersion.solution.StaffingLevelSolution;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import io.quarkus.runtime.QuarkusApplication;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -40,7 +38,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
@@ -332,7 +329,7 @@ public class StaffingLevelSolver {
                 unSolvedsolution = staffingLevelSolver.runSolverOnRequest(unSolvedsolution);
                 //writeSolutionToFile(unSolvedsolution);
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error(e.getMessage());
                 File file = new File(System.getProperty(USER_HOME) + "/" + "exception.text");
                 if(!file.exists()){
                     file.createNewFile();

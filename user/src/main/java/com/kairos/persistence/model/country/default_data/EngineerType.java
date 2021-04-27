@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class EngineerType extends UserBaseEntity {
 
+    private static final long serialVersionUID = 7183368264864017472L;
     @NotBlank(message = "error.EngineerType.name.notEmpty")
     private String name;
     private String description;

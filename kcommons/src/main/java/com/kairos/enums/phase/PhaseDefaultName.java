@@ -1,5 +1,7 @@
 package com.kairos.enums.phase;
 
-public enum PhaseDefaultName {
+import java.io.Serializable;
+
+public enum PhaseDefaultName implements Serializable {
     REQUEST,PUZZLE,CONSTRUCTION,DRAFT,REALTIME,TIME_ATTENDANCE,TENTATIVE,PAYROLL
 }

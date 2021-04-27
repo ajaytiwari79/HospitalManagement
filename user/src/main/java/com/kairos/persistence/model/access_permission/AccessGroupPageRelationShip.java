@@ -13,6 +13,7 @@ import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
 @RelationshipEntity(type=HAS_ACCESS_OF_TABS)
 public class AccessGroupPageRelationShip extends UserBaseEntity {
 
+    private static final long serialVersionUID = -9088539473365397095L;
     @StartNode private AccessGroup accessGroup;
     @EndNode private AccessPage accessPage;
     private boolean isEnabled;

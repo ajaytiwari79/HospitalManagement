@@ -8,7 +8,6 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.templates.*;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.wta.WTATemplateType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

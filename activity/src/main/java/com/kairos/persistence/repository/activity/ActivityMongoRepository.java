@@ -5,7 +5,6 @@ import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -27,8 +26,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     Activity findByParentIdAndDeletedFalseAndUnitId(BigInteger parentId, Long unitId);
 
-    Activity findByParentIdAndDeletedFalse(BigInteger parentId);
-
     @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'activityTimeCalculationSettings.methodForCalculatingTime':1,'activityRulesSettings':1,'activityBalanceSettings':1}")
     List<ActivityDTO> findByDeletedFalseAndCountryId(Long countryId);
 
@@ -38,9 +35,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'deleted' : false, 'unitId' :{$in:?0} }", fields = "{'name':1,'_id':1,'unitId':1}")
     List<ActivityDTO> findAllActivityByDeletedFalseAndUnitId(List<Long> unitId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'compositeActivities':1,'unitId':1,'activityTimeCalculationSettings.methodForCalculatingTime':1}")
-    List<Activity> findAllActivitiesByUnitId(Long unitId);
-
     List<Activity> findByExternalIdIn(List<String> activityExternalIds);
 
     @Query(value = "{'deleted' : false, 'unitId' :{$in:?0},'countryParentId':{$in:?1}}", fields = "{'countryParentId':1,'_id':1,'unitId':1}")
@@ -48,20 +42,11 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     List<Activity> findByUnitIdAndExternalIdInAndDeletedFalse(Long unitId, List<String> activityExternalIds);
 
-    @Query("{'deleted' : false, 'activityGeneralSettings.categoryId' :?0}")
-    List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
-
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Collection<BigInteger> activityIds);
 
-    @Query("{_id:{$in:?0}, deleted:false}")
-    List<ActivityWithCompositeDTO> findAllActivityWithCompositeDTOByIds(Collection<BigInteger> activityIds);
-
     @Query(value = "{childActivityIds:?0, deleted:false}")
     Activity findByChildActivityId(BigInteger childActivityId);
-
-    @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
-    List<Activity> findByChildActivityIds(Collection<BigInteger> childActivityIds);
 
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'activityPhaseSettings':1 ,'activityRulesSettings':1,'name':1,'activityBalanceSettings':1,'activityTimeCalculationSettings':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Collection<BigInteger> activityIds);
@@ -80,18 +65,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'activityBalanceSettings.timeTypeId':?0, deleted:false}",exists = true)
     boolean existsByTimeTypeId(BigInteger timeTypeId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0,'activityPriorityId':?1 }",exists = true)
-    boolean existsActivitiesByActivityPriorityIdAndUnitId(Long unitId,BigInteger activityPriorityId);
-
-    @Query(value = "{'deleted' : false, 'countryId' :?0,'activityPriorityId':?1 }",exists = true)
-    boolean existsActivitiesByActivityPriorityIdAndCountryId(Long countryId,BigInteger activityPriorityId);
-
     @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
     boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
-
-    @Query(value = "{'activityBalanceSettings.timeType':?0, deleted:false}")
-    List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
-
 
     @Query(value = "{'activityBalanceSettings.timeType':?0,unitId:{$in:?1 }, deleted:false}")
     List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds);
@@ -99,20 +74,9 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'activityGeneralSettings.tags':?0}")
     List<Activity> findActivitiesByTagId(BigInteger tagId);
 
-    @Query(value = "{unitId:?0, 'activityTimeCalculationSettings.methodForCalculatingTime':{$in:?1 }, 'activityRulesSettings.approvalAllowedPhaseIds':?2, deleted:false}")
-    List<Activity> findAllAbsenceActivities(Long unitId, Set<String> methodForCalculatingTimes, BigInteger phaseId);
-
-    @Query(value = "{'activityRulesSettings.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'activityRulesSettings':1}")
-    List<Activity> findAllSicknessActivity(Long unitId);
-
-    @Query(value = "{unitId:?0, deleted:false}")
-    List<ActivityDTO> getActivitiesByUnitId(Long unitId);
-
-
-    @Query(value = "{'activityBalanceSettings.priorityFor':?0,activityPriorityId:?1,_id:{$ne: ?2}}",exists = true)
-    boolean isActivityPriorityIdIsExistOrNot(PriorityFor priorityFor,BigInteger priorityId,BigInteger activityId);
+    @Query(value = "{unitId:?0, 'activityBalanceSettings.timeType':?1 , 'activityRulesSettings.approvalAllowedPhaseIds':?2, deleted:false}")
+    List<Activity> findAllAbsenceActivities(Long unitId, TimeTypeEnum timeType, BigInteger phaseId);
 
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeTypeId':{$in:?1 }, deleted:false}")
     List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds);
-
 }

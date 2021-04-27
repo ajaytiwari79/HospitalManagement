@@ -47,12 +47,12 @@ public class RuleTemplateCategoryController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.DELETE)
-    ResponseEntity<Map<String, Object>> deleteRuleTemplate(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId) {
+    ResponseEntity<Map<String, Object>> deleteRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger templateCategoryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.deleteRuleTemplateCategory(countryId, templateCategoryId));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
+    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable Long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory));
     }
 

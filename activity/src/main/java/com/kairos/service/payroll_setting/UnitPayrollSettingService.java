@@ -12,7 +12,6 @@ import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.payroll_setting.UnitPayrollSetting;
 import com.kairos.persistence.repository.payroll_setting.UnitPayrollSettingMongoRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class UnitPayrollSettingService extends MongoBaseService {
+public class UnitPayrollSettingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnitPayrollSettingService.class);
     @Inject
     private UnitPayrollSettingMongoRepository unitPayrollSettingMongoRepository;
