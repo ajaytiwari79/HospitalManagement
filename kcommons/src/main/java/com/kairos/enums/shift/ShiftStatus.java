@@ -1,5 +1,6 @@
 package com.kairos.enums.shift;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,7 +10,7 @@ import java.util.stream.Stream;
 /**
  * Created by vipul on 8/5/18.
  */
-public enum ShiftStatus {
+public enum ShiftStatus implements Serializable {
     PUBLISH,UNPUBLISH,FIX,LOCK,UNLOCK,UNFIX,PENDING,REQUEST,VALIDATE, DISAPPROVE,APPROVE,MOVED,REJECT;
 
     public static List<ShiftStatus> getListByValue(List<String> values) {

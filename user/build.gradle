@@ -58,7 +58,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.springframework.boot:spring-boot-starter-cache')
-    compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile('org.springframework.boot:spring-boot-starter-security')
 
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
@@ -68,13 +67,6 @@ dependencies {
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
 
     compile('org.springframework.boot:spring-boot-starter-data-neo4j')
-
-    //send grid
-    compile ('com.sendgrid:sendgrid-java:4.0.1')
-
-    compile("org.aspectj:aspectjweaver:1.8.8")
-
-
     compile('org.springframework.boot:spring-boot-starter-websocket')
 
     compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'
@@ -93,8 +85,7 @@ dependencies {
 
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
-    compile group: 'org.json',name: 'json', version: '20160810'
+
 
     compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
 

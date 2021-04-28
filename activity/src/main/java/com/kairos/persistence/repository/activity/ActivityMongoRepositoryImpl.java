@@ -329,9 +329,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Override
     public List<ActivityDTO> findAllActivitiesByTimeType(Long refId, TimeTypeEnum timeType) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ABSENCE.equals(timeType)?COUNTRY_ID:UNIT_ID).is(refId).and("activityBalanceSettings.timeType").is(timeType).and(DELETED).is(false)),
+                match(Criteria.where(ABSENCE.equals(timeType)?COUNTRY_ID:UNIT_ID).is(refId).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE).is(timeType).and(DELETED).is(false)),
                 sort(Sort.Direction.ASC, "createdAt"),
-                project("name","countryParentId","activityTimeCalculationSettings","expertises","activityGeneralSettings"));
+                project(NAME,COUNTRY_PARENT_ID,TIME_CALCULATION_ACTIVITY_TAB,EXPERTISES,GENERAL_ACTIVITY_TAB));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }

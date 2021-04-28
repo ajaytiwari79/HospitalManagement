@@ -1,17 +1,14 @@
 package com.kairos.service.country;
 
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.LevelDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.*;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
@@ -43,7 +40,6 @@ import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +49,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -157,7 +152,6 @@ public class CountryService {
        return activityIntegrationService.getCountryHolidaysByCountryId(countryId);
 
     }
-
 
     public List<Map> getCountryNameAndCodeList() {
         return countryGraphRepository.getCountryNameAndCodeList();
