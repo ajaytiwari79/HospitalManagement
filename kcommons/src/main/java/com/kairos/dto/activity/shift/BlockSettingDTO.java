@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class BlockSettingDTO {
     private BigInteger id;
     private Long unitId;
     private LocalDate date;
-    private Map<Long, Set<BigInteger>> blockDetails;
+    private Map<Long, Set<BigInteger>> blockDetails=new HashMap<>();
     private Set<Long> blockedStaffForCoverShift;
     private LocalDate endDate;
     private boolean unblockStaffs;
