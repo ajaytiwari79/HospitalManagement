@@ -7,6 +7,7 @@ import com.kairos.service.shift.CoverShiftService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,7 +96,7 @@ public class CoverShiftController {
     @ApiOperation("get details for cover shift")
     @GetMapping(value = "/cover_shift/staff_details/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId,@PathVariable Long unitId,@RequestParam("employmentId") Long employmentId,@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
+    public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId, @PathVariable Long unitId, @RequestParam("employmentId") Long employmentId, @RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftStaffDetails(startDate,endDate,unitId,staffId,employmentId));
     }
 }

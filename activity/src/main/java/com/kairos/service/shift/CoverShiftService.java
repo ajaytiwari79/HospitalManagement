@@ -264,7 +264,6 @@ public class CoverShiftService {
         Set<BigInteger> totalDeclined=  coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).map(k->k.getId()).collect(Collectors.toSet());
         Set<BigInteger> totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId,employmentId);
         return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
-
     }
 
     public Set<BigInteger> getEligibleShifts(List<Shift> shifts, Long unitId, Long staffId, Long employmentId){
