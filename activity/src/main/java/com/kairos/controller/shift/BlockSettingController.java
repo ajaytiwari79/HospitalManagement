@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class BlockSettingController {
     @ApiOperation("create or update block setting")
     @PutMapping(value = "/block_setting/cover_shift")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveBlockSettingForCoverShift(@PathVariable Long unitId, @RequestBody BlockSettingDTO blockSettingDTO) {
+    public ResponseEntity<Map<String, Object>> saveBlockSettingForCoverShift(@PathVariable Long unitId, @RequestBody @Valid BlockSettingDTO blockSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.saveBlockSettingForCoverShift(unitId, blockSettingDTO));
     }
 
