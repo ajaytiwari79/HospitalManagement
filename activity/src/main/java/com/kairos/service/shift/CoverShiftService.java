@@ -279,7 +279,7 @@ public class CoverShiftService {
         Set<BigInteger> shiftList=new HashSet<>();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO=userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId,employmentId);
         staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
-        staffAdditionalInfoDTO.setTimeSlotSets(timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(shifts.get(0).getUnitId(), TimeSlotType.SHIFT_PLANNING).getTimeSlots());
+        staffAdditionalInfoDTO.setTimeSlotSets(timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
         if(coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYMENT_TYPES) && coverShiftSetting.getEmploymentTypeIds().contains(employmentId)){
             return shiftList;
         }
