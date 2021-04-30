@@ -999,7 +999,4 @@ public class ActivityService {
     public List<ActivityDTO> findAllActivitiesByTimeType(Long refId, TimeTypeEnum timeType){
         return activityMongoRepository.findAllActivitiesByTimeType(refId,timeType);
     }
-    public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId, List<BigInteger> activityIds) {
-        return activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId,activityIds);
-    }
 }
