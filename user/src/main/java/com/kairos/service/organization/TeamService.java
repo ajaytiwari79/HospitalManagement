@@ -5,6 +5,7 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -429,5 +430,8 @@ public class TeamService {
 
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
         return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
+    }
+    public List<BigInteger> getTeamActivityIdsByUnit(Long unitId) {
+        return teamGraphRepository.getTeamActivityIdsByUnit(unitId);
     }
 }

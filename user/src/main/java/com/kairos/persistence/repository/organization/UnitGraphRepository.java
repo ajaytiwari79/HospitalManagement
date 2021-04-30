@@ -334,17 +334,17 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "MATCH (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) " +
             "MATCH (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) " +
             "RETURN unit,contactAddress,zipCode,municipality")
-    OrganizationContactAddress getOrganizationByOrganizationId(long organizationId);
+    OrganizationContactAddress getOrganizationByOrganizationId(Long organizationId);
 
     @Query("MATCH (organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(team)={0} RETURN organization")
-    Unit getOrganizationByTeamId(long groupId);
+    Unit getOrganizationByTeamId(Long teamId);
 
     @Query("MATCH (organization) WHERE id(organization)={0} WITH organization " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress\n" +
             "RETURN municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
-    OrganizationContactAddress getContactAddressOfOrg(long unitId);
+    OrganizationContactAddress getContactAddressOfOrg(Long unitId);
 
     @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress \n" +

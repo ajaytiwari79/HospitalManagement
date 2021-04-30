@@ -821,6 +821,11 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_EMPLOYMENT_DETAILS_BY_EMPLOYMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
         }, employmentId);
     }
+
+    public List<List<BigInteger>> getTeamActivityIdsByUnit(Long unitId){
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, TEAM_ACTIVITY_IDS, newArrayList(), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<List<BigInteger>>>>() {
+        });
+    }
 }
 
 
