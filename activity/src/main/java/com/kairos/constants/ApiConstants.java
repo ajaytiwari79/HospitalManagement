@@ -173,6 +173,7 @@ public final class ApiConstants {
 
     public static final String REQUEST_ABSENCE = API_V1+"/request_absence";
     public static final String TODO = API_V1 + UNIT_URL+"/todo";
+    public static final String TEAM_ACTIVITY_IDS = "/team_activity_ids";
     public static final Long DEFAULT_ID =-1l;
     public static final double DEFAULT_VALUE =1;
 

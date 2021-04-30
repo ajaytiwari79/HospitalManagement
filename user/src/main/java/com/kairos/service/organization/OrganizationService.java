@@ -93,8 +93,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 @Transactional
@@ -841,7 +840,8 @@ public class OrganizationService {
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        return new SelfRosteringMetaData(new ReasonCodeWrapper( userAccessRoleDTO));
+        List<BigInteger> activityIds = teamService.getTeamActivityIdsByUnit(unitId);
+        return new SelfRosteringMetaData(new ReasonCodeWrapper( userAccessRoleDTO),isCollectionNotEmpty(activityIds) ? (List<BigInteger>) activityIds.get(0) : newArrayList());
     }
 
     public boolean isUnit(Long unitId) {

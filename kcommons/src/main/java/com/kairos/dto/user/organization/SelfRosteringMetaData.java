@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -19,8 +20,10 @@ public class SelfRosteringMetaData {
     private List<DayTypeDTO> dayTypes;
     private ReasonCodeWrapper reasonCodeWrapper;
     private List<CountryHolidayCalenderDTO> publicHolidays;
+    private List<BigInteger> activityIds;
 
-    public SelfRosteringMetaData(ReasonCodeWrapper reasonCodeWrapper) {
+    public SelfRosteringMetaData(ReasonCodeWrapper reasonCodeWrapper,List<BigInteger> activityIds) {
         this.reasonCodeWrapper = reasonCodeWrapper;
+        this.activityIds = activityIds;
     }
 }
