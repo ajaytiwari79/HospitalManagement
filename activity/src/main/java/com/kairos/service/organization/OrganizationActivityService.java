@@ -693,16 +693,10 @@ public class OrganizationActivityService {
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(Long unitId) {
         SelfRosteringMetaData publicHolidayDayTypeWrapper = getSelfRosteringMetaData(unitId);
-        Future<List<ActivityWithCompositeDTO>> listFuture = executorService.submit(()->activityService.findAllActivityByUnitIdWithCompositeActivities(unitId,publicHolidayDayTypeWrapper.getActivityIds()));
         List<ActivityPhaseSettings> activityPhaseSettings = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId, new ArrayList<>(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().getAccessGroupIds()));
         Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
         LocalDate gracePeriodEndDate = getGracePeriodExpireDate(phase,publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().isManagement());
-        List<ActivityWithCompositeDTO> activities = null;
-        try {
-            activities = listFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error {}", e.getMessage());
-        }
+        List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId,publicHolidayDayTypeWrapper.getActivityIds());
         return PhaseActivityDTO.builder().activities(activities).activityPhaseSettings(activityPhaseSettings).gracePeriodExpireDate(gracePeriodEndDate).reasonCodes(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getReasonCodes()).staffAccessRole(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO()).build();
     }
 
