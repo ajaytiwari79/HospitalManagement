@@ -9,6 +9,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -218,38 +219,52 @@ public class AutoFillGapSettingsService {
     }
 
     public ShiftActivityDTO getActivityToFillTheGap(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, AutoGapFillingScenario gapFillingScenario, AutoFillGapSettings gapSettings, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList, boolean mainTeamRemoved, ShiftDTO shiftDTO) {
-        ShiftActivityDTO shiftActivityDTO;
-
-        RULE:for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
+        ShiftActivityDTO shiftActivityDTO = null;
+        BigInteger mainTeamActivityId = null;
+        TeamRankingInfoDTO mainTeam = staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().filter(k -> TeamType.MAIN.equals(k.getTeamType())).findAny().orElse(null);
+        if (mainTeam != null) {
+            mainTeamActivityId = mainTeam.getActivityId();
+        }
+        short gapDuration = (short) new DateTimeInterval(shiftActivityBeforeGap.getEndDate(),shiftActivityAfterGap.getStartDate()).getMinutes();
+        BigInteger activityId;
+        for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP :
-                    break RULE;
+                    shiftActivityDTO = getShiftActivityDTO(shiftActivityBeforeGap, shiftActivityAfterGap, shiftActivityDTO, mainTeamActivityId);
+                    break;
                 case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
-                    break RULE;
+                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO,gapDuration);
+                    if (activityId != null) {
+                        shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
+                    }
+                    break;
                 case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                    break RULE;
+                    break;
                 case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                    break RULE;
+                    break;
                 case HIGHEST_RANKED_ACTIVITY_THAT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                    break RULE;
+                    break;
                 case DO_NOT_ALLOW_TO_CAUSE_GAP :
-                    break RULE;
+                    break;
                 default:
+            }
+            if(isNotNull(shiftActivityDTO)){
+                break;
             }
         }
 
 
-        switch (gapFillingScenario) {
-            case PRODUCTIVE_TYPE_ON_BOTH_SIDE:
-                shiftActivityDTO = getApplicableActivityForProductiveTypeOnBothSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap,shiftDTO,mainTeamRemoved,activityList);
-                break;
-            case ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE:
-                shiftActivityDTO = getApplicableActivityForProductiveTypeOnOneSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, mainTeamRemoved,shiftDTO);
-                break;
-            default:
-                shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), shiftActivityBeforeGap.getActivityId(), null);
-                break;
-        }
+//        switch (gapFillingScenario) {
+//            case PRODUCTIVE_TYPE_ON_BOTH_SIDE:
+               shiftActivityDTO = getApplicableActivityForProductiveTypeOnBothSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap,shiftDTO,mainTeamRemoved,activityList);
+//                break;
+//            case ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE:
+//                shiftActivityDTO = getApplicableActivityForProductiveTypeOnOneSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, mainTeamRemoved,shiftDTO);
+//                break;
+//            default:
+//                shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), shiftActivityBeforeGap.getActivityId(), null);
+//                break;
+//        }
         if (isNull(shiftActivityDTO)) {
             exceptionService.actionNotPermittedException(SYSTEM_NOT_FOUND_ACTIVITY_TO_GAP_FILLING_CONFIGURATION);
         }
