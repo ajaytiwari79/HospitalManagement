@@ -34,6 +34,8 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.SelfRosteringMetaData;
+import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
@@ -657,8 +659,9 @@ public class OrganizationActivityService {
 
     }
 
-    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType) {
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType, List<StaffActivitySettingDTO> activitySettings) {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
+        activityList.addAll(activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet()));
         return activityMongoRepository.findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(activityList,unitId,staffId,isActivityType);
     }
 

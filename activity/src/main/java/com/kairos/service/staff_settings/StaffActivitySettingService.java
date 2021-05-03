@@ -123,7 +123,7 @@ public class StaffActivitySettingService {
         List<ActivityWithCompositeDTO> staffPersonalizedActivities;
         if(includeTeamActivity) {
             List<StaffActivitySettingDTO> activitySettings = staffActivitySettingRepository.findAllByStaffIdAndDeletedFalse(staffId);
-            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType);
+            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType,activitySettings);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
             activitySettings.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {

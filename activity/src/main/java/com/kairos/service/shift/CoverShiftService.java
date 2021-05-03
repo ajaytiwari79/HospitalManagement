@@ -268,7 +268,7 @@ public class CoverShiftService {
         Set<BigInteger> totalRequests= coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
         Set<BigInteger> totalInterests=  coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
         Set<BigInteger> totalDeclined=  coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).map(k->k.getId()).collect(Collectors.toSet());
-        Set<BigInteger> totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId,employmentId);
+        Set<BigInteger> totalEligibleShifts=newHashSet();//getEligibleShifts(shifts,unitId,staffId,employmentId);
         return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
     }
 
