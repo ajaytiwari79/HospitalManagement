@@ -746,16 +746,25 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
 
-    public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
+    public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId,Collection<BigInteger> activitIds) {
         Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
-        Aggregation aggregation = getParentActivityAggregation(criteria);
-        AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
+        Aggregation aggregation = getParentActivityAggregation(criteria,getBigIntegerString(activitIds.iterator()));
+        AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, StaffActivitySetting.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
     }
 
-    private Aggregation getParentActivityAggregation(Criteria criteria) {
+    private Aggregation getParentActivityAggregation(Criteria criteria,String activityIdsArray) {
         return Aggregation.newAggregation(
                     match(criteria),
+                    group().addToSet("activityId").as("activityIds"),
+                    new CustomAggregationOperation("{ $project: { \n" +
+                            "       \"activityIds\": { $concatArrays: [ \"$activityIds\", "+activityIdsArray+"] },\n" +
+                            "       \"_id\":0\n" +
+                            "       \n" +
+                            "       } }"),
+                    lookup("activities","activityIds","_id","activities"),
+                    unwind("activities",true),
+                    replaceRoot("activities"),
                     lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                     lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID,PARENT_ACTIVITY),
                     project(NAME, GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,
