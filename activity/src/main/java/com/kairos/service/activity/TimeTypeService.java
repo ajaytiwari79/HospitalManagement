@@ -324,7 +324,7 @@ public class TimeTypeService {
         }
         timeTypeDTO.setTimeTypes(timeType.getTimeTypes());
         timeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
-        if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
+        if (TimeTypes.WORKING_TYPE.toString().equals(timeType.getTimeTypes())) {
             parentOfWorkingTimeType.add(timeTypeDTO);
         } else {
             parentOfNonWorkingTimeType.add(timeTypeDTO);
