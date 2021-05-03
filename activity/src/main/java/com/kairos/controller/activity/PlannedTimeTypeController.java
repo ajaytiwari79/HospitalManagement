@@ -57,8 +57,8 @@ public class PlannedTimeTypeController {
 
     @ApiOperation(value = "Get all PlannedTimeType by countryId")
     @GetMapping(value = UNIT_URL + "/plannedTimeType")
-    public ResponseEntity<Map<String, Object>> getAllPresenceTypesByCountry(@RequestParam Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.getAllPresenceTypesByCountry(UserContext.getCountryId()));
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypesByCountry() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.getAllPresenceTypesByCountry(UserContext.getUserDetails().getCountryId()));
     }
 
     @ApiOperation(value = "update translation of PlannedTimeType by Id")
