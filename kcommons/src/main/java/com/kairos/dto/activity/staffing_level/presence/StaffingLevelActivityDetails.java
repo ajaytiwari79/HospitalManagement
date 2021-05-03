@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigInteger;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class StaffingLevelActivityDetails {
     private BigInteger activityId;
     private int availableCount;

@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import static com.kairos.constants.UserMessagesConstants.INTERNAL_SERVER_ERROR;
  * @auther anil maurya
  */
 public class CustomDefaultTokenServices extends DefaultTokenServices {
-    public static final String BEARER_ = "bearer ";
+    public static final String BEARER = "bearer ";
     private UserService userService;
     private RedisService redisService;
     private TokenStore tokenStore;
@@ -64,12 +63,12 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
     }
 
     public String updateToken(String token, User user){
-        OAuth2Authentication oAuth2Authentication = super.loadAuthentication(token.replace(BEARER_,""));
+        OAuth2Authentication oAuth2Authentication = super.loadAuthentication(token.replace(BEARER,""));
         OAuth2AccessToken oAuth2AccessToken = this.getoAuth2AccessToken(oAuth2Authentication,new UserPrincipal(user, new ArrayList<>()));
         if(isNull(oAuth2AccessToken)){
             exceptionService.invalidRequestException(INTERNAL_SERVER_ERROR);
         }
-        return BEARER_+oAuth2AccessToken.toString();
+        return BEARER +oAuth2AccessToken.toString();
     }
 
     private void saveTokenInRedisServer(UserPrincipal userPrincipal, String accessToken) {

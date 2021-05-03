@@ -158,7 +158,13 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
         return false;
     }
 
+    public boolean isChanged(ShiftActivity shiftActivity){
+        if(!isEquals(startDate,shiftActivity.getStartDate())){
+            return true;
+        }
+        return !this.activityId.equals(shiftActivity.getActivityId()) || this.getInterval().getMinutes() != shiftActivity.getInterval().getMinutes();
+    }
     private Integer timeInSeconds(Date date) {
-        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
+        return isNull(date) ? null : (date.getHours() * 60 * 60) + (date.getMinutes() * 60);
     }
 }

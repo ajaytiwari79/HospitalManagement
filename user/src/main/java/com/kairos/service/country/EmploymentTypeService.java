@@ -155,6 +155,9 @@ public class EmploymentTypeService {
                 employmentTypeDTO.isEditableAtEmployment());
         employmentType.setWeeklyMinutes(employmentTypeDTO.getWeeklyMinutes());
         employmentType.setCanRankTeam(employmentTypeDTO.isCanRankTeam());
+        if(employmentTypeToUpdate.isCanRankTeam() != employmentTypeDTO.isCanRankTeam()){
+            staffGraphRepository.setCanRankTeam(employmentTypeId, employmentTypeDTO.isCanRankTeam());
+        }
         return employmentTypeGraphRepository.save(employmentType);
     }
 

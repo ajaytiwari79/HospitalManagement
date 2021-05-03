@@ -142,7 +142,7 @@ public class PositionService {
             }
         }
         Long positionStartDate = DateUtils.getIsoDateInLong(staffPositionDetail.getEmployedSince());
-        EngineerType engineerType = engineerTypeGraphRepository.findOne(staffPositionDetail.getEngineerTypeId());
+        EngineerType engineerType = isNotNull(staffPositionDetail.getEngineerTypeId()) ? engineerTypeGraphRepository.findOne(staffPositionDetail.getEngineerTypeId()) : null;
         objectToUpdate.setEmail(staffPositionDetail.getEmail());
         objectToUpdate.setCardNumber(staffPositionDetail.getCardNumber());
         objectToUpdate.setSendNotificationBy(staffPositionDetail.getSendNotificationBy());

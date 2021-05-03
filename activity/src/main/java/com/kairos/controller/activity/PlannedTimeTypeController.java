@@ -2,6 +2,7 @@ package com.kairos.controller.activity;
 
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -56,8 +57,8 @@ public class PlannedTimeTypeController {
 
     @ApiOperation(value = "Get all PlannedTimeType by countryId")
     @GetMapping(value = UNIT_URL + "/plannedTimeType")
-    public ResponseEntity<Map<String, Object>> getAllPresenceTypesByCountry(@RequestParam Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.getAllPresenceTypesByCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypesByCountry() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.getAllPresenceTypesByCountry(UserContext.getUserDetails().getCountryId()));
     }
 
     @ApiOperation(value = "update translation of PlannedTimeType by Id")

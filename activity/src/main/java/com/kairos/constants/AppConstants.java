@@ -4,6 +4,9 @@ package com.kairos.constants;
  * Created by prabjot on 22/11/16.
  */
 public class AppConstants {
+    private AppConstants(){
+
+    }
     // Request methods
     public static final String GET = "GET";
     public static final String POST = "POST";

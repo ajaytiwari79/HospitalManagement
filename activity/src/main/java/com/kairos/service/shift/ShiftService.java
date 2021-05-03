@@ -284,6 +284,23 @@ public class ShiftService {
         return shift;
     }
 
+    private void updateTimeTypeDetails(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+            shiftActivity.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
+            shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+            shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toString());
+            shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
+            shiftActivity.getChildActivities().forEach(shiftActivity1 -> {
+                ActivityWrapper wrapper = activityWrapperMap.get(shiftActivity1.getActivityId());
+                shiftActivity1.setTimeTypeId(wrapper.getTimeTypeInfo().getId());
+                shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+                shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toString());
+                shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
+            });
+        }
+    }
+
     private boolean isValidForDraftShiftFunctionality(StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Phase phase, ShiftActionType shiftAction, PlanningPeriod planningPeriod) {
         boolean isValidActionType = (PhaseDefaultName.CONSTRUCTION.equals(phase.getPhaseEnum()) || !updateShift) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction);
         boolean isValidPhase = (PhaseDefaultName.CONSTRUCTION.equals(phase.getPhaseEnum()) || (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())

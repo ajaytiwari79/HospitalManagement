@@ -304,7 +304,7 @@ public class FunctionalPaymentService {
             Map<Set<Long>, List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap = constructMapOfFunctionalPaymentMatrixQueryResult(functionalPaymentQueryResults);
             functionalPaymentQueryResults.forEach(functionalPaymentQueryResult -> functionalPaymentQueryResult.setFunctionalPaymentMatrices(getMatrixFromPayGroupAreaWiseMap(payGroupAreaWiseMap)));
             List<FunctionalPayment> functionalPayments = functionalPaymentGraphRepository.findAllById(toBreakInNewList.stream().map(FunctionalPayment::getId).collect(Collectors.toList()));
-            Map<Long, FunctionalPayment> functionalPaymentMap = functionalPayments.stream().collect(Collectors.toMap(FunctionalPayment::getId, Functions.identity()));
+            Map<Long, FunctionalPayment> functionalPaymentMap = functionalPayments.stream().collect(Collectors.toMap(FunctionalPayment::getId, v->v));
             List<FunctionalPayment> functionalPaymentListBeforeDate = new ArrayList<>();
             List<FunctionalPayment> functionalPaymentListAfterDate = new ArrayList<>();
             List<FunctionalPayment> allFunctionalPayments = new ArrayList<>();

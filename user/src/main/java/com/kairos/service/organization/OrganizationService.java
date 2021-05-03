@@ -93,8 +93,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 @Transactional
@@ -200,23 +199,14 @@ public class OrganizationService {
 
 
 
-    public boolean deleteOrganization(long organizationId) {
+    public void deleteOrganization(long organizationId) {
         OrganizationBaseEntity organization = organizationBaseRepository.findOne(organizationId);
         if(organization.isBoardingCompleted()){
-            exceptionService.actionNotPermittedException(MESSAGE_PUBLISH_ORGANIZATION_CONNOT_DELETE);
+            boolean union = ((Organization) organization).isUnion();
+            exceptionService.actionNotPermittedException(union ? MESSAGE_PUBLISH_UNION_CONNOT_DELETE : MESSAGE_PUBLISH_ORGANIZATION_CONNOT_DELETE);
         }
-        boolean success;
-        if (organization.isBoardingCompleted()) {
-            organization.setEnable(false);
-            organization.setDeleted(true);
-            organizationBaseRepository.save(organization);
-            success = true;
-        } else {
-            List<Long> organizationIdsToDelete = getAllOrganizationIdsToDelete(organization);
-            unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
-            success = true;
-        }
-        return success;
+        List<Long> organizationIdsToDelete = getAllOrganizationIdsToDelete(organization);
+        unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
     }
 
     public OrganizationBaseEntity getOrganizationById(long id) {
@@ -850,7 +840,8 @@ public class OrganizationService {
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        return new SelfRosteringMetaData(new ReasonCodeWrapper( userAccessRoleDTO));
+        List<BigInteger> activityIds = teamService.getTeamActivityIdsByUnit(unitId);
+        return new SelfRosteringMetaData(new ReasonCodeWrapper( userAccessRoleDTO),isCollectionNotEmpty(activityIds) ? (List<BigInteger>) activityIds.get(0) : newArrayList());
     }
 
     public boolean isUnit(Long unitId) {

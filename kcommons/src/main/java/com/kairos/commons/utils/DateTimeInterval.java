@@ -328,7 +328,7 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
             if(this.start<dateTimeInterval.start && this.end>dateTimeInterval.end){
                 dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
                 dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
-            }else if(this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
+            }else if(!this.start.equals(dateTimeInterval.start) && this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
                 dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
             }else if (this.contains(dateTimeInterval.end) && dateTimeInterval.contains(this.start)){
                 dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
