@@ -14,6 +14,14 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public enum AutoFillGapSettingsRule implements Serializable {
+    HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP("Fill the gap with the highest ranked activity planned adjacent to the gap"),
+    HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST("Always fill with the highest ranked activity, if highest is causing gap then use the second highest"),
+    HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity if it is solving more problems than causing"),
+    HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity planned adjacent to the gap solving more problems than causing"),
+    HIGHEST_RANKED_ACTIVITY_THAT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity that is solving more problems than causing"),
+    DO_NOT_ALLOW_TO_CAUSE_GAP("Do not allow to cause gap"),
+
+
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1("Check if either side of the activity falls in main team. If it is, fill the gap with that activity."),
     /* Changed */RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2("Fill with main team assigned to the staff in subject. But if main team causes gap, fill with highest secondary team assigned to the staff (even if it is not planned in the shift, causing problems, or breaking continuity)."),
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3("Fill the gap with the activity of secondary teams with the highest rank planned in the same shift."),

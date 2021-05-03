@@ -3,6 +3,7 @@ package com.kairos.persistence.model.staff.personal_details;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.country.tag.Tag;
@@ -50,5 +51,6 @@ public class StaffAdditionalInfoQueryResult {
     private OrganizationType organizationSubType;
     private Set<BigInteger> mainTeamActivities;
     private List<TeamDTO> teamsData;
+    private Set<TeamRankingInfoDTO> staffTeamRankingInfoData;
 
 }

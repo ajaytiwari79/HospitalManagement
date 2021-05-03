@@ -219,6 +219,26 @@ public class AutoFillGapSettingsService {
 
     public ShiftActivityDTO getActivityToFillTheGap(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, AutoGapFillingScenario gapFillingScenario, AutoFillGapSettings gapSettings, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList, boolean mainTeamRemoved, ShiftDTO shiftDTO) {
         ShiftActivityDTO shiftActivityDTO;
+
+        RULE:for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
+            switch (autoFillGapSettingsRule) {
+                case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP :
+                    break RULE;
+                case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
+                    break RULE;
+                case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                    break RULE;
+                case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                    break RULE;
+                case HIGHEST_RANKED_ACTIVITY_THAT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                    break RULE;
+                case DO_NOT_ALLOW_TO_CAUSE_GAP :
+                    break RULE;
+                default:
+            }
+        }
+
+
         switch (gapFillingScenario) {
             case PRODUCTIVE_TYPE_ON_BOTH_SIDE:
                 shiftActivityDTO = getApplicableActivityForProductiveTypeOnBothSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap,shiftDTO,mainTeamRemoved,activityList);
@@ -330,11 +350,11 @@ public class AutoFillGapSettingsService {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
                     //TODO Check for all activities in shift
                     return getShiftActivityDTO(beforeGap, afterGap, shiftActivityDTO,mainTeamActivityId);
-                case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
+                /*case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
                     if(!mainTeamRemoved && mainTeamActivityId==null){
                         exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
                     }
-                    return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamActivityId==null ? highestRankTeam.getActivityId():mainTeamActivityId , true);
+                    return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamActivityId==null ? highestRankTeam.getActivityId():mainTeamActivityId , true);*/
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3:
                     if(!teamRankingMap.containsKey(afterGap.getActivityId()) && !teamRankingMap.containsKey(beforeGap.getActivityId())){
                         exceptionService.actionNotPermittedException(GAP_FILLING_CONFIGURATION_ABSENT);

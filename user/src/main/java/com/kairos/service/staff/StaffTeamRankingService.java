@@ -5,6 +5,7 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.staff.StaffTeamRankingDTO;
+import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
@@ -89,6 +90,15 @@ public class StaffTeamRankingService {
             staffTeamRankingDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRankings, StaffTeamRankingDTO.class);
         }
         return staffTeamRankingDTOList;
+    }
+
+    public Set<TeamRankingInfoDTO> getStaffTeamRankingInfo(Long staffId, LocalDate date) {
+        Set<TeamRankingInfoDTO> teamRankingInfoDTOS = new HashSet<>();
+        StaffTeamRanking staffTeamRanking = staffTeamRankingGraphRepository.getApplicableStaffTeamRanking(staffId, date);
+        if(isNotNull(staffTeamRanking)){
+            teamRankingInfoDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRanking.getTeamRankingInfo(),TeamRankingInfoDTO.class);
+        }
+        return teamRankingInfoDTOS;
     }
 
     public StaffTeamRankingDTO publishStaffTeamRanking(Long id, LocalDate publishedDate) {
@@ -415,5 +425,4 @@ public class StaffTeamRankingService {
             staffTeamRankingGraphRepository.updateTeamType(staffId, teamId, newTeamType);
         }
     }
-
 }
