@@ -652,4 +652,8 @@ public class TimeTypeService {
         return timeTypeMongoRepository.findAllSickTimeTypes();
     }
 
+    public TimeType getTimeTypeById(BigInteger timeTypeId){
+        return timeTypeMongoRepository.findOne(timeTypeId);
+    }
+
 }

@@ -9,10 +9,7 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
-import com.kairos.enums.UnityActivitySetting;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -907,6 +904,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 project(AppConstants.ID,NAME)
         );
         return mongoTemplate.aggregate(aggregation,Activity.class,Activity.class).getMappedResults().stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long refId, boolean refType, PriorityFor priorityFor) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(TIME_TYPE1+".priorityFor").is(priorityFor);
+        if(refType){
+            criteria.and(COUNTRY_ID).is(refId);
+        } else {
+            criteria.and(UNIT_ID).is(refId);
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
+                unwind(TIME_TYPE1),
+                match(criteria),
+                project(NAME,TIME_CALCULATION_ACTIVITY_TAB)
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
     }
 
     @Override
