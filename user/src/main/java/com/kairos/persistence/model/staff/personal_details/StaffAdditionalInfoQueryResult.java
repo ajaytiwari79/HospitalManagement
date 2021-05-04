@@ -51,6 +51,6 @@ public class StaffAdditionalInfoQueryResult {
     private OrganizationType organizationSubType;
     private Set<BigInteger> mainTeamActivities;
     private List<TeamDTO> teamsData;
-    private Set<TeamRankingInfoDTO> staffTeamRankingInfoData;
+    private List<TeamRankingInfoDTO> staffTeamRankingInfoData;
 
 }

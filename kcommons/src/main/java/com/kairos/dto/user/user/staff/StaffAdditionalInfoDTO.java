@@ -78,7 +78,7 @@ public class StaffAdditionalInfoDTO {
     private List<TeamDTO> teamsData;
     private Set<Long> employmentIds = new HashSet<>();
     private ShiftActivityDTO replacedActivity;
-    private Set<TeamRankingInfoDTO> staffTeamRankingInfoData;
+    private List<TeamRankingInfoDTO> staffTeamRankingInfoData;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;
