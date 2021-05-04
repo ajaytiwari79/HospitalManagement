@@ -255,7 +255,8 @@ public class OrganizationActivityService {
         }
         activityCopied.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activityCopied);
-        if(PRESENCE.equals(activityCopied.getActivityBalanceSettings().getTimeType())) {
+        TimeType timeType = timeTypeService.getTimeTypeById(activityCopied.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.PRESENCE.equals(timeType.getPriorityFor())) {
             activityRankingService.addOrRemovePresenceActivityRanking(unitId, activityCopied, checked);
         }
         return retrieveBasicDetails(activityCopied);
@@ -426,7 +427,8 @@ public class OrganizationActivityService {
         activityService.updateNotesTabOfActivity(generalDTO, activity);
         activitySettingsService.updateTimeTypePathInActivity(activity);
         activityMongoRepository.save(activity);
-        if(PRESENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState())){
+        TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.PRESENCE.equals(timeType.getPriorityFor()) && PUBLISHED.equals(activity.getState())){
             activityRankingService.updateEndDateOfPresenceActivity(unitId, activity, oldEndDate);
         }
         getGeneralActivityWithTagDTO(activity, generalActivityWithTagDTO);

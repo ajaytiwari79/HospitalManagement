@@ -7,6 +7,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
@@ -135,7 +136,8 @@ public class ActivityRankingService {
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
         List<ActivityDTO> fullDayActivities = new ArrayList<>();
         List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        activityService.findAllActivitiesByTimeType(UserContext.getUserDetails().getCountryId(), ABSENCE).forEach(activityDTO -> {
+        List<ActivityDTO> activityDTOS = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), PriorityFor.ABSENCE);
+        activityDTOS.forEach(activityDTO -> {
             if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 fullWeekActivities.add(activityDTO);
             } else {
