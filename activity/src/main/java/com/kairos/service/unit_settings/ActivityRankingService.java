@@ -136,7 +136,7 @@ public class ActivityRankingService {
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
         List<ActivityDTO> fullDayActivities = new ArrayList<>();
         List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        List<ActivityDTO> activityDTOS = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), PriorityFor.ABSENCE);
+        List<ActivityDTO> activityDTOS = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), true, PriorityFor.ABSENCE);
         activityDTOS.forEach(activityDTO -> {
             if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 fullWeekActivities.add(activityDTO);
@@ -151,7 +151,7 @@ public class ActivityRankingService {
     }
 
     public List<ActivityDTO> findAllPresenceActivities(Long unitId){
-        return activityService.findAllActivitiesByTimeType(unitId,PRESENCE);
+        return activityService.findAllActivitiesByCountryAndTimeTypePriority(unitId, false, PriorityFor.PRESENCE);
     }
 
     @Async
