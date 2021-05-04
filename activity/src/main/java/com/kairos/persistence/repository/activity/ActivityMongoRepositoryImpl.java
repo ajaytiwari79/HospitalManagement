@@ -248,7 +248,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 lookup(ACTIVITIES, UNDERSCORE_ID, CHILD_ACTIVITY_IDS, PARENT_ACTIVITY),
                 project(NAME, STATE, DESCRIPTION, COUNTRY_ID, IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
-                        .and(PARENT_ACTIVITY_ID).as(AppConstants.PARENT_ACTIVITY_ID)
+                        .and("parentActivity._id").as(AppConstants.PARENT_ACTIVITY_ID)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(APPLICABLE_FOR_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_SICKNESS_SETTING).arrayElementAt(0).as(SICKNESS_SETTING)
