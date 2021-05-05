@@ -430,8 +430,4 @@ public class ActivityRankingService {
         return activityRankingRepository.getCurrentlyActiveActivityRankingSettings(unitId,shiftDate);
     }
 
-    public Map<BigInteger, Integer> getActivityRankingMap(Set<BigInteger> allProductiveActivityIds, LocalDate shiftDate) {
-
-        return new HashMap<>();
-    }
 }
