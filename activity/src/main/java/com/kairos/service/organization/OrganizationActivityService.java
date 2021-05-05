@@ -204,6 +204,7 @@ public class OrganizationActivityService {
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private AutoFillGapSettingsService autoFillGapSettingsService;
     @Inject private ExecutorService executorService;
+    @Inject private ActivityHelperService activityHelperService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -682,6 +683,7 @@ public class OrganizationActivityService {
         activityMongoRepository.save(activity);
         return activity.getActivityGeneralSettings();
     }
+
     @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityGeneralSettings addIconInActivity(Long unitId,BigInteger activityId, MultipartFile file) throws IOException {
         return this.addIconInActivity(activityId,file);
@@ -710,51 +712,13 @@ public class OrganizationActivityService {
         return publicHolidayDayTypeWrapper;
     }
 
-    private List<PhaseWeeklyDTO> getPhaseWeeklyDTO(List<PhaseDTO> phaseDTOs,int currentWeek,int year) {
-        ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<>();
-        for (PhaseDTO phaseObj : phaseDTOs) {
-            if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
-                for (int i = 0; i < phaseObj.getDuration(); i++) {
-                    PhaseWeeklyDTO tempPhaseObj = phaseObj.buildWeekDTO();
-                    tempPhaseObj.setWeekCount(++currentWeek);
-                    tempPhaseObj.setYear(year);
-                    if (currentWeek >= 52) {
-                        year = year + 1;
-                        currentWeek = 0;
-                    }
-                    phaseWeeklyDTOS.add(tempPhaseObj);
-                }
-            }
-        }
-        return phaseWeeklyDTOS;
-    }
-
-    private void createDummyPhase(int year, int currentWeek, List<PhaseDTO> phaseDTOs, List<PhaseWeeklyDTO> phaseWeeklyDTOS) {
-        if (isCollectionNotEmpty(phaseDTOs)) {
-            int indexOfPhaseWithLowestSeq = phaseDTOs.size() - 1;
-            for (int start = phaseWeeklyDTOS.size(); start <= 104; start++) {
-                PhaseWeeklyDTO tempPhaseObj = phaseDTOs.get(indexOfPhaseWithLowestSeq).buildWeekDTO();
-                tempPhaseObj.setWeekCount(++currentWeek);
-                tempPhaseObj.setYear(year);
-                if (currentWeek >= 52) {
-                    year = year + 1;
-                    currentWeek = 0;
-                }
-                phaseWeeklyDTOS.add(tempPhaseObj);
-            }
-        }
-    }
-
-
     private LocalDate getGracePeriodExpireDate(Phase phase,boolean management) {
         ZonedDateTime startDate = DateUtils.asZonedDateTime(DateUtils.getStartOfDay(DateUtils.getDate()));
         ZonedDateTime endDate;
         if (management) {
             endDate = startDate.minusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusDays(1);
-            //endDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).minusDays(phase.getGracePeriodByStaff()).minusDays(1);
         } else {
             endDate=startDate.minusDays(phase.getGracePeriodByStaff()).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusDays(1);
-            //endDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).minusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).minusDays(1);
         }
         return endDate.toLocalDate();
     }
@@ -913,51 +877,11 @@ public class OrganizationActivityService {
     }
     public void updateBackgroundColorInShifts(TimeTypeDTO timeTypeDTO, String existingTimeTypeColor,BigInteger timeTypeId) {
         if(!existingTimeTypeColor.equals(timeTypeDTO.getBackgroundColor())){
-            new Thread(() -> {
-                Set<BigInteger> activityIds = updateColorInActivity(timeTypeDTO, timeTypeId);
-                updateColorInShift(timeTypeDTO.getBackgroundColor(),activityIds);
+                Set<BigInteger> activityIds = activityHelperService.updateColorInActivity(timeTypeDTO, timeTypeId);
+                activityHelperService.updateColorInShift(timeTypeDTO.getBackgroundColor(),activityIds);
+        }
+    }
 
-            }).start();
-
-        }
-    }
-    //@Async
-    public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO,BigInteger timeTypeId) {
-        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
-        if (isCollectionNotEmpty(activities)) {
-            activities.forEach(activity -> {
-                activity.getActivityGeneralSettings().setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                activity.getActivityRulesSettings().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
-                if(isNotNull(timeTypeDTO.getActivityRulesSettings())){
-                    activity.getActivityRulesSettings().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getActivityRulesSettings().getSicknessSetting(), SicknessSetting.class));
-                }
-            });
-            activityMongoRepository.saveEntities(activities);
-        }
-        return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
-    }
-    private void updateColorInShift(String newTimeTypeColor,Set<BigInteger> activityIds) {
-        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
-        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
-            updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
-            if(isNotNull(shift.getDraftShift())){
-                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, draftShiftActivity));
-            }
-        }));
-        if(isCollectionNotEmpty(shifts)){
-            shiftMongoRepository.saveEntities(shifts);
-        }
-    }
-    private void updateBackgroundColorInShiftActivity(String newTimeTypeColor, Set<BigInteger> activitiyIds, ShiftActivity shiftActivity) {
-        if(activitiyIds.contains(shiftActivity.getActivityId())){
-            shiftActivity.setBackgroundColor(newTimeTypeColor);
-        }
-        shiftActivity.getChildActivities().forEach(childActivity -> {
-            if(activitiyIds.contains(childActivity.getActivityId())){
-                childActivity.setBackgroundColor(newTimeTypeColor);
-            }
-        });
-    }
     public void validateActivityTimeRules( Short shortestTime, Short longestTime) {
         if (shortestTime != null && longestTime != null && shortestTime > longestTime) {
             exceptionService.actionNotPermittedException(SHORTEST_TIME_GREATER_LONGEST);

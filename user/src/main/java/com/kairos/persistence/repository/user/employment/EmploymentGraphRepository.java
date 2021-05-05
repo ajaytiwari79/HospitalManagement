@@ -379,5 +379,14 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(employment)-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(employment)={0} return id(appliedFunction) as id,appliedFunction.name as name,appliedFunction.icon as icon,rel.appliedDates as appliedDates")
     List<FunctionDTO> getFunctionsByEmploymentId(Long employementId);
 
+    @Query("MATCH (employment:Employment{deleted:false}) where id(employment)={0}\n" +
+            "MATCH (employment)-[empRel:HAS_EXPERTISE_IN]->(expertise:Expertise)\n" +
+            "OPTIONAL MATCH (expertise)-[expRel1:BELONGS_TO_EXPERTISE]-(seniorDays:SeniorDays{deleted:false,published:true})-[careDayRel:HAS_CARE_DAYS]-(careDays:CareDays) where DATE(seniorDays.startDate) <= DATE({1}) AND (seniorDays.endDate IS NULL OR DATE({1})<=DATE(seniorDays.endDate)) with employment,expertise,CASE WHEN careDays IS NULL THEN [] ELSE COLLECT({id:id(careDays),from:careDays.from,to:careDays.to,leavesAllowed:careDays.leavesAllowed}) END AS seniorCareDays\n" +
+            "OPTIONAL MATCH (expertise)-[expRel:BELONGS_TO_EXPERTISE]-(childDays:ChildCareDays{deleted:false,published:true})-[cRel:HAS_CARE_DAYS]-(childCareDay:CareDays) where DATE(childDays.startDate) <= DATE({1}) AND (childDays.endDate IS NULL OR DATE({1})<=DATE(childDays.endDate)) with employment,expertise,seniorCareDays,CASE WHEN childCareDay IS NULL THEN [] ELSE COLLECT({id:id(childCareDay),from:childCareDay.from,to:childCareDay.to,leavesAllowed:childCareDay.leavesAllowed}) END AS childCareDays\n" +
+            "MATCH (employment)<-[:BELONGS_TO_STAFF]-(staff:Staff)-[:BELONGS_TO]->(user:User)\n" +
+            "OPTIONAL MATCH (staff:Staff)-[:HAS_CHILDREN]-(staffChildDetail:StaffChildDetail) with employment,expertise,seniorCareDays,childCareDays,staff,user,CASE WHEN staffChildDetail IS NULL THEN [] ELSE COLLECT({cprNumber:staffChildDetail.cprNumber}) END AS staffChildDetails\n" +
+            "return employment.startDate as startDate,employment.endDate as endDate,id(expertise) as expertiseId,user.cprNumber as cprNumber,seniorCareDays as seniorDays,childCareDays as childCareDays,id(staff) as staffId,staffChildDetails as staffChildDetails")
+    EmploymentQueryResult getEmploymentDetailsById(Long employmentId,String startDate);
+
 }
 

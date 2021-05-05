@@ -100,10 +100,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate, Set<BigInteger> activityIds) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK).and(DRAFT).is(false)
                     .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
         } else {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK).and(DRAFT).is(false)
                     .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
         }
         return getShiftWithActivityByCriteria(criteria.and(ACTIVITIES_ACTIVITY_ID).in(activityIds),false,ShiftWithActivityDTO.class);
@@ -464,6 +464,30 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                     .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
         }
         return getShiftWithActivityByCriteria(criteria.and(ACTIVITIES_ACTIVITY_ID).in(activityIds),false,ShiftWithActivityDTO.class);
+    }
+
+    public List<ShiftActivityDTO> findAllShiftActivityiesBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds) {
+        Criteria criteria;
+        if (Optional.ofNullable(endDate).isPresent()) {
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
+                    .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
+        } else {
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
+                    .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
+        }
+        Aggregation aggregation = Aggregation.newAggregation(match(criteria.and(DRAFT).is(false)),
+                unwind("activities"),
+                match(Criteria.where(ACTIVITIES_ACTIVITY_ID).in(activityIds)),
+                new CustomAggregationOperation("{\n" +
+                        "    \"$project\": {\n" +
+                        "      \"status\": 1,\n" +
+                        "      \"activityId\": 1,\n" +
+                        "      \"startDate\": 1,\n" +
+                        "      \"endDate\": 1,\n" +
+                        "    }\n" +
+                        "  }")
+        );
+        return mongoTemplate.aggregate(aggregation,Shift.class ,ShiftActivityDTO.class).getMappedResults();
     }
 
     @Override

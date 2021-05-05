@@ -713,4 +713,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.allowPersonalRanking(staffId,canRankTeam));
     }
 
+    @GetMapping(value = "/staff_details_for_balances/{employmentId}")
+    @ApiOperation("Get staff details for balances")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffDetailsForBalances(@PathVariable long unitId,
+                                                                                       @PathVariable Long employmentId,@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailsForBalances(employmentId, unitId,startDate));
+    }
+
 }

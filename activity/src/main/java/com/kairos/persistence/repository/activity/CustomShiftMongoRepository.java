@@ -96,4 +96,6 @@ public interface CustomShiftMongoRepository {
     <T> List<StaffShiftDetailsDTO> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate, boolean includeDateComparison, RequiredDataForFilterDTO requiredDataForFilterDTO);
     Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting, List<Long> staffIds);
 
+    List<ShiftActivityDTO> findAllShiftActivityiesBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds);
+
 }

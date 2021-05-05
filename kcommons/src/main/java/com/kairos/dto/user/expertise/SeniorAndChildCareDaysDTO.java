@@ -22,4 +22,6 @@ public class SeniorAndChildCareDaysDTO {
         this.seniorDays = new ArrayList<>();
         this.childCareDays = new ArrayList<>();
     }
+
+
 }

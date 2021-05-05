@@ -196,7 +196,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        Function<ShiftActivityDTO, Integer> methodParam = ShiftActivityDTO::getScheduledMinutes;
+        Function<ShiftActivityDTO, Integer> methodParam = null;
         switch (kpiCalculationRelatedInfo.getCalculationType()) {
             case PLANNED_HOURS_TIMEBANK:
                 methodParam = ShiftActivityDTO::getPlannedMinutesOfTimebank;

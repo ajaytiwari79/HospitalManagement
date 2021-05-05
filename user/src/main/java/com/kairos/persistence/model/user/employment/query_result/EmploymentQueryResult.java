@@ -6,7 +6,11 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.staff.personal_details.StaffChildDetail;
+import com.kairos.persistence.model.user.expertise.CareDays;
+import com.kairos.persistence.model.user.expertise.ChildCareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.SeniorDays;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,6 +57,11 @@ public class EmploymentQueryResult {
     private long totalShifts;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private Long expertiseId;
+    private String cprNumber;
+    private List<CareDays> seniorDays;
+    private List<CareDays> childCareDays;
+    private List<StaffChildDetail> staffChildDetails;
+
 
 
 
