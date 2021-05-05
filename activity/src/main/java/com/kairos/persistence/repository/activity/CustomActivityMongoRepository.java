@@ -122,5 +122,8 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findAllActivitiesByTimeType(Long countryId, TimeTypeEnum timeType);
 
+    List<ActivityDTO> findChildActivityIdsByActivityIds(Collection<BigInteger> activityIds);
+
     List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long refId, boolean refType, PriorityFor priorityFor);
+
 }

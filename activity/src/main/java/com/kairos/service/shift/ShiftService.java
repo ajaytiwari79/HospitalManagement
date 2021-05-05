@@ -175,6 +175,7 @@ public class ShiftService {
 
     public List<ShiftWithViolatedInfoDTO> createShift(Long unitId, ShiftDTO shiftDTO, ShiftActionType shiftActionType) {
         shiftDTO.setUnitId(unitId);
+        exceptionService.dataNotFoundByIdException(ERROR_START_TIME_GREATER_THAN_EARLIEST_TIME,LocalDate.now());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = getStaffAdditionalInfoDTO(shiftDTO.getUnitId(), shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         updateCTADetailsOfEmployement(shiftDTO.getShiftDate(), staffAdditionalInfoDTO);

@@ -654,17 +654,19 @@ public class OrganizationActivityService {
         if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, parentActivity.getName());
         }
-        activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).collect(Collectors.toList());
-        if (isCollectionNotEmpty(activities)) {
-            List<String> activityNames = activities.stream().map(ActivityDTO::getName).collect(Collectors.toList());
+        List<String> activityNames = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).map(ActivityDTO::getName).collect(Collectors.toList());
+        if (isCollectionNotEmpty(activityNames)) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_PARENT, activityNames);
         }
 
     }
 
-    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType, List<StaffActivitySettingDTO> activitySettings) {
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType) {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
-        activityList.addAll(activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet()));
+        Set<BigInteger> childActivityIds = activityMongoRepository.findChildActivityIdsByActivityIds(activityList).stream().flatMap(activityDTO -> activityDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
+        if(isCollectionNotEmpty(childActivityIds)){
+            activityList.addAll(childActivityIds);
+        }
         return activityMongoRepository.findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(activityList,unitId,staffId,isActivityType);
     }
 
@@ -703,6 +705,10 @@ public class OrganizationActivityService {
         List<ActivityPhaseSettings> activityPhaseSettings = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId, new ArrayList<>(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().getAccessGroupIds()));
         Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
         LocalDate gracePeriodEndDate = getGracePeriodExpireDate(phase,publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().isManagement());
+        Set<BigInteger> childActivityIds = activityMongoRepository.findChildActivityIdsByActivityIds(publicHolidayDayTypeWrapper.getActivityIds()).stream().flatMap(activityDTO -> activityDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
+        if(isCollectionNotEmpty(childActivityIds)){
+            publicHolidayDayTypeWrapper.getActivityIds().addAll(childActivityIds);
+        }
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId,publicHolidayDayTypeWrapper.getActivityIds());
         return PhaseActivityDTO.builder().activities(activities).activityPhaseSettings(activityPhaseSettings).gracePeriodExpireDate(gracePeriodEndDate).reasonCodes(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getReasonCodes()).staffAccessRole(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO()).build();
     }

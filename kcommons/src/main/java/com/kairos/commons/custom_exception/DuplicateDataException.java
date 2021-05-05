@@ -4,9 +4,13 @@ package com.kairos.commons.custom_exception;
  * Created by oodles on 8/2/17.
  */
     public class DuplicateDataException extends RuntimeException{
-    @Deprecated//Please use ExceptionService
-    public DuplicateDataException(String message) {
+    private Object[] params;
+    public DuplicateDataException(String message,Object... params) {
         super(message);
+        this.params = params;
+    }
+    public Object[] getParams() {
+        return params;
     }
 
 }
