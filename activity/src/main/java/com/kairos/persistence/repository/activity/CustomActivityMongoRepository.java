@@ -120,4 +120,5 @@ public interface CustomActivityMongoRepository {
     List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
 
     List<ActivityDTO> findAllActivitiesByTimeType(Long countryId, TimeTypeEnum timeType);
+    List<ActivityDTO> findChildActivityIdsByActivityIds(Collection<BigInteger> activityIds);
 }
