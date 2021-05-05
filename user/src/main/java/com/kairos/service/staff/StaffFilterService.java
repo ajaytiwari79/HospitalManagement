@@ -178,8 +178,7 @@ public class StaffFilterService {
     }
 
     //todo send single call for get activity data
-    private List<FilterSelectionQueryResult>
-    getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
+    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
             case EMPLOYMENT_TYPE:
@@ -206,6 +205,14 @@ public class StaffFilterService {
                 return getStatusFilter();
             case REAL_TIME_STATUS:
                 return dtoToQueryesultConverter(RealTimeStatus.getListOfRealtimeStatusForFilters(), objectMapper);
+            default:
+                return getFilterDetailsByFilterType(filterType, countryId, unitId, objectMapper);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId, ObjectMapper objectMapper){
+        switch (filterType) {
             case TIME_SLOT:
                 return getTimeSlots();
             case ASSIGN_ACTIVITY:
