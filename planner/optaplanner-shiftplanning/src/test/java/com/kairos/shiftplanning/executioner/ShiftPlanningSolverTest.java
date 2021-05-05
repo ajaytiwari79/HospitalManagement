@@ -8,6 +8,8 @@ import com.kairos.shiftplanningNewVersion.generator.StaffingLevelGenerator;
 import com.kairos.shiftplanningNewVersion.solver.StaffingLevelSolver;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -20,7 +22,7 @@ import java.util.Map;
 
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftPlanningSolverTest {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShiftPlanningSolverTest.class);
     public static final String FIX_ACTIVITY_SHOULD_NOT_CHANGE = "Fix Activity should not change";
     public static final String IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY = "If this activity is used on a Tuesday";
     public static final String MAX_SHIFT_OF_STAFF = "Max Shift of Staff";
@@ -43,7 +45,7 @@ public class ShiftPlanningSolverTest {
         try {
             new StaffingLevelSolver().run();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 

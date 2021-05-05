@@ -87,6 +87,15 @@ public class StaffEmploymentDetails {
         this.employmentSubType = employmentSubType;
     }
 
+    public StaffEmploymentDetails(Long id,Expertise expertise, LocalDate startDate ,LocalDate endDate, Long unitId) {
+        this.id=id;
+        this.expertise = expertise;
+        this.endDate = endDate;
+        this.StartDate = startDate;
+        this.unitId = unitId;
+        this.employmentSubType = employmentSubType;
+    }
+
     public StaffEmploymentDetails(Long unitId) {
         this.unitId = unitId;
     }

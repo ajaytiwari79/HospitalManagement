@@ -79,4 +79,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeTypeId':{$in:?1 }, deleted:false}")
     List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds);
+
+    @Query(value = "{'_id':{'$in':?0}, 'deleted':false}",fields = "{'_id':1,'ranking':1, 'activityGeneralSettings':1 ,'activityRulesSettings':1,'name':1,'activityBalanceSettings':1,'activityTimeCalculationSettings':1}")
+    List<ActivityDTO> findByDeletedFalseAndIdsInForBalances(Collection<BigInteger> activityIds);
 }

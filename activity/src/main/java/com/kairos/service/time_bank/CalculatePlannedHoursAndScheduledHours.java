@@ -412,18 +412,37 @@ public class CalculatePlannedHoursAndScheduledHours {
         int count = protectedDaysOffSettings.size();
         protectedDaysOffSettings.sort((protectedDaysOffSetting, t1) -> protectedDaysOffSetting.getPublicHolidayDate().compareTo(t1.getPublicHolidayDate()));
         DateTimeInterval protectedDaysDateTimeInterval = new DateTimeInterval(protectedDaysOffSettings.get(0).getPublicHolidayDate(), getLocalDate());
-        scheduledAndApproveActivityCount = timeBankCalculationService.workTimeAgreementBalancesCalculationService.getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
+        scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
         count = count - scheduledAndApproveActivityCount[0];
         DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, protectedDaysDateTimeInterval, count,false);
         PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap,employmentIdAndPayOutPerShiftMap, employmentDetails, protectedDaysDateTimeInterval, count ,false);
         return new Object[]{dailyTimeBankEntry, payOutPerShift};
     }
 
+    public int[] getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Set<BigInteger> activityIds) {
+        int activityCount = 0;
+        int approveCount = 0;
+        Set<ShiftStatus> shiftStatuses = newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH);
+        for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
+            for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
+                if ((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())) {
+                    if (CollectionUtils.containsAny(shiftStatuses,activity.getStatus())) {
+                        approveCount++;
+                    }
+                    if(activity.getStatus().contains(ShiftStatus.REQUEST)){
+                        activityCount++;
+                    }
+                }
+            }
+        }
+        return new int[]{activityCount, approveCount};
+    }
+
     private Object[] getDailyTimeBankAndPayoutByOnceInAYear(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails) {
         int[] scheduledAndApproveActivityCount;
         DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
         int count = (int) employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && activityDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
-        scheduledAndApproveActivityCount = timeBankCalculationService.workTimeAgreementBalancesCalculationService.getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
+        scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
         count = count - scheduledAndApproveActivityCount[0];
         DailyTimeBankEntry dailyTimeBankEntry = null;
         PayOutPerShift payOutPerShift = null;
@@ -503,7 +522,7 @@ public class CalculatePlannedHoursAndScheduledHours {
             }
         }
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>(activityIdDateTimeIntervalMap.values());
-        dateTimeIntervals.sort((dateTimeInterval, t1) -> dateTimeInterval.getStartLocalDate().compareTo(t1.getStartLocalDate()));
+        dateTimeIntervals.sort(Comparator.comparing(DateTimeInterval::getStartLocalDate));
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = timeBankCalculationService.shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), activityIds);
         Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap = shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
         return new Map[]{activityIdDateTimeIntervalMap, employmentIdAndShiftMap};
