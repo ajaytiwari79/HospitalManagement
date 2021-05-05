@@ -661,7 +661,7 @@ public class OrganizationActivityService {
 
     }
 
-    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType, List<StaffActivitySettingDTO> activitySettings) {
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType) {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
         Set<BigInteger> childActivityIds = activityMongoRepository.findChildActivityIdsByActivityIds(activityList).stream().flatMap(activityDTO -> activityDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
         if(isCollectionNotEmpty(childActivityIds)){
