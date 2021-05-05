@@ -5,6 +5,10 @@ package com.kairos.constants;
  */
 public final class MongoConstant {
 
+    private MongoConstant(){
+
+    }
+
     public static final String DB_NAME = "spring.data.mongodb.database";
 
     public static final String DB_URL = "spring.data.mongodb.host";

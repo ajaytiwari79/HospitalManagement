@@ -9,6 +9,7 @@ import com.kairos.dto.activity.staffing_level.presence.StaffingLevelActivityDeta
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -20,12 +21,15 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.CoverShiftMongoRepository;
 import com.kairos.persistence.repository.shift.CoverShiftSettingMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelValidatorService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +69,8 @@ public class CoverShiftService {
     @Inject private CoverShiftMongoRepository coverShiftMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private DayTypeService dayTypeService;
+    @Inject private TimeSlotMongoRepository timeSlotMongoRepository;
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
@@ -262,7 +268,7 @@ public class CoverShiftService {
         Set<BigInteger> totalRequests= coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
         Set<BigInteger> totalInterests=  coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
         Set<BigInteger> totalDeclined=  coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).map(k->k.getId()).collect(Collectors.toSet());
-        Set<BigInteger> totalEligibleShifts=getEligibleShifts(shifts,unitId,staffId,employmentId);
+        Set<BigInteger> totalEligibleShifts=newHashSet();//getEligibleShifts(shifts,unitId,staffId,employmentId);
         return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
     }
 
@@ -272,7 +278,9 @@ public class CoverShiftService {
         CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(unitId);
         Set<BigInteger> shiftList=new HashSet<>();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO=userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId,employmentId);
-        if(coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYMENT_TYPES) && coverShiftSetting.getEmploymentTypeIds().contains(employmentId)){
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        staffAdditionalInfoDTO.setTimeSlotSets(timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
+        if(isCollectionEmpty(shifts) || coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYMENT_TYPES) && coverShiftSetting.getEmploymentTypeIds().contains(employmentId)){
             return shiftList;
         }
         Set<BigInteger> activityIds = getActivityIdsByShift(shifts);

@@ -325,7 +325,7 @@ public class TimeTypeService {
         }
         timeTypeDTO.setTimeTypes(timeType.getTimeTypes());
         timeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
-        if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
+        if (TimeTypes.WORKING_TYPE.toString().equals(timeType.getTimeTypes())) {
             parentOfWorkingTimeType.add(timeTypeDTO);
         } else {
             parentOfNonWorkingTimeType.add(timeTypeDTO);
@@ -651,6 +651,10 @@ public class TimeTypeService {
 
     public List<TimeType> getAllSickTimeTypes(){
         return timeTypeMongoRepository.findAllSickTimeTypes();
+    }
+
+    public TimeType getTimeTypeById(BigInteger timeTypeId){
+        return timeTypeMongoRepository.findOne(timeTypeId);
     }
 
 }

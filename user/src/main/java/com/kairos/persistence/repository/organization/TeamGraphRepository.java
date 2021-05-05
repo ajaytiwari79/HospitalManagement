@@ -152,6 +152,6 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} SET staffTeamRel.teamMembership=false")
     void assignStaffAsTeamLeaderOnly(List<Long> staffIds, Long teamId);
 
-    @Query("MATCH (organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(organization)=2403 return collect(team.activityId)")
+    @Query("MATCH (organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(organization)={0} return collect(team.activityId)")
     List<BigInteger> getTeamActivityIdsByUnit(Long unitId);
 }
