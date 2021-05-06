@@ -426,6 +426,7 @@ public class ActivityService {
         return timeCalculationActivityDTO;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
         Activity activity = findActivityById(activityId);
         List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
