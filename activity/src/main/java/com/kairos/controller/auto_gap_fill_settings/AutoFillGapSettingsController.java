@@ -92,7 +92,7 @@ public class AutoFillGapSettingsController {
     @PostMapping("/remove_key_from_cache")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> removeKeyFromCache(@RequestBody Set<String> cacheKeys) {
-        redisService.removeKeyFromCache(cacheKeys);
+        redisService.removeKeyFromCacheAsyscronously(cacheKeys);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

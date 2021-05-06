@@ -79,11 +79,19 @@ public class RedisService extends CommonsExceptionUtil {
     }
 
     @Async
-    public void removeKeyFromCache(Set<String> removeKeys){
-        Set<String> patternKeys = removeKeys.stream().filter(key->key.contains("*")).collect(Collectors.toSet());
-        if(isCollectionNotEmpty(patternKeys)){
-            patternKeys.forEach(key->removeKeys.addAll(valueOperations.keys(key)));
+    public void removeKeyFromCacheAsyscronously(Set<String> removeKeys){
+        removeEntryFromCache(removeKeys);
+    }
+    private void removeEntryFromCache(Set<String> removeKeys) {
+        Set<String> patternKeys = removeKeys.stream().filter(key -> key.contains("*")).collect(Collectors.toSet());
+        if (isCollectionNotEmpty(patternKeys)) {
+            patternKeys.forEach(key -> removeKeys.addAll(valueOperations.keys(key)));
         }
         valueOperations.delete(removeKeys);
     }
+
+    public void removeKeyFromCache(Set<String> removeKeys){
+        removeEntryFromCache(removeKeys);
+    }
+
 }
