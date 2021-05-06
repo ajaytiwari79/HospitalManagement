@@ -142,7 +142,7 @@ public class ActivityConstants {
             "               {\n" +
             "                 $cond: { if: { $ne: [ \"$activities\", [] ] }, then: {\n" +
             "          \"$arrayElemAt\": [\n" +
-            "            \"$activities.childActivityIds\",\n" +
+            "            \"$activities.activityIds\",\n" +
             "            0\n" +
             "          ]\n" +
             "        }, else: [] }\n" +
