@@ -22,6 +22,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
+import com.kairos.service.time_bank.AsyncTimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
@@ -54,7 +55,7 @@ public class ShiftFilterService {
     @Inject
     private ShiftValidatorService shiftValidatorService;
     @Inject
-    private TimeBankService timeBankService;
+    private AsyncTimeBankCalculationService asyncTimeBankCalculationService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -96,7 +97,7 @@ public class ShiftFilterService {
         Map<Long,Double> employmentIdAndActualTimeBankData = new HashMap<>();
         if(filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE))) {
             for (Long employmentId : employmentIds) {
-                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, false,null,null).toString()));
+                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(asyncTimeBankCalculationService.getAccumulatedTimebankAndDelta(employmentId, unitId, false,null,null).toString()));
                 employmentIdAndActualTimeBankData.put(employmentId,timeBank);
             }
         }

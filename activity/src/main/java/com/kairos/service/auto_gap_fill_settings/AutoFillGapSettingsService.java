@@ -510,9 +510,9 @@ public class AutoFillGapSettingsService {
 
     private void resetCacheData(AutoFillGapSettings autoFillGapSettings) {
         if (isNotNull(autoFillGapSettings.getCountryId())) {
-            redisService.removeKeyFromCache(newHashSet("getAllAutoFillGapSettingsByCountryId::" + autoFillGapSettings.getCountryId()));
+            redisService.removeKeyFromCacheAsyscronously(newHashSet("getAllAutoFillGapSettingsByCountryId::" + autoFillGapSettings.getCountryId()));
         } else if (isNotNull(autoFillGapSettings.getUnitId())) {
-            redisService.removeKeyFromCache(newHashSet("getAllAutoFillGapSettingsByUnitId::" + autoFillGapSettings.getUnitId()));
+            redisService.removeKeyFromCacheAsyscronously(newHashSet("getAllAutoFillGapSettingsByUnitId::" + autoFillGapSettings.getUnitId()));
         }
     }
 
