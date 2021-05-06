@@ -31,7 +31,9 @@ public class Expertise {
         //Not in use
     }
 
-
+    public Expertise(Long id) {
+        this.id = id;
+    }
     public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSettings() {
         return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
     }

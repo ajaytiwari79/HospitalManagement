@@ -8,6 +8,7 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.Day;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;

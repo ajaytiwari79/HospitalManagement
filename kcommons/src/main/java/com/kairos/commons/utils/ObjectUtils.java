@@ -74,6 +74,12 @@ public class ObjectUtils {
         return set;
     }
 
+    public static <E> LinkedHashSet<E> newLinkedHashSet(E... elements) {
+        LinkedHashSet<E> set = new LinkedHashSet<>(elements.length);
+        Collections.addAll(set, elements);
+        return set;
+    }
+
     //Due to UnsupportedMethodException on calling add method of Arrays.asList
     public static <E> List<E> newArrayList(E... elements) {
         List<E> list = new ArrayList<>(elements.length);

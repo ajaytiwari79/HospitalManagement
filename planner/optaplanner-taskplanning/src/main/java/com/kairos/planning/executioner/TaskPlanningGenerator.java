@@ -5,6 +5,8 @@ import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.planning.utils.JodaTimeConverter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,8 @@ public class TaskPlanningGenerator {
     private static final String DATA_UNPLANNED_TASK3_XML = "data/unplannedTask3.xml";
     private static final String DATA_PLANNED_TASKS = "data/plannedTasks.xml";
     private static final String FILE_TO_USE=DATA_UNPLANNED_TASK3_XML;
+
+    public  static final Logger LOGGER = LoggerFactory.getLogger(TaskPlanningGenerator.class);
 
 
 	public TaskPlanningSolution loadUnsolvedSolution() {
@@ -51,7 +55,7 @@ public class TaskPlanningGenerator {
             //unresolvedSolution = (TaskPlanningSolution) xstream.fromXML("");//unplannedTask.xml
             unresolvedSolution = (TaskPlanningSolution) xstream.fromXML(this.getClass().getClassLoader().getResourceAsStream(FILE_TO_USE));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw e;
         }
         return unresolvedSolution;

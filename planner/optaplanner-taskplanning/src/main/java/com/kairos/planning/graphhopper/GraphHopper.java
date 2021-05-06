@@ -16,10 +16,7 @@ import java.util.List;
 
 //@PropertySource("classpath:taskplanner.properties")
 public class GraphHopper {
-	Logger log = LoggerFactory.getLogger(GraphHopper.class);
-
-	private String matrixKey = "7ba37151-7141-4ea4-a89f-28a2ae297a0a";
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(GraphHopper.class);
 
 	public void getLocationData(List<Location> locations) {
 		//getLatLongByAddress("");
@@ -38,7 +35,7 @@ public class GraphHopper {
 		try {
 			response =  api.matrixGet(getApiKey(), point, fromPoint, toPoint, requiredFields, vehicle);
 		} catch (ApiException e) {
-			logger.error(e.getMessage());
+			LOGGER.error(e.getMessage());
 		}
 		return response;
 	}
@@ -67,9 +64,9 @@ public class GraphHopper {
 		GeocodingResponse response;
 		try {
 			response = geoApi.geocodeGet(getApiKey(), address, "en", 1, false, "", "default");
-			log.info("latitude "+response.getHits().get(0).getPoint().getLat()+" longitude "+response.getHits().get(0).getPoint().getLat());
+			LOGGER.info("latitude "+response.getHits().get(0).getPoint().getLat()+" longitude "+response.getHits().get(0).getPoint().getLat());
 		} catch (ApiException e) {
-			logger.error(e.getMessage());
+			LOGGER.error(e.getMessage());
 		}
 		return null;
 	}
@@ -89,8 +86,8 @@ public class GraphHopper {
 		 String key = prop.getProperty("graphhopper.key"); 
 		 
 		  } catch (IOException e) { logger.error(e.getMessage()); }*/
-		 
-		log.info(matrixKey);
+		String matrixKey = "7ba37151-7141-4ea4-a89f-28a2ae297a0a";
+		LOGGER.info(matrixKey);
 		return matrixKey;
 	}
 

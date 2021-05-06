@@ -161,9 +161,9 @@ public class ActivityRankingService {
             if(isCollectionEmpty(activityRankings)){
                 ActivityRanking newActivityRanking;
                 if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                    newActivityRanking = new ActivityRanking(expertiseId, activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+                    newActivityRanking = new ActivityRanking(expertiseId, activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), new LinkedHashSet<>(), newLinkedHashSet(activity.getId()), activity.getCountryId(), true);
                 } else {
-                    newActivityRanking = new ActivityRanking(expertiseId, activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+                    newActivityRanking = new ActivityRanking(expertiseId, activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newLinkedHashSet(activity.getId()), new LinkedHashSet<>(), activity.getCountryId(), true);
                 }
                 activityRankingRepository.save(newActivityRanking);
             } else {
@@ -184,7 +184,7 @@ public class ActivityRankingService {
         List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(unitId);
         if(addActivityId) {
             if (isCollectionEmpty(activityRankings)) {
-                activityRankingRepository.save(new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newHashSet(activity.getId()), unitId, true));
+                activityRankingRepository.save(new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activity.getActivityGeneralSettings().getEndDate(), newLinkedHashSet(activity.getId()), unitId, true));
             } else {
                 LocalDate activityEndDate = activity.getActivityGeneralSettings().getEndDate();
                 activity.getActivityGeneralSettings().setEndDate(null);
@@ -213,11 +213,11 @@ public class ActivityRankingService {
         if(activity.getActivityGeneralSettings().getStartDate().isBefore(activityRankings.get(0).getStartDate())){
             ActivityRanking newActivityRanking;
             if(presenceActivity){
-                newActivityRanking = new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newHashSet(activity.getId()), unitOrexpertiseId, true);
+                newActivityRanking = new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newLinkedHashSet(activity.getId()), unitOrexpertiseId, true);
             } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), new LinkedHashSet<>(), newLinkedHashSet(activity.getId()), activity.getCountryId(), true);
             } else {
-                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newLinkedHashSet(activity.getId()), new LinkedHashSet<>(), activity.getCountryId(), true);
             }
             activityRankingRepository.save(newActivityRanking);
             newActivityRankings.add(newActivityRanking);
@@ -373,11 +373,11 @@ public class ActivityRankingService {
         if(isCollectionNotEmpty(activityRankings) && isNotNull(activityRankings.get(activityRankings.size()-1).getEndDate())){
             ActivityRanking newActivityRanking;
             if(presenceActivity){
-                newActivityRanking = new ActivityRanking(activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newHashSet(activity.getId()), unitOrexpertiseId, true);
+                newActivityRanking = new ActivityRanking(activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newLinkedHashSet(activity.getId()), unitOrexpertiseId, true);
             } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, new HashSet<>(), newHashSet(activity.getId()), activity.getCountryId(), true);
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, new LinkedHashSet<>(), newLinkedHashSet(activity.getId()), activity.getCountryId(), true);
             } else {
-                newActivityRanking = new ActivityRanking(unitOrexpertiseId,activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newHashSet(activity.getId()), new HashSet<>(), activity.getCountryId(), true);
+                newActivityRanking = new ActivityRanking(unitOrexpertiseId,activityRankings.get(activityRankings.size()-1).getEndDate().plusDays(1), null, newLinkedHashSet(activity.getId()), new LinkedHashSet<>(), activity.getCountryId(), true);
             }
             activityRankingRepository.save(newActivityRanking);
             activityRankings.add(newActivityRanking);

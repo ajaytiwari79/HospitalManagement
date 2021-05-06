@@ -78,7 +78,7 @@ public class TomTomService {
             try {
                 response = submitToTomtomForMatrix(request);
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                LOGGER.error(e.getMessage());
             }
             //i++;
            // tomTomRepository.saveEntity(response);
@@ -179,9 +179,9 @@ public class TomTomService {
             }
             return tomTomResponse;
         }catch (InterruptedException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         } catch (URISyntaxException | IOException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }finally {
             ((CloseableHttpClient) httpclient).close();
         }
@@ -210,7 +210,7 @@ public class TomTomService {
             return route;
         } catch (URISyntaxException | IOException e) {
             LOGGER.error(fromLat+","+fromLong+":"+toLat+","+toLong+":::::");
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }finally {
             ((CloseableHttpClient) httpclient).close();
         }
@@ -229,7 +229,7 @@ public class TomTomService {
             TomTomResponse tomTomResponse = mapper.readValue(response.getEntity().getContent(), TomTomResponse.class);
             return tomTomResponse;
         } catch (URISyntaxException | IOException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }finally {
             ((CloseableHttpClient) httpclient).close();
         }

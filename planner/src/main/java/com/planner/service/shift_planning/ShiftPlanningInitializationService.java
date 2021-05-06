@@ -9,6 +9,9 @@ import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.planner.component.rest_client.IntegrationService;
+import com.planner.service.tomtomService.TomTomService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -24,6 +27,8 @@ import static com.kairos.enums.constraint.ConstraintSubType.MAXIMUM_ALLOCATIONS_
 @Service
 public class ShiftPlanningInitializationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShiftPlanningInitializationService.class);
+
     @Inject
     private IntegrationService integrationService;
 
@@ -32,16 +37,15 @@ public class ShiftPlanningInitializationService {
      */
     public ShiftPlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         shiftPlanningProblemSubmitDTO.setSolverConfig(getSolverConfigDTO());
-        Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
         integrationService.updateDataOfShiftForPlanningFromUserService(shiftPlanningProblemSubmitDTO);
         integrationService.updateDataOfShiftForPlanningFromActivityService(shiftPlanningProblemSubmitDTO);
         String objectString = ObjectMapperUtils.objectToJsonString(shiftPlanningProblemSubmitDTO);
         new Thread(()->writeProblemToTheFile(objectString,shiftPlanningProblemSubmitDTO.getPlanningProblemId().toString())).start();
         writeProblemToTheFile(objectString,"problem.json");
         try {
-            new ShiftPlanningSolver().run(null);
+            new ShiftPlanningSolver().run();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return null;
     }
@@ -65,7 +69,7 @@ public class ShiftPlanningInitializationService {
             printWriter.write(objectString);
             printWriter.close();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 

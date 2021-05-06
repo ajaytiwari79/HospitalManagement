@@ -5,7 +5,12 @@ package com.kairos.custom_exception;
  */
 public class UnitNotFoundException extends RuntimeException {
 
-    public UnitNotFoundException(String message) {
+    private Object[] params;
+    public UnitNotFoundException(String message,Object... params) {
         super(message);
+        this.params = params;
+    }
+    public Object[] getParams() {
+        return params;
     }
 }

@@ -76,6 +76,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -229,6 +230,7 @@ public class StaffService {
         return true;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public StaffDTO savePersonalDetail(long staffId, StaffDTO staffDTO, long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
@@ -726,57 +728,6 @@ public class StaffService {
 
     }
 
-    public void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
-        AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
-        unitPermissionAccessPermissionRelationship.setEnabled(true);
-        unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
-        accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroup.getId());
-    }
-
-    public void setUserAndPosition(OrganizationBaseEntity organizationBaseEntity, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
-        Organization organization = organizationService.fetchParentOrganization(organizationBaseEntity.getId());
-        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(), user.getId());
-        if (isNull(position)) {
-            position = createPositionAndStaff(user, organization);
-        }
-        // if the organization is not parent organization then adding position in parent organization.
-        organization.getPositions().add(position);
-        organizationGraphRepository.save(organization);
-        user.setCountryId(organization.getCountry().getId());
-
-        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organization.getId(), user.getId(), organizationBaseEntity.getId()).orElse(new UnitPermission());
-        if (organizationBaseEntity instanceof Organization) {
-            unitPermission.setOrganization((Organization) organizationBaseEntity);
-        } else {
-            unitPermission.setUnit((Unit) organizationBaseEntity);
-        }
-        if (accessGroupId != null) {
-            AccessGroup accessGroup = (union || parentOrganization) ? accessGroupRepository.getAccessGroupByParentAccessGroupId(organization.getId(), accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
-            if (Optional.ofNullable(accessGroup).isPresent()) {
-                unitPermission.setAccessGroup(accessGroup);
-                linkAccessOfModules(accessGroup, unitPermission);
-            }
-        }
-        position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position, 2);
-    }
-
-    private Position createPositionAndStaff(User user, Organization organization) {
-        Position position;
-        Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-        position = new Position();
-        position.setStaff(staff);
-        staff.setGender(user.getGender());
-        staff.setDateOfBirth(user.getDateOfBirth());
-        staff.setUser(user);
-        position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
-        position.setStaff(staff);
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
-        position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
-        return position;
-    }
-
     public void updateStaffFromExcel(MultipartFile multipartFile) {
         int staffUpdated = 0;
         List<Staff> staffList = new ArrayList<>();
@@ -821,15 +772,6 @@ public class StaffService {
             staffUpdated++;
         }
         return staffUpdated;
-    }
-
-    public void sendEmailToUnitManager(UnitManagerDTO unitManagerDTO, String password) {
-        String body = "Hi,\n\n" + "You are assigned as an unit manager and to get access in KairosPlanning.\n" + "Your username " + unitManagerDTO.getEmail() + " and password is " + password + "\n\n Thanks";
-        String subject = "You are a unit manager at KairosPlanning";
-        Map<String, Object> templateParam = new HashMap<>();
-        templateParam.put("receiverName", unitManagerDTO.getFullName());
-        templateParam.put("description", body);
-        sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, subject, unitManagerDTO.getEmail());
     }
 
     public List<Staff> getUploadedStaffByOrganizationId(Long organizationId) {

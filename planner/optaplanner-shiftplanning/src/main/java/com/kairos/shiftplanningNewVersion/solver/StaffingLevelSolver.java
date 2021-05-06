@@ -46,6 +46,7 @@ import static org.optaplanner.core.config.solver.SolverConfig.createFromXmlFile;
 @NoArgsConstructor
 public class StaffingLevelSolver {
 
+    public  static final Logger LOGGER = LoggerFactory.getLogger(StaffingLevelSolver.class);
         public static final String BASE_SRC = "src/main/resources/data/";
         public static final String STR = "\n------------------------\n";
         public static final String INFO = "info {}";
@@ -329,7 +330,7 @@ public class StaffingLevelSolver {
                 unSolvedsolution = staffingLevelSolver.runSolverOnRequest(unSolvedsolution);
                 //writeSolutionToFile(unSolvedsolution);
             }catch (Exception e){
-                logger.error(e.getMessage());
+                LOGGER.error(e.getMessage());
                 File file = new File(System.getProperty(USER_HOME) + "/" + "exception.text");
                 if(!file.exists()){
                     file.createNewFile();

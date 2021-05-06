@@ -18,9 +18,9 @@ public class ActivityRanking extends MongoBaseEntity {
     private Long expertiseId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Set<BigInteger> fullDayActivities=new LinkedHashSet<>();
-    private Set<BigInteger> fullWeekActivities=new LinkedHashSet<>();
-    private Set<BigInteger> presenceActivities=new LinkedHashSet<>();
+    private LinkedHashSet<BigInteger> fullDayActivities=new LinkedHashSet<>();
+    private LinkedHashSet<BigInteger> fullWeekActivities=new LinkedHashSet<>();
+    private LinkedHashSet<BigInteger> presenceActivities=new LinkedHashSet<>();
     private Long unitId;
     private Long countryId;
     private boolean published;
@@ -28,7 +28,7 @@ public class ActivityRanking extends MongoBaseEntity {
     private BigInteger draftId;
     private PriorityFor priorityFor;
 
-    public ActivityRanking(Long expertiseId, LocalDate startDate, LocalDate endDate, Set<BigInteger> fullDayActivities, Set<BigInteger> fullWeekActivities, Long countryId, boolean published){
+    public ActivityRanking(Long expertiseId, LocalDate startDate, LocalDate endDate, LinkedHashSet<BigInteger> fullDayActivities, LinkedHashSet<BigInteger> fullWeekActivities, Long countryId, boolean published){
         this.expertiseId = expertiseId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -38,7 +38,7 @@ public class ActivityRanking extends MongoBaseEntity {
         this.published = published;
     }
 
-    public ActivityRanking(LocalDate startDate, LocalDate endDate, Set<BigInteger> presenceActivities, Long unitId, boolean published){
+    public ActivityRanking(LocalDate startDate, LocalDate endDate, LinkedHashSet<BigInteger> presenceActivities, Long unitId, boolean published){
         this.startDate = startDate;
         this.endDate = endDate;
         this.presenceActivities = presenceActivities;
