@@ -17,6 +17,7 @@ import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.skill.SkillDTO;
+import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.filter.FilteredStaffsAndRequiredDataFilterDTO;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
@@ -92,8 +93,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
-import static com.kairos.commons.utils.DateUtils.getLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
@@ -483,7 +483,7 @@ public class StaffRetrievalService {
 
     public StaffEmploymentDetails getStaffEmploymentDatailsByEmploymentId(Long employmentId, long organizationId) {
         Unit unit = unitGraphRepository.findOne(organizationId);
-        List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), true);
+        List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), false);
         StaffEmploymentDetails employment = isCollectionNotEmpty(employmentDetails) ? employmentDetails.get(0) : null;
         if (Optional.ofNullable(employment).isPresent()) {
             employment.setUnitTimeZone(unit.getTimeZone());
@@ -935,9 +935,17 @@ public class StaffRetrievalService {
                     iterator.remove();
                 }
             }
-            //User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
             return staffAdditionalInfoDTOS;
         }
         return staffAdditionalInfoDTOS;
+    }
+    public StaffAdditionalInfoDTO getStaffDetailsForBalances(Long employmentId, long unitId,LocalDate date) {
+        EmploymentQueryResult employmentDetails = employmentGraphRepository.getEmploymentDetailsById(employmentId,date.toString());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(employmentDetails.getCprNumber(),new SeniorAndChildCareDaysDTO(copyCollectionPropertiesByMapper(employmentDetails.getSeniorDays(), CareDaysDTO.class),copyCollectionPropertiesByMapper(employmentDetails.getChildCareDays(),CareDaysDTO.class)));
+        StaffEmploymentDetails staffEmploymentDetails = new StaffEmploymentDetails(employmentDetails.getId(),new com.kairos.dto.activity.shift.Expertise(employmentDetails.getExpertiseId()),employmentDetails.getStartDate(),employmentDetails.getEndDate(),unitId);
+        staffAdditionalInfoDTO.setEmployment(staffEmploymentDetails);
+        staffAdditionalInfoDTO.setStaffChildDetails(copyCollectionPropertiesByMapper(employmentDetails.getStaffChildDetails(),StaffChildDetailDTO.class));
+        staffAdditionalInfoDTO.setCprNumber(employmentDetails.getCprNumber());
+        return staffAdditionalInfoDTO;
     }
 }

@@ -167,18 +167,22 @@ public class StaffingLevelAvailableCountService {
         }else{
             for (int i = 0; i < oldShift.getActivities().size(); i++) {
                 ShiftActivity oldShiftActivity = oldShift.getActivities().get(i);
-                Object[] objects = getShiftActivities(shift, oldShiftActivity);
-                List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
-                int duration = (int)objects[1];
-                for (ShiftActivity shiftActivity : shiftActivities) {
-                    if(oldShiftActivity.getInterval().overlaps(shiftActivity.getInterval()) && oldShiftActivity.getInterval().getMinutes()!=duration){
-                        List<DateTimeInterval> timeIntervals = oldShiftActivity.getInterval().minusInterval(shiftActivity.getInterval());
-                        if(isCollectionNotEmpty(timeIntervals)) {
-                            List<DateTimeInterval> dateTimeIntervals = updateAcivityMap.getOrDefault(shiftActivity.getActivityId(),new ArrayList<>());
-                            dateTimeIntervals.addAll(timeIntervals);
-                            updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
+                if(isNotNull(shift)){
+                    Object[] objects = getShiftActivities(shift, oldShiftActivity);
+                    List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
+                    int duration = (int)objects[1];
+                    for (ShiftActivity shiftActivity : shiftActivities) {
+                        if(oldShiftActivity.getInterval().overlaps(shiftActivity.getInterval()) && oldShiftActivity.getInterval().getMinutes()!=duration){
+                            List<DateTimeInterval> timeIntervals = oldShiftActivity.getInterval().minusInterval(shiftActivity.getInterval());
+                            if(isCollectionNotEmpty(timeIntervals)) {
+                                List<DateTimeInterval> dateTimeIntervals = updateAcivityMap.getOrDefault(shiftActivity.getActivityId(),new ArrayList<>());
+                                dateTimeIntervals.addAll(timeIntervals);
+                                updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
+                            }
                         }
                     }
+                }else {
+                    updateAcivityMap.put(oldShiftActivity.getActivityId(),newArrayList(oldShiftActivity.getInterval()));
                 }
             }
         }
@@ -198,25 +202,34 @@ public class StaffingLevelAvailableCountService {
 
     private Map<BigInteger, List<DateTimeInterval>> getActivityCreatedMap(Shift shift, Shift oldShift) {
         Map<BigInteger, List<DateTimeInterval>> updateAcivityMap = new HashMap<>();
-        if(isNull(oldShift)){
+        if(isNull(shift)){
+            for (int i = 0; i < oldShift.getActivities().size(); i++) {
+                updateAcivityMap.put(oldShift.getActivities().get(i).getActivityId(),null);
+            }
+        }
+        else if(isNull(oldShift)){
             for (int i = 0; i < shift.getActivities().size(); i++) {
                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),newArrayList(shift.getActivities().get(i).getInterval()));
             }
         }else{
             for (int i = 0; i < shift.getActivities().size(); i++) {
                 ShiftActivity shiftActivity = shift.getActivities().get(i);
-                Object[] objects = getShiftActivities(oldShift, shiftActivity);
-                List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
-                int duration = (int)objects[1];
-                for (ShiftActivity oldShiftActivity : shiftActivities) {
-                    if(shiftActivity.getInterval().overlaps(oldShiftActivity.getInterval()) && shiftActivity.getInterval().getMinutes()!=duration){
-                        List<DateTimeInterval> timeIntervals = shiftActivity.getInterval().minusInterval(oldShiftActivity.getInterval());
-                        if(isCollectionNotEmpty(timeIntervals)) {
-                            List<DateTimeInterval> dateTimeIntervals = updateAcivityMap.getOrDefault(oldShiftActivity.getActivityId(),new ArrayList<>());
-                            dateTimeIntervals.addAll(timeIntervals);
-                            updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
+                if(isNotNull(oldShift)){
+                    Object[] objects = getShiftActivities(oldShift, shiftActivity);
+                    List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
+                    int duration = (int)objects[1];
+                    for (ShiftActivity oldShiftActivity : shiftActivities) {
+                        if(shiftActivity.getInterval().overlaps(oldShiftActivity.getInterval()) && shiftActivity.getInterval().getMinutes()!=duration){
+                            List<DateTimeInterval> timeIntervals = shiftActivity.getInterval().minusInterval(oldShiftActivity.getInterval());
+                            if(isCollectionNotEmpty(timeIntervals)) {
+                                List<DateTimeInterval> dateTimeIntervals = updateAcivityMap.getOrDefault(oldShiftActivity.getActivityId(),new ArrayList<>());
+                                dateTimeIntervals.addAll(timeIntervals);
+                                updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
+                            }
                         }
                     }
+                }else {
+                    updateAcivityMap.put(shiftActivity.getActivityId(),newArrayList(shiftActivity.getInterval()));
                 }
             }
         }

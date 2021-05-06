@@ -72,6 +72,7 @@ public class TimeTypeService {
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private ReasonCodeService reasonCodeService;
     @Inject private PhaseService phaseService;
+    @Inject private ActivityHelperService activityHelperService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -538,7 +539,7 @@ public class TimeTypeService {
         if (!timeType.getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
             timeType.getActivityTimeCalculationSettings().setDayTypes(timeType.getActivityRulesSettings().getDayTypes());
         }
-        organizationActivityService.updateColorInActivity(new TimeTypeDTO(timeType.getBackgroundColor(),rulesActivityDTO.isSicknessSettingValid(),rulesActivityDTO),timeTypeId);
+        activityHelperService.updateColorInActivity(new TimeTypeDTO(timeType.getBackgroundColor(),rulesActivityDTO.isSicknessSettingValid(),rulesActivityDTO),timeTypeId);
         timeTypeMongoRepository.save(timeType);
         return new ActivitySettingsWrapper(activityRulesSettings);
     }
@@ -650,6 +651,10 @@ public class TimeTypeService {
 
     public List<TimeType> getAllSickTimeTypes(){
         return timeTypeMongoRepository.findAllSickTimeTypes();
+    }
+
+    public TimeType getTimeTypeById(BigInteger timeTypeId){
+        return timeTypeMongoRepository.findOne(timeTypeId);
     }
 
 }

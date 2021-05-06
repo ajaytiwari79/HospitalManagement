@@ -5,6 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.skill.Skill;
@@ -12,8 +13,13 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.model.activity.tabs.ActivityGeneralSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
@@ -22,6 +28,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -32,7 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.service.activity.ActivityUtil.getPhaseForRulesActivity;
 import static com.kairos.service.activity.ActivityUtil.initializeTimeCareActivities;
@@ -48,6 +55,7 @@ public class ActivityHelperService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     public void initializeActivitySettings(Activity activity, Long countryId, ActivityDTO activityDTO) {
         ActivityGeneralSettings activityGeneralSettings = new ActivityGeneralSettings(activity.getName(), activity.getDescription(), "");
@@ -147,5 +155,45 @@ public class ActivityHelperService {
             activities.add(activity);
         }
         return activities;
+    }
+
+    @Async
+    public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO, BigInteger timeTypeId) {
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity -> {
+                activity.getActivityGeneralSettings().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                activity.getActivityRulesSettings().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+                if(isNotNull(timeTypeDTO.getActivityRulesSettings())){
+                    activity.getActivityRulesSettings().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getActivityRulesSettings().getSicknessSetting(), SicknessSetting.class));
+                }
+            });
+            activityMongoRepository.saveEntities(activities);
+        }
+        return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
+    }
+
+    @Async
+    public void updateColorInShift(String newTimeTypeColor,Set<BigInteger> activityIds) {
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
+        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+            updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
+            if(isNotNull(shift.getDraftShift())){
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, draftShiftActivity));
+            }
+        }));
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
+    }
+    private void updateBackgroundColorInShiftActivity(String newTimeTypeColor, Set<BigInteger> activitiyIds, ShiftActivity shiftActivity) {
+        if(activitiyIds.contains(shiftActivity.getActivityId())){
+            shiftActivity.setBackgroundColor(newTimeTypeColor);
+        }
+        shiftActivity.getChildActivities().forEach(childActivity -> {
+            if(activitiyIds.contains(childActivity.getActivityId())){
+                childActivity.setBackgroundColor(newTimeTypeColor);
+            }
+        });
     }
 }

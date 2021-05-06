@@ -56,6 +56,7 @@ import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftHelperService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -822,9 +823,11 @@ public class UserIntegrationService {
         }, employmentId);
     }
 
-    public List<List<BigInteger>> getTeamActivityIdsByUnit(Long unitId){
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, TEAM_ACTIVITY_IDS, newArrayList(), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<List<BigInteger>>>>() {
-        });
+    public StaffAdditionalInfoDTO getStaffDetailsForBalances(Long unitId, LocalDate localDate,Long employmentId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair(START_DATE, localDate != null ? localDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_DETAILS_FOR_BALANCES_BY_EMPLOYMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, employmentId);
     }
 }
 

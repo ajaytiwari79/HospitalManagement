@@ -5,7 +5,13 @@ package com.kairos.custom_exception;
  */
 public class FlsCredentialException extends RuntimeException {
 
-    public FlsCredentialException(String message) {
+    private Object[] params;
+    public FlsCredentialException(String message,Object... params) {
         super(message);
+        this.params = params;
+    }
+
+    public Object[] getParams() {
+        return params;
     }
 }

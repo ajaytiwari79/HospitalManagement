@@ -35,6 +35,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffTeamRankingService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,6 +83,7 @@ public class TeamService {
     @Inject private CommonRepository commonRepository;
     @Inject private StaffTeamRankingService staffTeamRankingService;
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
         OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
         validateDetails(unitId, teamDTO, organizationContactAddress);
@@ -121,6 +123,7 @@ public class TeamService {
         }
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public TeamDTO updateTeam(Long unitId, Long teamId, TeamDTO teamDTO) {
         boolean teamExistInOrganizationAndGroupByName = teamGraphRepository.teamExistInOrganizationByName(unitId, teamId, "(?i)" + teamDTO.getName());
         if (teamExistInOrganizationAndGroupByName) {
@@ -138,6 +141,7 @@ public class TeamService {
         return teamDTO;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public boolean updateActivitiesOfTeam(Long unitId , Long teamId, BigInteger activityId) {
         Team team = teamGraphRepository.findOne(teamId);
         team.setActivityId(activityId);
@@ -146,6 +150,7 @@ public class TeamService {
         return true;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public List<StaffTeamDTO> updateStaffsInTeam(Long unitId, Long teamId, List<StaffTeamDTO> staffTeamDTOs) {
         List<StaffPersonalDetailQueryResult> staffSkills = staffGraphRepository.getSkillIdsByStaffIds(staffTeamDTOs.stream().map(staffTeamDTO -> staffTeamDTO.getStaffId()).collect(Collectors.toList()));
         Map<Long,Set<Long>> staffSkillMap = staffSkills.stream().collect(Collectors.toMap(k -> k.getId(),v->v.getSkillIds()));
@@ -178,9 +183,6 @@ public class TeamService {
                 if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),teamId)) {
                     staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
                 }
-//                } else {
-//                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
-//                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
             staffTeamRankingService.addOrUpdateStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship, staffTeamRelationShipQueryResult);
@@ -217,6 +219,7 @@ public class TeamService {
         return map;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public boolean deleteTeamByTeamId(long teamId) {
         Team team = teamGraphRepository.findOne(teamId);
         if (team != null) {
@@ -229,6 +232,7 @@ public class TeamService {
     }
 
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned) {
 
         Staff staff = staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY)));
@@ -324,6 +328,7 @@ public class TeamService {
         return unitGraphRepository.getOrganizationByTeamId(teamId);
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {
         Team team = teamGraphRepository.findById(teamId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId)));
         team.setName(teamDTO.getName());
@@ -350,6 +355,7 @@ public class TeamService {
         return teamGraphRepository.activityExistInTeamByActivityId(activityId);
 
     }
+
 
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
@@ -401,6 +407,7 @@ public class TeamService {
         }
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
         List<Long> validStaffIds = new ArrayList<>();
         List<Long> onlyTeamLeader = new ArrayList<>();

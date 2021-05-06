@@ -22,6 +22,7 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,7 @@ public class StaffActivitySettingService {
     @Inject private TimeTypeService timeTypeService;
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         organizationActivityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
@@ -70,6 +72,7 @@ public class StaffActivitySettingService {
         return staffActivitySettingRepository.findAllByUnitIdAndDeletedFalse(unitId);
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public StaffActivitySettingDTO updateStaffActivitySettings(BigInteger staffActivitySettingId,Long unitId, StaffActivitySettingDTO staffActivitySettingDTO){
         organizationActivityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
@@ -84,6 +87,7 @@ public class StaffActivitySettingService {
         return staffActivitySettingDTO;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public boolean deleteStaffActivitySettings(BigInteger staffActivitySettingId){
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
@@ -98,6 +102,7 @@ public class StaffActivitySettingService {
         return activityMongoRepository.findStaffPersonalizedSettings(unitId,activityId);
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public Map<String,List<StaffActivityResponse>> assignActivitySettingToStaffs(Long unitId, StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
         if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING);
@@ -118,12 +123,12 @@ public class StaffActivitySettingService {
         return responseMap;
     }
 
-    //@Cacheable(value = "getStaffSpecificActivitySettings", key = "{#unitId,#staffId,#includeTeamActivity,#isActivityType}", cacheManager = "cacheManager")
+    @Cacheable(value = "getStaffSpecificActivitySettings", key = "{#unitId,#staffId,#includeTeamActivity,#isActivityType}", cacheManager = "cacheManager")
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity,boolean isActivityType){
         List<ActivityWithCompositeDTO> staffPersonalizedActivities;
         if(includeTeamActivity) {
             List<StaffActivitySettingDTO> activitySettings = staffActivitySettingRepository.findAllByStaffIdAndDeletedFalse(staffId);
-            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType,activitySettings);
+            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
             activitySettings.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {
@@ -151,7 +156,7 @@ public class StaffActivitySettingService {
         return staffActivitySettingRepository.findByActivityIdAndStaffIdAndUnitIdAndDeletedFalse(activityId,staffId,unitId);
     }
 
-
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
    public List<StaffActivitySettingDTO> updateBulkStaffActivitySettings(Long unitId,Long staffId,List<StaffActivitySettingDTO> staffActivitySettings){
         staffActivitySettings.forEach(staffActivitySetting->{
             staffActivitySetting.setUnitId(unitId);
@@ -169,6 +174,7 @@ public class StaffActivitySettingService {
         return !messages.isEmpty() ? messages.stream().map(message-> localeService.getMessage(message)).collect(Collectors.toList()) : null;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
    private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap, Map<BigInteger,Activity> activityMap, Map<Long, StaffDTO> staffExpertiseWrapperMap, Long staffId,
                                                                                          List<StaffActivitySettingDTO> staffActivitySettingDTOS, Long unitId, Set<StaffActivitySetting> staffActivitySettings){
        List<StaffActivityResponse> success=(responseMap.get(SUCCESS)==null)?new ArrayList<>():responseMap.get(SUCCESS);
@@ -186,15 +192,12 @@ public class StaffActivitySettingService {
            activitySettingDTOMap.put(staffActivitySetting.getActivityId(),staffActivitySetting);
            staffWiseActivityMap.put(staffId,activitySettingDTOMap);
         });
-
-
        staffActivitySettings.forEach(currentStaffActivitySettings->{
            StaffActivitySettingDTO staffActivitySettingDTO=null;
            Map<BigInteger,StaffActivitySettingDTO> staffActivitySettingDTOMap=staffWiseActivityMap.get(currentStaffActivitySettings.getStaffId());
            if(staffActivitySettingDTOMap!=null){
                 staffActivitySettingDTO=staffActivitySettingDTOMap.get(currentStaffActivitySettings.getActivityId());
            }
-
            if(staffActivitySettingDTO!=null){
                staffActivitySettingDTO.setStaffId(currentStaffActivitySettings.getStaffId());
                staffActivitySettingDTO.setId(currentStaffActivitySettings.getId());
@@ -204,7 +207,6 @@ public class StaffActivitySettingService {
                staffWiseActivityMap.remove(currentStaffActivitySettings.getStaffId()).get(currentStaffActivitySettings.getActivityId());
            }
        });
-
        activitySettingDTOMap.forEach((activityId,activitySetting)->{
            Activity activity = activityMap.get(activitySetting.getActivityId());
            StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getEmploymentId(),
@@ -217,11 +219,9 @@ public class StaffActivitySettingService {
            success.add(staffActivityResponse);
 
        });
-
        if(!staffActivitySettingSet.isEmpty()){
            staffActivitySettingRepository.saveEntities(staffActivitySettingSet);
        }
-
        responseMap.put(SUCCESS,success);
        responseMap.put(ERROR,error);
        return responseMap;

@@ -662,7 +662,7 @@ public class TimeBankService implements KPIService {
     public <T> T getAccumulatedTimebankAndDelta(Long employmentId, Long unitId, Boolean includeActualTimebank,StaffEmploymentDetails employment,ShiftDataHelper shiftDataHelper) {
         employment = isNotNull(employment) ? employment : userIntegrationService.getEmploymentDetailsOfStaffByEmploymentId(unitId,  employmentId);
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(employment, unitId);
-        T object;
+        T response;
         DateTimeInterval planningPeriodInterval = isNotNull(shiftDataHelper) ? shiftDataHelper.getPlanningPeriodDateTimeInterval() : planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         LocalDate periodEndDate = planningPeriodInterval.getEndLocalDate();
         Date endDate = asDate(periodEndDate);
@@ -672,14 +672,14 @@ public class TimeBankService implements KPIService {
         Map[] mapArray = phaseService.getPhasesByDates(unitId, employmentStartDate,periodEndDate,employmentWithCtaDetailsDTO.getUnitTimeZone(),employmentWithCtaDetailsDTO.getEmploymentTypeId());
         shiftDataHelper = ShiftDataHelper.builder().dateAndPhaseDefaultName(mapArray[0]).dateAndPublishPlanningPeriod(mapArray[1]).build();
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(DailyTimeBankEntry::getDate, v -> v));
-        object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dateDailyTimeBankEntryMap,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate,shiftDataHelper);
+        response = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dateDailyTimeBankEntryMap,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate,shiftDataHelper);
         if(includeActualTimebank) {
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             PlanningPeriod firstRequestPhasePlanningPeriodByUnitId = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
             java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = isNull(firstRequestPhasePlanningPeriodByUnitId) ? periodEndDate : firstRequestPhasePlanningPeriodByUnitId.getEndDate();
-            object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dateDailyTimeBankEntryMap, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates,shiftDataHelper);
+            response = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dateDailyTimeBankEntryMap, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)response,ruleTemplates,shiftDataHelper);
         }
-        return object;
+        return response;
     }
 
     public void updateDailyTimebank(Long unitId){

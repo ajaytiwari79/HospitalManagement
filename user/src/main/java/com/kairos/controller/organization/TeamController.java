@@ -196,11 +196,4 @@
             return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
         }
 
-        @GetMapping(value = "/team_activity_ids")
-        @ApiOperation("Get Team Activity Ids By unit")
-            //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        ResponseEntity<Map<String, Object>> getTeamActivityIdsByUnit(@PathVariable Long unitId) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getTeamActivityIdsByUnit(unitId));
-        }
-
     }

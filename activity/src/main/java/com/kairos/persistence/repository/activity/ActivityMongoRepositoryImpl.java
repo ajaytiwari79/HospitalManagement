@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
@@ -9,10 +10,7 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
-import com.kairos.enums.UnityActivitySetting;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -699,6 +697,16 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
+    @Override
+    public List<ActivityDTO> findChildActivityIdsByActivityIds(Collection<BigInteger> activityIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(AppConstants.ID).in(activityIds).and(DELETED).is(false)),
+                project(CHILD_ACTIVITY_IDS)
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
+
     public boolean existsByActivityIdInChildActivities(BigInteger activityId) {
         Query query = new Query(Criteria.where(CHILD_ACTIVITY_IDS).is(activityId).and(DELETED).is(false).and(STATE).is(ActivityStateEnum.PUBLISHED));
         return isNotNull(mongoTemplate.findOne(query, Activity.class));
@@ -910,6 +918,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
+    public List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long refId, boolean refType, PriorityFor priorityFor) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(TIME_TYPE1+".priorityFor").is(priorityFor);
+        if(refType){
+            criteria.and(COUNTRY_ID).is(refId);
+        } else {
+            criteria.and(UNIT_ID).is(refId);
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
+                unwind(TIME_TYPE1),
+                match(criteria),
+                project(NAME,TIME_CALCULATION_ACTIVITY_TAB)
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
     public List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId, Long staffId, boolean isActivityType) {
         String activityIdString = getBigIntegerString(activityIds.iterator());
         AggregationOperation[] aggregations = new AggregationOperation[10];
@@ -919,7 +945,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             staffId = 0l;
         }
         aggregations[i++] = match(Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false));
-        aggregations[i++] = group(STAFF_ID).addToSet(ACTIVITY_ID).as(ACTIVITY_IDS);
+        aggregations[i++] = group(STAFF_ID).addToSet(ACTIVITYID).as(ACTIVITY_IDS);
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType,unitId);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
         aggregations[i++] = getCustomAggregationOperationForConcatArray();
@@ -1015,7 +1041,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "                    ]\n" +
                 "                  },\n" +
                 "                  {\n" +
-                "                    \"$gte\": [\n" +
+                "                    \"$eq\": [\n" +
                 "                      \"$activityId\",\n" +
                 "                      \"$$activityId\"\n" +
                 "                    ]\n" +

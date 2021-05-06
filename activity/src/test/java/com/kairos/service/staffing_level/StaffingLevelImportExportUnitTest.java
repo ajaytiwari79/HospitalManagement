@@ -23,7 +23,7 @@ import java.io.IOException;
 public class StaffingLevelImportExportUnitTest {
 
     @InjectMocks
-    StaffingLevelService staffingLevelService;
+    ImportStaffingLevelService staffingLevelService;
 
     @Mock
     private StaffingLevelMongoRepository staffingLevelMongoRepository;

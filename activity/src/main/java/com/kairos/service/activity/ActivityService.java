@@ -25,6 +25,7 @@ import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
@@ -212,7 +213,8 @@ public class ActivityService {
         }
         activity.setDeleted(true);
         activityMongoRepository.save(activity);
-        if(PRESENCE.equals(activity.getActivityBalanceSettings().getTimeType())) {
+        TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.PRESENCE.equals(timeType.getPriorityFor())) {
             activityRankingService.addOrRemovePresenceActivityRanking(UserContext.getUnitId(), activity, false);
         }
         return true;
@@ -256,7 +258,8 @@ public class ActivityService {
         updateBalanceSettingTab(generalDTO, activity);
         updateNotesTabOfActivity(generalDTO, activity);
         activityMongoRepository.save(activity);
-        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState())){
+        TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.ABSENCE.equals(timeType.getPriorityFor()) && PUBLISHED.equals(activity.getState())){
             activityRankingService.updateEndDateOfAbsenceActivity(activity, oldEndDate);
         }
         return getActivitySettingsWrapper(activity, checkCountryAndFindActivityCategory(countryId), generalActivityWithTagDTO);
@@ -423,6 +426,7 @@ public class ActivityService {
         return timeCalculationActivityDTO;
     }
 
+    @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
     public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
         Activity activity = findActivityById(activityId);
         List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
@@ -702,7 +706,8 @@ public class ActivityService {
         activity.setLevels(organizationMappingDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingDTO.getEmploymentTypes());
         activityMongoRepository.save(activity);
-        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState()) && expertiseIds.size() != activity.getExpertises().size()){
+        TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.ABSENCE.equals(timeType.getPriorityFor()) && PUBLISHED.equals(activity.getState()) && expertiseIds.size() != activity.getExpertises().size()){
             if(activity.getExpertises().size() > expertiseIds.size()){
                 List<Long> updateExpertiseIds = activity.getExpertises();
                 updateExpertiseIds.removeAll(expertiseIds);
@@ -815,7 +820,8 @@ public class ActivityService {
         }
         activity.setDeleted(true);
         activityMongoRepository.save(activity);
-        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && PUBLISHED.equals(activity.getState()) && activity.getExpertises().size() > 0) {
+        TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.ABSENCE.equals(timeType.getPriorityFor()) && PUBLISHED.equals(activity.getState()) && activity.getExpertises().size() > 0) {
             activityRankingService.removeAbsenceActivityId(activity, activity.getExpertises());
         }
         return true;
@@ -832,7 +838,8 @@ public class ActivityService {
         }
         activity.setState(PUBLISHED);
         activityMongoRepository.save(activity);
-        if(ABSENCE.equals(activity.getActivityBalanceSettings().getTimeType()) && isCollectionNotEmpty(activity.getExpertises()) && activity.getExpertises().size() > 0) {
+        TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+        if(PriorityFor.ABSENCE.equals(timeType.getPriorityFor()) && isCollectionNotEmpty(activity.getExpertises()) && activity.getExpertises().size() > 0) {
             activityRankingService.createOrUpdateAbsenceActivityRanking(activity, activity.getExpertises());
         }
         return true;
@@ -998,5 +1005,9 @@ public class ActivityService {
 
     public List<ActivityDTO> findAllActivitiesByTimeType(Long refId, TimeTypeEnum timeType){
         return activityMongoRepository.findAllActivitiesByTimeType(refId,timeType);
+    }
+
+    public List<ActivityDTO> findAllActivitiesByCountryAndTimeTypePriority(long refId, boolean refType, PriorityFor priorityFor){
+        return activityMongoRepository.findAllActivityByCountryAndPriorityFor(refId, refType, priorityFor);
     }
 }

@@ -8,6 +8,7 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
+import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.UnityActivitySetting;
 import com.kairos.persistence.model.activity.Activity;
@@ -47,7 +48,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 
-    //@Cacheable(value = "findAllActivityByUnitIdWithCompositeActivities", key = "#unitId", cacheManager = "cacheManager")
+    @Cacheable(value = "findAllActivityByUnitIdWithCompositeActivities", key = "#unitId", cacheManager = "cacheManager")
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId,Collection<BigInteger> activitIds);
 
     List<ActivityPhaseSettings> findActivityIdAndStatusByUnitAndAccessGroupIds(Long unitId, List<Long> accessGroupIds);
@@ -120,4 +121,9 @@ public interface CustomActivityMongoRepository {
     List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
 
     List<ActivityDTO> findAllActivitiesByTimeType(Long countryId, TimeTypeEnum timeType);
+
+    List<ActivityDTO> findChildActivityIdsByActivityIds(Collection<BigInteger> activityIds);
+
+    List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long refId, boolean refType, PriorityFor priorityFor);
+
 }
