@@ -18,9 +18,9 @@ public class ActivityRankingDTO {
     private Long expertiseId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Set<BigInteger> fullDayActivities=new LinkedHashSet<>();
-    private Set<BigInteger> fullWeekActivities=new LinkedHashSet<>();
-    private Set<BigInteger> presenceActivities=new LinkedHashSet<>();
+    private LinkedHashSet<BigInteger> fullDayActivities=new LinkedHashSet<>();
+    private LinkedHashSet<BigInteger> fullWeekActivities=new LinkedHashSet<>();
+    private LinkedHashSet<BigInteger> presenceActivities=new LinkedHashSet<>();
     private Long countryId;
     private boolean published;
     private Long unitId;
