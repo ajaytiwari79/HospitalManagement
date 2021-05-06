@@ -90,6 +90,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -292,7 +293,7 @@ public class OrganizationActivityService {
 
     }
 
-    //@Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
+    @Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId);
