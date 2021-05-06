@@ -525,8 +525,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(criteria),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, ID1,
                         TIME_TYPE1),
-                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
-                        ACTIVITY_PRIORITY),
                 getProjectForParentActivityWrapper()
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
@@ -535,11 +533,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     private ProjectionOperation getProjectForParentActivityWrapper() {
         return project().and(AppConstants.ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(CHILD_ACTIVITY_IDS).as(ACTIVITY_CHILD_ACTIVITY_IDS)
-                .and(AppConstants.ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as(ACTIVITY_ACTIVITY_PRIORITY_ID).and(UNIT_ID).as(ACTIVITY_UNIT_ID)
+                .and(AppConstants.ID).as(AppConstants.ACTIVITY_ID).and(UNIT_ID).as(ACTIVITY_UNIT_ID)
                 .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB).and(GENERAL_ACTIVITY_TAB).as(ACTIVITY_GENERAL_ACTIVITY_TAB).and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
                 .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB).and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
-                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1).and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
-                .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY);
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1).and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO);
     }
 
     @Override
