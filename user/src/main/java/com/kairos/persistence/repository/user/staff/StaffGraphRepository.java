@@ -509,6 +509,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} " +
             "RETURN staff.canRankTeam")
-    boolean getAllowPersonalRanking(Long staffId);
+    Boolean getAllowPersonalRanking(Long staffId);
 }
 

@@ -971,6 +971,7 @@ public class StaffService {
     }
 
     public boolean getAllowPersonalRanking(Long staffId) {
-        return staffGraphRepository.getAllowPersonalRanking(staffId);
+        Boolean allowPersonalRanking = staffGraphRepository.getAllowPersonalRanking(staffId);
+        return isNotNull(allowPersonalRanking) && allowPersonalRanking;
     }
 }
