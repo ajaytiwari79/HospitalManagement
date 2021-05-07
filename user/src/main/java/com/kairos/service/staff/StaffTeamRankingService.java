@@ -3,13 +3,12 @@ package com.kairos.service.staff;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.staff.StaffTeamRankingDTO;
+import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamRanking;
 import com.kairos.persistence.model.staff.TeamRankingInfo;
 import com.kairos.persistence.repository.user.staff.StaffTeamRankingGraphRepository;
@@ -38,6 +37,8 @@ public class StaffTeamRankingService {
     @Inject private StaffTeamRankingGraphRepository staffTeamRankingGraphRepository;
 
     @Inject private ExceptionService exceptionService;
+
+    @Inject private StaffService staffService;
 
     public StaffTeamRankingDTO updateStaffTeamRanking(StaffTeamRankingDTO staffTeamRankingDTO){
         StaffTeamRanking staffTeamRanking = staffTeamRankingGraphRepository.findById(staffTeamRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, STAFF_TEAM_RANKING, staffTeamRankingDTO.getId())));
@@ -79,16 +80,29 @@ public class StaffTeamRankingService {
     public List<StaffTeamRankingDTO> getStaffTeamRankings(Long staffId, boolean includeDraft){
         List<StaffTeamRankingDTO> staffTeamRankingDTOList = new ArrayList<>();
         List<StaffTeamRanking> staffTeamRankings;
-        if(includeDraft) {
-            staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
-        } else {
-            staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
-        }
-        if(isCollectionNotEmpty(staffTeamRankings)) {
-            staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate).thenComparing(StaffTeamRanking::getCreationDate));
-            staffTeamRankingDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRankings, StaffTeamRankingDTO.class);
+        if(staffService.getAllowPersonalRanking(staffId)) {
+            if (includeDraft) {
+                staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
+            } else {
+                staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
+            }
+            if (isCollectionNotEmpty(staffTeamRankings)) {
+                staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate).thenComparing(StaffTeamRanking::getCreationDate));
+                staffTeamRankingDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRankings, StaffTeamRankingDTO.class);
+            }
         }
         return staffTeamRankingDTOList;
+    }
+
+    public Set<TeamRankingInfoDTO> getStaffTeamRankingInfo(Long staffId, LocalDate date) {
+        Set<TeamRankingInfoDTO> teamRankingInfoDTOS = new HashSet<>();
+        if(staffService.getAllowPersonalRanking(staffId)) {
+            StaffTeamRanking staffTeamRanking = staffTeamRankingGraphRepository.getApplicableStaffTeamRanking(staffId, date.toString());
+            if (isNotNull(staffTeamRanking) && isCollectionNotEmpty(staffTeamRanking.getTeamRankingInfo())) {
+                teamRankingInfoDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRanking.getTeamRankingInfo(), TeamRankingInfoDTO.class);
+            }
+        }
+        return teamRankingInfoDTOS;
     }
 
     public StaffTeamRankingDTO publishStaffTeamRanking(Long id, LocalDate publishedDate) {
@@ -111,7 +125,7 @@ public class StaffTeamRankingService {
 
     @Async
     public void updateActivityIdInTeamRanking(Long teamId, BigInteger activityId){
-        staffTeamRankingGraphRepository.updateActivityIdInTeamRanking(teamId, activityId);
+        staffTeamRankingGraphRepository.updateActivityIdInTeamRanking(teamId, activityId.toString());
     }
 
     @Async
@@ -415,5 +429,4 @@ public class StaffTeamRankingService {
             staffTeamRankingGraphRepository.updateTeamType(staffId, teamId, newTeamType);
         }
     }
-
 }

@@ -14,6 +14,7 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
+import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.utils.CPRUtil;
@@ -77,6 +78,7 @@ public class StaffAdditionalInfoDTO {
     private List<TeamDTO> teamsData;
     private Set<Long> employmentIds = new HashSet<>();
     private ShiftActivityDTO replacedActivity;
+    private List<TeamRankingInfoDTO> staffTeamRankingInfoData;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;

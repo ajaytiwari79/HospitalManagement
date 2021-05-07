@@ -164,6 +164,7 @@ public class StaffRetrievalService {
     @Inject private StaffGraphRepositoryImpl staffGraphRepositoryImpl;
     @Inject private GroupService groupService;
     @Inject private EngineerTypeService engineerTypeService;
+    @Inject private StaffTeamRankingService staffTeamRankingService;
 
 
     public Map<String, Object> getDefaultDataOfStaff(long staffId, long unitId) {
@@ -506,6 +507,7 @@ public class StaffRetrievalService {
         }
         User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
         staffAdditionalInfoQueryResult.setUnitWiseAccessRole(user.getUnitWiseAccessRole());
+        staffAdditionalInfoQueryResult.setStaffTeamRankingInfoData(staffTeamRankingService.getStaffTeamRankingInfo(staffId, startDate).stream().collect(Collectors.toList()));
         return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, reasonCodeIds,startDate);
     }
 

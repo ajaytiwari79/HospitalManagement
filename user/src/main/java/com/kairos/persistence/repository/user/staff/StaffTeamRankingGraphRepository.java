@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -25,9 +26,13 @@ public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<Sta
 
     @Query("MATCH (teamRankingInfo:TeamRankingInfo) WHERE teamRankingInfo.teamId={0} " +
             "SET teamRankingInfo.activityId={1}")
-    void updateActivityIdInTeamRanking(Long teamId, BigInteger activityId);
+    void updateActivityIdInTeamRanking(Long teamId, String activityId);
 
     @Query("MATCH (staffTeamRanking:StaffTeamRanking)-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.staffId = {0} AND teamRankingInfo.teamId={1} " +
             "SET teamRankingInfo.teamType={2}")
     void updateTeamType(Long staffId, Long teamId, TeamType newTeamType);
+
+    @Query("MATCH (staffTeamRanking:StaffTeamRanking)-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.staffId = {0} AND date(staffTeamRanking.startDate)<=DATE({1}) AND (staffTeamRanking.endDate IS NULL OR date(staffTeamRanking.endDate)>=DATE({1})) " +
+            "RETURN staffTeamRanking,rel,teamRankingInfo")
+    StaffTeamRanking getApplicableStaffTeamRanking(Long staffId, String date);
 }

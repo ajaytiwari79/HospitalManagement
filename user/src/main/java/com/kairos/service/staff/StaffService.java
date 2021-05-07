@@ -969,4 +969,8 @@ public class StaffService {
         staffGraphRepository.allowPersonalRanking(staffId, canRankTeam);
         return true;
     }
+
+    public boolean getAllowPersonalRanking(Long staffId) {
+        return staffGraphRepository.getAllowPersonalRanking(staffId);
+    }
 }
