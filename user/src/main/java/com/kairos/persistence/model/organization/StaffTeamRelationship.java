@@ -72,7 +72,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.teamMembership = true;
     }
 
-    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType,LocalDate startDate, LocalDate endDate,int sequence,boolean teamMembership) {
+    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType,LocalDate startDate, LocalDate endDate,boolean teamMembership) {
         this.id=id;
         this.team = team;
         this.staff = staff;
@@ -80,7 +80,6 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.teamType = teamType;
         this.startDate =startDate;
         this.endDate =endDate;
-        this.sequence =sequence;
         this.teamMembership = teamMembership;
     }
 
