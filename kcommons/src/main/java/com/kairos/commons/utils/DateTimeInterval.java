@@ -337,6 +337,26 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         return dateTimeIntervals;
     }
 
+    public final List<DateTimeInterval> minusIntervalViceVersa(DateTimeInterval dateTimeInterval){
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
+        if(this.overlaps(dateTimeInterval)){
+            if(this.start<dateTimeInterval.start && this.end>dateTimeInterval.end){
+                dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+            }else if(!this.start.equals(dateTimeInterval.start) && this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
+                dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
+                dateTimeIntervals.add(new DateTimeInterval(this.end,dateTimeInterval.end));
+            }else if (this.contains(dateTimeInterval.end) && dateTimeInterval.contains(this.start)){
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.start,this.start));
+            }else if(dateTimeInterval.start<this.start && dateTimeInterval.end>this.end){
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.start,this.start));
+                dateTimeIntervals.add(new DateTimeInterval(this.end,dateTimeInterval.end));
+            }
+        }
+        return dateTimeIntervals;
+    }
+
     public final List<DateTimeInterval> minusIntervals(List<DateTimeInterval> dateTimeIntervals){
         List<DateTimeInterval> updatedDateTimeIntervals = new ArrayList<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {

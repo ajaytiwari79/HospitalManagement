@@ -119,19 +119,24 @@ public class StaffingLevelAvailableCountService {
             if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
                 staffingLevelActivity.setRemainingUnderStaffing(Math.min(staffingLevelActivity.getRemainingUnderStaffing()+1,staffingLevelActivity.getMinNoOfStaff()));
                 staffingLevelActivity.setInitialUnderStaffing(staffingLevelActivity.getRemainingUnderStaffing());
+            }else {
+                updateCountOnCreation(createdActivityMap, staffingLevel, staffingLevelInterval, staffingLevelActivity);
             }
         }else {
-            dateTimeIntervals = createdActivityMap.get(staffingLevelActivity.getActivityId());
-            if(isCollectionNotEmpty(dateTimeIntervals)){
-                DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
-                Optional<DateTimeInterval> dateTimeIntervalOptional = dateTimeIntervals.stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
-                if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
-                    staffingLevelActivity.setRemainingUnderStaffing(Math.min(staffingLevelActivity.getRemainingUnderStaffing()-1,staffingLevelActivity.getMinNoOfStaff()));
-                }
-            }
-
+            updateCountOnCreation(createdActivityMap, staffingLevel, staffingLevelInterval, staffingLevelActivity);
         }
         staffingLevelActivity.setSolvedUnderStaffing(staffingLevelActivity.getInitialUnderStaffing()-staffingLevelActivity.getRemainingUnderStaffing());
+    }
+    private void updateCountOnCreation(Map<BigInteger, List<DateTimeInterval>> createdActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
+        List<DateTimeInterval> dateTimeIntervals;
+        dateTimeIntervals = createdActivityMap.get(staffingLevelActivity.getActivityId());
+        if(isCollectionNotEmpty(dateTimeIntervals)){
+            DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
+            Optional<DateTimeInterval> dateTimeIntervalOptional = dateTimeIntervals.stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
+            if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
+                staffingLevelActivity.setRemainingUnderStaffing(Math.min(staffingLevelActivity.getRemainingUnderStaffing()-1,staffingLevelActivity.getMinNoOfStaff()));
+            }
+        }
     }
 
     private void updateCountForOverStaffing(Map<BigInteger, List<DateTimeInterval>> createdActivityMap,Map<BigInteger, List<DateTimeInterval>> deletedActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
@@ -143,19 +148,25 @@ public class StaffingLevelAvailableCountService {
             if(overStaffingCount > 0 && dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
                 staffingLevelActivity.setRemainingOverStaffing(Math.min(staffingLevelActivity.getRemainingOverStaffing()+1,staffingLevelActivity.getMaxNoOfStaff()));
                 staffingLevelActivity.setInitialOverStaffing(staffingLevelActivity.getRemainingOverStaffing());
+            }else {
+                updateCountOnDeletion(deletedActivityMap, staffingLevel, staffingLevelInterval, staffingLevelActivity);
             }
         }
         else {
-            dateTimeIntervals = deletedActivityMap.get(staffingLevelActivity.getActivityId());
-            if(isCollectionNotEmpty(dateTimeIntervals)){
-                DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
-                Optional<DateTimeInterval> dateTimeIntervalOptional = dateTimeIntervals.stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
-                if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
-                    staffingLevelActivity.setRemainingOverStaffing(Math.min(staffingLevelActivity.getRemainingOverStaffing()-1,staffingLevelActivity.getMaxNoOfStaff()));
-                }
-            }
+            updateCountOnDeletion(deletedActivityMap, staffingLevel, staffingLevelInterval, staffingLevelActivity);
         }
         staffingLevelActivity.setSolvedOverStaffing(staffingLevelActivity.getInitialOverStaffing()-staffingLevelActivity.getRemainingOverStaffing());
+    }
+    private void updateCountOnDeletion(Map<BigInteger, List<DateTimeInterval>> deletedActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
+        List<DateTimeInterval> dateTimeIntervals;
+        dateTimeIntervals = deletedActivityMap.get(staffingLevelActivity.getActivityId());
+        if(isCollectionNotEmpty(dateTimeIntervals)){
+            DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
+            Optional<DateTimeInterval> dateTimeIntervalOptional = dateTimeIntervals.stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
+            if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
+                staffingLevelActivity.setRemainingOverStaffing(Math.min(staffingLevelActivity.getRemainingOverStaffing()-1,staffingLevelActivity.getMaxNoOfStaff()));
+            }
+        }
     }
 
     private Map<BigInteger, List<DateTimeInterval>> getActivityDeletedMap(Shift shift, Shift oldShift) {
@@ -173,12 +184,14 @@ public class StaffingLevelAvailableCountService {
                     int duration = (int)objects[1];
                     for (ShiftActivity shiftActivity : shiftActivities) {
                         if(oldShiftActivity.getInterval().overlaps(shiftActivity.getInterval()) && oldShiftActivity.getInterval().getMinutes()!=duration){
-                            List<DateTimeInterval> timeIntervals = oldShiftActivity.getInterval().minusInterval(shiftActivity.getInterval());
+                            List<DateTimeInterval> timeIntervals = getTimeIntervalsExcludeBreakInterval(oldShiftActivity, shiftActivity,shift.getBreakActivities(),oldShift.getBreakActivities());
                             if(isCollectionNotEmpty(timeIntervals)) {
                                 List<DateTimeInterval> dateTimeIntervals = updateAcivityMap.getOrDefault(shiftActivity.getActivityId(),new ArrayList<>());
                                 dateTimeIntervals.addAll(timeIntervals);
                                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
                             }
+                        }else {
+                            updateAcivityMap.put(oldShiftActivity.getActivityId(),newArrayList(oldShiftActivity.getInterval()));
                         }
                     }
                 }else {
@@ -187,6 +200,15 @@ public class StaffingLevelAvailableCountService {
             }
         }
         return updateAcivityMap;
+    }
+
+    private List<DateTimeInterval> getTimeIntervalsExcludeBreakInterval(ShiftActivity oldShiftActivity, ShiftActivity shiftActivity, List<ShiftActivity> breakActivities, List<ShiftActivity> breakActivities1) {
+        Optional<ShiftActivity> optionalBreakActivity = breakActivities.stream().filter(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && oldShiftActivity.getInterval().overlaps(shiftActivity1.getInterval())).findAny();
+        List<DateTimeInterval> timeIntervals = oldShiftActivity.getInterval().minusInterval(shiftActivity.getInterval());
+        if(optionalBreakActivity.isPresent() && optionalBreakActivity.get().getInterval().overlaps(oldShiftActivity.getInterval()) && breakActivities1.stream().noneMatch(shiftActivity1 -> shiftActivity1.getInterval().equals(optionalBreakActivity.get().getInterval()))) {
+            timeIntervals.add(optionalBreakActivity.get().getInterval());
+        }
+        return timeIntervals;
     }
     private Object[] getShiftActivities(Shift shift, ShiftActivity shiftActivity) {
         int duration = 0;
@@ -220,12 +242,14 @@ public class StaffingLevelAvailableCountService {
                     int duration = (int)objects[1];
                     for (ShiftActivity oldShiftActivity : shiftActivities) {
                         if(shiftActivity.getInterval().overlaps(oldShiftActivity.getInterval()) && shiftActivity.getInterval().getMinutes()!=duration){
-                            List<DateTimeInterval> timeIntervals = shiftActivity.getInterval().minusInterval(oldShiftActivity.getInterval());
+                            List<DateTimeInterval> timeIntervals = getTimeIntervalsExcludeBreakInterval(shiftActivity,oldShiftActivity, oldShift.getBreakActivities(), shift.getBreakActivities());
                             if(isCollectionNotEmpty(timeIntervals)) {
                                 List<DateTimeInterval> dateTimeIntervals = updateAcivityMap.getOrDefault(oldShiftActivity.getActivityId(),new ArrayList<>());
                                 dateTimeIntervals.addAll(timeIntervals);
                                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
                             }
+                        }else {
+                            updateAcivityMap.put(shiftActivity.getActivityId(),newArrayList(shiftActivity.getInterval()));
                         }
                     }
                 }else {
@@ -236,43 +260,6 @@ public class StaffingLevelAvailableCountService {
         return updateAcivityMap;
     }
 
-    private void updateIfShiftDeleted(StaffingLevelActivity staffingLevelActivity, Map<BigInteger, Boolean> updateActivityMap, StaffingLevelActivityDetails staffingLevelActivityDetails) {
-        if(staffingLevelActivity.getAvailableNoOfStaff() < staffingLevelActivity.getPreviousAvailableNoOfStaff()){
-            if(updateActivityMap.get(staffingLevelActivity.getActivityId())) {
-                int diff = staffingLevelActivity.getPreviousAvailableNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff();
-                if (staffingLevelActivity.getMinNoOfStaff() >= staffingLevelActivity.getAvailableNoOfStaff()) {
-                    staffingLevelActivity.setSolvedUnderStaffing(Math.max(staffingLevelActivity.getSolvedUnderStaffing() - diff, 0));
-                    staffingLevelActivityDetails.setSolvedUnderStaffing(staffingLevelActivityDetails.getSolvedUnderStaffing() + staffingLevelActivity.getSolvedUnderStaffing());
-                }
-                if (staffingLevelActivity.getMinNoOfStaff() > staffingLevelActivity.getAvailableNoOfStaff()) {
-                    staffingLevelActivity.setRemainingUnderStaffing(staffingLevelActivity.getRemainingUnderStaffing() + diff);
-                    staffingLevelActivityDetails.setRemainingUnderStaffing(staffingLevelActivityDetails.getRemainingUnderStaffing() + staffingLevelActivity.getRemainingUnderStaffing());
-                }
-                if (staffingLevelActivity.getMaxNoOfStaff() <= staffingLevelActivity.getAvailableNoOfStaff()) {
-                    staffingLevelActivity.setSolvedOverStaffing(staffingLevelActivity.getSolvedOverStaffing() + diff);
-                    staffingLevelActivityDetails.setSolvedOverStaffing(staffingLevelActivityDetails.getSolvedOverStaffing() + staffingLevelActivity.getSolvedOverStaffing());
-                }
-            }
-        }
-    }
-
-    private void updateIFShiftCreatedOrUpdated(StaffingLevelActivity staffingLevelActivity, StaffingLevelActivityDetails staffingLevelActivityDetails) {
-        if(staffingLevelActivity.getAvailableNoOfStaff()>staffingLevelActivity.getPreviousAvailableNoOfStaff()){
-            int diff = staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getPreviousAvailableNoOfStaff();
-            if(staffingLevelActivity.getMinNoOfStaff()>=staffingLevelActivity.getAvailableNoOfStaff()) {
-                staffingLevelActivity.setSolvedUnderStaffing(staffingLevelActivity.getSolvedUnderStaffing() + diff);
-                staffingLevelActivityDetails.setSolvedUnderStaffing(staffingLevelActivityDetails.getSolvedUnderStaffing() + staffingLevelActivity.getSolvedUnderStaffing());
-            }
-            if(staffingLevelActivity.getMaxNoOfStaff()<=staffingLevelActivity.getAvailableNoOfStaff()) {
-                staffingLevelActivity.setSolvedOverStaffing(Math.max(staffingLevelActivity.getSolvedOverStaffing() - diff,0));
-                staffingLevelActivityDetails.setSolvedOverStaffing(staffingLevelActivityDetails.getSolvedOverStaffing() + staffingLevelActivity.getSolvedOverStaffing());
-            }
-            if(staffingLevelActivity.getMaxNoOfStaff()<staffingLevelActivity.getAvailableNoOfStaff()){
-                staffingLevelActivity.setRemainingOverStaffing(staffingLevelActivity.getRemainingOverStaffing() + diff);
-                staffingLevelActivityDetails.setRemainingOverStaffing(staffingLevelActivityDetails.getRemainingOverStaffing() + staffingLevelActivity.getRemainingOverStaffing());
-            }
-        }
-    }
 
     private void updateCount(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, Map<LocalDate, StaffingLevel> staffingLevelMap, boolean removedShift,Phase phase) {
         if (isNotNull(startDate) && isNotNull(shift)) {
