@@ -214,30 +214,21 @@ public class TimeTypeService {
         boolean partOfTeamUpdated = false;
         boolean allowedChildActivityUpdated = false;
         boolean allowedConflictsUpdate = false;
-        boolean priorityForUpdate = false;
         boolean sicknessSettingUpdate  = false;
         for (TimeType childTimeType : childTimeTypeList) {
             organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, childTimeType.getBackgroundColor(),childTimeType.getId());
             partOfTeamUpdated = isPartOfTeamUpdated(timeTypeDTO, partOfTeamUpdated, childTimeType);
             allowedChildActivityUpdated = isAllowedChildActivityUpdated(timeTypeDTO, allowedChildActivityUpdated, childTimeType);
             allowedConflictsUpdate = isAllowedConflictsUpdate(timeTypeDTO, allowedConflictsUpdate, childTimeType);
-            priorityForUpdate = isPriorityForUpdate(timeTypeDTO, priorityForUpdate, childTimeType);
             sicknessSettingUpdate=isSicknessUpdated(timeTypeDTO,sicknessSettingUpdate,childTimeType);
             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+            childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
             if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
-                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, leafTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, priorityForUpdate, childTimeType,sicknessSettingUpdate);
+                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, leafTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, childTimeType,sicknessSettingUpdate);
                 timeTypes.addAll(leafTimeTypeList);
             }
         }
-    }
-
-    private boolean isPriorityForUpdate(TimeTypeDTO timeTypeDTO, boolean priorityForUpdate, TimeType childTimeType) {
-        if (isNotNull(childTimeType.getPriorityFor()) && isNotNull(timeTypeDTO.getPriorityFor()) && !childTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
-            childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
-            priorityForUpdate = true;
-        }
-        return priorityForUpdate;
     }
 
     private boolean isAllowedConflictsUpdate(TimeTypeDTO timeTypeDTO, boolean allowedConflictsUpdate, TimeType childTimeType) {
@@ -272,10 +263,11 @@ public class TimeTypeService {
         return sicknessUpdated;
     }
 
-    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean priorityForUpdate, TimeType childTimeType,boolean sicknessSettingUpdate) {
+    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, TimeType childTimeType,boolean sicknessSettingUpdate) {
         for (TimeType leafTimeType : childTimeTypeList) {
             organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, leafTimeType.getBackgroundColor(),leafTimeType.getId());
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+            leafTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
             }
@@ -287,9 +279,6 @@ public class TimeTypeService {
             }
             if (leafTimeType.isSicknessSettingValid() != timeTypeDTO.isSicknessSettingValid() && !sicknessSettingUpdate && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
-            }
-            if (leafTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && !priorityForUpdate && timeType.getUpperLevelTimeTypeId() != null) {
-                childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             }
         }
     }
