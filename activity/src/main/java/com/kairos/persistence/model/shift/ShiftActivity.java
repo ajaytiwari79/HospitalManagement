@@ -73,8 +73,11 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }
 
-
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType,String ultraShortName,String shortName) {
+    public ShiftActivity(Date startDate, Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, String timeType, String ultraShortName, String shortName) {
         this.activityId = activityId;
         this.startDate = roundDateByMinutes(startDate, 15);
         this.endDate = roundDateByMinutes(endDate, 15);
