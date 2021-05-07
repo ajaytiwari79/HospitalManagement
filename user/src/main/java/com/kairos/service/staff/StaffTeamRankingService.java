@@ -5,6 +5,7 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.staff.staff.StaffTeamRankingDTO;
 import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
@@ -429,4 +430,21 @@ public class StaffTeamRankingService {
             staffTeamRankingGraphRepository.updateTeamType(staffId, teamId, newTeamType);
         }
     }
+
+    @Async
+    public void updateStaffTeamRankingFromPersonalInfo(Long staffId, List<Team> teams, List<StaffTeamRelationship> newStaffTeams, List<TeamDTO> oldStaffTeams) {
+        Map<Long, StaffTeamRelationship> newStaffTeamMap = newStaffTeams.stream().collect(Collectors.toMap(k-> k.getTeam().getId(), v ->v));
+        Map<Long, TeamDTO> oldStaffTeamMap = oldStaffTeams.stream().collect(Collectors.toMap(k-> k.getId(), v -> v));
+        Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k-> k.getId(), v -> v));
+        Set<Long> teamIds = new HashSet<>(newStaffTeamMap.keySet());
+        teamIds.addAll(oldStaffTeamMap.keySet());
+        for (Long teamId : teamIds) {
+            if(oldStaffTeamMap.containsKey(teamId) && !newStaffTeamMap.containsKey(teamId)){
+                removeStaffTeamInfo(staffId, teamId);
+            } else if(newStaffTeamMap.containsKey(teamId) && !oldStaffTeamMap.containsKey(teamId)){
+                addOrUpdateStaffTeamRanking(staffId, teamMap.get(teamId), newStaffTeamMap.get(teamId),null);
+            }
+        }
+    }
+
 }

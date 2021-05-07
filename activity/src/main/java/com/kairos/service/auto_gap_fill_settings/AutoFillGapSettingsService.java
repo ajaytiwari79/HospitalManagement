@@ -106,12 +106,12 @@ public class AutoFillGapSettingsService {
                 parentSetting = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(autoFillGapSettings.getUnitId(), autoFillGapSettings.getPhaseId(), autoFillGapSettings.getAutoGapFillingScenario().toString(), autoFillGapSettings.getId(), autoFillGapSettings.getGapApplicableFor().toString(), autoFillGapSettings.getStartDate());
             }
             if (isCollectionNotEmpty(autoFillGapSettingsList)) {
-                exceptionService.actionNotPermittedException(ERROR_AUTO_FILL_GAP_SETTING_PUBLISH_DATE_INVALID);
+                exceptionService.actionNotPermittedException(ERROR_PUBLISH_DATE_INVALID);
             }
         } else {
             parentSetting = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettings.getParentId());
             if ((!parentSetting.getStartDate().isBefore(autoFillGapSettings.getStartDate())) || isNotNull(parentSetting.getEndDate()) && parentSetting.getEndDate().isBefore(autoFillGapSettings.getStartDate())) {
-                exceptionService.actionNotPermittedException(ERROR_AUTO_FILL_GAP_SETTING_PUBLISH_DATE_INVALID);
+                exceptionService.actionNotPermittedException(ERROR_PUBLISH_DATE_INVALID);
             }
         }
         if (isNotNull(parentSetting)) {

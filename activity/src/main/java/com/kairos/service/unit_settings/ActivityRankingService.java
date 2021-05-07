@@ -45,7 +45,7 @@ public class ActivityRankingService {
 
     public ActivityRankingDTO updateAbsenceRankingSettings(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = activityRankingRepository.findById(activityRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking", activityRankingDTO.getId())));
-        if (activityRanking.getDraftId()!=null) {
+        if (isNotNull(activityRanking.getDraftId())) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
         }
         if (activityRanking.isPublished()) {
@@ -102,34 +102,16 @@ public class ActivityRankingService {
         if (activityRanking.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_RANKING_ALREADY_PUBLISHED);
         }
-        activityRanking.setPublished(true);
-        activityRanking.setStartDate(publishedDate); // changing
         ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
-        ActivityRanking lastAbsenceRanking = activityRankingRepository.findTopByExpertiseIdAndDeletedFalseAndPublishedTrueOrderByStartDateDesc(activityRanking.getExpertiseId());
-        boolean onGoingUpdated = false;
-        if (lastAbsenceRanking != null && publishedDate.isAfter(lastAbsenceRanking.getStartDate()) && lastAbsenceRanking.getEndDate() == null) {
-            lastAbsenceRanking.setEndDate(publishedDate.minusDays(1));
-            if(parentAbsenceRanking.getId().equals(lastAbsenceRanking.getId())){
-                lastAbsenceRanking.setDraftId(null);
-            }
-            activityRankingRepository.save(lastAbsenceRanking);
-            activityRanking.setEndDate(null);
-            onGoingUpdated = true;
+        if(!(publishedDate.isAfter(parentAbsenceRanking.getStartDate()) && (isNull(parentAbsenceRanking.getEndDate()) || !publishedDate.isAfter(parentAbsenceRanking.getEndDate())))){
+            exceptionService.actionNotPermittedException(ERROR_PUBLISH_DATE_INVALID);
         }
-        if (!onGoingUpdated && Optional.ofNullable(parentAbsenceRanking).isPresent()) {
-            if (parentAbsenceRanking.getStartDate().isEqual(publishedDate) || parentAbsenceRanking.getStartDate().isAfter(publishedDate)) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE);
-            }
-            parentAbsenceRanking.setEndDate(publishedDate.minusDays(1L));
-            if (lastAbsenceRanking == null && activityRanking.getEndDate() != null && activityRanking.getEndDate().isBefore(publishedDate)) {
-                activityRanking.setEndDate(null);
-            }
-        }
-        if(isNotNull(parentAbsenceRanking) && !parentAbsenceRanking.getId().equals(lastAbsenceRanking.getId())){
-            parentAbsenceRanking.setDraftId(null);
-            activityRankingRepository.save(parentAbsenceRanking);
-        }
-        activityRankingRepository.save(activityRanking);
+        activityRanking.setPublished(true);
+        activityRanking.setStartDate(publishedDate);
+        parentAbsenceRanking.setDraftId(null);
+        activityRanking.setEndDate(parentAbsenceRanking.getEndDate());
+        parentAbsenceRanking.setEndDate(publishedDate.minusDays(1));
+        activityRankingRepository.saveEntities(newArrayList(activityRanking,parentAbsenceRanking));
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
     }
 

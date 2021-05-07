@@ -46,6 +46,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ArrayUtil.getUnionOfList;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MAIN_TEAM_RANKING;
@@ -380,31 +381,22 @@ public class TeamService {
     }
 
     public void assignStaffInTeams(Staff staff, List<com.kairos.dto.user.team.TeamDTO> staffTeamDetails, Long unitId) {
+        Set<Long> teamIds = staffTeamDetails.stream().map(k -> k.getId()).collect(Collectors.toSet());
+        if(teamIds.size()<staffTeamDetails.size()){
+            exceptionService.actionNotPermittedException(TEAM_SHOULD_BE_UNIQUE);
+        }
         if (staffTeamDetails.stream().anyMatch(k -> k.getLeaderType() != null) && !accessGroupService.findStaffAccessRole(unitId, staff.getId()).isManagement()) {
             exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
         }
-        List<Integer> teamRanking = staffTeamDetails.stream().filter(teamDTO -> TeamType.SECONDARY.equals(teamDTO.getTeamType())).map(teamDTO -> teamDTO.getSequence()).collect(Collectors.toList());
-        Collections.sort(teamRanking);
-        int sequence = isCollectionNotEmpty(teamRanking)?teamRanking.get(teamRanking.size()-1):0;
-        for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
-            if (TeamType.MAIN.equals(teamDTO.getTeamType())) {
-                teamDTO.setSequence(MAIN_TEAM_RANKING);
-            }else if(TeamType.SECONDARY.equals(teamDTO.getTeamType())&&teamDTO.getSequence()==0){
-                if(sequence==0) {
-                    teamDTO.setSequence(CommonConstants.DEFAULT_SEQUENCE);
-                    sequence=CommonConstants.DEFAULT_SEQUENCE;
-                }else {
-                    teamDTO.setSequence(++sequence);
-                }
-            }
-        }
+        List<com.kairos.dto.user.team.TeamDTO> oldStaffTeams = copyCollectionPropertiesByMapper(teamGraphRepository.getTeamDetailsOfStaff(staff.getId(), unitId), com.kairos.dto.user.team.TeamDTO.class);
         teamGraphRepository.removeStaffFromAllTeams(staff.getId());
-        List<Team> teams = teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k -> k.getId()).collect(Collectors.toSet())));
+        List<Team> teams = teamGraphRepository.findAllById(new ArrayList<>(teamIds));
         Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k -> k.getId(), Function.identity()));
-        List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail -> new StaffTeamRelationship(null, teamMap.get(staffTeamDetail.getId()), staff, staffTeamDetail.getLeaderType(), staffTeamDetail.getTeamType(),staffTeamDetail.getStartDate(),staffTeamDetail.getEndDate(),staffTeamDetail.getSequence(),staffTeamDetail.isTeamMembership())).collect(Collectors.toList());
+        List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail -> new StaffTeamRelationship(null, teamMap.get(staffTeamDetail.getId()), staff, staffTeamDetail.getLeaderType(), staffTeamDetail.getTeamType(),staffTeamDetail.getStartDate(),staffTeamDetail.getEndDate(),staffTeamDetail.isTeamMembership())).collect(Collectors.toList());
         if (isCollectionNotEmpty(staffTeamRelationshipList)) {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
         }
+        staffTeamRankingService.updateStaffTeamRankingFromPersonalInfo(staff.getId(), teams, staffTeamRelationshipList, oldStaffTeams);
     }
 
     @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
