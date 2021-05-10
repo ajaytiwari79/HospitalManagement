@@ -134,6 +134,7 @@ public class StaffingLevelTemplateService {
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = Day.valueOf(day);
         if(!holidayDayType.isPresent()) {
+
             return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }else {
             return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);

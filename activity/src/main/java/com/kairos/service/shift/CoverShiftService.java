@@ -263,15 +263,14 @@ public class CoverShiftService {
     }
 
     public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long unitId, Long staffId, Long employmentId) {
-        List<CoverShift> coverShifts=coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate,endDate);
-        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
-        Set<BigInteger> totalRequests= coverShifts.stream().filter(k->k.getRequestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
-        Set<BigInteger> totalInterests=  coverShifts.stream().filter(k->k.getInterestedStaffs().containsKey(staffId)).map(MongoBaseEntity::getId).collect(Collectors.toSet());
-        Set<BigInteger> totalDeclined=  coverShifts.stream().filter(k->k.getDeclinedStaffIds().contains(staffId)).map(k->k.getId()).collect(Collectors.toSet());
-        Set<BigInteger> totalEligibleShifts=newHashSet();//getEligibleShifts(shifts,unitId,staffId,employmentId);
-        return new CoverShiftStaffDetails(totalRequests,totalInterests,totalDeclined,totalEligibleShifts);
+        List<CoverShiftDTO> coverShifts = coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate, endDate);
+        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate, endDate, unitId);
+        List<CoverShiftDTO> totalRequests = coverShifts.stream().filter(k -> k.getRequestedStaffs().containsKey(staffId)).collect(Collectors.toList());
+        List<CoverShiftDTO> totalInterests = coverShifts.stream().filter(k -> k.getInterestedStaffs().containsKey(staffId)).collect(Collectors.toList());
+        List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().contains(staffId)).collect(Collectors.toList());
+        List<CoverShiftDTO> totalEligibleShifts = new ArrayList<>();//getEligibleShifts(shifts,unitId,staffId,employmentId);
+        return new CoverShiftStaffDetails(totalRequests, totalInterests,totalEligibleShifts, totalDeclined);
     }
-
     public Set<BigInteger> getEligibleShifts(List<Shift> shifts, Long unitId, Long staffId, Long employmentId){
         List<DateTimeInterval> dateTimeIntervals=shifts.stream().filter(k->k.getStaffId().equals(staffId)).map(Shift::getInterval).collect(Collectors.toList());
         shifts=shifts.stream().filter(k->!dateTimeIntervals.contains(k.getInterval())).collect(Collectors.toList());

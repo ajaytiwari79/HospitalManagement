@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -13,8 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CoverShiftStaffDetails {
-    private Set<BigInteger> totalInvitations;
-    private Set<BigInteger> totalInterests;
-    private Set<BigInteger> eligibleShift;
-    private Set<BigInteger> declinedRequests;
+    private List<CoverShiftDTO> totalInvitations;
+    private List<CoverShiftDTO> totalInterests;
+    private List<CoverShiftDTO> eligibleShift;
+    private List<CoverShiftDTO> declinedRequests;
 }
