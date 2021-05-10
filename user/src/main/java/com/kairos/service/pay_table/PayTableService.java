@@ -118,10 +118,9 @@ public class PayTableService {
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYTABLE_LEVEL_NOTFOUND);
         }
 
-        Boolean isAlreadyExists = payTableGraphRepository.
-                checkPayTableNameAlreadyExitsByName(countryId, -1L, "(?i)" + payTableDTO.getName().trim());
+        Boolean isAlreadyExists = payTableGraphRepository.checkPayTableNameAlreadyExitsByName(countryId, -1L, "(?i)" + payTableDTO.getName().trim(), payTableDTO.getLevelId());
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException(MESSAGE_PAYTABLE_NAME_ALREADYEXIST, payTableDTO.getName(), countryId);
+            exceptionService.duplicateDataException(MESSAGE_PAYTABLE_NAME_ALREADYEXIST);
         }
         PayTable payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), -1L);
         // if any payTable is found then only validate
@@ -203,10 +202,9 @@ public class PayTableService {
         // if  name or short name is changes then only we are checking its name existance
         // skipped to current pay table it is checking weather any other payTable has same name or short name in current organization level
         if (!payTableDTO.getName().trim().equalsIgnoreCase(payTable.getName())) {
-            Boolean isAlreadyExists = payTableGraphRepository.
-                    checkPayTableNameAlreadyExitsByName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim());
+            Boolean isAlreadyExists = payTableGraphRepository.checkPayTableNameAlreadyExitsByName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim(), payTableDTO.getLevelId());
             if (isAlreadyExists) {
-                exceptionService.duplicateDataException(MESSAGE_PAYTABLE_NAME_ALREADYEXIST, payTableDTO.getName(), countryId);
+                exceptionService.duplicateDataException(MESSAGE_PAYTABLE_NAME_ALREADYEXIST);
             }
         }
         PayTable payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), payTableId);

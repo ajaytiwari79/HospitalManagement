@@ -23,10 +23,10 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     PayTable findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
-            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where (payTable.name =~{2}) AND id(payTable)<>{1} " +
+            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where (payTable.name =~{2}) AND id(payTable)<>{1} AND id(level)={3} " +
             " with count(payTable) as payTableCount\n" +
             " RETURN case when payTableCount>0 THEN  true ELSE false END as response")
-    Boolean checkPayTableNameAlreadyExitsByName(Long countryId, Long currentPayTableId, String payTableName);
+    Boolean checkPayTableNameAlreadyExitsByName(Long countryId, Long currentPayTableId, String payTableName, Long levelId);
 
     @Query("MATCH (c:Country) where id(c)={0} \n" +
             "MATCH(c)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true,deleted:false})\n" +
