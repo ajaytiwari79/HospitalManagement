@@ -43,7 +43,7 @@ public class ActivityRankingService {
         return activityRankingDTO;
     }
 
-    public ActivityRankingDTO updateAbsenceRankingSettings(ActivityRankingDTO activityRankingDTO){
+    public ActivityRankingDTO updateActivityRankingSettings(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = activityRankingRepository.findById(activityRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking", activityRankingDTO.getId())));
         if (isNotNull(activityRanking.getDraftId())) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
@@ -78,7 +78,7 @@ public class ActivityRankingService {
         return isCollectionEmpty(activityRankings) ? new ArrayList<>() : ObjectMapperUtils.copyCollectionPropertiesByMapper(activityRankings, ActivityRankingDTO.class);
     }
 
-    public boolean deleteAbsenceRankingSettings(BigInteger id){
+    public boolean deleteActivityRankingSettings(BigInteger id){
         ActivityRanking activityRanking = activityRankingRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
         if(activityRanking.isPublished()){
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED);
@@ -94,7 +94,7 @@ public class ActivityRankingService {
     }
 
 
-    public ActivityRankingDTO publishAbsenceRanking(BigInteger id, LocalDate publishedDate) {
+    public ActivityRankingDTO publishActivityRanking(BigInteger id, LocalDate publishedDate) {
         ActivityRanking activityRanking = activityRankingRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
         if (activityRanking.getFullDayActivities().isEmpty() && activityRanking.getFullWeekActivities().isEmpty() && activityRanking.getPresenceActivities().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
@@ -103,15 +103,24 @@ public class ActivityRankingService {
             exceptionService.dataNotFoundByIdException(MESSAGE_RANKING_ALREADY_PUBLISHED);
         }
         ActivityRanking parentAbsenceRanking = activityRankingRepository.findByDraftIdAndDeletedFalse(activityRanking.getId());
-        if(!(publishedDate.isAfter(parentAbsenceRanking.getStartDate()) && (isNull(parentAbsenceRanking.getEndDate()) || !publishedDate.isAfter(parentAbsenceRanking.getEndDate())))){
+        if(publishedDate.isBefore(parentAbsenceRanking.getStartDate()) && isNotNull(parentAbsenceRanking.getEndDate()) && publishedDate.isAfter(parentAbsenceRanking.getEndDate())){
             exceptionService.actionNotPermittedException(ERROR_PUBLISH_DATE_INVALID);
         }
-        activityRanking.setPublished(true);
-        activityRanking.setStartDate(publishedDate);
+        if(publishedDate.isEqual(parentAbsenceRanking.getStartDate())){
+            activityRanking.setDeleted(true);
+            parentAbsenceRanking.setFullDayActivities(activityRanking.getFullDayActivities());
+            parentAbsenceRanking.setFullWeekActivities(activityRanking.getFullWeekActivities());
+            parentAbsenceRanking.setPresenceActivities(activityRanking.getPresenceActivities());
+        } else {
+            activityRanking.setPublished(true);
+            activityRanking.setStartDate(publishedDate);
+            activityRanking.setEndDate(parentAbsenceRanking.getEndDate());
+            parentAbsenceRanking.setEndDate(publishedDate.minusDays(1));
+        }
         parentAbsenceRanking.setDraftId(null);
-        activityRanking.setEndDate(parentAbsenceRanking.getEndDate());
-        parentAbsenceRanking.setEndDate(publishedDate.minusDays(1));
         activityRankingRepository.saveEntities(newArrayList(activityRanking,parentAbsenceRanking));
+        List<ActivityRanking> activityRankings = isNotNull(parentAbsenceRanking.getExpertiseId()) ? activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(parentAbsenceRanking.getExpertiseId(), true) : activityRankingRepository.getActivityRankingSettingsByUnitIdAndPublishedTrueAndDeletedFalse(parentAbsenceRanking.getUnitId());
+        this.mergeActivityRanking(activityRankings, isNull(parentAbsenceRanking.getExpertiseId()));
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
     }
 
@@ -189,17 +198,17 @@ public class ActivityRankingService {
         }
     }
 
-    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity,long unitOrexpertiseId, boolean presenceActivity){
+    private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity,long unitOrExpertiseId, boolean presenceActivity){
         List<ActivityRanking> newActivityRankings = new ArrayList<>();
         activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
         if(activity.getActivityGeneralSettings().getStartDate().isBefore(activityRankings.get(0).getStartDate())){
             ActivityRanking newActivityRanking;
             if(presenceActivity){
-                newActivityRanking = new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newLinkedHashSet(activity.getId()), unitOrexpertiseId, true);
+                newActivityRanking = new ActivityRanking(activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newLinkedHashSet(activity.getId()), unitOrExpertiseId, true);
             } else if(FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), new LinkedHashSet<>(), newLinkedHashSet(activity.getId()), activity.getCountryId(), true);
+                newActivityRanking = new ActivityRanking(unitOrExpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), new LinkedHashSet<>(), newLinkedHashSet(activity.getId()), activity.getCountryId(), true);
             } else {
-                newActivityRanking = new ActivityRanking(unitOrexpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newLinkedHashSet(activity.getId()), new LinkedHashSet<>(), activity.getCountryId(), true);
+                newActivityRanking = new ActivityRanking(unitOrExpertiseId, activity.getActivityGeneralSettings().getStartDate(), activityRankings.get(0).getStartDate().minusDays(1), newLinkedHashSet(activity.getId()), new LinkedHashSet<>(), activity.getCountryId(), true);
             }
             activityRankingRepository.save(newActivityRanking);
             newActivityRankings.add(newActivityRanking);
@@ -259,23 +268,32 @@ public class ActivityRankingService {
 
     private void mergeActivityRanking(List<ActivityRanking> activityRankings, boolean presenceActivity) {
         Map<BigInteger,ActivityRanking> mergeActivityRankings = new HashMap<>();
+        List<BigInteger> deleteDraftCopy = new ArrayList<>();
         if(isCollectionNotEmpty(activityRankings) && activityRankings.size() > 1) {
             activityRankings.sort(Comparator.comparing(ActivityRanking::getStartDate));
             for(int index=0; index < activityRankings.size()-1; index++){
                 ActivityRanking activityRanking = activityRankings.get(index);
                 ActivityRanking nextActivityRanking = activityRankings.get(index+1);
-                checkAndMerge(mergeActivityRankings, activityRanking, nextActivityRanking, presenceActivity);
+                checkAndMerge(mergeActivityRankings, activityRanking, nextActivityRanking, presenceActivity, deleteDraftCopy);
             }
         } else if(isCollectionNotEmpty(activityRankings) && ((presenceActivity && isCollectionEmpty(activityRankings.get(0).getPresenceActivities())) ||(!presenceActivity && isCollectionEmpty(activityRankings.get(0).getFullDayActivities()) && isCollectionEmpty(activityRankings.get(0).getFullWeekActivities())))){
             activityRankings.get(0).setDeleted(true);
             mergeActivityRankings.put(activityRankings.get(0).getId(), activityRankings.get(0));
+            if(isNotNull(activityRankings.get(0).getDraftId())){
+                deleteDraftCopy.add(activityRankings.get(0).getDraftId());
+            }
         }
         if(isMapNotEmpty(mergeActivityRankings)){
             activityRankingRepository.saveEntities(mergeActivityRankings.values());
         }
+        if(isCollectionNotEmpty(deleteDraftCopy)){
+            List<ActivityRanking> draftRankings = activityRankingRepository.getAllDraftByIds(deleteDraftCopy);
+            draftRankings.forEach(ranking-> ranking.setDeleted(true));
+            activityRankingRepository.saveEntities(draftRankings);
+        }
     }
 
-    private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking activityRanking, ActivityRanking nextActivityRanking, boolean presenceActivity) {
+    private void checkAndMerge(Map<BigInteger, ActivityRanking> mergeActivityRankings, ActivityRanking activityRanking, ActivityRanking nextActivityRanking, boolean presenceActivity, List<BigInteger> deleteDraftCopy) {
         if(presenceActivity){
             activityRanking.setDeleted(isCollectionEmpty(activityRanking.getPresenceActivities()));
             nextActivityRanking.setDeleted(isCollectionEmpty(nextActivityRanking.getPresenceActivities()));
@@ -283,13 +301,34 @@ public class ActivityRankingService {
             activityRanking.setDeleted(isCollectionEmpty(activityRanking.getFullWeekActivities()) && isCollectionEmpty(activityRanking.getFullDayActivities()));
             nextActivityRanking.setDeleted(isCollectionEmpty(nextActivityRanking.getFullWeekActivities()) && isCollectionEmpty(nextActivityRanking.getFullDayActivities()));
         }
-        if((presenceActivity && activityRanking.getPresenceActivities().equals(nextActivityRanking.getPresenceActivities())) ||
-                (!presenceActivity && activityRanking.getFullWeekActivities().equals(nextActivityRanking.getFullWeekActivities()) && activityRanking.getFullDayActivities().equals(nextActivityRanking.getFullDayActivities()))){
+        if((presenceActivity && isSetSame(activityRanking.getPresenceActivities(), nextActivityRanking.getPresenceActivities())) ||
+                (!presenceActivity && isSetSame(activityRanking.getFullDayActivities(), nextActivityRanking.getFullDayActivities()) && isSetSame(activityRanking.getFullDayActivities(), nextActivityRanking.getFullDayActivities()))){
             activityRanking.setDeleted(true);
             nextActivityRanking.setStartDate(activityRanking.getStartDate());
         }
+        if(activityRanking.isDeleted() && isNotNull(activityRanking.getDraftId())){
+            deleteDraftCopy.add(activityRanking.getDraftId());
+        }
+        if(nextActivityRanking.isDeleted() && isNotNull(nextActivityRanking.getDraftId())){
+            deleteDraftCopy.add(nextActivityRanking.getDraftId());
+        }
         mergeActivityRankings.put(activityRanking.getId(), activityRanking);
         mergeActivityRankings.put(nextActivityRanking.getId(), nextActivityRanking);
+    }
+
+    private boolean isSetSame(LinkedHashSet<BigInteger> firstSet, LinkedHashSet<BigInteger> secondSet) {
+        boolean isSame = firstSet.size() == secondSet.size();
+        if(isSame){
+            Object[] activities = secondSet.toArray();
+            int index = 0;
+            for (BigInteger activityId : firstSet) {
+                if(!activityId.equals(activities[index++])){
+                    isSame = false;
+                    break;
+                }
+            }
+        }
+        return isSame;
     }
 
     @Async
