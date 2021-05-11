@@ -191,11 +191,11 @@ public class StaffingLevelAvailableCountService {
                                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
                             }
                         }else {
-                            updateAcivityMap.put(oldShiftActivity.getActivityId(),newArrayList(oldShiftActivity.getInterval()));
+                            updateAcivityMap.put(oldShiftActivity.getActivityId(),getTimeIntervalsExcludeBreakInterval(oldShiftActivity,oldShift.getBreakActivities()));
                         }
                     }
                 }else {
-                    updateAcivityMap.put(oldShiftActivity.getActivityId(),newArrayList(oldShiftActivity.getInterval()));
+                    updateAcivityMap.put(oldShiftActivity.getActivityId(),getTimeIntervalsExcludeBreakInterval(oldShiftActivity,oldShift.getBreakActivities()));
                 }
             }
         }
@@ -210,6 +210,18 @@ public class StaffingLevelAvailableCountService {
         }
         return timeIntervals;
     }
+
+    private List<DateTimeInterval> getTimeIntervalsExcludeBreakInterval(ShiftActivity shiftActivity, List<ShiftActivity> breakActivities) {
+        Optional<ShiftActivity> optionalBreakActivity = breakActivities.stream().filter(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && shiftActivity.getInterval().overlaps(shiftActivity1.getInterval())).findAny();
+        List<DateTimeInterval> timeIntervals = new ArrayList<>();
+        if(optionalBreakActivity.isPresent()) {
+            timeIntervals.addAll(shiftActivity.getInterval().minusInterval(optionalBreakActivity.get().getInterval()));
+        }else {
+            timeIntervals.add(shiftActivity.getInterval());
+        }
+        return timeIntervals;
+    }
+
     private Object[] getShiftActivities(Shift shift, ShiftActivity shiftActivity) {
         int duration = 0;
         List<ShiftActivity> shiftActivities = new ArrayList<>();
@@ -231,7 +243,7 @@ public class StaffingLevelAvailableCountService {
         }
         else if(isNull(oldShift)){
             for (int i = 0; i < shift.getActivities().size(); i++) {
-                updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),newArrayList(shift.getActivities().get(i).getInterval()));
+                updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),getTimeIntervalsExcludeBreakInterval(shift.getActivities().get(i),shift.getBreakActivities()));
             }
         }else{
             for (int i = 0; i < shift.getActivities().size(); i++) {
@@ -249,11 +261,11 @@ public class StaffingLevelAvailableCountService {
                                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),dateTimeIntervals);
                             }
                         }else {
-                            updateAcivityMap.put(shiftActivity.getActivityId(),newArrayList(shiftActivity.getInterval()));
+                            updateAcivityMap.put(shiftActivity.getActivityId(),getTimeIntervalsExcludeBreakInterval(shiftActivity,shift.getBreakActivities()));
                         }
                     }
                 }else {
-                    updateAcivityMap.put(shiftActivity.getActivityId(),newArrayList(shiftActivity.getInterval()));
+                    updateAcivityMap.put(shiftActivity.getActivityId(),getTimeIntervalsExcludeBreakInterval(shiftActivity,shift.getBreakActivities()));
                 }
             }
         }
