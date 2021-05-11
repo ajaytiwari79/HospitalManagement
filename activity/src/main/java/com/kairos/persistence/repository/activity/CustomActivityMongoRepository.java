@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
@@ -44,7 +43,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId);
 
-    List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, Long countryId);
+    List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, Long countryId, List<Long> orgSubTypes);
 
     List<ActivityTagDTO> findAllowChildActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 

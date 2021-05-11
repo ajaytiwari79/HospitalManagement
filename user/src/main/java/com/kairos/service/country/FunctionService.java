@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.country.functions.FunctionGraphRep
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 /**
  * Created by pavan on 13/3/18.
  */
-@Service
+@Repository
 @Transactional
 public class FunctionService {
 

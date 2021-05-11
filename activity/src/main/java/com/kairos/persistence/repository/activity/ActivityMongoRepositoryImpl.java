@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
@@ -36,18 +35,11 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_PRIORITY_ID;
-import static com.kairos.constants.AppConstants.DESCRIPTION;
-import static com.kairos.constants.AppConstants.NAME;
-import static com.kairos.constants.AppConstants.PARENT_ID;
-import static com.kairos.constants.AppConstants.UNIT_ID;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
-import static com.kairos.persistence.repository.activity.ActivityConstants.ACTIVITY_ID;
-import static com.kairos.persistence.repository.activity.ActivityConstants.ID;
-import static com.kairos.persistence.repository.activity.ActivityConstants.PARENT_ACTIVITY_ID;
 import static com.kairos.persistence.repository.activity.ActivityConstants.STAFF;
 import static com.kairos.persistence.repository.activity.ActivityConstants.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -193,9 +185,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, Long countryId) {
+    public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, Long countryId, List<Long> orgSubTypes) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId), Criteria.where(COUNTRY_ID).is(countryId))),
+                match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId), Criteria.where(COUNTRY_ID).is(countryId).and("organizationSubTypes").in(orgSubTypes))),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 match(Criteria.where(DELETED).is(false).orOperator(Criteria.where(UNIT_ID).is(unitId),Criteria.where(COUNTRY_ID).is(countryId).and(TIME_TYPE_PART_OF_TEAM).is(true))),
                 lookup(TAG, TAGS, UNDERSCORE_ID, TAGS),
