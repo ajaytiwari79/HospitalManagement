@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by pavan on 13/3/18.
  */
-@Service
+@Repository
 public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, Long> {
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(function:Function{deleted:false}) where id(country)={0} " +

@@ -34,7 +34,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 /**
  * Created by pavan on 13/3/18.
  */
-@Repository
+@Service
 @Transactional
 public class FunctionService {
 
