@@ -16,7 +16,6 @@ import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -33,9 +32,8 @@ import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.SelfRosteringMetaData;
-import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
@@ -43,7 +41,6 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -107,9 +104,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
@@ -300,7 +295,7 @@ public class OrganizationActivityService {
         if (Optional.ofNullable(activities).isPresent() && Optional.ofNullable(activities.getActivityDTOList()).isPresent()) {
             activityDetails.setAllActivities(activities.getActivityDTOList());
         }
-        activityDetails.setSelectedActivities(activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId,INVALID_ID));
+        activityDetails.setSelectedActivities(activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId,INVALID_ID, newArrayList()));
         return activityDetails;
     }
 
@@ -308,7 +303,8 @@ public class OrganizationActivityService {
     public Map<String, Object> getAllActivityByUnit(Long unitId,boolean includeTeamActivity,boolean includeCountryActivity) {
         Map<String, Object> response = new HashMap<>();
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, includeCountryActivity?UserContext.getUserDetails().getCountryId():INVALID_ID) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
+        List<Long> orgSubTypes = organizationDTO.getOrganizationSubTypes().stream().map(OrganizationTypeDTO::getId).collect(Collectors.toList());
+        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, includeCountryActivity?UserContext.getUserDetails().getCountryId():INVALID_ID,orgSubTypes) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             boolean activityCanBeCopied = ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
