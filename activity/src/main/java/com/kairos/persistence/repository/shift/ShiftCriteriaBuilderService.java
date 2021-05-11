@@ -90,7 +90,7 @@ public class ShiftCriteriaBuilderService {
         FilterType timeType = FilterType.TIME_TYPE;
         if(isValidFilter(filterTypeMap, timeType)) {
             timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(timeType)));
-            timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
+            //timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
         }
         if(isValidFilter(filterTypeMap, REAL_TIME_STATUS)){
             if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString())) {
