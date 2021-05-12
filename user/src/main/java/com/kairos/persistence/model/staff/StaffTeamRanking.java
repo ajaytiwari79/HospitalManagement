@@ -7,7 +7,10 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @NodeEntity
 @Getter
@@ -20,6 +23,7 @@ public class StaffTeamRanking extends UserBaseEntity {
     private boolean published;
     private Set<TeamRankingInfo> teamRankingInfo;
     private Long draftId;
+    private LocalDateTime updatedOn;
 
     public StaffTeamRanking(Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo, boolean published){
         this.staffId = staffId;
@@ -27,5 +31,9 @@ public class StaffTeamRanking extends UserBaseEntity {
         this.endDate = endDate;
         this.published = published;
         this.teamRankingInfo = teamRankingInfo;
+    }
+
+    public LocalDateTime getUpdatedOn() {
+        return isNull(super.getLastModificationDate()) ? super.getCreationDate() : super.getLastModificationDate();
     }
 }

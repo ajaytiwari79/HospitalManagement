@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -16,5 +16,5 @@ public class StaffTeamRankingDTO {
     private LocalDate endDate;
     private boolean published;
     private Set<TeamRankingInfoDTO> teamRankingInfo;
-    private Date updatedAt;
+    private LocalDateTime updatedOn;
 }
