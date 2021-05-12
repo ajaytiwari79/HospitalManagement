@@ -78,9 +78,8 @@ public class StaffTeamRankingService {
         return true;
     }
 
-    public List<StaffTeamRankingDTO> getStaffTeamRankings(Long staffId, boolean includeDraft){
-        List<StaffTeamRankingDTO> staffTeamRankingDTOList = new ArrayList<>();
-        List<StaffTeamRanking> staffTeamRankings;
+    public List<StaffTeamRanking> getStaffTeamRankings(Long staffId, boolean includeDraft){
+        List<StaffTeamRanking> staffTeamRankings = new ArrayList<>();
         if(staffService.getAllowPersonalRanking(staffId)) {
             if (includeDraft) {
                 staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
@@ -89,10 +88,11 @@ public class StaffTeamRankingService {
             }
             if (isCollectionNotEmpty(staffTeamRankings)) {
                 staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate).thenComparing(StaffTeamRanking::getCreationDate));
-                staffTeamRankingDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffTeamRankings, StaffTeamRankingDTO.class);
+            } else {
+                staffTeamRankings = new ArrayList<>();
             }
         }
-        return staffTeamRankingDTOList;
+        return staffTeamRankings;
     }
 
     public Set<TeamRankingInfoDTO> getStaffTeamRankingInfo(Long staffId, LocalDate date) {
@@ -112,15 +112,23 @@ public class StaffTeamRankingService {
             exceptionService.actionNotPermittedException(MESSAGE_RANKING_ALREADY_PUBLISHED, "Staff team");
         }
         StaffTeamRanking parent = staffTeamRankingGraphRepository.findByDraftIdAndDeletedFalse(id);
-        if(!parent.getStartDate().isBefore(publishedDate) || (isNotNull(parent.getEndDate()) && parent.getEndDate().isBefore(publishedDate))){
+        if(publishedDate.isBefore(parent.getStartDate()) && isNotNull(parent.getEndDate()) && publishedDate.isAfter(parent.getEndDate())){
             exceptionService.actionNotPermittedException("Invalid publish date");
         }
-        staffTeamRanking.setStartDate(publishedDate);
-        staffTeamRanking.setEndDate(parent.getEndDate());
-        staffTeamRanking.setPublished(true);
-        parent.setEndDate(publishedDate.minusDays(1));
+        if(publishedDate.isEqual(parent.getStartDate())){
+            staffTeamRanking.setDeleted(true);
+            Map<Long,Integer> newTeamRankMap = staffTeamRanking.getTeamRankingInfo().stream().collect(Collectors.toMap(k->k.getTeamId(), v-> v.getRank()));
+            parent.getTeamRankingInfo().forEach(teamRankingInfo -> teamRankingInfo.setRank(newTeamRankMap.get(teamRankingInfo.getTeamId())));
+        } else {
+            staffTeamRanking.setStartDate(publishedDate);
+            staffTeamRanking.setEndDate(parent.getEndDate());
+            staffTeamRanking.setPublished(true);
+            parent.setEndDate(publishedDate.minusDays(1));
+        }
         parent.setDraftId(null);
         staffTeamRankingGraphRepository.saveAll(newArrayList(staffTeamRanking,parent));
+        List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffTeamRanking.getStaffId());
+        mergeStaffTeamRanking(staffTeamRankings);
         return ObjectMapperUtils.copyPropertiesByMapper(staffTeamRanking, StaffTeamRankingDTO.class);
     }
 
@@ -129,8 +137,7 @@ public class StaffTeamRankingService {
         staffTeamRankingGraphRepository.updateActivityIdInTeamRanking(teamId, activityId.toString());
     }
 
-    @Async
-    public void addOrUpdateStaffTeamRanking(Long staffId, Team team, StaffTeamRelationship staffTeamRelationship, StaffTeamRelationShipQueryResult oldStaffTeamRelationship) {
+   public void addOrUpdateStaffTeamRanking(Long staffId, Team team, StaffTeamRelationship staffTeamRelationship, StaffTeamRelationShipQueryResult oldStaffTeamRelationship) {
         if(isNull(oldStaffTeamRelationship)){
             addStaffTeamRanking(staffId, team, staffTeamRelationship);
         } else {
@@ -203,8 +210,6 @@ public class StaffTeamRankingService {
             teamRank.setRank(TOP_RANK);
         }
     }
-
-    @Async
     public void removeStaffTeamInfo(Long staffId, Long teamId){
         List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndDeletedFalse(staffId);
         Set<Long> removeTeamRankingInfoIds = new HashSet<>();
@@ -219,6 +224,7 @@ public class StaffTeamRankingService {
 
     private void mergeStaffTeamRanking(List<StaffTeamRanking> staffTeamRankings) {
         Map<Long, StaffTeamRanking> mergeStaffTeamRankings = new HashMap<>();
+        List<Long> deleteDraftIds = new ArrayList<>();
         if(isCollectionNotEmpty(staffTeamRankings) && staffTeamRankings.size() > 1) {
             staffTeamRankings.sort(Comparator.comparing(StaffTeamRanking::getStartDate));
             for(int index=0; index < staffTeamRankings.size()-1; index++){
@@ -232,6 +238,12 @@ public class StaffTeamRankingService {
                 }
                 mergeStaffTeamRankings.put(staffTeamRanking.getId(), staffTeamRanking);
                 mergeStaffTeamRankings.put(nextStaffTeamRanking.getId(), nextStaffTeamRanking);
+                if(staffTeamRanking.isDeleted() && isNotNull(staffTeamRanking.getDraftId())){
+                    deleteDraftIds.add(staffTeamRanking.getDraftId());
+                }
+                if(nextStaffTeamRanking.isDeleted() && isNotNull(nextStaffTeamRanking.getDraftId())){
+                    deleteDraftIds.add(nextStaffTeamRanking.getDraftId());
+                }
             }
         } else if(isCollectionNotEmpty(staffTeamRankings) && isCollectionEmpty(staffTeamRankings.get(0).getTeamRankingInfo())){
             staffTeamRankings.get(0).setDeleted(true);
@@ -239,6 +251,9 @@ public class StaffTeamRankingService {
         }
         if(isMapNotEmpty(mergeStaffTeamRankings)){
             staffTeamRankingGraphRepository.saveAll(mergeStaffTeamRankings.values());
+        }
+        if(isCollectionNotEmpty(deleteDraftIds)){
+            staffTeamRankingGraphRepository.setDeleted(deleteDraftIds);
         }
     }
 
@@ -433,8 +448,14 @@ public class StaffTeamRankingService {
 
     @Async
     public void updateStaffTeamRankingFromPersonalInfo(Long staffId, List<Team> teams, List<StaffTeamRelationship> newStaffTeams, List<TeamDTO> oldStaffTeams) {
-        Map<Long, StaffTeamRelationship> newStaffTeamMap = newStaffTeams.stream().collect(Collectors.toMap(k-> k.getTeam().getId(), v ->v));
-        Map<Long, TeamDTO> oldStaffTeamMap = oldStaffTeams.stream().collect(Collectors.toMap(k-> k.getId(), v -> v));
+        Map<Long, StaffTeamRelationship> newStaffTeamMap = new HashMap<>();
+        Map<Long, TeamDTO> oldStaffTeamMap = new HashMap<>();
+        if(isCollectionNotEmpty(newStaffTeams)) {
+            newStaffTeamMap = newStaffTeams.stream().collect(Collectors.toMap(k -> k.getTeam().getId(), v -> v));
+        }
+        if(isCollectionNotEmpty(oldStaffTeams)) {
+            oldStaffTeamMap = oldStaffTeams.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        }
         Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k-> k.getId(), v -> v));
         Set<Long> teamIds = new HashSet<>(newStaffTeamMap.keySet());
         teamIds.addAll(oldStaffTeamMap.keySet());
