@@ -264,7 +264,8 @@ public class StaffTeamRankingService {
     private boolean isSameTeamInfo(Set<TeamRankingInfo> teamRankingInfos, Set<TeamRankingInfo> nextTeamRankingInfos) {
         boolean isSame = teamRankingInfos.size() == nextTeamRankingInfos.size();
         if(isSame){
-            Map<Long,Integer> teamRankingInfoMap = teamRankingInfos.stream().collect(Collectors.toMap(k->k.getTeamId(), v->v.getRank()));
+            Map<Long,Integer> teamRankingInfoMap = new HashMap<>();
+            teamRankingInfos.forEach(teamRankingInfo -> teamRankingInfoMap.put(teamRankingInfo.getTeamId(), teamRankingInfo.getRank()));
             for (TeamRankingInfo nextTeamRankingInfo : nextTeamRankingInfos) {
                 int teamRank = teamRankingInfoMap.getOrDefault(nextTeamRankingInfo.getTeamId(), 0);
                 if(nextTeamRankingInfo.getRank() != teamRank){
@@ -403,13 +404,21 @@ public class StaffTeamRankingService {
     }
 
     private void removeTeamRankingInfo(Long teamId, Set<Long> removeTeamRankingInfoIds, StaffTeamRanking staffTeamRanking) {
-        TeamRankingInfo teamRank = staffTeamRanking.getTeamRankingInfo().stream().filter(teamRankingInfo -> teamRankingInfo.getTeamId().equals(teamId)).findAny().orElse(null);
-        if(isNotNull(teamRank)){
-            removeTeamRankingInfoIds.add(teamRank.getId());
-            staffTeamRanking.setTeamRankingInfo(staffTeamRanking.getTeamRankingInfo().stream().filter(teamRankingInfo -> !teamId.equals(teamRankingInfo.getTeamId())).collect(Collectors.toSet()));
-            staffTeamRanking.getTeamRankingInfo().forEach(teamRankingInfo ->
-                    teamRankingInfo.setRank(teamRankingInfo.getRank() > teamRank.getRank() ? teamRankingInfo.getRank() - 1 : teamRankingInfo.getRank())
-            );
+        List<TeamRankingInfo> teamRankingInfos = staffTeamRanking.getTeamRankingInfo().stream().collect(Collectors.toList());
+        teamRankingInfos.sort(Comparator.comparing(TeamRankingInfo::getRank));
+        int decreaseRank = 0;
+        Set<TeamRankingInfo> newTeamRankingInfos = new HashSet<>();
+        if(isCollectionNotEmpty(teamRankingInfos)){
+            for (TeamRankingInfo teamRankingInfo : teamRankingInfos) {
+                if(teamRankingInfo.getTeamId().equals(teamId)){
+                    decreaseRank++;
+                    removeTeamRankingInfoIds.add(teamRankingInfo.getId());
+                } else {
+                    teamRankingInfo.setRank(teamRankingInfo.getRank() - decreaseRank);
+                    newTeamRankingInfos.add(teamRankingInfo);
+                }
+            }
+            staffTeamRanking.setTeamRankingInfo(newTeamRankingInfos);
         }
     }
 
