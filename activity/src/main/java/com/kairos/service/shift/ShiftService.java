@@ -990,4 +990,10 @@ public class ShiftService {
         return shiftMongoRepository.getNotEligibleStaffsForCoverShifts(startDate,endDate,coverShiftSetting,staffIds);
     }
 
+    public List<Shift> findAllShiftsByIds(List<BigInteger> shiftIds){
+        return shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+    }
+
+
+
 }
