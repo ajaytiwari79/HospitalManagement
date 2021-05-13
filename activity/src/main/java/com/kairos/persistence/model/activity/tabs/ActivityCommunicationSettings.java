@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ActivityCommunicationSettings implements Serializable {
 
-    private static final long serialVersionUID = 213213213563l;
+    private static final long serialVersionUID = 213213213563L;
     @KPermissionField
     private boolean allowCommunicationReminder;
     @KPermissionField

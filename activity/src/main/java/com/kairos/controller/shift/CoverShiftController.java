@@ -4,6 +4,7 @@ import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
 import com.kairos.dto.activity.shift.CoverShiftDTO;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -25,6 +27,8 @@ import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 public class CoverShiftController {
 
     @Inject private CoverShiftService coverShiftService;
+    @Inject
+    private ShiftService shiftService;
 
     @ApiOperation("get eligible staffs")
     @PostMapping(value = "/get_eligible_staffs")
@@ -98,5 +102,12 @@ public class CoverShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getcoverShiftStaffDetails(@PathVariable Long staffId, @PathVariable Long unitId, @RequestParam("employmentId") Long employmentId, @RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftStaffDetails(startDate,endDate,unitId,staffId,employmentId));
+    }
+
+    @ApiOperation("get details for cover shift")
+    @PostMapping(value = "/cover_shift/fetch_shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> findAllShiftsByIds(@RequestBody List<BigInteger> shiftIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.findAllShiftsByIds(shiftIds));
     }
 }
