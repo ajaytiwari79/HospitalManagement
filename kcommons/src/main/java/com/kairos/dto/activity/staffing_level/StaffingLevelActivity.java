@@ -56,6 +56,7 @@ public class StaffingLevelActivity {
         this.availableNoOfStaff = Math.max(availableNoOfStaff,0);
     }
 
+
     @JsonIgnore
     public void resetValueOnPhaseFlip(){
         this.remainingOverStaffing = Math.max(availableNoOfStaff - maxNoOfStaff,0);

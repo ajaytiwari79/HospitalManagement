@@ -7,6 +7,7 @@ import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelActivityDetails;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.SkillLevel;
@@ -28,6 +29,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MIN_GREATER
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.REMOVE;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.UPDATE;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
+import static com.kairos.service.staffing_level.StaffingLevelAvailableCountService.getStaffingLevelActivityDetails;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -349,12 +351,14 @@ public class StaffingLevelUtil {
 
     public static void updateStaffingLevelToPublish(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
         List<StaffingLevelInterval> staffingLevelIntervals = isNotNull(staffingLevelPublishDTO.getInterval()) ? getFilteredIntervals(staffingLevelPublishDTO, staffingLevel) : staffingLevel.getPresenceStaffingLevelInterval();
+        Set<StaffingLevelActivityDetails> staffingLevelActivityDetails = new HashSet<>();
         for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
-            updateActivities(staffingLevelPublishDTO, staffingLevelInterval);
+            updateActivities(staffingLevelPublishDTO, staffingLevelInterval,staffingLevelActivityDetails);
         }
         for(StaffingLevelInterval absenceStaffingLevelInterval:staffingLevel.getAbsenceStaffingLevelInterval()){
-            updateActivities(staffingLevelPublishDTO, absenceStaffingLevelInterval);
+            updateActivities(staffingLevelPublishDTO, absenceStaffingLevelInterval,staffingLevelActivityDetails);
         }
+        staffingLevel.setStaffingLevelActivityDetails(staffingLevelActivityDetails);
     }
 
     private static List<StaffingLevelInterval> getFilteredIntervals(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
@@ -369,7 +373,7 @@ public class StaffingLevelUtil {
         return staffingLevelIntervals;
     }
 
-    private static void updateActivities(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevelInterval staffingLevelInterval) {
+    private static void updateActivities(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevelInterval staffingLevelInterval, Set<StaffingLevelActivityDetails> staffingLevelActivityDetails) {
         if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs())){
             StaffingLevelIntervalLog staffingLevelIntervalLog = staffingLevelInterval.getStaffingLevelIntervalLogs().last();
             Set<StaffingLevelActivity> staffingLevelActivities = getStaffingLevelActivitiesToPublish(staffingLevelPublishDTO, staffingLevelIntervalLog);
@@ -377,12 +381,16 @@ public class StaffingLevelUtil {
 
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelInterval.getStaffingLevelActivities().stream().collect(toMap(k -> k.getActivityId(), v -> v));
             staffingLevelActivities.forEach(staffingLevelActivity -> {
+                StaffingLevelActivity levelActivity = null;
                 if (staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
-                    staffingLevelInterval.getStaffingLevelActivities().remove(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()));
+                    levelActivity = staffingLevelActivityMap.get(staffingLevelActivity.getActivityId());
+                    levelActivity.getAvailableNoOfStaff();
+                    staffingLevelInterval.getStaffingLevelActivities().remove(levelActivity);
                 }
-                Optional<StaffingLevelActivity> staffingLevelActivityOptional = staffingLevelInterval.getStaffingLevelActivities().stream().filter(staffingLevelActivity1 -> staffingLevelActivity1.getActivityId().equals(staffingLevelActivity.getActivityId())).findFirst();
-                if(staffingLevelActivityOptional.isPresent()){
-                    staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivityOptional.get().getAvailableNoOfStaff());
+                if(isNotNull(levelActivity)){
+                    staffingLevelActivity.setAvailableNoOfStaff(levelActivity.getAvailableNoOfStaff());
+                    resetStaffingLevelActivityDetails(levelActivity,staffingLevelActivity);
+                    staffingLevelActivityDetails.add(getStaffingLevelActivityDetails(staffingLevelActivityDetails,staffingLevelActivity));
                 }
                 staffingLevelInterval.getStaffingLevelActivities().add(staffingLevelActivity);
             });
@@ -409,6 +417,24 @@ public class StaffingLevelUtil {
             removeActivityAndSkills(staffingLevelInterval, staffingLevelIntervalLog, staffingLevelPublishDTO);
             resetIntervalLogs(staffingLevelInterval, staffingLevelActivities, staffingLevelSkills);
         }
+    }
+    private static void resetStaffingLevelActivityDetails(StaffingLevelActivity oldStaffingLevelActivity, StaffingLevelActivity staffingLevelActivity) {
+        int minNoOfStaffDifference = Math.max(oldStaffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getMinNoOfStaff(),0);
+        int maxNoOfStaffDifference = Math.max(oldStaffingLevelActivity.getMaxNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff(),0);
+        if(minNoOfStaffDifference>0){
+            oldStaffingLevelActivity.setInitialUnderStaffing(Math.max(staffingLevelActivity.getInitialUnderStaffing()-minNoOfStaffDifference,0));
+            oldStaffingLevelActivity.setRemainingUnderStaffing(Math.max(staffingLevelActivity.getRemainingUnderStaffing()-minNoOfStaffDifference,0));
+        }
+        if(maxNoOfStaffDifference>0){
+            oldStaffingLevelActivity.setInitialOverStaffing(Math.max(staffingLevelActivity.getInitialOverStaffing() - maxNoOfStaffDifference,0));
+            oldStaffingLevelActivity.setRemainingOverStaffing(Math.max(staffingLevelActivity.getRemainingOverStaffing() - maxNoOfStaffDifference,0));
+        }
+        staffingLevelActivity.setInitialUnderStaffing(oldStaffingLevelActivity.getInitialUnderStaffing());
+        staffingLevelActivity.setRemainingUnderStaffing(oldStaffingLevelActivity.getRemainingUnderStaffing());
+        staffingLevelActivity.setSolvedUnderStaffing(oldStaffingLevelActivity.getSolvedUnderStaffing());
+        staffingLevelActivity.setInitialOverStaffing(oldStaffingLevelActivity.getInitialOverStaffing());
+        staffingLevelActivity.setRemainingOverStaffing(oldStaffingLevelActivity.getRemainingOverStaffing());
+        staffingLevelActivity.setSolvedOverStaffing(oldStaffingLevelActivity.getSolvedOverStaffing());
     }
 
     private static Set<StaffingLevelActivity> getStaffingLevelActivitiesToPublish(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevelIntervalLog staffingLevelIntervalLog) {
