@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.staff.staff.StaffTeamRankingDTO;
 import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffTeamRanking;
 import com.kairos.persistence.model.staff.TeamRankingInfo;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffTeamRankingGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.scheduling.annotation.Async;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.team.TeamType.MAIN;
@@ -40,6 +43,7 @@ public class StaffTeamRankingService {
     @Inject private ExceptionService exceptionService;
 
     @Inject private StaffService staffService;
+    @Inject private TeamGraphRepository teamGraphRepository;
 
     public StaffTeamRankingDTO updateStaffTeamRanking(StaffTeamRankingDTO staffTeamRankingDTO){
         StaffTeamRanking staffTeamRanking = staffTeamRankingGraphRepository.findById(staffTeamRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, STAFF_TEAM_RANKING, staffTeamRankingDTO.getId())));
@@ -174,7 +178,7 @@ public class StaffTeamRankingService {
 
     private void updateStaffTeamRankingInfo(Long staffId, Team team, StaffTeamRelationship staffTeamRelationship, List<StaffTeamRanking> staffTeamRankings) {
         List<StaffTeamRanking> updateStaffTeamRankings = staffTeamRankings.stream().filter(staffTeamRanking -> isNull(staffTeamRanking.getEndDate()) || staffTeamRanking.getEndDate().isAfter(staffTeamRelationship.getStartDate())).collect(Collectors.toList());
-        if(isNull(updateStaffTeamRankings)){
+        if(isCollectionEmpty(updateStaffTeamRankings)){
             StaffTeamRanking staffTeamRanking = new StaffTeamRanking(staffId, staffTeamRelationship.getStartDate(), staffTeamRelationship.getEndDate(), newHashSet(new TeamRankingInfo(team.getId(), staffTeamRelationship.getTeamType(), team.getActivityId(), TOP_RANK, 0)), true);
             staffTeamRankingGraphRepository.save(staffTeamRanking);
         } else {
@@ -466,6 +470,24 @@ public class StaffTeamRankingService {
                 addOrUpdateStaffTeamRanking(staffId, teamMap.get(teamId), newStaffTeamMap.get(teamId),null);
             }
         }
+    }
+
+    public boolean createAllStaffTeamRankingIfNotCreated(Long unitId){
+        List<Long> staffIds = staffTeamRankingGraphRepository.getAllStaffIdsByUnitId(unitId);
+        for (Long staffId : staffIds) {
+            staffTeamRankingGraphRepository.updateStaffTeamRelationStartDate(unitId, staffId, DateUtils.getCurrentLocalDate().toString());
+            List<StaffTeamRelationship> staffTeams = staffTeamRankingGraphRepository.getStaffTeamDetails(unitId, staffId);
+            if(isCollectionNotEmpty(staffTeams)){
+                List<StaffTeamRanking> staffTeamRankings = staffTeamRankingGraphRepository.findByStaffIdAndPublishedTrueAndDeletedFalse(staffId);
+                if(isCollectionEmpty(staffTeamRankings)){
+                    staffTeams.sort(Comparator.comparing(StaffTeamRelationship::getTeamType));
+                    for (StaffTeamRelationship staffTeam : staffTeams) {
+                        addOrUpdateStaffTeamRanking(staffId, staffTeam.getTeam(), staffTeam,null);
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 }
