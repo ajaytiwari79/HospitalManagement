@@ -53,9 +53,7 @@ public class Neo4jConfig  implements EnvironmentAware {
     /**
      * Bean for environment variables
      *
-     * @return mkkkkkkkkkkkkkkkvt8h  dfxcd/'nilg nv hvg8bi mub kh
-     *
-     *
+     * @return
      */
     @Bean
     public EnvConfig envConfig() {
