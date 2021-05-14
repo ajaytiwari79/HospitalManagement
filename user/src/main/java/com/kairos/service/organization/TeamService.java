@@ -51,6 +51,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MAIN_TEAM_RANKING;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.team.TeamType.MAIN;
+
 /**
  * Created by oodles on 7/10/16.
  */
@@ -156,7 +158,7 @@ public class TeamService {
         List<StaffPersonalDetailQueryResult> staffSkills = staffGraphRepository.getSkillIdsByStaffIds(staffTeamDTOs.stream().map(staffTeamDTO -> staffTeamDTO.getStaffId()).collect(Collectors.toList()));
         Map<Long,Set<Long>> staffSkillMap = staffSkills.stream().collect(Collectors.toMap(k -> k.getId(),v->v.getSkillIds()));
         for (StaffTeamDTO staffTeamDTO : staffTeamDTOs) {
-            if (TeamType.MAIN.equals(staffTeamDTO.getTeamType()) && staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
+            if (MAIN.equals(staffTeamDTO.getTeamType()) && staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
                 exceptionService.actionNotPermittedException("staff.main_team.exists");
             }
             if (staffTeamDTO.getLeaderType() != null && !accessGroupService.findStaffAccessRole(unitId, staffTeamDTO.getStaffId()).isStaff()) {
@@ -178,7 +180,7 @@ public class TeamService {
             }
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
-            if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
+            if(MAIN.equals(staffTeamRelationship.getTeamType())){
                 staffTeamRelationship.setSequence(MAIN_TEAM_RANKING);
             }else {
                 if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),teamId)) {
@@ -384,6 +386,10 @@ public class TeamService {
         Set<Long> teamIds = staffTeamDetails.stream().map(k -> k.getId()).collect(Collectors.toSet());
         if(teamIds.size()<staffTeamDetails.size()){
             exceptionService.actionNotPermittedException(TEAM_SHOULD_BE_UNIQUE);
+        }
+        long mainTeamCount = staffTeamDetails.stream().filter(staffTeamDetail->MAIN.equals(staffTeamDetail.getTeamType())).count();
+        if(mainTeamCount > 1){
+            exceptionService.actionNotPermittedException(MAIN_TEAM_SHOULD_BE_UNIQUE);
         }
         if (staffTeamDetails.stream().anyMatch(k -> k.getLeaderType() != null) && !accessGroupService.findStaffAccessRole(unitId, staff.getId()).isManagement()) {
             exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
