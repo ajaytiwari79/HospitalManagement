@@ -384,7 +384,6 @@ public class OrganizationActivityService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
-        activityCopied.setState(PUBLISHED);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
         updateSkills(activityCopied);
@@ -538,7 +537,7 @@ public class OrganizationActivityService {
         activityCopied.getActivityGeneralSettings().setName(activityDTO.getName().trim());
         activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
         activityCopied.getActivityGeneralSettings().setEndDate(activityDTO.getEndDate());
-        activityCopied.setState(ActivityStateEnum.DRAFT);
+        activityCopied.setState(PUBLISHED);
     }
 
     public OrderAndActivityDTO getActivitiesWithBalanceSettings(long unitId) {
