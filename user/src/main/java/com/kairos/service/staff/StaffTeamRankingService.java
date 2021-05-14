@@ -30,6 +30,7 @@ import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertie
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.team.TeamType.MAIN;
+import static com.kairos.enums.team.TeamType.SECONDARY;
 
 @Transactional
 @Service
@@ -472,12 +473,30 @@ public class StaffTeamRankingService {
         Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k-> k.getId(), v -> v));
         Set<Long> teamIds = new HashSet<>(newStaffTeamMap.keySet());
         teamIds.addAll(oldStaffTeamMap.keySet());
+        Long mainTeamTypeId = null;
+        Long secondaryTeamTypeId = null;
         for (Long teamId : teamIds) {
             if(oldStaffTeamMap.containsKey(teamId) && !newStaffTeamMap.containsKey(teamId)){
                 removeStaffTeamInfo(staffId, teamId);
             } else if(newStaffTeamMap.containsKey(teamId) && !oldStaffTeamMap.containsKey(teamId)){
+                if(MAIN.equals(newStaffTeamMap.get(teamId).getTeamType())){
+                    mainTeamTypeId = teamId;
+                    newStaffTeamMap.get(teamId).setTeamType(SECONDARY);
+                }
                 addOrUpdateStaffTeamRanking(staffId, teamMap.get(teamId), newStaffTeamMap.get(teamId),null);
+            } else if(newStaffTeamMap.containsKey(teamId) && oldStaffTeamMap.containsKey(teamId) && !newStaffTeamMap.get(teamId).getTeamType().equals(oldStaffTeamMap.get(teamId).getTeamType())){
+                if(MAIN.equals(newStaffTeamMap.get(teamId).getTeamType())){
+                    mainTeamTypeId = teamId;
+                } else {
+                    secondaryTeamTypeId = teamId;
+                }
             }
+        }
+        if(isNotNull(secondaryTeamTypeId)){
+            updateTeamType(staffId,secondaryTeamTypeId,SECONDARY);
+        }
+        if(isNotNull(mainTeamTypeId)){
+            updateTeamType(staffId,mainTeamTypeId,MAIN);
         }
     }
 
