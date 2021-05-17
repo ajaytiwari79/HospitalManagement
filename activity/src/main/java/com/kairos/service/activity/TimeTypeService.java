@@ -222,7 +222,6 @@ public class TimeTypeService {
             allowedConflictsUpdate = isAllowedConflictsUpdate(timeTypeDTO, allowedConflictsUpdate, childTimeType);
             sicknessSettingUpdate=isSicknessUpdated(timeTypeDTO,sicknessSettingUpdate,childTimeType);
             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-            childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
             if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
                 setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, leafTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, childTimeType,sicknessSettingUpdate);
@@ -267,7 +266,6 @@ public class TimeTypeService {
         for (TimeType leafTimeType : childTimeTypeList) {
             organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, leafTimeType.getBackgroundColor(),leafTimeType.getId());
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-            leafTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
             }
