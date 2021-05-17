@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.enums.PriorityFor.NONE;
 import static com.kairos.enums.PriorityFor.PRESENCE;
 
 @Document(collection = "time_Type")
@@ -51,7 +52,7 @@ public class TimeType extends MongoBaseEntity implements Serializable {
     private List<Long> levels;
     private List<Long> employmentTypes;
     private boolean breakNotHeldValid;
-    private PriorityFor priorityFor = PRESENCE;
+    private PriorityFor priorityFor = NONE;
     private boolean sicknessSettingValid;
     private Map<String,BigInteger> upperLevelTimeTypeDetails;
     //this setting for unity graph
