@@ -120,7 +120,7 @@ public class StaffingLevelAvailableCountService {
     }
     private void updateCountForUnderStaffing(Map<BigInteger, IntervalAndDurationWrapper> deletedActivityMap,Map<BigInteger, IntervalAndDurationWrapper> createdActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
         IntervalAndDurationWrapper intervalAndDurationWrapper = deletedActivityMap.get(staffingLevelActivity.getActivityId());
-        if(isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
+        if(isNotNull(intervalAndDurationWrapper) && isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
             DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
             Optional<DateTimeInterval> dateTimeIntervalOptional = intervalAndDurationWrapper.getIntervals().stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
             if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
@@ -133,7 +133,7 @@ public class StaffingLevelAvailableCountService {
     }
     private void updateCountOnCreation(Map<BigInteger, IntervalAndDurationWrapper> createdActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
         IntervalAndDurationWrapper intervalAndDurationWrapper = createdActivityMap.get(staffingLevelActivity.getActivityId());
-        if(isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
+        if(isNotNull(intervalAndDurationWrapper) && isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
             DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
             Optional<DateTimeInterval> dateTimeIntervalOptional = intervalAndDurationWrapper.getIntervals().stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
             if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){
@@ -147,7 +147,7 @@ public class StaffingLevelAvailableCountService {
 
     private void updateCountForOverStaffing(Map<BigInteger, IntervalAndDurationWrapper> createdActivityMap,Map<BigInteger, IntervalAndDurationWrapper> deletedActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
         IntervalAndDurationWrapper intervalAndDurationWrapper = createdActivityMap.get(staffingLevelActivity.getActivityId());
-        if(isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
+        if(isNotNull(intervalAndDurationWrapper) && isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
             DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
             Optional<DateTimeInterval> dateTimeIntervalOptional = intervalAndDurationWrapper.getIntervals().stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
             int overStaffingCount = staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff();
@@ -161,7 +161,7 @@ public class StaffingLevelAvailableCountService {
     }
     private void updateCountOnDeletion(Map<BigInteger, IntervalAndDurationWrapper> deletedActivityMap, StaffingLevel staffingLevel, StaffingLevelInterval staffingLevelInterval, StaffingLevelActivity staffingLevelActivity) {
         IntervalAndDurationWrapper intervalAndDurationWrapper = deletedActivityMap.get(staffingLevelActivity.getActivityId());
-        if(isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
+        if(isNotNull(intervalAndDurationWrapper) && isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())){
             DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
             Optional<DateTimeInterval> dateTimeIntervalOptional = intervalAndDurationWrapper.getIntervals().stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
             if(dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes()==interval.getMinutes()){

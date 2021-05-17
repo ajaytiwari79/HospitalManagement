@@ -28,7 +28,7 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query(value = "{countryId:?0,name:?1,deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
 
-    @Query(value = "{countryId:?0,name:?1,_id:{$ne:?2},deleted:false,disabled:false}",exists = true)
+    @Query(value = "{countryId:?0,name:?1,_id:{$ne:?2},organization:{$exists:false},deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
     @Query(value = "{name:?2,deleted:false,disabled:false,'organizationType._id':?0,'organizationSubType._id':?1}",exists = true)
