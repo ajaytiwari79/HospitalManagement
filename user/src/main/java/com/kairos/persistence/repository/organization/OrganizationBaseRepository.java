@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT;
+import static com.kairos.persistence.model.constants.RelationshipConstants.VAT_TYPE;
 
 @Repository
 public interface OrganizationBaseRepository extends Neo4jBaseRepository<OrganizationBaseEntity,Long> {
@@ -35,4 +36,7 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
             "unwind t as x with distinct x\n" +
             "Return x")
     List<Long> fetchAllUnitIds(Long orgId);
+
+    @Query("MATCH(org)-[rel:" + VAT_TYPE + "]->(vatType:VatType) where id(org)={0} DETACH DELETE rel")
+    void removeVatTypeRelation(long orgId);
 }
