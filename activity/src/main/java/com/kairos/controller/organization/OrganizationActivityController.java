@@ -332,8 +332,7 @@ public class OrganizationActivityController {
     @PostMapping(value = "/organization_default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationActivityService.createDefaultDataForOrganization(unitId, orgTypeAndSubTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.createDefaultDataForOrganization(unitId, orgTypeAndSubTypeDTO));
     }
 
     @ApiOperation("Remove uploaded Attachments in Activity")
@@ -347,8 +346,7 @@ public class OrganizationActivityController {
     @GetMapping(value = "/activity")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityByUnitId( @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                activityService.getActivityByUnitId(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityByUnitId(unitId));
     }
 
     @ApiOperation(value = "Get All Activities and Phases by unitId")
