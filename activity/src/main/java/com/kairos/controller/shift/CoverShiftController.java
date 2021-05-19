@@ -89,6 +89,14 @@ public class CoverShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
+    @ApiOperation("update cover shift setting by unit")
+    @PutMapping(value = "/remove_interest/{id}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> removeInterestInCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId) {
+        coverShiftService.notInterestInCoverShift(id,staffId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
     @ApiOperation("move  shift to another staff")
     @PutMapping(value = "/cover_shift/{id}/approve_request")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
