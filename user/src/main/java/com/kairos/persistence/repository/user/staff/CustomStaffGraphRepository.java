@@ -23,7 +23,7 @@ public interface CustomStaffGraphRepository {
     <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                       Map<FilterType, Set<T>> filters, String searchText, String imagePath, Long loggedInStaffId, LocalDate selectedDate);
 
-    <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType, Set<T>> filters, Long unitId, LocalDate today, String searchText, Long loggedInUserId,String imagePath,List<Long> staffIds);
+    <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType, Set<T>> filters, Long unitId, LocalDate today, String searchText, Long loggedInUserId,String imagePath);
 
     StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId,String imagePath);
 

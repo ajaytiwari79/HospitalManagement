@@ -766,7 +766,7 @@ public class StaffRetrievalService {
                 staffEmploymentWithTags.add(matchedStaff);
             }
         }else {
-            staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),staffFilterDetails.getStaffIds());
+            staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
             int i = -1;
             StaffEmploymentWithTag matchedStaff = null;
             for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
