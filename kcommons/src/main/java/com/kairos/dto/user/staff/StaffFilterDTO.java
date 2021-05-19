@@ -33,7 +33,7 @@ public class StaffFilterDTO {
     private long id;
     private String searchText;
     private String name;
-    private List<Long> staffIds;
+    private List<Long> staffIds=new ArrayList<>();
     Map<Long,List<Long>> mapOfStaffAndEmploymentIds;
     private List<BigInteger> planningPeriodIds;
     private Map<Long, Boolean> nightWorkerDetails;
