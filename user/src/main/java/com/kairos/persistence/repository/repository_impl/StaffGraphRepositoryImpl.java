@@ -227,17 +227,18 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId,String imagePath) {
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId,String imagePath,List<Long> staffIds) {
         String today = DateUtils.formatLocalDate(localDateToday, "yyyy-MM-dd");
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("today", today);
+        queryParameters.put("staffIds", staffIds);
         queryParameters.put("loggedInUserId", loggedInUserId);
         queryParameters.put(IMAGE_PATH,imagePath);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment{published:true,deleted:false})-[:IN_UNIT]-(unit:Unit)\n" +
-                "WHERE id(unit)={unitId} ");
+                "WHERE id(unit)={unitId} OR id(staff) IN {staffIds}");
         if (searchText != null && searchText.trim() != "") {
             String qText = "(?i)" + searchText + ".*";
             queryParameters.put("searchText", qText);
