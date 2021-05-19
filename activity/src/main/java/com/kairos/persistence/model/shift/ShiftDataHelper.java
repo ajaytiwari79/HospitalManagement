@@ -224,7 +224,7 @@ public class ShiftDataHelper {
 
     public Map<java.time.LocalDate, PhaseDefaultName> getDatePhaseDefaultName() {
         if (isMapEmpty(dateAndPhaseDefaultName)) {
-            dateAndPhaseDefaultName = phaseMap.entrySet().stream().collect(Collectors.toMap(localDatePhaseEntry -> localDatePhaseEntry.getKey(), v -> v.getValue().getPhaseEnum()));
+            dateAndPhaseDefaultName = phaseMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().getPhaseEnum()));
         }
         return dateAndPhaseDefaultName;
     }
