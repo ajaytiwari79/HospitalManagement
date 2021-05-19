@@ -94,7 +94,6 @@ public class UnitService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
         Long countryId = organization.getCountry().getId();
-
         Map<String, Object> response = new HashMap<>(2);
         response.put("parentInfo", parentOrgDefaultDetails(organization));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
