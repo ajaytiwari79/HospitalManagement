@@ -15,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 public enum AutoFillGapSettingsRule implements Serializable {
     HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP("Fill the gap with the highest ranked activity planned adjacent to the gap"),
-    HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST("Always fill with the highest ranked activity, if highest is causing gap then use the second highest"),
-    HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity if it is solving more problems than causing"),
+    HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST("Always fill with the highest ranked activity, if highest is causing gap then use the second highest (planned or not in the shift)."),
+    HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity if it is solving more problems than causing (planned or not in the shift)."),
     HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity planned adjacent to the gap solving more problems than causing"),
     HIGHEST_RANKED_ACTIVITY_THAT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING("Fill the gap with the highest ranked activity that is solving more problems than causing"),
     DO_NOT_ALLOW_TO_CAUSE_GAP("Do not allow to cause gap");
