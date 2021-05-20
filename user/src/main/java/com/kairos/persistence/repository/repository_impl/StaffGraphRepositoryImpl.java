@@ -238,7 +238,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment{published:true,deleted:false})-[:IN_UNIT]-(unit:Unit)\n" +
-                "WHERE id(unit)={unitId} OR id(staff) IN {staffIds}");
+                "WHERE (id(unit)={unitId} OR id(staff) IN {staffIds}) ");
         if (searchText != null && searchText.trim() != "") {
             String qText = "(?i)" + searchText + ".*";
             queryParameters.put("searchText", qText);

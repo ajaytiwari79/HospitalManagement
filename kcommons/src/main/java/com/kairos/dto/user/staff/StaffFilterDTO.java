@@ -64,5 +64,10 @@ public class StaffFilterDTO {
         }
         return isValidFilterForShift;
     }
+
+    public List<Long> getStaffIds() {
+        this.staffIds = isNullOrElse(staffIds,new ArrayList<>());
+        return staffIds;
+    }
 }
 
