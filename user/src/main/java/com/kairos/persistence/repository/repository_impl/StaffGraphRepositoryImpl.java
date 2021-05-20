@@ -227,12 +227,11 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId,String imagePath,List<Long> staffIds) {
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId,String imagePath) {
         String today = DateUtils.formatLocalDate(localDateToday, "yyyy-MM-dd");
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("today", today);
-        queryParameters.put("staffIds", staffIds);
         queryParameters.put("loggedInUserId", loggedInUserId);
         queryParameters.put(IMAGE_PATH,imagePath);
         StringBuilder query = new StringBuilder();

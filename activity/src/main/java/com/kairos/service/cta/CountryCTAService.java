@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NAME_ALREADYEXIST;
 
 /**
@@ -155,7 +156,7 @@ public class CountryCTAService {
             ctaRuleTemplateRepository.saveEntities(ruleTemplates);
             ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
         }
-        if (creatingFromCountry) {
+        if (creatingFromCountry && isNotNull(ctaBasicDetailsDTO)) {
             Expertise expertise = new Expertise(ctaBasicDetailsDTO.getExpertise().getId(), ctaBasicDetailsDTO.getExpertise().getName(), ctaBasicDetailsDTO.getExpertise().getDescription());
             costTimeAgreement.setExpertise(expertise);
             if (!doUpdate) {
@@ -263,7 +264,6 @@ public class CountryCTAService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair(ORGANIZATION_SUB_TYPE_ID, collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair(EXPERTISE_ID, collectiveTimeAgreementDTO.getExpertise().getId().toString()));
-        CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId, requestParam);
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
@@ -277,7 +277,7 @@ public class CountryCTAService {
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         updateCostTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
-        buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, ctaBasicDetailsDTO, null);
+        buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, null, null);
         costTimeAgreementRepository.save(updateCostTimeAgreement);
         return addTagsInResponse( updateCostTimeAgreement, tagDTOS);
     }
