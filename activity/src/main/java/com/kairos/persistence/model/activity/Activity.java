@@ -89,6 +89,8 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
+    @JsonIgnore
+    private boolean isChildActivity = false;
     //time care id
     private String externalId;
     private String path;
