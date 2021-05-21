@@ -512,7 +512,7 @@ public class OrganizationActivityService {
             exceptionService.dataNotFoundException(activity.getActivityGeneralSettings().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
-        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
+        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
         TimeType timeType = timeTypeMongoRepository.findOneById(activityFromDatabase.get().getActivityBalanceSettings().getTimeTypeId());
@@ -523,9 +523,13 @@ public class OrganizationActivityService {
             Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
             setDataInActivity(activityDTO, activityCopied);
             activityMongoRepository.save(activityCopied);
+            if(PriorityFor.PRESENCE.equals(timeType.getPriorityFor()) && !activityCopied.isChildActivity()) {
+                activityRankingService.addOrRemovePresenceActivityRanking(unitId, activityCopied, true);
+            }
             activityDTO.setId(activityCopied.getId());
             activityDTO.setActivityCanBeCopied(true);
             activityDTO.setUnitId(unitId);
+            activityDTO.setCountryParentId(activityCopied.getCountryParentId());
         } else {
             exceptionService.actionNotPermittedException(ACTIVITY_NOT_ELIGIBLE_FOR_COPY);
         }
@@ -537,6 +541,8 @@ public class OrganizationActivityService {
         activityCopied.getActivityGeneralSettings().setName(activityDTO.getName().trim());
         activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
         activityCopied.getActivityGeneralSettings().setEndDate(activityDTO.getEndDate());
+        activityCopied.setTranslations(new HashMap<>());
+        activityCopied.getTranslations().put(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase(), new TranslationInfo(activityDTO.getName().trim(), activityCopied.getDescription()));
         activityCopied.setState(PUBLISHED);
     }
 
