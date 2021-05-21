@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
@@ -32,6 +33,7 @@ import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.reason_code.ReasonCodeService;
+import com.kairos.service.unit_settings.ActivityRankingService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.annotation.Lazy;
@@ -43,8 +45,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ENTERED_TIMES;
 import static com.kairos.enums.TimeTypeEnum.*;
@@ -73,6 +74,7 @@ public class TimeTypeService {
     @Inject private ReasonCodeService reasonCodeService;
     @Inject private PhaseService phaseService;
     @Inject private ActivityHelperService activityHelperService;
+    @Inject private ActivityRankingService activityRankingService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -150,6 +152,7 @@ public class TimeTypeService {
         List<TimeType> leafTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
         Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
         organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, timeType.getBackgroundColor(),timeType.getId());
+        PriorityFor oldPriorityFor = timeType.getPriorityFor();
         updateDetailsTimeType(timeTypeDTO, timeType);
         updateOrganizationHierarchyDetailsInTimeType(timeTypeDTO, timeType);
         List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
@@ -162,6 +165,9 @@ public class TimeTypeService {
             activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
         }
         timeTypeMongoRepository.saveEntities(timeTypes);
+        if(isCollectionEmpty(childTimeTypeIds) && !oldPriorityFor.equals(timeType.getPriorityFor())){
+            activityRankingService.updateRankingListOnUpdatePriorityFor(timeType.getId(), timeType.getPriorityFor(), oldPriorityFor);
+        }
         return timeTypeDTO;
     }
 
