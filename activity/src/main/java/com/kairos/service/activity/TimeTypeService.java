@@ -74,7 +74,7 @@ public class TimeTypeService {
     @Inject private ReasonCodeService reasonCodeService;
     @Inject private PhaseService phaseService;
     @Inject private ActivityHelperService activityHelperService;
-    @Inject private ActivityRankingService activityRankingService;
+    @Inject @Lazy private ActivityRankingService activityRankingService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
