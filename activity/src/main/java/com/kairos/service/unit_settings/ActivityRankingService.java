@@ -10,7 +10,9 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
@@ -35,6 +37,7 @@ public class ActivityRankingService {
     private ExceptionService exceptionService;
     @Inject
     private ActivityService activityService;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
 
     public ActivityRankingDTO saveActivityRanking(ActivityRankingDTO activityRankingDTO){
         ActivityRanking activityRanking = ObjectMapperUtils.copyPropertiesByMapper(activityRankingDTO, ActivityRanking.class);
@@ -529,7 +532,8 @@ public class ActivityRankingService {
         activityRankingRepository.saveEntities(activityRankings);
         List<Activity> activities = activityService.findAllByUnitIdAndDeletedFalse(unitId);
         for (Activity activity : activities) {
-            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && PriorityFor.PRESENCE.equals(activity.getActivityBalanceSettings().getPriorityFor())) {
+            TimeType timeType = timeTypeMongoRepository.findOne(activity.getActivityBalanceSettings().getTimeTypeId());
+            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && PriorityFor.PRESENCE.equals(timeType.getPriorityFor())) {
                 addOrRemovePresenceActivityRanking(unitId, activity, true);
             }
         }
