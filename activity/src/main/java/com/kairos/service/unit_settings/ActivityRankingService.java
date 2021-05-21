@@ -533,7 +533,7 @@ public class ActivityRankingService {
         List<Activity> activities = activityService.findAllByUnitIdAndDeletedFalse(unitId);
         for (Activity activity : activities) {
             TimeType timeType = timeTypeMongoRepository.findOne(activity.getActivityBalanceSettings().getTimeTypeId());
-            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && PriorityFor.PRESENCE.equals(timeType.getPriorityFor())) {
+            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && PriorityFor.PRESENCE.equals(timeType.getPriorityFor()) && !activity.isChildActivity()) {
                 addOrRemovePresenceActivityRanking(unitId, activity, true);
             }
         }
