@@ -314,12 +314,7 @@ public class WorkTimeAgreementService{
 
 
     private WTAResponseDTO prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
-        if (!oldWta.getOrganizationType().getId().equals(updateDTO.getOrganizationType())) {
-            exceptionService.actionNotPermittedException(MESSAGE_ORGANIZATION_TYPE_UPDATE, updateDTO.getOrganizationType());
-        }
-        if (!oldWta.getOrganizationSubType().getId().equals(updateDTO.getOrganizationSubType())) {
-            exceptionService.actionNotPermittedException(MESSAGE_ORGANIZATION_SUBTYPE_UPDATE, updateDTO.getOrganizationSubType());
-        }
+        validateOrganizationTypeAndSubType(oldWta, updateDTO);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
             for (WTABaseRuleTemplateDTO ruleTemplateDTO : updateDTO.getRuleTemplates()) {
@@ -341,21 +336,39 @@ public class WorkTimeAgreementService{
             }
             oldWta.setExpertise(new Expertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription()));
         }
+        setBasicDetails(oldWta, updateDTO, wtaBasicDetailsDTO);
+        List<TagDTO> tags = setTags(oldWta);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        wtaResponseDTO.setTags(tags);
+        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
+        return wtaResponseDTO;
+    }
+
+    private List<TagDTO> setTags(WorkingTimeAgreement oldWta) {
+        List<TagDTO> tags = null;
+        if (isCollectionNotEmpty(oldWta.getTags())) {
+            tags = tagMongoRepository.findAllTagsByIdIn(oldWta.getTags());
+            oldWta.setTags(null);
+        }
+        return tags;
+    }
+
+    private void setBasicDetails(WorkingTimeAgreement oldWta, WTADTO updateDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
         oldWta.setTags(updateDTO.getTags());
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
         oldWta.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
         oldWta.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
         wtaRepository.save(oldWta);
-        List<TagDTO> tags = null;
-        if (isCollectionNotEmpty(oldWta.getTags())) {
-            tags = tagMongoRepository.findAllTagsByIdIn(oldWta.getTags());
-            oldWta.setTags(null);
+    }
+
+    private void validateOrganizationTypeAndSubType(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+        if (!oldWta.getOrganizationType().getId().equals(updateDTO.getOrganizationType())) {
+            exceptionService.actionNotPermittedException(MESSAGE_ORGANIZATION_TYPE_UPDATE, updateDTO.getOrganizationType());
         }
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
-        wtaResponseDTO.setTags(tags);
-        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
-        return wtaResponseDTO;
+        if (!oldWta.getOrganizationSubType().getId().equals(updateDTO.getOrganizationSubType())) {
+            exceptionService.actionNotPermittedException(MESSAGE_ORGANIZATION_SUBTYPE_UPDATE, updateDTO.getOrganizationSubType());
+        }
     }
 
     public WTAResponseDTO getWta(BigInteger wtaId) {
