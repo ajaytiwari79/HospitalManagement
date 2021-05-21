@@ -311,6 +311,7 @@ public class CoverShiftService {
         }
         coverShift.getDeclinedStaffIds().add(staffId);
         coverShift.getInterestedStaffs().remove(staffId);
+        coverShift.getRequestedStaffs().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
     }
 
