@@ -528,6 +528,7 @@ public class OrganizationActivityService {
             }
             activityDTO.setId(activityCopied.getId());
             activityDTO.setActivityCanBeCopied(true);
+            activityDTO.setUnitId(unitId);
             activityDTO.setCountryParentId(activityCopied.getCountryParentId());
         } else {
             exceptionService.actionNotPermittedException(ACTIVITY_NOT_ELIGIBLE_FOR_COPY);
