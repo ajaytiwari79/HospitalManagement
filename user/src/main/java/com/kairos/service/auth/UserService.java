@@ -673,9 +673,7 @@ public class UserService {
     }
 
     public boolean updateChatStatus(ChatStatus chatStatus){
-        User user = userGraphRepository.findByIdAndDeletedFalse(UserContext.getUserDetails().getId());
-        user.setChatStatus(chatStatus);
-        userGraphRepository.save(user);
+        User user = userGraphRepository.updateChatStatusByUserId(UserContext.getUserDetails().getId(),chatStatus);
         return true;
     }
 
