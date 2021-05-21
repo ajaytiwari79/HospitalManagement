@@ -71,4 +71,11 @@ public class ActivityRankingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,unitId==null? activityRankingService.findAllAbsenceActivities(): activityRankingService.findAllPresenceActivities(unitId));
     }
 
+    //use for created activity to add in unit ranking list
+    @ApiOperation(value = "create a presence_ranking ")
+    @PostMapping(value =  "/unit/{unitId}/create_activity_ranking")
+    public ResponseEntity<Map<String, Object>> createPresenceRanking(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.createPresenceRanking(unitId));
+    }
+
 }

@@ -1021,11 +1021,15 @@ public class ActivityService {
         return activityMongoRepository.findAllActivitiesByTimeType(refId,timeType);
     }
 
-    public List<ActivityDTO> findAllActivitiesByCountryAndTimeTypePriority(long refId, boolean refType, PriorityFor priorityFor){
-        return activityMongoRepository.findAllActivityByCountryAndPriorityFor(refId, refType, priorityFor);
+    public List<ActivityDTO> findAllActivitiesByCountryAndTimeTypePriority(long countryId, PriorityFor priorityFor){
+        return activityMongoRepository.findAllActivityByCountryAndPriorityFor(countryId, priorityFor);
     }
 
     public List<Activity> findAllByTimeTypeId(BigInteger timeTypeId) {
         return activityMongoRepository.findAllByTimeTypeId(timeTypeId);
+    }
+
+    public List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId) {
+        return activityMongoRepository.findAllByUnitIdAndDeletedFalse(unitId);
     }
 }

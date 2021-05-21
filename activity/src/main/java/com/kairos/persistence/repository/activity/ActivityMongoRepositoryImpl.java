@@ -907,8 +907,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long refId, boolean refType, PriorityFor priorityFor) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(refType?COUNTRY_ID:UNIT_ID).is(refId).and(TIME_TYPE1+".priorityFor").is(priorityFor);
+    public List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long countryId, PriorityFor priorityFor) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and(TIME_TYPE1+".priorityFor").is(priorityFor);
         Aggregation aggregation = Aggregation.newAggregation(
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 unwind(TIME_TYPE1),
