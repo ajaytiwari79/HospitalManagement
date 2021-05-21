@@ -7,6 +7,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
@@ -25,8 +26,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
-import static com.kairos.enums.TimeTypeEnum.ABSENCE;
-import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
 @Service
 public class ActivityRankingService {
@@ -128,7 +127,7 @@ public class ActivityRankingService {
     public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
         List<ActivityDTO> fullDayActivities = new ArrayList<>();
         List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        List<ActivityDTO> activityDTOS = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), true, PriorityFor.ABSENCE);
+        List<ActivityDTO> activityDTOS = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), PriorityFor.ABSENCE);
         activityDTOS.forEach(activityDTO -> {
             if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
                 fullWeekActivities.add(activityDTO);
@@ -143,7 +142,7 @@ public class ActivityRankingService {
     }
 
     public List<ActivityDTO> findAllPresenceActivities(Long unitId){
-        return activityService.findAllActivitiesByCountryAndTimeTypePriority(unitId, false, PriorityFor.PRESENCE);
+        return activityService.findAllActivityByDeletedFalseAndUnitId(newArrayList(unitId));
     }
 
     @Async
@@ -522,5 +521,18 @@ public class ActivityRankingService {
             activityRankingRepository.saveEntities(activityRankings);
             mergeActivityRanking(activityRankings, false);
         }
+    }
+
+    public boolean createPresenceRanking(Long unitId){
+        List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndDeletedFalse(unitId);
+        activityRankings.forEach(activityRanking -> activityRanking.setDeleted(true));
+        activityRankingRepository.saveEntities(activityRankings);
+        List<Activity> activities = activityService.findAllByUnitIdAndDeletedFalse(unitId);
+        for (Activity activity : activities) {
+            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && PriorityFor.PRESENCE.equals(activity.getActivityBalanceSettings().getPriorityFor())) {
+                addOrRemovePresenceActivityRanking(unitId, activity, true);
+            }
+        }
+        return true;
     }
 }
