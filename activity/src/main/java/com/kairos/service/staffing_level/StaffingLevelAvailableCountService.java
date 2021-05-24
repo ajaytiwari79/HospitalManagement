@@ -214,12 +214,13 @@ public class StaffingLevelAvailableCountService {
         DateTimeInterval oldShiftActivityInterval = oldShiftActivity.getInterval();
         Optional<ShiftActivity> optionalBreakActivity = breakActivities.stream().filter(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && oldShiftActivityInterval.overlaps(shiftActivity1.getInterval())).findFirst();
         List<DateTimeInterval> timeIntervals = oldShiftActivityInterval.minusInterval(shiftActivity.getInterval());
-        DateTimeInterval breakInterval = optionalBreakActivity.get().getInterval();
         boolean breakDurationSame = false;
-        if(optionalBreakActivity.isPresent() && breakInterval.overlaps(oldShiftActivityInterval) && breakActivities1.stream().noneMatch(shiftActivity1 -> shiftActivity1.getInterval().equals(breakInterval))) {
+        DateTimeInterval breakInterval = null;
+        if(optionalBreakActivity.isPresent() && optionalBreakActivity.get().getInterval().overlaps(oldShiftActivityInterval) && breakActivities1.stream().noneMatch(shiftActivity1 -> shiftActivity1.getInterval().equals(optionalBreakActivity.get().getInterval()))) {
             Optional<ShiftActivity> optionalBreakActivity1 = breakActivities1.stream().filter(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && shiftActivity1.getInterval().overlaps(oldShiftActivityInterval)).findFirst();
-            breakDurationSame = optionalBreakActivity1.isPresent() && optionalBreakActivity1.get().getInterval().getMinutes() == breakInterval.getMinutes();
-            timeIntervals.add(breakInterval);
+            breakDurationSame = optionalBreakActivity1.isPresent() && optionalBreakActivity1.get().getInterval().getMinutes() == optionalBreakActivity.get().getInterval().getMinutes();
+            timeIntervals.add(optionalBreakActivity.get().getInterval());
+            breakInterval = optionalBreakActivity.get().getInterval();
         }
         return new Object[]{timeIntervals,breakDurationSame,breakInterval};
     }
