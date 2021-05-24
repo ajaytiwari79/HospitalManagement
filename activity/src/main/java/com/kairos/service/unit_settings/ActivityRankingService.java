@@ -127,25 +127,26 @@ public class ActivityRankingService {
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
     }
 
-    public Map<String,List<Activity>> findAllAbsenceActivities(){
-        List<Activity> fullDayActivities = new ArrayList<>();
-        List<Activity> fullWeekActivities = new ArrayList<>();
+    public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
+        List<ActivityDTO> fullDayActivities = new ArrayList<>();
+        List<ActivityDTO> fullWeekActivities = new ArrayList<>();
         List<Activity> activities = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), true, PriorityFor.ABSENCE);
         activities.forEach(activity -> {
+            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activity, ActivityDTO.class);
             if(CommonConstants.FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                fullWeekActivities.add(activity);
+                fullWeekActivities.add(activityDTO);
             } else {
-                fullDayActivities.add(activity);
+                fullDayActivities.add(activityDTO);
             }
         });
-        Map<String,List<Activity>> resultMap = new HashMap<>();
+        Map<String,List<ActivityDTO>> resultMap = new HashMap<>();
         resultMap.put("fullDayActivities", fullDayActivities);
         resultMap.put("fullWeekActivities", fullWeekActivities);
         return resultMap;
     }
 
-    public List<Activity> findAllPresenceActivities(Long unitId){
-        return activityService.findAllActivitiesByCountryAndTimeTypePriority(unitId, false, PriorityFor.PRESENCE);
+    public List<ActivityDTO> findAllPresenceActivities(Long unitId){
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(activityService.findAllActivitiesByCountryAndTimeTypePriority(unitId, false, PriorityFor.PRESENCE), ActivityDTO.class);
     }
 
     @Async

@@ -914,7 +914,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 unwind(TIME_TYPE1),
                 match(criteria),
-                project(NAME,TIME_CALCULATION_ACTIVITY_TAB,STATE,IS_CHILD_ACTIVITY,EXPERTISES,COUNTRY_ID,GENERAL_ACTIVITY_TAB)
+                project(NAME,TIME_CALCULATION_ACTIVITY_TAB,STATE,IS_CHILD_ACTIVITY,EXPERTISES,COUNTRY_ID,GENERAL_ACTIVITY_TAB,TRANSLATIONS)
         );
         AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
         return result.getMappedResults();
