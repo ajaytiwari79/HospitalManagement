@@ -178,8 +178,10 @@ public class AutoFillGapSettingsService {
             setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap, staffActivityRankMap);
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(shiftActivityBeforeGap,shiftActivityAfterGap, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
-            AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, UserContext.getUserDetails().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
-            if (isNull(gapSettings)) {
+            AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, UserContext.getUserDetails().isStaff() ? STAFF.toString() : MANAGEMENT.toString(), shiftDTO.getShiftDate());
+            if (isNull(gapSettings) && autoFillGapSettingsMongoRepository.isAutoFillGapSettingsByUnitId(shiftDTO.getUnitId())) {
+                exceptionService.dataNotFoundException(GAP_FILLING_CONFIGURATION_INCORRECTLY);
+            } else {
                 exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
             }
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapSettings, staffingLevelActivityWithDurationMap, activityList, shiftDTO);
@@ -252,30 +254,42 @@ public class AutoFillGapSettingsService {
     private ShiftActivityDTO getShiftActivityDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList, ShiftDTO shiftDTO, short gapDuration, AutoFillGapSettingsRule autoFillGapSettingsRule) {
         ShiftActivityDTO shiftActivityDTO = null;
         BigInteger activityId;
+        List<ActivityWrapper> sortedActivityWrapper;
         switch (autoFillGapSettingsRule) {
             case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP :
                 activityId = shiftActivityAfterGap.getActivity().getRanking() < shiftActivityBeforeGap.getActivity().getRanking() ? shiftActivityAfterGap.getActivityId() : shiftActivityBeforeGap.getActivityId();
                 shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
                 break;
+            case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
+                sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
+                shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), sortedActivityWrapper.get(0).getActivity().getId(), null);
+                break;
             case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
                 short durationOfBefore = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) ? staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() : 0;
                 short durationOfAfter = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) ? staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() : 0;
                 if (durationOfBefore != 0 || durationOfAfter != 0) {
-                    shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), durationOfBefore > durationOfAfter ? shiftActivityBeforeGap.getActivityId() : shiftActivityAfterGap.getActivityId(), null);
+                    if(durationOfBefore == durationOfAfter){
+                        activityId = shiftActivityAfterGap.getActivity().getRanking() < shiftActivityBeforeGap.getActivity().getRanking() ? shiftActivityAfterGap.getActivityId() : shiftActivityBeforeGap.getActivityId();
+                    } else {
+                        activityId = durationOfBefore > durationOfAfter ? shiftActivityBeforeGap.getActivityId() : shiftActivityAfterGap.getActivityId();
+                    }
+                    shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
                 }
                 break;
-            case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
             case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-            case HIGHEST_RANKED_ACTIVITY_THAT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
+                if(!staffingLevelActivityWithDurationMap.containsKey(sortedActivityWrapper.get(0).getActivity().getId())) {
+                    shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), sortedActivityWrapper.get(0).getActivity().getId(), null);
+                }
+                break;
+            case HIGHEST_RANKED_ACTIVITY_AMONGST_THAT_ARE_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
                 activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO,gapDuration);
-                if (activityId != null) {
+                if (isNotNull(activityId)) {
                     shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
                 }
                 break;
             case DO_NOT_ALLOW_TO_CAUSE_GAP :
-                if (allActivitiesAreCreatingProblems(staffingLevelActivityWithDurationMap)) {
-                    exceptionService.actionNotPermittedException("all.activities.create.problem");
-                }
+                exceptionService.actionNotPermittedException(DO_NOT_ALLOW_TO_CAUSE_GAP);
                 break;
             default:
         }
