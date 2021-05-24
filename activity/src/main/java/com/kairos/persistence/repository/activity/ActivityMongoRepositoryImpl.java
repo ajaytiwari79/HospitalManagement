@@ -55,6 +55,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public static final String BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID = "activityBalanceSettings.timeTypeId";
     public static final String TIME_TYPE_INFO = "timeTypeInfo";
     public static final String IS_PARENT_ACTIVITY = "isParentActivity";
+    public static final String IS_CHILD_ACTIVITY = "isChildActivity";
     public static final String ORGANIZATION_TYPES = "organizationTypes";
     public static final String ORGANIZATION_SUB_TYPES = "organizationSubTypes";
     public static final String STATE = "state";
@@ -907,15 +908,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long countryId, PriorityFor priorityFor) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and(TIME_TYPE1+".priorityFor").is(priorityFor);
+    public List<Activity> findAllActivityByCountryAndPriorityFor(long countryOrUnitId, boolean countryId, PriorityFor priorityFor) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(countryId?COUNTRY_ID:UNIT_ID).is(countryOrUnitId).and(TIME_TYPE1+".priorityFor").is(priorityFor);
         Aggregation aggregation = Aggregation.newAggregation(
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                 unwind(TIME_TYPE1),
                 match(criteria),
-                project(NAME,TIME_CALCULATION_ACTIVITY_TAB)
+                project(NAME,TIME_CALCULATION_ACTIVITY_TAB,STATE,IS_CHILD_ACTIVITY,EXPERTISES,COUNTRY_ID,GENERAL_ACTIVITY_TAB)
         );
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
         return result.getMappedResults();
     }
 

@@ -1021,8 +1021,8 @@ public class ActivityService {
         return activityMongoRepository.findAllActivitiesByTimeType(refId,timeType);
     }
 
-    public List<ActivityDTO> findAllActivitiesByCountryAndTimeTypePriority(long countryId, PriorityFor priorityFor){
-        return activityMongoRepository.findAllActivityByCountryAndPriorityFor(countryId, priorityFor);
+    public List<Activity> findAllActivitiesByCountryAndTimeTypePriority(long countryOrUnitId, boolean countryId, PriorityFor priorityFor){
+        return activityMongoRepository.findAllActivityByCountryAndPriorityFor(countryOrUnitId, countryId, priorityFor);
     }
 
     public List<Activity> findAllByTimeTypeId(BigInteger timeTypeId) {

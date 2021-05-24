@@ -123,6 +123,6 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findChildActivityIdsByActivityIds(Collection<BigInteger> activityIds);
 
-    List<ActivityDTO> findAllActivityByCountryAndPriorityFor(long countryId, PriorityFor priorityFor);
+    List<Activity> findAllActivityByCountryAndPriorityFor(long countryOrUnitId, boolean countryId, PriorityFor priorityFor);
 
 }

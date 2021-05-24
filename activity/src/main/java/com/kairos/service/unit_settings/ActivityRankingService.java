@@ -127,25 +127,25 @@ public class ActivityRankingService {
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking, ActivityRankingDTO.class);
     }
 
-    public Map<String,List<ActivityDTO>> findAllAbsenceActivities(){
-        List<ActivityDTO> fullDayActivities = new ArrayList<>();
-        List<ActivityDTO> fullWeekActivities = new ArrayList<>();
-        List<ActivityDTO> activityDTOS = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), PriorityFor.ABSENCE);
-        activityDTOS.forEach(activityDTO -> {
-            if(CommonConstants.FULL_WEEK.equals(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
-                fullWeekActivities.add(activityDTO);
+    public Map<String,List<Activity>> findAllAbsenceActivities(){
+        List<Activity> fullDayActivities = new ArrayList<>();
+        List<Activity> fullWeekActivities = new ArrayList<>();
+        List<Activity> activities = activityService.findAllActivitiesByCountryAndTimeTypePriority(UserContext.getUserDetails().getCountryId(), true, PriorityFor.ABSENCE);
+        activities.forEach(activity -> {
+            if(CommonConstants.FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                fullWeekActivities.add(activity);
             } else {
-                fullDayActivities.add(activityDTO);
+                fullDayActivities.add(activity);
             }
         });
-        Map<String,List<ActivityDTO>> resultMap = new HashMap<>();
+        Map<String,List<Activity>> resultMap = new HashMap<>();
         resultMap.put("fullDayActivities", fullDayActivities);
         resultMap.put("fullWeekActivities", fullWeekActivities);
         return resultMap;
     }
 
-    public List<ActivityDTO> findAllPresenceActivities(Long unitId){
-        return activityService.findAllActivityByDeletedFalseAndUnitId(newArrayList(unitId));
+    public List<Activity> findAllPresenceActivities(Long unitId){
+        return activityService.findAllActivitiesByCountryAndTimeTypePriority(unitId, false, PriorityFor.PRESENCE);
     }
 
     @Async
@@ -530,11 +530,23 @@ public class ActivityRankingService {
         List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByUnitIdAndDeletedFalse(unitId);
         activityRankings.forEach(activityRanking -> activityRanking.setDeleted(true));
         activityRankingRepository.saveEntities(activityRankings);
-        List<Activity> activities = activityService.findAllByUnitIdAndDeletedFalse(unitId);
+        List<Activity> activities = activityService.findAllActivitiesByCountryAndTimeTypePriority(unitId, false, PriorityFor.PRESENCE);
         for (Activity activity : activities) {
-            TimeType timeType = timeTypeMongoRepository.findOne(activity.getActivityBalanceSettings().getTimeTypeId());
-            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && PriorityFor.PRESENCE.equals(timeType.getPriorityFor()) && !activity.isChildActivity()) {
+            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && !activity.isChildActivity()) {
                 addOrRemovePresenceActivityRanking(unitId, activity, true);
+            }
+        }
+        return true;
+    }
+
+    public boolean createAbsenceRanking(Long countryId){
+        List<ActivityRanking> activityRankings = activityRankingRepository.getActivityRankingSettingsByCountryIdAndDeletedFalse(countryId);
+        activityRankings.forEach(activityRanking -> activityRanking.setDeleted(true));
+        activityRankingRepository.saveEntities(activityRankings);
+        List<Activity> activities = activityService.findAllActivitiesByCountryAndTimeTypePriority(countryId, true, PriorityFor.ABSENCE);
+        for (Activity activity : activities) {
+            if(ActivityStateEnum.PUBLISHED.equals(activity.getState()) && isCollectionNotEmpty(activity.getExpertises()) && !activity.isChildActivity()) {
+                createOrUpdateAbsenceActivityRanking(activity, activity.getExpertises());
             }
         }
         return true;
