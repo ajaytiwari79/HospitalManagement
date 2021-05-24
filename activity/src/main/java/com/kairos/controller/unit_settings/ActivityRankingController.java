@@ -72,10 +72,17 @@ public class ActivityRankingController {
     }
 
     //use for created activity to add in unit ranking list
-    @ApiOperation(value = "create a presence_ranking ")
+    @ApiOperation(value = "create a presence ranking ")
     @PostMapping(value =  "/unit/{unitId}/create_activity_ranking")
     public ResponseEntity<Map<String, Object>> createPresenceRanking(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.createPresenceRanking(unitId));
+    }
+
+    //use for created activity to add in unit ranking list
+    @ApiOperation(value = "create a absence ranking ")
+    @PostMapping(value =  "/country/{countryId}/create_activity_ranking")
+    public ResponseEntity<Map<String, Object>> createAbsenceRanking(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.createAbsenceRanking(countryId));
     }
 
 }
