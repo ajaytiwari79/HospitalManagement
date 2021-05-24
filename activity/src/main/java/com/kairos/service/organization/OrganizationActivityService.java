@@ -223,29 +223,7 @@ public class OrganizationActivityService {
 
             Set<Long> parentAccessGroupIds = activity.getActivityPhaseSettings().getPhaseTemplateValues().stream().flatMap(a -> a.getActivityShiftStatusSettings().stream().flatMap(b -> b.getAccessGroupIds().stream())).collect(Collectors.toSet());
             Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
-            List<PhaseTemplateValue> phaseTemplateValues1 = activity.getActivityPhaseSettings().getPhaseTemplateValues();
-            List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-            for (int i = 0; i < phaseDTOList.size(); i++) {
-                List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getActivityPhaseSettings().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
-                List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
-                Set<Long> agIds = new HashSet<>();
-                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), phaseTemplateValues1.get(i).getEligibleEmploymentTypes(),
-                        phaseTemplateValues1.get(i).isEligibleForManagement(), phaseTemplateValues1.get(i).isStaffCanDelete(), phaseTemplateValues1.get(i).isManagementCanDelete(),
-                        phaseTemplateValues1.get(i).isStaffCanSell(), phaseTemplateValues1.get(i).isManagementCanSell(), phaseTemplateValues1.get(i).getAllowedSettings());
-                phaseTemplateValue.setSequence(phaseDTOList.get(i).getSequence());
-                for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
-                    List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
-                    accessGroupIds.forEach(a -> {
-                        if (accessGroupIdsMap.get(a) != null) {
-                            agIds.add(accessGroupIdsMap.get(a));
-                        }
-                    });
-                    activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
-                }
-                phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
-                phaseTemplateValues.add(phaseTemplateValue);
-            }
-            activity.getActivityPhaseSettings().setPhaseTemplateValues(phaseTemplateValues);
+            copyPhaseWiseActivityDetails(activity, phaseDTOList, accessGroupIdsMap);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
         } else {
             activityCopied = removeActivityFromUnity(unitId, activityId);
@@ -257,6 +235,32 @@ public class OrganizationActivityService {
             activityRankingService.addOrRemovePresenceActivityRanking(unitId, activityCopied, checked);
         }
         return retrieveBasicDetails(activityCopied);
+    }
+
+    private void copyPhaseWiseActivityDetails(Activity activity, List<PhaseDTO> phaseDTOList, Map<Long, Long> accessGroupIdsMap) {
+        List<PhaseTemplateValue> phaseTemplateValues1 = activity.getActivityPhaseSettings().getPhaseTemplateValues();
+        List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+        for (int i = 0; i < phaseDTOList.size(); i++) {
+            List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getActivityPhaseSettings().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
+            List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
+            Set<Long> agIds = new HashSet<>();
+            PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), phaseTemplateValues1.get(i).getEligibleEmploymentTypes(),
+                    phaseTemplateValues1.get(i).isEligibleForManagement(), phaseTemplateValues1.get(i).isStaffCanDelete(), phaseTemplateValues1.get(i).isManagementCanDelete(),
+                    phaseTemplateValues1.get(i).isStaffCanSell(), phaseTemplateValues1.get(i).isManagementCanSell(), phaseTemplateValues1.get(i).getAllowedSettings());
+            phaseTemplateValue.setSequence(phaseDTOList.get(i).getSequence());
+            for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
+                List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
+                accessGroupIds.forEach(a -> {
+                    if (accessGroupIdsMap.get(a) != null) {
+                        agIds.add(accessGroupIdsMap.get(a));
+                    }
+                });
+                activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
+            }
+            phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
+            phaseTemplateValues.add(phaseTemplateValue);
+        }
+        activity.getActivityPhaseSettings().setPhaseTemplateValues(phaseTemplateValues);
     }
 
 

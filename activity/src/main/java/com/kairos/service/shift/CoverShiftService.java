@@ -135,25 +135,7 @@ public class CoverShiftService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getActivities().get(0).getStartDate(), shiftDataHelper);
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null,shiftDataHelper.getActivityMap(),shift);
             List<Future<ShiftWithViolatedInfoDTO>> shiftWithViolatedInfoDTOS = new ArrayList<>();
-            Iterator<StaffAdditionalInfoDTO> staffAdditionalInfoDTOIterator = staffAdditionalInfoDTOS.iterator();
-            Set<LocalDate> localDates = shiftDataHelper.getPlanningPeriods().stream().flatMap(planningPeriod -> planningPeriod.getLocalDates().stream()).collect(Collectors.toSet());
-            Map<LocalDate, Phase> phaseMapByDate = phaseService.getPhasesByDates(localDates,shiftDataHelper);
-            shiftDataHelper.setPhaseMap(phaseMapByDate);
-            while (staffAdditionalInfoDTOIterator.hasNext()){
-                StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoDTOIterator.next();
-                if(shiftDataHelper.getWtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null || shiftDataHelper.getCtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null){
-                    staffAdditionalInfoDTOIterator.remove();
-                    continue;
-                }
-                Callable<ShiftWithViolatedInfoDTO> data = () -> {
-                    ShiftWithActivityDTO shift1 = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO,ShiftWithActivityDTO.class);
-                    shift1.setStaffId(staffAdditionalInfoDTO.getId());
-                    shift1.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
-                    return shiftValidatorService.validateShiftWithActivity(phase, shift1, staffAdditionalInfoDTO, shiftDataHelper);
-                };
-                Future<ShiftWithViolatedInfoDTO> responseData = executorService.submit(data);
-                shiftWithViolatedInfoDTOS.add(responseData);
-            }
+            validateShifts(shift, staffAdditionalInfoDTOS, shiftDataHelper, phase, shiftWithActivityDTO, shiftWithViolatedInfoDTOS);
             List<ShiftWithViolatedInfoDTO> withViolatedInfoDTOS = new ArrayList<>();
             for (Future<ShiftWithViolatedInfoDTO> data : shiftWithViolatedInfoDTOS) {
                 try {
@@ -169,6 +151,28 @@ public class CoverShiftService {
                 }
             }
 
+        }
+    }
+
+    private void validateShifts(Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, ShiftDataHelper shiftDataHelper, Phase phase, ShiftWithActivityDTO shiftWithActivityDTO, List<Future<ShiftWithViolatedInfoDTO>> shiftWithViolatedInfoDTOS) {
+        Iterator<StaffAdditionalInfoDTO> staffAdditionalInfoDTOIterator = staffAdditionalInfoDTOS.iterator();
+        Set<LocalDate> localDates = shiftDataHelper.getPlanningPeriods().stream().flatMap(planningPeriod -> planningPeriod.getLocalDates().stream()).collect(Collectors.toSet());
+        Map<LocalDate, Phase> phaseMapByDate = phaseService.getPhasesByDates(localDates,shiftDataHelper);
+        shiftDataHelper.setPhaseMap(phaseMapByDate);
+        while (staffAdditionalInfoDTOIterator.hasNext()){
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoDTOIterator.next();
+            if(shiftDataHelper.getWtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null || shiftDataHelper.getCtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null){
+                staffAdditionalInfoDTOIterator.remove();
+                continue;
+            }
+            Callable<ShiftWithViolatedInfoDTO> data = () -> {
+                ShiftWithActivityDTO shift1 = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO,ShiftWithActivityDTO.class);
+                shift1.setStaffId(staffAdditionalInfoDTO.getId());
+                shift1.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
+                return shiftValidatorService.validateShiftWithActivity(phase, shift1, staffAdditionalInfoDTO, shiftDataHelper);
+            };
+            Future<ShiftWithViolatedInfoDTO> responseData = executorService.submit(data);
+            shiftWithViolatedInfoDTOS.add(responseData);
         }
     }
 
@@ -307,6 +311,7 @@ public class CoverShiftService {
         }
         coverShift.getDeclinedStaffIds().add(staffId);
         coverShift.getInterestedStaffs().remove(staffId);
+        coverShift.getRequestedStaffs().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
     }
 
