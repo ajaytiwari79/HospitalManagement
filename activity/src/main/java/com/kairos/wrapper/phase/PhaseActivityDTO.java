@@ -10,6 +10,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@Builder
 public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
