@@ -178,11 +178,13 @@ public class AutoFillGapSettingsService {
             setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap, staffActivityRankMap);
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(shiftActivityBeforeGap,shiftActivityAfterGap, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
-            AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, UserContext.getUserDetails().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
-            if (isNull(gapSettings) && autoFillGapSettingsMongoRepository.isAutoFillGapSettingsByUnitId(shiftDTO.getUnitId())) {
-                exceptionService.dataNotFoundException(GAP_FILLING_CONFIGURATION_INCORRECTLY);
-            } else {
-                exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
+            AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getUserAccessRoleDTO().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
+            if (isNull(gapSettings)) {
+                if(autoFillGapSettingsMongoRepository.isAutoFillGapSettingsByUnitId(shiftDTO.getUnitId())) {
+                    exceptionService.dataNotFoundException(GAP_FILLING_CONFIGURATION_INCORRECTLY);
+                } else {
+                    exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
+                }
             }
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapSettings, staffingLevelActivityWithDurationMap, activityList, shiftDTO);
             for (int index = 0; index < shiftDTO.getActivities().size() - 1; index++) {
