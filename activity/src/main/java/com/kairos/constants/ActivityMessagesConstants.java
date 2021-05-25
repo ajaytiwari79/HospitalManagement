@@ -434,11 +434,13 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
     public static final String MESSAGE_REASONCODE_NAME_ALREADYEXIST = "message.reasonCode.name.alreadyExist";
     public static final String MESSAGE_REASONCODE_ID_NOTFOUND = "message.reasonCode.id.notFound";
-    public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.not.configuration";
     public static final String TIMESLOT_NOT_FOUND_FOR_UNIT = "timeslot.not.found";
 
     public static final String GAP_FILLING_CONFIGURATION_ABSENT = "gap.filling.configuration.absent";
     public static final String SHIFT_STATE_NOT_FOUND_TANDA = "message.shift.state.t&A";
 
     public static final String SYSTEM_NOT_FOUND_ACTIVITY_TO_GAP_FILLING_CONFIGURATION = "system.not.found.activity.to.gap.filling.configuration";
+    public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.not.configuration";
+    public static final String GAP_FILLING_CONFIGURATION_INCORRECTLY = "gap.filling.configuration.incorrectly";
+    public static final String DO_NOT_ALLOW_TO_CAUSE_GAP = "do.not.allow.to.cause.gap";
 }
