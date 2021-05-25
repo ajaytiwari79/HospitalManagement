@@ -545,6 +545,7 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setEmployment(employment);
             staffAdditionalInfoDTO.setStaffChildDetails(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffAdditionalInfoQueryResult.getStaffChildDetails(), StaffChildDetailDTO.class));
         }
+        staffAdditionalInfoDTO.setCanRankTeam(staffGraphRepository.getAllowPersonalRanking(staffAdditionalInfoQueryResult.getId()));
         return staffAdditionalInfoDTO;
     }
 
