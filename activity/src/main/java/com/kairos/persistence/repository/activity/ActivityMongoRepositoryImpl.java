@@ -967,7 +967,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     private CustomAggregationOperation getCustomLookUpForActivityAggregationOperation(String activityString,boolean isActivityType,Long unitId) {
-        String condition = "";//!isActivityType ? $_NE_$_CHILD_ACTIVITY_IDS : "";
+        String condition = !isActivityType ? $_NE_$_CHILD_ACTIVITY_IDS : "";
         return new CustomAggregationOperation("{\n" +
                 "    \"$lookup\": {\n" +
                 "      \"from\": \"activities\",\n" +
