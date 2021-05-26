@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 
 /**
  * Created by vipul on 26/9/17.
@@ -68,14 +69,18 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
     }
 
     public List<PhaseDTO> getActualPhasesByUnit(Long unitId) {
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(ORGANIZATION_ID).is(unitId).and(PHASE_TYPE).is(PhaseType.ACTUAL)));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(PHASE_TYPE).is(PhaseType.ACTUAL)),
+                sort(Sort.by(Sort.Direction.ASC, SEQUENCE))
+                );
         AggregationResults<PhaseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseDTO.class);
         return result.getMappedResults();
     }
 
     public List<PhaseResponseDTO> getAllPlanningPhasesByUnit(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING))
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING)),
+                sort(Sort.Direction.ASC)
         );
         AggregationResults<PhaseResponseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseResponseDTO.class);
         return result.getMappedResults();
@@ -101,18 +106,18 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     public List<Phase> getPlanningPhasesByUnit(Long unitId) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(Sort.by(Sort.Direction.DESC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
         return mongoTemplate.find(query, Phase.class, PHASES);
     }
     public List<Phase> getPlanningPhasesByCountry(Long countryId) {
         Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(Sort.by(Sort.Direction.DESC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
         return mongoTemplate.find(query, Phase.class, PHASES);
     }
 
     public List<PhaseResponseDTO> findPlanningPhasesByCountry(Long countryId) {
         Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(Sort.by(Sort.Direction.DESC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
         query.fields().include("id").include("name");
         return mongoTemplate.find(query, PhaseResponseDTO.class, PHASES);
     }
