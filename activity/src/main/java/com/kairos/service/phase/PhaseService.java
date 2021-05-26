@@ -34,6 +34,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.function.Function;
@@ -86,20 +87,20 @@ public class PhaseService {
      *@Author vipul
      */
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
-        return phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
+        return phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.ASC);
     }
 
 
     @Cacheable(value = "getPhasesByUnit", key = "#unitId", cacheManager = "cacheManager")
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
-        return phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
+        return phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.ASC);
     }
 
     public Map<String, List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
         List<PhaseDTO> phases = getPhasesByUnit(unitId);
         Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
-        phasesData.put("planningPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.PLANNING)).collect(Collectors.toList()));
-        phasesData.put("actualPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(ACTUAL)).collect(Collectors.toList()));
+        phasesData.put("planningPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.PLANNING)).sorted(Comparator.comparing(PhaseDTO::getSequence)).collect(Collectors.toList()));
+        phasesData.put("actualPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(ACTUAL)).sorted(Comparator.comparing(PhaseDTO::getSequence)).collect(Collectors.toList()));
         return phasesData;
     }
 
