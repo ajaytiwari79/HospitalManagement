@@ -120,7 +120,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     List<FilterSelectionQueryResult> getTeamsByUnitIdForFilters(long organizationId);
 
     @Query("MATCH (team:Team{isEnabled:true,deleted:false}) WHERE id(team) IN {0} " +
-            "RETURN COLLECT( team.activityId)")
+            "RETURN team.activityId")
     List<BigInteger> getTeamActivityIdsByTeamIds(List<Long> teamIds);
 
     @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} SET r.customName={2} \n"+

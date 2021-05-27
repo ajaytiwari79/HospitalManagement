@@ -676,6 +676,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         shiftCriteriaBuilderService.updateCriteria(unitId,filterTypes,criteria,requiredDataForFilterDTO);
         Aggregation aggregations = newAggregation(
                 match(criteria),
+                project(STAFF_ID),
                 group(STAFF_ID)
         );
         return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetailsDTO.class).getMappedResults();
