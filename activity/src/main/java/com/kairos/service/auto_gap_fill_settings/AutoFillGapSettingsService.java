@@ -168,8 +168,8 @@ public class AutoFillGapSettingsService {
             ShiftActivityDTO shiftActivityAfterGap = activities[1];
             ShiftActivityDTO removedActivity = activities[2];
             Set<BigInteger> allProductiveActivityIds = staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().map(TeamRankingInfoDTO::getActivityId).collect(Collectors.toSet());
-            allProductiveActivityIds.addAll(newHashSet(shiftActivityBeforeGap.getActivityId(), shiftActivityAfterGap.getActivityId()));
-            allProductiveActivityIds.remove(removedActivity.getActivityId());
+            allProductiveActivityIds.addAll(newHashSet(shiftActivityBeforeGap.getActivity().getId(), shiftActivityAfterGap.getActivity().getId()));
+            allProductiveActivityIds.remove(removedActivity.getActivity().getId());
             staffAdditionalInfoDTO.setStaffTeamRankingInfoData(staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().filter(node->!node.getActivityId().equals(removedActivity.getActivityId())).collect(Collectors.toList()));
             List<ActivityWrapper> activityList = activityMongoRepository.findParentActivitiesAndTimeTypeByActivityId(allProductiveActivityIds);
             activityList = filterParentActivities(activityList);
