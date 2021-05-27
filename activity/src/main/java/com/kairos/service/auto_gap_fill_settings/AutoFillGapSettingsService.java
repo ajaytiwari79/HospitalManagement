@@ -182,12 +182,7 @@ public class AutoFillGapSettingsService {
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getUserAccessRoleDTO().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
             if (isNull(gapSettings)) {
-                List<AutoFillGapSettings> autoFillGapSettings = autoFillGapSettingsMongoRepository.getAutoFillGapSettingsByUnitId(shiftDTO.getUnitId(), phase.getId(), shiftDTO.getShiftDate());
-                if(isCollectionNotEmpty(autoFillGapSettings)) {
-                    exceptionService.actionNotPermittedException(GAP_FILLING_CONFIGURATION_INCORRECTLY);
-                } else {
-                    exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
-                }
+                exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
             }
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapSettings, staffingLevelActivityWithDurationMap, activityList, shiftDTO);
             for (int index = 0; index < shiftDTO.getActivities().size() - 1; index++) {

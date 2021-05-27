@@ -40,7 +40,4 @@ public interface AutoFillGapSettingsMongoRepository extends MongoBaseRepository<
     @Query("{deleted : false, published: true,countryId: ?0,organizationTypeId: ?1,organizationSubTypeId: {$in: ?2}}")
     List<AutoFillGapSettings> getAllDefautAutoFillSettings(Long countryId, Long organizationTypeId, List<Long> organizationSubTypeIds);
 
-    @Query(value = "{deleted : false,unitId:?0,phaseId: ?1, $or:[{startDate:{$lte:?2},endDate:{$exists:false} },{startDate: {$lte: ?2},endDate:{$gte:?2}}]}")
-    List<AutoFillGapSettings> getAutoFillGapSettingsByUnitId(Long unitId, BigInteger phaseId, LocalDate startDate);
-
 }
