@@ -175,14 +175,15 @@ public class AutoFillGapSettingsService {
             activityList = filterParentActivities(activityList);
             updateActivityRank(staffAdditionalInfoDTO.getUnitId(), shiftDTO.getShiftDate(), activityList);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            Map<BigInteger, Integer> staffActivityRankMap = staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().collect(Collectors.toMap(k -> k.getActivityId(), v -> v.getRank()));
+            Map<BigInteger, Integer> staffActivityRankMap = getStaffRankMap(staffAdditionalInfoDTO);
             filterActivities(staffAdditionalInfoDTO.getStaffTeamRankingInfoData(), shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
             setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap, staffActivityRankMap, staffAdditionalInfoDTO.getUserAccessRoleDTO().isStaff() && staffAdditionalInfoDTO.getCanRankTeam());
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(shiftActivityBeforeGap,shiftActivityAfterGap, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getUserAccessRoleDTO().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
             if (isNull(gapSettings)) {
-                if(autoFillGapSettingsMongoRepository.isAutoFillGapSettingsByUnitId(shiftDTO.getUnitId(), phase.getId(), shiftDTO.getShiftDate())) {
+                List<AutoFillGapSettings> autoFillGapSettings = autoFillGapSettingsMongoRepository.getAutoFillGapSettingsByUnitId(shiftDTO.getUnitId(), phase.getId(), shiftDTO.getShiftDate());
+                if(isCollectionNotEmpty(autoFillGapSettings)) {
                     exceptionService.actionNotPermittedException(GAP_FILLING_CONFIGURATION_INCORRECTLY);
                 } else {
                     exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
@@ -199,6 +200,14 @@ public class AutoFillGapSettingsService {
             skipRules = shiftActivityDTO.isSkipRules();
         }
         return skipRules;
+    }
+
+    private Map<BigInteger, Integer> getStaffRankMap(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        Map<BigInteger, Integer> rankMap = new HashMap<>();
+        for (TeamRankingInfoDTO staffTeamRankingInfoDatum : staffAdditionalInfoDTO.getStaffTeamRankingInfoData()) {
+            rankMap.put(staffTeamRankingInfoDatum.getActivityId(), staffTeamRankingInfoDatum.getRank());
+        }
+        return rankMap;
     }
 
     private void updateActivityRank(Long unitId, LocalDate shiftDate, List<ActivityWrapper> activityList) {
