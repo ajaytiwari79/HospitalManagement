@@ -161,7 +161,7 @@ public class AutoFillGapSettingsService {
 
     public Boolean adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Boolean skipRules=null;
-        if (shiftDTO.isFillGap() && gapCreated(shiftDTO, shift)) {
+        if (shiftDTO.isFillGap()) {
             adjustTiming(shiftDTO, shift);
             ShiftActivityDTO[] activities = getActivitiesAroundGap(shiftDTO, shift);
             ShiftActivityDTO shiftActivityBeforeGap = activities[0];
