@@ -161,15 +161,15 @@ public class AutoFillGapSettingsService {
 
     public Boolean adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Boolean skipRules=null;
-        if (gapCreated(shiftDTO, shift)) {
+        if (shiftDTO.isFillGap() && gapCreated(shiftDTO, shift)) {
             adjustTiming(shiftDTO, shift);
             ShiftActivityDTO[] activities = getActivitiesAroundGap(shiftDTO, shift);
             ShiftActivityDTO shiftActivityBeforeGap = activities[0];
             ShiftActivityDTO shiftActivityAfterGap = activities[1];
             ShiftActivityDTO removedActivity = activities[2];
             Set<BigInteger> allProductiveActivityIds = staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().map(TeamRankingInfoDTO::getActivityId).collect(Collectors.toSet());
-            allProductiveActivityIds.addAll(newHashSet(shiftActivityBeforeGap.getActivity().getId(), shiftActivityAfterGap.getActivity().getId()));
-            allProductiveActivityIds.remove(removedActivity.getActivity().getId());
+            allProductiveActivityIds.addAll(newHashSet(shiftActivityBeforeGap.getActivityId(), shiftActivityAfterGap.getActivityId()));
+            allProductiveActivityIds.remove(removedActivity.getActivityId());
             staffAdditionalInfoDTO.setStaffTeamRankingInfoData(staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().filter(node->!node.getActivityId().equals(removedActivity.getActivityId())).collect(Collectors.toList()));
             List<ActivityWrapper> activityList = activityMongoRepository.findParentActivitiesAndTimeTypeByActivityId(allProductiveActivityIds);
             activityList = filterParentActivities(activityList);
@@ -243,6 +243,7 @@ public class AutoFillGapSettingsService {
             for (int i = 1; i < shiftDTO.getActivities().size(); i++) {
                 if (!shiftDTO.getActivities().get(i).getActivityId().equals(shift.getActivities().get(i).getActivityId())) {
                     shiftDTO.getActivities().get(i - 1).setEndDate(shift.getActivities().get(i).getStartDate());
+                    shiftDTO.getActivities().get(i).setStartDate(shift.getActivities().get(i).getEndDate());
                     break;
                 }
             }
