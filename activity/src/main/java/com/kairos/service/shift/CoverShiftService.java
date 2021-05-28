@@ -272,7 +272,7 @@ public class CoverShiftService {
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate, endDate, unitId);
         List<CoverShiftDTO> totalRequests = coverShifts.stream().filter(k -> k.getRequestedStaffs().containsKey(staffId)).collect(Collectors.toList());
         List<CoverShiftDTO> totalInterests = coverShifts.stream().filter(k -> k.getInterestedStaffs().containsKey(staffId)).collect(Collectors.toList());
-        List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().contains(staffId)).collect(Collectors.toList());
+        List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().containsKey(staffId)).collect(Collectors.toList());
         List<CoverShiftDTO> totalEligibleShifts = new ArrayList<>();//getEligibleShifts(shifts,unitId,staffId,employmentId);
         return new CoverShiftStaffDetails(totalRequests, totalInterests,totalEligibleShifts, totalDeclined);
     }

@@ -22,7 +22,7 @@ public class CoverShiftDTO {
     private Long staffId;
     private BigInteger shiftId;
     private LocalDate date;
-    private Set<Long> declinedStaffIds=new HashSet<>();
+    private Map<Long,Date> declinedStaffIds;
 
     private enum ApprovalBy{
         SELF,AUTO_PICK,PLANNER
