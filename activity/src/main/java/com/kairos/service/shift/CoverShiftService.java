@@ -309,7 +309,7 @@ public class CoverShiftService {
         if(isNull(coverShift)){
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
         }
-        coverShift.getDeclinedStaffIds().add(staffId);
+        coverShift.getDeclinedStaffIds().put(staffId,DateUtils.getDate());
         coverShift.getInterestedStaffs().remove(staffId);
         coverShift.getRequestedStaffs().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
