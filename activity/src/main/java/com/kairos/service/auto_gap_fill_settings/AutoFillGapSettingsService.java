@@ -55,8 +55,6 @@ public class AutoFillGapSettingsService {
     @Inject
     private RedisService redisService;
     @Inject
-    private PhaseSettingsRepository phaseSettingsRepository;
-    @Inject
     private ActivityRankingService activityRankingService;
 
     public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
@@ -96,7 +94,7 @@ public class AutoFillGapSettingsService {
     }
 
     private void validateGapSettingAndUpdateParentEndDate(AutoFillGapSettings autoFillGapSettings, boolean forCountry) {
-        AutoFillGapSettings parentSetting = null;
+        AutoFillGapSettings parentSetting;
         if (isNull(autoFillGapSettings.getParentId())) {
             List<AutoFillGapSettings> autoFillGapSettingsList;
             if (forCountry) {

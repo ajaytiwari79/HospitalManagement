@@ -60,8 +60,6 @@ public class PayOutService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
-    @Inject private ShiftMongoRepository shiftMongoRepository;
-    @Inject private ShiftService shiftService;
     @Inject private ProtectedDaysOffService protectedDaysOffService;
 
 
