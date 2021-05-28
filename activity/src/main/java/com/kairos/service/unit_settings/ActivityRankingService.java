@@ -217,6 +217,15 @@ public class ActivityRankingService {
             activityRankingRepository.save(newActivityRanking);
             newActivityRankings.add(newActivityRanking);
         }
+        addActivityInRanking(activityRankings, activity, presenceActivity, newActivityRankings);
+        if(isCollectionNotEmpty(newActivityRankings)){
+            activityRankings.addAll(newActivityRankings);
+        }
+        activityRankingRepository.saveEntities(activityRankings);
+        mergeActivityRanking(activityRankings, presenceActivity);
+    }
+
+    private void addActivityInRanking(List<ActivityRanking> activityRankings, Activity activity, boolean presenceActivity, List<ActivityRanking> newActivityRankings) {
         for (ActivityRanking activityRanking : activityRankings) {
             if(activityRanking.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate()) && (isNull(activityRanking.getEndDate()) || activityRanking.getEndDate().isAfter(activity.getActivityGeneralSettings().getStartDate()))) {
                 newActivityRankings.add(createNewAbsenceRanking(activity, presenceActivity, activityRanking));
@@ -230,11 +239,6 @@ public class ActivityRankingService {
                 }
             }
         }
-        if(isCollectionNotEmpty(newActivityRankings)){
-            activityRankings.addAll(newActivityRankings);
-        }
-        activityRankingRepository.saveEntities(activityRankings);
-        mergeActivityRanking(activityRankings, presenceActivity);
     }
 
     private ActivityRanking createNewAbsenceRanking(Activity activity, boolean presenceActivity, ActivityRanking activityRanking) {

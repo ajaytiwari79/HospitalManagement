@@ -413,7 +413,6 @@ public class ShiftService {
             Long functionId = shiftDTO.getFunctionId();
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getActivities().get(0).getStartDate());
-            //reason code will be sanem for all shifts
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = getStaffAdditionalInfoDTO(unitId, DateUtils.asLocalDate(shiftStartDate), shiftDTO.getStaffId(), shift.getEmploymentId());
             Shift oldShift = getOldShift(shift.getId());
             Map<BigInteger, ActivityWrapper> activityWrapperMap = organizationActivityService.getActivityWrapperMap(isNotNull(oldShift) ? newArrayList(oldShift) : newArrayList(), shiftDTO);
@@ -426,7 +425,6 @@ public class ShiftService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
             shift.setPhaseId(phase.getId());
             WTAQueryResultDTO wtaQueryResultDTO = getWtaQueryResultByEmploymentIdAndDate(staffAdditionalInfoDTO, shiftWithViolatedInfo.getShifts().get(0));
-            // replace id from shift id if request come form detailed view and compact view
             if (isNotNull(shiftDTO.getShiftId())) {
                 shift.setId(shiftDTO.getShiftId());
             }
@@ -434,7 +432,6 @@ public class ShiftService {
             PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), shiftDTO.getShiftDate());
             List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shift.isShiftUpdated(isNotNull(oldShift) ? oldShift : shift), shift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), isNotNull(oldShift) ? oldShift : shift,null);
             shift.setBreakActivities(breakActivities);
-            //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
             ShiftType shiftType = updateShiftType(activityWrapperMap, shift);
             shift.setShiftType(shiftType);
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()), false);
@@ -459,7 +456,6 @@ public class ShiftService {
             } else {
                 shiftWithViolatedInfo = updatedShiftWithViolatedInfo;
             }
-
             if (isNotNull(shiftDTO.getDraftShift())) {
                 shiftDTO.getDraftShift().setId(shift.getId());
             }
