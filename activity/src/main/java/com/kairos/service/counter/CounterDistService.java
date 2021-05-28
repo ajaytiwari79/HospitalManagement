@@ -343,7 +343,7 @@ public class CounterDistService extends MongoBaseService {
             }
         }));
         if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(ERROR_KPI_ALREADY_EXISTS_IN_TAB);
         }
         counterRepository.saveEntities(entriesToSave);
     }
@@ -419,7 +419,7 @@ public class CounterDistService extends MongoBaseService {
             }
         }));
         if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(ERROR_KPI_ALREADY_EXISTS_IN_TAB);
         }
         counterRepository.saveEntities(entriesToSave);
         if (ConfLevel.UNIT.equals(level)) {
