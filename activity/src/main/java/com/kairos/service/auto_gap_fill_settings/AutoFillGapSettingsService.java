@@ -297,7 +297,7 @@ public class AutoFillGapSettingsService {
                 break;
             default:
         }
-        if(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes()) {
+        if(isNotNull(activityId)) {
             shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
         }
         return shiftActivityDTO;
