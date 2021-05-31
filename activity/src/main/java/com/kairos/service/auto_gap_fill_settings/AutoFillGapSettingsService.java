@@ -158,7 +158,7 @@ public class AutoFillGapSettingsService {
 
     public Boolean adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Boolean skipRules=null;
-        if (shiftDTO.isFillGap()) {
+        if (gapCreated(shiftDTO, shift)) {
             adjustTiming(shiftDTO, shift);
             ShiftActivityDTO[] activities = getActivitiesAroundGap(shiftDTO, shift);
             ShiftActivityDTO shiftActivityBeforeGap = activities[0];
@@ -268,60 +268,60 @@ public class AutoFillGapSettingsService {
 
     private ShiftActivityDTO getShiftActivityDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList, ShiftDTO shiftDTO, short gapDuration, AutoFillGapSettingsRule autoFillGapSettingsRule, AutoFillGapSettings autoFillGapSetting) {
         ShiftActivityDTO shiftActivityDTO = null;
-        BigInteger activityId;
-        List<ActivityWrapper> sortedActivityWrapper;
+        BigInteger activityId = null;
         switch (autoFillGapSettingsRule) {
             case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP :
                 if(!NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE.equals(autoFillGapSetting.getAutoGapFillingScenario())) {
                     activityId = shiftActivityAfterGap.getActivity().getRanking() < shiftActivityBeforeGap.getActivity().getRanking() ? shiftActivityAfterGap.getActivityId() : shiftActivityBeforeGap.getActivityId();
-                    shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
                 }
                 break;
             case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
-                shiftActivityDTO = getHighestRankActivity(shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, activityList, autoFillGapSetting);
+                activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
                 break;
             case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
                 if(!NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE.equals(autoFillGapSetting.getAutoGapFillingScenario())) {
-                    shiftActivityDTO = getHighstRankActiviyOfAdjacentToGapSolvingProblems(shiftActivityBeforeGap, shiftActivityAfterGap, staffingLevelActivityWithDurationMap);
+                    activityId = getHighestRankActivityOfAdjacentToGapSolvingProblems(shiftActivityBeforeGap, shiftActivityAfterGap, staffingLevelActivityWithDurationMap);
                 }
                 break;
             case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
-                activityId = isCollectionNotEmpty(sortedActivityWrapper) ? sortedActivityWrapper.get(0).getActivity().getId() : null;
-                if(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes()) {
-                    shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), sortedActivityWrapper.get(0).getActivity().getId(), null);
+                activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
+                if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
+                    activityId = null;
                 }
                 break;
             case HIGHEST_RANKED_ACTIVITY_AMONGST_THAT_ARE_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
                 activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO,gapDuration);
-                if (isNotNull(activityId)) {
-                    shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
-                }
                 break;
             case DO_NOT_ALLOW_TO_CAUSE_GAP :
                 exceptionService.actionNotPermittedException(DO_NOT_ALLOW_TO_CAUSE_GAP);
                 break;
             default:
         }
-        return shiftActivityDTO;
-    }
-
-    private ShiftActivityDTO getHighstRankActiviyOfAdjacentToGapSolvingProblems(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
-        ShiftActivityDTO shiftActivityDTO = null;
-        BigInteger activityId;
-        if (shiftActivityBeforeGap.getActivity().getRanking() < shiftActivityAfterGap.getActivity().getRanking()) {
-            activityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityBeforeGap.getActivityId() : null;
-        } else {
-            activityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityAfterGap.getActivityId() : null;
-        }
-        if (isNotNull(activityId)) {
+        if(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes()) {
             shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
         }
         return shiftActivityDTO;
     }
 
-    private ShiftActivityDTO getHighestRankActivity(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap,StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ActivityWrapper> activityList, AutoFillGapSettings autoFillGapSetting) {
-        ShiftActivityDTO shiftActivityDTO = null;
+    private BigInteger getHighestRankActivityOfAdjacentToGapSolvingProblems(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
+        BigInteger beforeActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityBeforeGap.getActivityId() : null;
+        BigInteger afterActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityAfterGap.getActivityId() : null;
+        BigInteger activityId = null;
+        if(isNotNull(beforeActivityId) && isNotNull(afterActivityId)){
+            if (shiftActivityBeforeGap.getActivity().getRanking() < shiftActivityAfterGap.getActivity().getRanking()) {
+                activityId = beforeActivityId;
+            } else {
+                activityId = afterActivityId;
+            }
+        } else if(isNotNull(beforeActivityId)){
+            activityId = beforeActivityId;
+        } else if(isNotNull(afterActivityId)){
+            activityId = afterActivityId;
+        }
+        return activityId;
+    }
+
+    private BigInteger getHighestRankActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ActivityWrapper> activityList, AutoFillGapSettings autoFillGapSetting) {
         BigInteger activityId;
         List<ActivityWrapper> sortedActivityWrapper;
         boolean canRankTeam = staffAdditionalInfoDTO.getCanRankTeam();
@@ -331,10 +331,12 @@ public class AutoFillGapSettingsService {
         } else {
             sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
             activityId = isCollectionNotEmpty(sortedActivityWrapper) ? sortedActivityWrapper.get(0).getActivity().getId() : null;
-        }if(isNotNull(activityId)) {
-            shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
         }
-        return shiftActivityDTO;
+        return activityId;
+    }
+
+    private boolean gapCreated(ShiftDTO shiftDTO, Shift shift) {
+        return shift.getActivities().size() > shiftDTO.getActivities().size() && shift.getStartDate().equals(shiftDTO.getStartDate()) && shift.getEndDate().equals(shiftDTO.getEndDate()) && shift.getActivities().get(0).getActivityId().equals(shiftDTO.getActivities().get(0).getActivityId()) && shift.getActivities().get(shift.getActivities().size() - 1).getActivityId().equals(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getActivityId());
     }
 
     private ShiftActivityDTO[] getActivitiesAroundGap(ShiftDTO shiftDTO, Shift shift) {
