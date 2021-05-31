@@ -278,7 +278,7 @@ public class CoverShiftService {
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate, endDate, unitId);
         List<CoverShiftDTO> totalRequests = coverShifts.stream().filter(k -> k.getRequestedStaffs().containsKey(staffId)).collect(Collectors.toList());
         List<CoverShiftDTO> totalInterests = coverShifts.stream().filter(k -> k.getInterestedStaffs().containsKey(staffId)).collect(Collectors.toList());
-        List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().contains(staffId)).collect(Collectors.toList());
+        List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().containsKey(staffId)).collect(Collectors.toList());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO=userIntegrationService.verifyUnitEmploymentOfStaff(null,staffId,employmentId);
         DateTimeInterval interval=new DateTimeInterval(coverShifts.get(0).getDate(),coverShifts.get(coverShifts.size()-1).getDate());
         DailyTimeBankEntry dailyTimeBankEntriy = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), startDate);
@@ -321,10 +321,14 @@ public class CoverShiftService {
         if(isNull(coverShift)){
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND,"Cover Shift");
         }
-        coverShift.getDeclinedStaffIds().add(staffId);
+        coverShift.getDeclinedStaffIds().put(staffId,DateUtils.getDate());
         coverShift.getInterestedStaffs().remove(staffId);
         coverShift.getRequestedStaffs().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
+    }
+
+    private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS){
+
     }
 
 }

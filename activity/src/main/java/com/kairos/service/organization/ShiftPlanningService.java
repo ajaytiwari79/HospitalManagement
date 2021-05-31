@@ -112,7 +112,7 @@ public class ShiftPlanningService {
             shiftSearchDTO.setEndDate(asDate(DateUtils.asZonedDateTime(shiftSearchDTO.getEndDate()).plusDays(1)));
         }
         boolean includeDateComparison = !shiftSearchDTO.getShiftFilterDurationType().equals(ShiftFilterDurationType.INDIVIDUAL);
-        List<StaffShiftDetailsDTO> shiftWithActivityDTOS = Collections.EMPTY_LIST;
+        List<StaffShiftDetailsDTO> shiftWithActivityDTOS;
         if (anyShiftFilterExists) {
             shiftWithActivityDTOS = shiftMongoRepository.getStaffListFilteredByShiftCriteria(staffEmploymentMap.keySet(), validFilterMap, unitId, shiftSearchDTO.getStartDate(), shiftSearchDTO.getEndDate(), includeDateComparison,filteredStaffsAndRequiredDataFilterDTO.getRequiredDataForFilterDTO());
             Set<Long> filteredShiftStaff = shiftWithActivityDTOS.stream().map(StaffShiftDetailsDTO::getId).collect(Collectors.toSet());
@@ -122,7 +122,7 @@ public class ShiftPlanningService {
             staffListWithPersonalDetails.add(0,loggedInStaff.get());
         }
         setNightWorkerDetails(staffListWithPersonalDetails);
-        return staffListWithPersonalDetails;//getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId(),shiftSearchDTO,anyShiftFilterExists);
+        return staffListWithPersonalDetails;
     }
 
     private <T> List<StaffShiftDetailsDTO> updateStaffListBasedOnStaffFilter(List<StaffShiftDetailsDTO> staffListWithPersonalDetails,final Long unitId, Map<FilterType, Set<T>> filterTypeSetMap,Map<Long,Set<Long>> staffEmploymentMap) {
