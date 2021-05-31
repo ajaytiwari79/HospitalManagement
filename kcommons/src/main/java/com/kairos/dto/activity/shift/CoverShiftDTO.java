@@ -23,6 +23,8 @@ public class CoverShiftDTO {
     private BigInteger shiftId;
     private LocalDate date;
     private Map<Long,Date> declinedStaffIds;
+    private int deltaTimeBankMinutes;
+    private long totalPayOutMinutes;
 
     private enum ApprovalBy{
         SELF,AUTO_PICK,PLANNER
