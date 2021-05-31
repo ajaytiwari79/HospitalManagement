@@ -290,7 +290,7 @@ public class AutoFillGapSettingsService {
                 }
                 break;
             case HIGHEST_RANKED_ACTIVITY_AMONGST_THAT_ARE_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO,gapDuration);
+                activityId = getHighestRankActivityOfSolvingProblems(staffAdditionalInfoDTO, activityList, autoFillGapSetting, staffingLevelActivityWithDurationMap);
                 break;
             case DO_NOT_ALLOW_TO_CAUSE_GAP :
                 exceptionService.actionNotPermittedException(DO_NOT_ALLOW_TO_CAUSE_GAP);
@@ -304,8 +304,8 @@ public class AutoFillGapSettingsService {
     }
 
     private BigInteger getHighestRankActivityOfAdjacentToGapSolvingProblems(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
-        BigInteger beforeActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityBeforeGap.getActivityId() : null;
-        BigInteger afterActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityAfterGap.getActivityId() : null;
+        BigInteger beforeActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() >= staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityBeforeGap.getActivityId() : null;
+        BigInteger afterActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() >= staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityAfterGap.getActivityId() : null;
         BigInteger activityId = null;
         if(isNotNull(beforeActivityId) && isNotNull(afterActivityId)){
             if (shiftActivityBeforeGap.getActivity().getRanking() < shiftActivityAfterGap.getActivity().getRanking()) {
@@ -323,13 +323,12 @@ public class AutoFillGapSettingsService {
 
     private BigInteger getHighestRankActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ActivityWrapper> activityList, AutoFillGapSettings autoFillGapSetting) {
         BigInteger activityId;
-        List<ActivityWrapper> sortedActivityWrapper;
         boolean canRankTeam = staffAdditionalInfoDTO.getCanRankTeam();
         if(canRankTeam && AccessGroupRole.STAFF.equals(autoFillGapSetting.getGapApplicableFor())){
             List<TeamRankingInfoDTO> sortedStaffTeamRanking = staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().sorted(Comparator.comparing(TeamRankingInfoDTO::getRank)).collect(Collectors.toList());
             activityId = isCollectionNotEmpty(sortedStaffTeamRanking) ? sortedStaffTeamRanking.get(0).getActivityId() : null;
         } else {
-            sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
+            List<ActivityWrapper> sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
             activityId = isCollectionNotEmpty(sortedActivityWrapper) ? sortedActivityWrapper.get(0).getActivity().getId() : null;
         }
         return activityId;
@@ -363,22 +362,31 @@ public class AutoFillGapSettingsService {
         return NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE;
     }
 
-    private BigInteger getHighestRankActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityWrappers, ShiftDTO shiftDTO,short gapDuration) {
-        List<BigInteger> allActivitySolvingMaxDuration = getActivitiesResolvingMostProblem(staffingLevelActivityWithDurationMap,shiftDTO);
+    private BigInteger getHighestRankActivityOfSolvingProblems(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ActivityWrapper> activityList, AutoFillGapSettings autoFillGapSetting, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
+        List<BigInteger> allActivitySolvingMaxDuration = staffingLevelActivityWithDurationMap.values().stream().filter(k->k.getResolvingUnderOrOverStaffingDurationInMinutes()>=k.getOverStaffingDurationInMinutes()).collect(Collectors.toList()).stream().map(StaffingLevelActivityWithDuration::getActivityId).collect(Collectors.toList());
         if (allActivitySolvingMaxDuration.isEmpty()) {
             return null;
         }
-        short solvedDuration = staffingLevelActivityWithDurationMap.getOrDefault(allActivitySolvingMaxDuration.get(0), new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes();
-        Set<BigInteger> solvingEqualProblems = new HashSet<>();
-        solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
-        for (int i = 1; i < allActivitySolvingMaxDuration.size() - 1; i++) {
-            if (solvedDuration == staffingLevelActivityWithDurationMap.getOrDefault(allActivitySolvingMaxDuration.get(i), new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() || solvedDuration > gapDuration) {
-                solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
-                continue;
+        BigInteger activityId = null;
+        boolean canRankTeam = staffAdditionalInfoDTO.getCanRankTeam();
+        if(canRankTeam && AccessGroupRole.STAFF.equals(autoFillGapSetting.getGapApplicableFor())){
+            List<TeamRankingInfoDTO> sortedStaffTeamRanking = staffAdditionalInfoDTO.getStaffTeamRankingInfoData().stream().sorted(Comparator.comparing(TeamRankingInfoDTO::getRank)).collect(Collectors.toList());
+            for (TeamRankingInfoDTO teamRankingInfoDTO : sortedStaffTeamRanking) {
+                if(allActivitySolvingMaxDuration.contains(teamRankingInfoDTO.getActivityId())){
+                    activityId = teamRankingInfoDTO.getActivityId();
+                    break;
+                }
             }
-            break;
+        } else {
+            List<ActivityWrapper> sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
+            for (ActivityWrapper activityWrapper : sortedActivityWrapper) {
+                if(allActivitySolvingMaxDuration.contains(activityWrapper.getActivity().getId())){
+                    activityId = activityWrapper.getActivity().getId();
+                    break;
+                }
+            }
         }
-        return getHighestRankedActivity(solvingEqualProblems, activityWrappers.isEmpty() ? new ArrayList<>() : staffAdditionalInfoDTO.getStaffTeamRankingInfoData(), activityWrappers.isEmpty() ? new ArrayList<>() : activityWrappers);
+        return activityId;
     }
 
     private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(ShiftActivityDTO beforeGap,ShiftActivityDTO afterGap, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
@@ -394,32 +402,6 @@ public class AutoFillGapSettingsService {
             staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap, true);
         }
         return staffingLevelActivityWithDurationMap;
-    }
-
-    private List<BigInteger> getActivitiesResolvingMostProblem(Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, ShiftDTO shiftDTO) {
-        Set<BigInteger> activityIds=shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
-        List<BigInteger> mostProblemResolvingActivities=staffingLevelActivityWithDurationMap.values().stream().filter(k->k.getResolvingUnderOrOverStaffingDurationInMinutes()!=0).sorted(Comparator.comparing(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).reversed()).collect(Collectors.toList()).stream().map(StaffingLevelActivityWithDuration::getActivityId).collect(Collectors.toList());
-        mostProblemResolvingActivities.removeAll(activityIds);
-        return mostProblemResolvingActivities;
-    }
-
-    private BigInteger getHighestRankedActivity(Set<BigInteger> activityIds, List<TeamRankingInfoDTO> teamsData, List<ActivityWrapper> activityList) {
-        if (activityIds.size() == 1) {
-            return activityIds.iterator().next();
-        }
-        List<TeamRankingInfoDTO> sortedData = teamsData.stream().sorted(Comparator.comparing(TeamRankingInfoDTO::getRank)).collect(Collectors.toList());
-        for (TeamRankingInfoDTO teamRankingInfoDTO : sortedData) {
-            if (activityIds.contains(teamRankingInfoDTO.getActivityId())) {
-                return teamRankingInfoDTO.getActivityId();
-            }
-        }
-        List<ActivityWrapper> sortedActivityWrapper = activityList.stream().sorted(Comparator.comparing(ActivityWrapper::getRanking)).collect(Collectors.toList());
-        for (ActivityWrapper activityWrapper : sortedActivityWrapper) {
-            if (activityIds.contains(activityWrapper.getActivity().getId())) {
-                return activityWrapper.getActivity().getId();
-            }
-        }
-        return null;
     }
 
     private void filterActivities(List<TeamRankingInfoDTO> teamDTOS, Set<BigInteger> activityIds, Set<BigInteger> activityIdsDB) {
