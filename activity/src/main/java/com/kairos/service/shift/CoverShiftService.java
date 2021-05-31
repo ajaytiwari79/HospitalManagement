@@ -335,7 +335,7 @@ public class CoverShiftService {
     }
 
     private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<LocalDate, DailyTimeBankEntry> dailyTimeBankEntryMap, List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval planningPeriodInterval, List<Shift> shifts){
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = organizationActivityService.getActivityWrapperMap(shifts,null);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap =isCollectionEmpty(shifts)?new HashMap<>(): organizationActivityService.getActivityWrapperMap(shifts,null);
         for (CoverShiftDTO coverShiftDTO:coverShiftDTOS) {
             DateTimeInterval interval=new DateTimeInterval(coverShiftDTO.getDate(),coverShiftDTO.getDate().plusDays(1));
             List<ShiftWithActivityDTO> shiftWithActivityDTOList=shiftWithActivityDTOS.stream().filter(k->asLocalDate(k.getStartDate()).equals(coverShiftDTO.getDate())).collect(Collectors.toList());
