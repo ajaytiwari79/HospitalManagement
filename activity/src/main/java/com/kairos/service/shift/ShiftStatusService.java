@@ -22,6 +22,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -160,8 +161,12 @@ public class ShiftStatusService {
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
         List<TodoStatus> todoStatuses = newArrayList(TodoStatus.REQUESTED,TodoStatus.PENDING);
         if(todoStatuses.contains(currentShift.getRequestAbsence().getTodoStatus()) && validAccessGroup && accessRoles.contains(staffAccessRole)){
-            ViolatedRulesDTO violatedRulesDTO = getViolatedRulesDTO(todoService.updateTodoStatus(null, getTodoStatus(shiftPublishDTO.getStatus()),shiftPublishDTO.getShifts().get(0).getShiftId(),null));
-            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) ? MESSAGE_SHIFT_STATUS_ADDED : ERROR_SHIFT_CREATION), true, newHashSet(shiftPublishDTO.getStatus()), violatedRulesDTO);
+            Object response = todoService.updateTodoStatus(null, getTodoStatus(shiftPublishDTO.getStatus()),shiftPublishDTO.getShifts().get(0).getShiftId(),null);
+            ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
+            if(response instanceof List) {
+                violatedRulesDTO = getViolatedRulesDTO((List)response);
+            }
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) && isCollectionEmpty(violatedRulesDTO.getActivities()) ? MESSAGE_SHIFT_STATUS_ADDED : ERROR_SHIFT_CREATION), true, newHashSet(shiftPublishDTO.getStatus()), violatedRulesDTO);
             shiftActivityDTO.setId(currentShift.getId());
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }else if(!accessRoles.contains(staffAccessRole) || !validAccessGroup){
@@ -181,6 +186,8 @@ public class ShiftStatusService {
         shiftWithViolatedInfoDTOS.forEach(shiftWithViolatedInfoDTO -> {
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())){
                 violatedRulesDTO.getWorkTimeAgreements().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
+            }
+            if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
                 violatedRulesDTO.getActivities().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
             }
         });
