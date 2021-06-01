@@ -60,26 +60,9 @@ public class PayOutService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
-    @Inject private ShiftMongoRepository shiftMongoRepository;
-    @Inject private ShiftService shiftService;
     @Inject private ProtectedDaysOffService protectedDaysOffService;
 
 
-
-    /**
-     * @param employmentDetails
-     * @param shifts
-     * @param activities
-     */
-    public void savePayOuts(StaffEmploymentDetails employmentDetails, List<Shift> shifts, List<Activity> activities, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<DayTypeDTO> dayTypeDTOS) {
-        if (isNull(activityWrapperMap)) {
-            activityWrapperMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> new ActivityWrapper(v, "")));
-        }
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(employmentDetails,dayTypeDTOS);
-        for (Shift shift : shifts) {
-            updatePayOut(staffAdditionalInfoDTO,shift,activityWrapperMap);
-        }
-    }
 
 
     /**
