@@ -174,7 +174,7 @@ public class AutoFillGapSettingsService {
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             Map<BigInteger, Integer> staffActivityRankMap = getStaffRankMap(staffAdditionalInfoDTO);
             filterActivities(staffAdditionalInfoDTO.getStaffTeamRankingInfoData(), shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
-            setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap, staffActivityRankMap, staffAdditionalInfoDTO.getUserAccessRoleDTO().isStaff() && staffAdditionalInfoDTO.getCanRankTeam());
+            setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap, staffActivityRankMap, staffAdditionalInfoDTO.getUserAccessRoleDTO().isStaff() && staffAdditionalInfoDTO.getCanRankTeam(), allProductiveActivityIds);
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(shiftActivityBeforeGap,shiftActivityAfterGap, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getUserAccessRoleDTO().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
@@ -214,7 +214,7 @@ public class AutoFillGapSettingsService {
         });
     }
 
-    public void setBasicDetails(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, Integer> staffActivityRankMap, boolean isStaff) {
+    public void setBasicDetails(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, Integer> staffActivityRankMap, boolean isStaff, Set<BigInteger> allProductiveActivityIds) {
         shiftActivityBeforeGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getActivity(), ActivityDTO.class));
         shiftActivityBeforeGap.getActivity().setTimeType(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getTimeTypeInfo(), TimeTypeDTO.class));
         shiftActivityAfterGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getActivity(), ActivityDTO.class));
@@ -223,8 +223,8 @@ public class AutoFillGapSettingsService {
             shiftActivityBeforeGap.getActivity().setRanking(staffActivityRankMap.getOrDefault(shiftActivityBeforeGap.getActivityId(), Integer.MAX_VALUE));
             shiftActivityAfterGap.getActivity().setRanking(staffActivityRankMap.getOrDefault(shiftActivityAfterGap.getActivityId(), Integer.MAX_VALUE));
         } else {
-            shiftActivityBeforeGap.getActivity().setRanking(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getRanking());
-            shiftActivityAfterGap.getActivity().setRanking(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getRanking());
+            shiftActivityBeforeGap.getActivity().setRanking(allProductiveActivityIds.contains(shiftActivityBeforeGap.getActivityId()) ? activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getRanking() : Integer.MAX_VALUE);
+            shiftActivityAfterGap.getActivity().setRanking(allProductiveActivityIds.contains(shiftActivityAfterGap.getActivityId()) ? activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getRanking() : Integer.MAX_VALUE);
         }
     }
 
@@ -232,9 +232,10 @@ public class AutoFillGapSettingsService {
     private void adjustTiming(ShiftDTO shiftDTO, Shift shift) {
         boolean sameActivity = shift.getActivities().size() - shiftDTO.getActivities().size() > 1;
         if (sameActivity) {
-            Set<BigInteger> activityIds = shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
+            Set<Date> activityStartDate = shiftDTO.getActivities().stream().map(ShiftActivityDTO::getStartDate).collect(Collectors.toSet());
+            Set<Date> activityEndDate = shiftDTO.getActivities().stream().map(ShiftActivityDTO::getEndDate).collect(Collectors.toSet());
             List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyCollectionPropertiesByMapper(shift.getActivities(), ShiftActivity.class);
-            shiftActivities.removeIf(current -> !activityIds.contains(current.getActivityId()));
+            shiftActivities.removeIf(current -> !activityStartDate.contains(current.getStartDate()) && !activityEndDate.contains(current.getEndDate()));
             shiftDTO.setActivities(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftActivities, ShiftActivityDTO.class));
         } else {
             for (int i = 1; i < shiftDTO.getActivities().size(); i++) {
