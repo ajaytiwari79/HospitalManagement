@@ -275,7 +275,7 @@ public class AutoFillGapSettingsService {
                     break;
                 case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
                     activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
-                    if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
+                    if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() <= staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
                         activityId = null;
                     }
                     showError = false;
@@ -304,8 +304,8 @@ public class AutoFillGapSettingsService {
     }
 
     private BigInteger getHighestRankActivityOfAdjacentToGapSolvingProblems(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
-        BigInteger beforeActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() >= staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityBeforeGap.getActivityId() : null;
-        BigInteger afterActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() >= staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityAfterGap.getActivityId() : null;
+        BigInteger beforeActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityBeforeGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityBeforeGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityBeforeGap.getActivityId() : null;
+        BigInteger afterActivityId = staffingLevelActivityWithDurationMap.containsKey(shiftActivityAfterGap.getActivityId()) && staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > staffingLevelActivityWithDurationMap.get(shiftActivityAfterGap.getActivityId()).getOverStaffingDurationInMinutes() ? shiftActivityAfterGap.getActivityId() : null;
         BigInteger activityId = null;
         if(isNotNull(beforeActivityId) && isNotNull(afterActivityId)){
             if (shiftActivityBeforeGap.getActivity().getRanking() < shiftActivityAfterGap.getActivity().getRanking()) {
@@ -363,7 +363,7 @@ public class AutoFillGapSettingsService {
     }
 
     private BigInteger getHighestRankActivityOfSolvingProblems(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ActivityWrapper> activityList, AutoFillGapSettings autoFillGapSetting, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
-        List<BigInteger> allActivitySolvingMaxDuration = staffingLevelActivityWithDurationMap.values().stream().filter(k->k.getResolvingUnderOrOverStaffingDurationInMinutes() >= k.getOverStaffingDurationInMinutes()).collect(Collectors.toList()).stream().map(StaffingLevelActivityWithDuration::getActivityId).collect(Collectors.toList());
+        List<BigInteger> allActivitySolvingMaxDuration = staffingLevelActivityWithDurationMap.values().stream().filter(k->k.getResolvingUnderOrOverStaffingDurationInMinutes() > k.getOverStaffingDurationInMinutes()).collect(Collectors.toList()).stream().map(StaffingLevelActivityWithDuration::getActivityId).collect(Collectors.toList());
         if (allActivitySolvingMaxDuration.isEmpty()) {
             return null;
         }
