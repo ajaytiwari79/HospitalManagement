@@ -15,18 +15,14 @@ import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -453,19 +449,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "'staffId':{'$first':'$staffId'},'shiftType':{'$first':'$shiftType'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'breakActivities':{'$first':'$breakActivities'},'activities':{'$addToSet':'$activities'}}}";
     }
 
-
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds) {
-        Criteria criteria;
-        if (Optional.ofNullable(endDate).isPresent()) {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
-                    .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
-        } else {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
-                    .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
-        }
-        return getShiftWithActivityByCriteria(criteria.and(ACTIVITIES_ACTIVITY_ID).in(activityIds),false,ShiftWithActivityDTO.class);
-    }
-
     public List<ShiftActivityDTO> findAllShiftActivityiesBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
@@ -688,7 +671,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         if(isCollectionNotEmpty(staffIds)){
             criteria = criteria.and(STAFF_ID).in(staffIds);
         }
-        List<Criteria> criteriaList = getConverShiftCriteria(coverShiftSetting,startDate,endDate);
+        List<Criteria> criteriaList = getCoverShiftCriteria(coverShiftSetting,startDate,endDate);
         Criteria[] criterias = new Criteria[criteriaList.size()];
         for (int i = 0; i < criteriaList.size(); i++) {
             criterias[i] = criteriaList.get(i);
@@ -706,7 +689,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return new HashSet<>();
     }
 
-    private List<Criteria> getConverShiftCriteria(CoverShiftSetting coverShiftSetting,Date startDate,Date endDate) {
+    private List<Criteria> getCoverShiftCriteria(CoverShiftSetting coverShiftSetting, Date startDate, Date endDate) {
         List<Criteria> criterias = new ArrayList<>();
         for (CoverShiftCriteria coverShiftCriterion : coverShiftSetting.getCoverShiftCriteria()) {
             switch (coverShiftCriterion){
@@ -736,6 +719,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 case STAFF_WITH_PERSONAL_CALENDAR:
                     //criteria.orOperator(Criteria.where("activities.secondLevelTimeType").is());
                     break;
+                case STAFF_WITH_OVERLAPPING_SHIFTS:
+                    criterias.add(Criteria.where(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
                 default:break;
             }
         }
