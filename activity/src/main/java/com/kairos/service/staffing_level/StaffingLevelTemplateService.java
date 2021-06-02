@@ -70,6 +70,7 @@ public class StaffingLevelTemplateService {
         StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
         staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
         staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
+        removeLogsFromTemplate(staffingLevelTemplate);
         staffingLevelTemplateRepository.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
         staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()
@@ -77,6 +78,12 @@ public class StaffingLevelTemplateService {
 
         return staffingLevelTemplateDTO;
 
+    }
+
+    private void removeLogsFromTemplate(StaffingLevelTemplate staffingLevelTemplate) {
+        for (StaffingLevelInterval staffingLevelInterval : staffingLevelTemplate.getPresenceStaffingLevelInterval()) {
+            staffingLevelInterval.setStaffingLevelIntervalLogs(new TreeSet<>());
+        }
     }
 
     /**
