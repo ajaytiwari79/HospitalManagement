@@ -26,7 +26,6 @@ import javax.inject.Inject;
 @Service
 public class ShiftCopyService {
 
-    public static final String ERROR = "error";
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
