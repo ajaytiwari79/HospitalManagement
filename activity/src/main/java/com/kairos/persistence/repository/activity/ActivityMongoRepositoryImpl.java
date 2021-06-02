@@ -13,6 +13,7 @@ import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -347,6 +348,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             staffIds = stringListMap.get(STAFF_IDS);
         }
         return new List[]{nonProductiveTypeActivityIds,staffIds};
+    }
+
+    @Override
+    public Set<BigInteger> findAllProductiveTypeActivityIdsByUnitId(Long unitId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO),
+                match(Criteria.where(TIME_TYPE_INFO_PART_OF_TEAM).is(true)),
+                project(AppConstants.ID,NAME)
+        );
+        return mongoTemplate.aggregate(aggregation,Activity.class,Activity.class).getMappedResults().stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
     }
 
     //Ignorecase
