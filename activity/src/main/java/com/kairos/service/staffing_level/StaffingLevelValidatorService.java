@@ -62,7 +62,7 @@ public class StaffingLevelValidatorService {
             Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
             Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate);
-            validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivity, staffingLevelActivityWithDurationMap);
+            validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
         return isStaffingLevelVerify;
@@ -142,10 +142,13 @@ public class StaffingLevelValidatorService {
     }
 
 
-    private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
+    private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
         if (activityWrapper.getActivity().getActivityRulesSettings().isEligibleForStaffingLevel()) {
             if (CollectionUtils.isEmpty(staffingLevels)) {
+                if(gapFilling){
+                    return;
+                }
                 exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
             }
             StaffingLevel staffingLevel = staffingLevels.get(0);
@@ -156,30 +159,33 @@ public class StaffingLevelValidatorService {
                 if (!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                     lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                     upperLimit = 95;
-                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap);
+                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
                     lowerLimit = 0;
                     upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
                     if (staffingLevels.size() < 2) {
+                        if(gapFilling){
+                            return;
+                        }
                         exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
                     }
                     staffingLevel = staffingLevels.get(1);
                     applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
 
-                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap);
+                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
 
                 } else {
                     lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                     upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
-                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap);
+                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
                 }
-            } else {
+            } else if(!gapFilling){
                 validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shift);
             }
         }
 
     }
 
-    private void checkStaffingLevelInterval(int lowerLimit, int upperLimit, List<StaffingLevelInterval> applicableIntervals, StaffingLevel staffingLevel, Shift shift, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
+    private void checkStaffingLevelInterval(int lowerLimit, int upperLimit, List<StaffingLevelInterval> applicableIntervals, StaffingLevel staffingLevel, Shift shift, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling) {
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit && currentIndex < applicableIntervals.size(); currentIndex++) {
             int shiftsCount;
             Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
@@ -193,7 +199,7 @@ public class StaffingLevelValidatorService {
                 int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
                 checkOverStaffing(checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, breakValid, totalCount);
                 checkUnderStaffing(checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, breakValid, totalCount);
-            } else {
+            } else if(!gapFilling){
                 exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
             }
         }
@@ -222,8 +228,7 @@ public class StaffingLevelValidatorService {
         }
     }
 
-    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity
-            shiftActivity, boolean checkOverStaffing, Shift shift) {
+    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean checkOverStaffing, Shift shift) {
         if (CollectionUtils.isEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
         }

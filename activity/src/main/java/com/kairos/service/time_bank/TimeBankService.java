@@ -316,7 +316,8 @@ public class TimeBankService implements KPIService {
         List<Long> employmentIds = advanceViewData.getEmploymentIds();
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
-        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts);
+        boolean includeTimeTypeCalculation = !newHashSet("DAILY-VIEW", "INDIVIDUAL-VIEW").contains(query);
+        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
     }
 
     /**

@@ -436,7 +436,7 @@ public class TimeBankCalculationService {
         Interval interval = getIntervalValidIntervalForTimebank(employmentWithCtaDetailsDTO, new Interval(startDate.getTime(), endDate.getTime()), planningPeriodInterval);
         List<TimeBankIntervalDTO> weeklyTimeBankIntervals = new ArrayList<>();
         if (isNotNull(interval)) {
-            weeklyTimeBankIntervals = getTimeBankIntervals(unitId, startDate, endDate, 0, WEEKLY, intervals, new HashMap<>(), intervalTimeBankMap, null, newArrayList(employmentWithCtaDetailsDTO), payoutTransactionIntervalMap, new HashMap<>());
+            weeklyTimeBankIntervals = getTimeBankIntervals(unitId, startDate, endDate, 0, WEEKLY, intervals, new HashMap<>(), intervalTimeBankMap, null, newArrayList(employmentWithCtaDetailsDTO), payoutTransactionIntervalMap, new HashMap<>(), false);
             weeklyTimeBankIntervals = weeklyTimeBankIntervals.stream().filter(timeBankIntervalDTO -> interval.contains(timeBankIntervalDTO.getStartDate().getTime()) || interval.contains(timeBankIntervalDTO.getEndDate().getTime())).collect(Collectors.toList());
         }
         timeBankDTO.setWeeklyIntervalsTimeBank(weeklyTimeBankIntervals);
@@ -450,7 +450,7 @@ public class TimeBankCalculationService {
         payoutTransactionIntervalMap = getPayoutTrasactionIntervalsMap(intervals, startDate, endDate, employmentId);
         List<TimeBankIntervalDTO> monthlyTimeBankIntervals = new ArrayList<>();
         if (isNotNull(interval)) {
-            monthlyTimeBankIntervals = getTimeBankIntervals(unitId, startDate, endDate, 0, MONTHLY, intervals, new HashMap<>(), intervalTimeBankMap, null, newArrayList(employmentWithCtaDetailsDTO), payoutTransactionIntervalMap, new HashMap<>());
+            monthlyTimeBankIntervals = getTimeBankIntervals(unitId, startDate, endDate, 0, MONTHLY, intervals, new HashMap<>(), intervalTimeBankMap, null, newArrayList(employmentWithCtaDetailsDTO), payoutTransactionIntervalMap, new HashMap<>(), false);
             monthlyTimeBankIntervals = monthlyTimeBankIntervals.stream().filter(timeBankIntervalDTO -> interval.contains(timeBankIntervalDTO.getStartDate().getTime()) || interval.contains(timeBankIntervalDTO.getEndDate().getTime())).collect(Collectors.toList());
         }
         timeBankDTO.setMonthlyIntervalsTimeBank(monthlyTimeBankIntervals);
@@ -552,7 +552,7 @@ public class TimeBankCalculationService {
     }
 
 
-    public List<TimeBankIntervalDTO> getTimeBankIntervals(Long unitId, Date startDate, Date endDate, long totalTimeBankBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap, Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap, List<TimeTypeDTO> timeTypeDTOS, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap, Map<Interval, List<PayOutPerShift>> payOutsintervalMap) {
+    public List<TimeBankIntervalDTO> getTimeBankIntervals(Long unitId, Date startDate, Date endDate, long totalTimeBankBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap, Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap, List<TimeTypeDTO> timeTypeDTOS, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap, Map<Interval, List<PayOutPerShift>> payOutsintervalMap, boolean includeTimeTypeCalculation) {
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = new ArrayList<>(intervals.size());
         List<PeriodDTO> planningPeriods = planningPeriodService.findAllPeriodsByStartDateAndLastDate(unitId, DateUtils.asLocalDate(startDate), DateUtils.asLocalDate(endDate));
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
@@ -582,11 +582,11 @@ public class TimeBankCalculationService {
             timeBankIntervalDTO.setHeaderName(getHeaderName(query, interval));
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = employmentWithCtaDetailsDTOS.stream().flatMap(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getCtaRuleTemplates().stream()).filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(toList());
             if (isCollectionNotEmpty(dailyTimeBankEntries)) {
-                totalTimeBankBefore = getTotalTimeBankDetailsByInterval(totalTimeBankBefore, query, timeTypeDTOS, interval, payOutPerShifts, shifts, dailyTimeBankEntries, timeBankIntervalDTO, timeBankOfInterval, approvePayOut, ctaRuleTemplateDTOS,employmentWithCtaDetailsDTOMap);
+                totalTimeBankBefore = getTotalTimeBankDetailsByInterval(totalTimeBankBefore, query, timeTypeDTOS, interval, payOutPerShifts, shifts, dailyTimeBankEntries, timeBankIntervalDTO, timeBankOfInterval, approvePayOut, ctaRuleTemplateDTOS,employmentWithCtaDetailsDTOMap,includeTimeTypeCalculation);
                 timeBankIntervalDTOS.add(timeBankIntervalDTO);
             } else {
                 totalTimeBankBefore -= timeBankOfInterval;
-                updateTimebankIntervalWithDefaultValue(totalTimeBankBefore, query, timeTypeDTOS, ctaRuleTemplateDTOS, interval, shifts, timeBankIntervalDTO, timeBankOfInterval, approvePayOut);
+                updateTimebankIntervalWithDefaultValue(totalTimeBankBefore, query, timeTypeDTOS, ctaRuleTemplateDTOS, interval, shifts, timeBankIntervalDTO, timeBankOfInterval, approvePayOut,includeTimeTypeCalculation);
                 timeBankIntervalDTOS.add(timeBankIntervalDTO);
             }
         }
@@ -611,22 +611,21 @@ public class TimeBankCalculationService {
         return new Object[]{totalTimebank,totalContractual,totalTimebankCost,totalContractualCost};
     }
 
-    private long getTotalTimeBankDetailsByInterval(long totalTimeBankBefore, String query, List<TimeTypeDTO> timeTypeDTOS, Interval interval, List<PayOutPerShift> payOutPerShifts, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS,Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsDTOMap) {
+    private long getTotalTimeBankDetailsByInterval(long totalTimeBankBefore, String query, List<TimeTypeDTO> timeTypeDTOS, Interval interval, List<PayOutPerShift> payOutPerShifts, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, Map<Long, List<EmploymentLinesDTO>> employmentWithCtaDetailsDTOMap, boolean includeTimeTypeCalculation) {
         Object[] calculatedTimebankValues = getSumOfTimebankValues(dailyTimeBankEntries,employmentWithCtaDetailsDTOMap);
         long plannedMinutesOfTimebank = (long)calculatedTimebankValues[1];
         long scheduledMinutesOfTimebank = (long)calculatedTimebankValues[2];
         BigDecimal plannedTimebankCost = (BigDecimal) calculatedTimebankValues[3];
-        long timeBankOffMinutes = (Long) calculatedTimebankValues[4];
         Object[] calculatedPayoutValues = getSumOfPayoutValues(payOutPerShifts,employmentWithCtaDetailsDTOMap);
         long plannedMinutesOfPayout = (long)calculatedPayoutValues[0];
         long scheduledMinutesOfPayout = (long)calculatedPayoutValues[1];
         long protectedDaysOffMinutes = (long)calculatedTimebankValues[5];
         BigDecimal plannedPayoutCost = (BigDecimal) calculatedPayoutValues[2];
-        totalTimeBankBefore = getTotalTimeBankBeforeAndUpdateTimebankInterval(query,totalTimeBankBefore, timeTypeDTOS, interval, shifts, dailyTimeBankEntries, timeBankIntervalDTO, timeBankOfInterval, approvePayOut, ctaRuleTemplateDTOS, plannedMinutesOfTimebank, scheduledMinutesOfTimebank, plannedTimebankCost, timeBankOffMinutes, plannedMinutesOfPayout, scheduledMinutesOfPayout, protectedDaysOffMinutes, plannedPayoutCost);
+        totalTimeBankBefore = getTotalTimeBankBeforeAndUpdateTimebankInterval(query,totalTimeBankBefore, timeTypeDTOS, interval, shifts, dailyTimeBankEntries, timeBankIntervalDTO, timeBankOfInterval, approvePayOut, ctaRuleTemplateDTOS, plannedMinutesOfTimebank, scheduledMinutesOfTimebank, plannedTimebankCost, plannedMinutesOfPayout, scheduledMinutesOfPayout, protectedDaysOffMinutes, plannedPayoutCost,includeTimeTypeCalculation);
         return totalTimeBankBefore;
     }
 
-    private long getTotalTimeBankBeforeAndUpdateTimebankInterval(String query,long totalTimeBankBefore, List<TimeTypeDTO> timeTypeDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, long plannedMinutesOfTimebank, long scheduledMinutesOfTimebank, BigDecimal plannedTimebankCost, long timeBankOffMinutes, long plannedMinutesOfPayout, long scheduledMinutesOfPayout, long protectedDaysOffMinutes, BigDecimal plannedPayoutCost) {
+    private long getTotalTimeBankBeforeAndUpdateTimebankInterval(String query, long totalTimeBankBefore, List<TimeTypeDTO> timeTypeDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, long plannedMinutesOfTimebank, long scheduledMinutesOfTimebank, BigDecimal plannedTimebankCost, long plannedMinutesOfPayout, long scheduledMinutesOfPayout, long protectedDaysOffMinutes, BigDecimal plannedPayoutCost, boolean includeTimeTypeCalculation) {
         timeBankIntervalDTO.setTitle(getTitle(query, interval,false));
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore);
         totalTimeBankBefore += timeBankOfInterval;
@@ -641,18 +640,18 @@ public class TimeBankCalculationService {
         Map<String, Integer> ctaDistributionMap = timeBankDistributions.stream().collect(Collectors.groupingBy(TimeBankCTADistribution::getCtaName, Collectors.summingInt(TimeBankCTADistribution::getMinutes)));
         Map<String, Double> ctaCostDistributionMap = timeBankDistributions.stream().collect(Collectors.groupingBy(TimeBankCTADistribution::getCtaName, Collectors.summingDouble(TimeBankCTADistribution::getCost)));
         timeBankIntervalDTO.setTimeBankDistribution(getDistributionOfTimeBank(ctaDistributionMap, ctaRuleTemplateDTOS, plannedMinutesOfTimebank,ctaCostDistributionMap));
-        timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) ? timeBankAndPayOutCalculationService.getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
+        timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) && includeTimeTypeCalculation ? timeBankAndPayOutCalculationService.getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
         return totalTimeBankBefore;
     }
 
-    private void updateTimebankIntervalWithDefaultValue(long totalTimeBankBefore, String query, List<TimeTypeDTO> timeTypeDTOS, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut) {
+    private void updateTimebankIntervalWithDefaultValue(long totalTimeBankBefore, String query, List<TimeTypeDTO> timeTypeDTOS, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut, boolean includeTimeTypeCalculation) {
         timeBankIntervalDTO.setTotalTimeBankAfterCtaMin(totalTimeBankBefore - approvePayOut);
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore + timeBankOfInterval);
         timeBankIntervalDTO.setTotalTimeBankMin(timeBankOfInterval + approvePayOut);
         timeBankIntervalDTO.setTotalTimeBankDiff(timeBankOfInterval + approvePayOut);
         timeBankIntervalDTO.setTitle(getTitle(query, interval,false));
         timeBankIntervalDTO.setTimeBankDistribution(getDistributionOfTimeBank(new HashMap<>(), ctaRuleTemplateDTOS, 0,new HashMap<>()));
-        timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) ? timeBankAndPayOutCalculationService.getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
+        timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) && includeTimeTypeCalculation ? timeBankAndPayOutCalculationService.getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
     }
 
     private String getPhaseNameByPeriods(List<PeriodDTO> planningPeriods, DateTime startDate) {

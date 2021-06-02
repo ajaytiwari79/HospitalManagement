@@ -367,7 +367,7 @@ public class CoverShiftService {
             DateTimeInterval interval=new DateTimeInterval(coverShiftDTO.getDate(),coverShiftDTO.getDate().plusDays(1));
             List<ShiftWithActivityDTO> shiftWithActivityDTOList=shiftWithActivityDTOS.stream().filter(k->asLocalDate(k.getStartDate()).equals(coverShiftDTO.getDate())).collect(Collectors.toList());
             DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntryMap.get(coverShiftDTO.getDate()), planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), false);
-            coverShiftDTO.setDeltaTimeBankMinutes(dailyTimeBankEntry.getDeltaTimeBankMinutes());
+            coverShiftDTO.setDeltaTimeBankMinutes(isNotNull(dailyTimeBankEntry) ? dailyTimeBankEntry.getDeltaTimeBankMinutes() : 0);
             ShiftWithActivityDTO shift=shiftWithActivityDTOS.stream().filter(k->k.getId().equals(coverShiftDTO.getShiftId())).findAny().orElse(new ShiftWithActivityDTO());
             shift.setStaffId(staffAdditionalInfoDTO.getId());
             shift.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
