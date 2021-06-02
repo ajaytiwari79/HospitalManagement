@@ -214,7 +214,7 @@ public class AutoFillGapSettingsService {
     }
 
     public void setBasicDetails(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, Integer> staffActivityRankMap, boolean isStaff) {
-        List<ActivityWrapper> activityList = activityMongoRepository.findParentActivitiesAndTimeTypeByActivityId(newArrayList(shiftActivityBeforeGap.getActivityId(),shiftActivityBeforeGap.getActivityId()));
+        List<ActivityWrapper> activityList = activityMongoRepository.findParentActivitiesAndTimeTypeByActivityId(newArrayList(shiftActivityBeforeGap.getActivityId(),shiftActivityAfterGap.getActivityId()));
         Map<BigInteger, ActivityWrapper> adjacentActivityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         shiftActivityBeforeGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(adjacentActivityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getActivity(), ActivityDTO.class));
         shiftActivityBeforeGap.getActivity().setTimeType(ObjectMapperUtils.copyPropertiesByMapper(adjacentActivityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getTimeTypeInfo(), TimeTypeDTO.class));
