@@ -353,7 +353,7 @@ public class ShiftService {
             for (ShiftActivity shiftActivity : shiftActivities[1]) {
                 staffingLevelValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap,false);
             }
-            staffingLevelValidatorService.verifyStaffingLevel(new HashMap<>(), staffingLevelActivityWithDurationMap,  null, null, activityWrapperMap, false, null);
+            staffingLevelValidatorService.verifyStaffingLevel(new HashMap<>(), staffingLevelActivityWithDurationMap,  null, null, activityWrapperMap, false, null,false);
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
@@ -750,7 +750,7 @@ public class ShiftService {
         if (CommonConstants.FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
             violatedRulesDTO = deleteShifts(shiftDTOS, getFullWeekShiftsByDate(shift.getStartDate(), shift.getEmploymentId(), activity), staffAdditionalInfoDTO);
         } else {
-            violatedRulesDTO = shiftValidatorService.validateRule(shift, staffAdditionalInfoDTO);
+            violatedRulesDTO = shiftValidatorService.validateRule(shift, staffAdditionalInfoDTO,false);
             if(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) && isCollectionEmpty(violatedRulesDTO.getActivities())) {
                 shift.setDeleted(true);
                 shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
@@ -766,7 +766,7 @@ public class ShiftService {
     public ViolatedRulesDTO deleteShifts(List<ShiftDTO> shiftDTOS, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         for (Shift shift : shifts) {
-            violatedRulesDTO = shiftValidatorService.validateRule(shift, staffAdditionalInfoDTO);
+            violatedRulesDTO = shiftValidatorService.validateRule(shift, staffAdditionalInfoDTO,false);
             if (isCollectionNotEmpty(violatedRulesDTO.getWorkTimeAgreements())) {
                 break;
             }
