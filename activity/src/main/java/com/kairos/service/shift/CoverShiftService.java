@@ -188,14 +188,14 @@ public class CoverShiftService {
 
     private void removeStaffWhichCreatesProblem(CoverShiftSetting coverShiftSetting, Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Set<BigInteger> activityIds) {
         if (coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_OVERLAPPING_SHIFTS)) {
-            List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffAdditionalInfoDTOS.stream().map(k -> k.getId()).collect(Collectors.toList()), shift.getStartDate(), shift.getEndDate());
+            List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffAdditionalInfoDTOS.stream().map(StaffAdditionalInfoDTO::getId).collect(Collectors.toList()), shift.getStartDate(), shift.getEndDate());
             Map<BigInteger, ActivityWrapper> activityWrapperMap = organizationActivityService.getActivityWrapperMap(shifts, ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
             Map<Long, List<Shift>> staffWiseShiftsMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId));
             ShiftDataHelper shiftDataHelper = getShiftDataHelperForCoverShift(coverShiftSetting, shift, staffAdditionalInfoDTOS, activityIds, UserContext.getUserDetails().getCountryId(), UserContext.getUserDetails().isManagement());
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getActivities().get(0).getStartDate(), shiftDataHelper);
             for (int i = 0; i < staffAdditionalInfoDTOS.size(); i++) {
                 Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForUnderStaffing = new HashMap<>();
-                for (ShiftActivity shiftActivity : staffWiseShiftsMap.get(staffAdditionalInfoDTOS.get(i)).stream().flatMap(k -> k.getActivities().stream()).collect(Collectors.toList())) {
+                for (ShiftActivity shiftActivity : staffWiseShiftsMap.get(staffAdditionalInfoDTOS.get(i).getId()).stream().flatMap(k -> k.getActivities().stream()).collect(Collectors.toList())) {
                     staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity, staffingLevelActivityWithDurationMapForUnderStaffing, true);
                 }
                 Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForOverStaffing = new HashMap<>();
@@ -344,15 +344,15 @@ public class CoverShiftService {
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null, staffAdditionalInfoDTO.getEmployment().getId(), asDate(startDate), asDate(endDate), null);
         updateTimeBankInCoverShifts(coverShifts, staffAdditionalInfoDTO, dailyTimeBankEntryMap, shiftWithActivityDTOS, planningPeriodInterval, shifts);
-        List<CoverShiftDTO> totalEligibleShifts = new ArrayList<>();//getEligibleShifts(shifts,unitId,staffId,employmentId);
+        List<CoverShiftDTO> totalEligibleShifts = getEligibleShifts(shifts,unitId,staffId,employmentId,coverShifts);
         return new CoverShiftStaffDetails(totalRequests, totalInterests, totalEligibleShifts, totalDeclined);
     }
 
-    public Set<BigInteger> getEligibleShifts(List<Shift> shifts, Long unitId, Long staffId, Long employmentId) {
-        List<DateTimeInterval> dateTimeIntervals = shifts.stream().filter(k -> k.getStaffId().equals(staffId)).map(Shift::getInterval).collect(Collectors.toList());
-        shifts = shifts.stream().filter(k -> !dateTimeIntervals.contains(k.getInterval())).collect(Collectors.toList());
+    public List<CoverShiftDTO> getEligibleShifts(List<Shift> shifts, Long unitId, Long staffId, Long employmentId,List<CoverShiftDTO> coverShiftDTOS) {
+        Map<BigInteger,CoverShiftDTO> coverShiftMap=coverShiftDTOS.stream().collect(Collectors.toMap(CoverShiftDTO::getShiftId,Function.identity()));
+        shifts = shifts.stream().filter(k->coverShiftDTOS.stream().map(CoverShiftDTO::getId).collect(Collectors.toList()).contains(k.getId())).collect(Collectors.toList());
         CoverShiftSetting coverShiftSetting = getCoverShiftSettingByUnit(unitId);
-        Set<BigInteger> shiftList = new HashSet<>();
+        List<CoverShiftDTO> shiftList = new ArrayList<>();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, staffId, employmentId);
         staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         staffAdditionalInfoDTO.setTimeSlotSets(timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
@@ -371,7 +371,7 @@ public class CoverShiftService {
             shift1.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(datePhaseMap.get(shift.getStartDate()), shift1, staffAdditionalInfoDTO, shiftDataHelper);
             if (isCollectionEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) && isCollectionEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())) {
-                shiftList.add(shift.getId());
+                shiftList.add(coverShiftMap.get(shift1.getId()));
             }
         }
         return shiftList;
