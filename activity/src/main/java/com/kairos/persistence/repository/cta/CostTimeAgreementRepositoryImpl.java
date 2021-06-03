@@ -188,45 +188,6 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
 
     @Override
-    public List<CTAResponseDTO> getVersionsCTA(List<Long> upIds) {
-        String query = getVersionCTAQuery();
-        Document document = Document.parse(query);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(EMPLOYMENT_ID).in(upIds).and(DELETED).is(false).and(CommonConstants.DISABLED).is(true)),
-                new CustomAggregationOperation(document)
-        );
-        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults();
-    }
-
-    private String getVersionCTAQuery() {
-        return "{\n" +
-                "      $graphLookup: {\n" +
-                "         from: \"costTimeAgreement\",\n" +
-                "         startWith: \"$parentId\",\n" +
-                "         connectFromField: \"parentId\",\n" +
-                "         connectToField: \"_id\",\n" +
-                "         maxDepth: 10000,\n" +
-                "         depthField: \"numConnections\",\n" +
-                "         as: \"versions\"\n" +
-                "      }\n" +
-                "   },{\n" +
-                "       $unwind:\"$versions\"\n" +
-                "       },\n" +
-                "       { $project:{\"versions\":1,\"_id\":0}},\n" +
-                "       {\n" +
-                "     $replaceRoot: { newRoot: \"$versions\" }\n" +
-                "   },{\n" +
-                "       $lookup:{\n" +
-                "           from:\"cTARuleTemplate\",\n" +
-                "           localField:\"ruleTemplateIds\",\n" +
-                "           foreignField:\"_id\",\n" +
-                "           as:\"ruleTemplates\"\n" +
-                "           }\n" +
-                "       }";
-    }
-
-    @Override
     public List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(endDate).and(END_DATE).gte(startDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
@@ -297,16 +258,6 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Query query = new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId)).with(Sort.by(Sort.Direction.DESC,START_DATE)).limit(1);
         mongoTemplate.findAndModify(query,update,CostTimeAgreement.class);
     }
-
-    //find Overlap wta of employmentId
-
-    @Override
-    public boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate) {
-        Criteria endDateCriteria = Criteria.where(END_DATE).exists(false).and(START_DATE).lte(startDate);
-        Criteria criteria = Criteria.where(DELETED).is(false).and("id").ne(ctaId).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(startDate).and(END_DATE).gte(startDate),endDateCriteria);
-        return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
-    }
-
 
 
     @Override

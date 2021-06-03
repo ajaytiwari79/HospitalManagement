@@ -68,26 +68,30 @@ public class StaffingLevelValidatorService {
         return isStaffingLevelVerify;
     }
 
-    public void verifyStaffingLevel(Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForUnderStaffing, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, Short allowedMaxOverStaffing, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Boolean gapFilling, ShiftActivityDTO replacedActivity) {
+    public boolean verifyStaffingLevel(Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForUnderStaffing, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, Short allowedMaxOverStaffing, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Boolean gapFilling, ShiftActivityDTO replacedActivity,boolean coverShiftEligibility) {
         int totalUnderStaffingCreated = staffingLevelActivityWithDurationMapForUnderStaffing.values().stream().mapToInt(StaffingLevelActivityWithDuration::getUnderStaffingDurationInMinutes).sum();
         int totalOverStaffingLevelResolve = staffingLevelActivityWithDurationMapForUnderStaffing.values().stream().mapToInt(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).sum();
         int totalUnderStaffingResolved = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).sum();
         int totalOverStaffingCreated = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getOverStaffingDurationInMinutes).sum();
         if (staffingLevelActivityWithDurationMapForUnderStaffing.isEmpty()) {
             if (totalUnderStaffingResolved < totalOverStaffingCreated) {
+                if(coverShiftEligibility) return false;
                 exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING_ADD);
             }
         } else if (staffingLevelActivityWithDurationMap.isEmpty()) {
             if (totalOverStaffingLevelResolve < totalUnderStaffingCreated) {
+                if(coverShiftEligibility) return false;
                 exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING_DELETE);
             }
         } else {
             if (totalUnderStaffingCreated > totalUnderStaffingResolved || (allowedMaxOverStaffing != null && allowedMaxOverStaffing < totalOverStaffingCreated)) {
+                if(coverShiftEligibility) return false;
                 suggestError(totalUnderStaffingCreated, totalUnderStaffingResolved, replacedActivity == null ?MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY   : gapFilling ? MESSAGE_SHIFT_OVERSTAFFING_GAP :MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY);
             } else if (totalUnderStaffingCreated == totalUnderStaffingResolved) {
-                isHigherActivity(oldShift, activityWrapperMap, replacedActivity);
+                return isHigherActivity(oldShift, activityWrapperMap, replacedActivity,coverShiftEligibility);
             }
         }
+        return true;
     }
 
     public void suggestError(int totalUnderStaffingCreated, int totalUnderStaffingResolved, String messageShiftStaffingLevelReplaceWithoutActivity) {
@@ -120,15 +124,17 @@ public class StaffingLevelValidatorService {
         return shiftActivityToCheck;
     }
 
-    private void isHigherActivity(Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftActivityDTO replacedActivity) {
+    private boolean isHigherActivity(Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftActivityDTO replacedActivity, boolean coverShiftEligibity) {
         ShiftActivity[] shiftActivities = replacedActivity == null ? null : activityReplaced(oldShift, replacedActivity, activityWrapperMap);
         if (shiftActivities != null) {
             int rankOfOld = activityWrapperMap.get(shiftActivities[0].getActivityId()).getRanking();
             int rankOfNew = activityWrapperMap.get(shiftActivities[1].getActivityId()).getRanking();
             if (rankOfNew > rankOfOld) {
+                if(coverShiftEligibity) return false;
                 exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE);
             }
         }
+        return true;
     }
 
     public boolean isVerificationRequired(boolean checkOverStaffing, PhaseSettings phaseSettings) {

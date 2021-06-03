@@ -34,10 +34,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate);
 
-    List<WTAQueryResultDTO> getAllWtaOfEmploymentIdAndDate(Long employmentId,LocalDate selectedDate);
-
-    List<WTAQueryResultDTO> getAllWtaByIds(List<BigInteger> ids);
-
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
     WorkingTimeAgreement checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
@@ -52,27 +48,17 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> employmentIds, Date date);
 
-    List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate);
-
-    List<WTAQueryResultDTO> getProtectedWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate,WTATemplateType templateType);
-
     List<WorkingTimeAgreement> getWTAByEmployment(Long employmentId);
 
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
     void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate);
 
-    boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate);
-
     List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate);
 
     List<WTAQueryResultDTO> getWTAByEmploymentIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType);
 
     List<WTAQueryResultDTO> getAllWTAByEmploymentIds(Collection<Long> employmentIds);
-
-    List<WTAQueryResultDTO> getAllWTAByEmploymentIdsAndShowRuleToView(Collection<Long> employmentIds,boolean showRuleToView);
-
-    List<WTAQueryResultDTO> getAllWTAByDate(Date date);
 
     boolean isEmploymentWTAExistsOnDate(Long employmentId, LocalDate localDate, BigInteger wtaId);
     boolean isGapExistsInEmploymentWTA(Long employmentId, LocalDate localDate, BigInteger wtaId);

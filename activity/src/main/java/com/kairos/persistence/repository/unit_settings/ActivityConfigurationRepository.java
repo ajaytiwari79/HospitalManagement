@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface ActivityConfigurationRepository extends MongoBaseRepository<ActivityConfiguration, BigInteger> ,CustomActivityConfigurationRepository{
+public interface ActivityConfigurationRepository extends MongoBaseRepository<ActivityConfiguration, BigInteger> {
 
    boolean existsByUnitIdAndDeletedFalse(Long unitId);
 
