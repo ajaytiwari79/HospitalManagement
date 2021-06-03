@@ -165,6 +165,8 @@ public class ShiftStatusService {
             ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
             if(response instanceof List) {
                 violatedRulesDTO = getViolatedRulesDTO((List)response);
+            } else if (response instanceof Todo){
+                currentShift.getRequestAbsence().setTodoStatus(((Todo)response).getStatus());
             }
             ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) && isCollectionEmpty(violatedRulesDTO.getActivities()) ? MESSAGE_SHIFT_STATUS_ADDED : ERROR_SHIFT_CREATION), true, newHashSet(shiftPublishDTO.getStatus()), violatedRulesDTO);
             shiftActivityDTO.setId(currentShift.getId());
