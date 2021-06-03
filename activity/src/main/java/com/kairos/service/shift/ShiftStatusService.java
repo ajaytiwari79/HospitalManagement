@@ -171,6 +171,9 @@ public class ShiftStatusService {
             ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) && isCollectionEmpty(violatedRulesDTO.getActivities()) ? MESSAGE_SHIFT_STATUS_ADDED : ERROR_SHIFT_CREATION), true, newHashSet(shiftPublishDTO.getStatus()), violatedRulesDTO);
             shiftActivityDTO.setId(currentShift.getId());
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
+            if(ShiftStatus.APPROVE.equals(shiftPublishDTO.getStatus()) && isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) && isCollectionEmpty(violatedRulesDTO.getActivities())){
+                currentShift = shiftMongoRepository.findOne(currentShift.getId());
+            }
         }else if(!accessRoles.contains(staffAccessRole) || !validAccessGroup){
             ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getStartDate(), currentShift.getEndDate(), currentShift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED)+" to " +shiftPublishDTO.getStatus()+" Request Absence" , false);
             shiftActivityDTO.setId(currentShift.getId());
