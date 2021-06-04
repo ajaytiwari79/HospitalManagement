@@ -1,6 +1,5 @@
 package com.kairos.controller.auth;
 
-import com.kairos.config.security.CustomDefaultTokenServices;
 import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;

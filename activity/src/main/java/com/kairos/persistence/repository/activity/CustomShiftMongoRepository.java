@@ -9,12 +9,8 @@ import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.wrapper.ShiftResponseDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 
 import java.math.BigInteger;

@@ -1,7 +1,7 @@
 package com.kairos.controller.shift;
 
-import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
 import com.kairos.dto.activity.shift.CoverShiftDTO;
+import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
 import com.kairos.service.shift.ShiftService;

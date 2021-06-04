@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.text.ParseException;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;

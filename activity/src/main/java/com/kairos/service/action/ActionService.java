@@ -10,7 +10,6 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.action.Action;
 import com.kairos.persistence.model.action.ActionInfo;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.action.ActionInfoRepository;

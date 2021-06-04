@@ -1,7 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;

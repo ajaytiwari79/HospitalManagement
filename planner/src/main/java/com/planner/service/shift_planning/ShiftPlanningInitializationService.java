@@ -9,7 +9,6 @@ import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.planner.component.rest_client.IntegrationService;
-import com.planner.service.tomtomService.TomTomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

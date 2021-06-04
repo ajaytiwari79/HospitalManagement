@@ -3,18 +3,14 @@ package com.kairos.persistence.repository.user.staff;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.staff.StaffTeamRanking;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UNIT;
 
 
 @Repository

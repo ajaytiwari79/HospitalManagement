@@ -1,8 +1,6 @@
 package com.kairos.scheduler.kafka.producer;
 
-
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.scheduler.custom_exception.InvalidJobSubTypeException;
 import com.kairos.scheduler.service.ActivityIntegrationService;
 import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;

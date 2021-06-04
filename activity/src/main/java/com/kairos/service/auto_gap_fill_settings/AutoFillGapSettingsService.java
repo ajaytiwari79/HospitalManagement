@@ -1,6 +1,5 @@
 package com.kairos.service.auto_gap_fill_settings;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.auto_gap_fill_settings.AutoFillGapSettingsDTO;

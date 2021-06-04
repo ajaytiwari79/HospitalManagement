@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.enums.kpermissions.PermissionAction.DELETE;
 
 

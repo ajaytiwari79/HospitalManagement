@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.BlockSettingDTO;
 import com.kairos.persistence.model.shift.BlockSetting;

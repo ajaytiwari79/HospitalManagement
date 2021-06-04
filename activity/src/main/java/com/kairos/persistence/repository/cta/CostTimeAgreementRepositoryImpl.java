@@ -7,8 +7,6 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;

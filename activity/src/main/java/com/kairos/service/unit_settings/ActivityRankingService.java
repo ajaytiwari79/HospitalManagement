@@ -10,7 +10,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;

@@ -39,7 +39,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static org.optaplanner.core.config.solver.SolverConfig.createFromXmlFile;
 
