@@ -1,6 +1,5 @@
 package com.kairos.service.expertise;
 
-import com.google.common.base.Functions;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;

@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;

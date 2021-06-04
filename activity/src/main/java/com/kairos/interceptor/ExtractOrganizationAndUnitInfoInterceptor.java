@@ -1,6 +1,5 @@
 package com.kairos.interceptor;
 
-import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.rest_client.UserIntegrationService;
 import org.slf4j.Logger;

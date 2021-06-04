@@ -28,7 +28,6 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
 import com.kairos.service.dashboard.SickService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;

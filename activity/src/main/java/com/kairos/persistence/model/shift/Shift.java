@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.CoverShiftDTO;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
 import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;

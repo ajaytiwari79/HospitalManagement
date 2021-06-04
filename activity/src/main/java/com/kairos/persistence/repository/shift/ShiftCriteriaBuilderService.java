@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.shift;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.RealTimeStatus;
 import com.kairos.rest_client.UserIntegrationService;

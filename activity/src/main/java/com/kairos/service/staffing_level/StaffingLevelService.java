@@ -1,6 +1,5 @@
 package com.kairos.service.staffing_level;
 
-
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
@@ -77,7 +76,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.PLANNING_PERIOD;
+import static com.kairos.constants.AppConstants.WEEK;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.utils.service_util.StaffingLevelUtil.initializeUserWiseLogs;
 

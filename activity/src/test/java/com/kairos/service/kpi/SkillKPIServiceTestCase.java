@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.SkillKPIService;
 import org.joda.time.DateTimeZone;

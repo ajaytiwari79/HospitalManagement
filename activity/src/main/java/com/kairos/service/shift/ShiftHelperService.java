@@ -1,13 +1,10 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -17,11 +14,9 @@ import com.kairos.persistence.model.wta.templates.template_types.DurationBetween
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.phase.PhaseService;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +25,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValueByPhase;
 

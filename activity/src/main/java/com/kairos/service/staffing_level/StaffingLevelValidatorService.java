@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.LOW_ACTIVITY_RANK;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
 @Service

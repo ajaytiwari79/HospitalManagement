@@ -22,16 +22,13 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
-import static com.kairos.service.staff_settings.StaffActivitySettingService.ERROR;
 
 @Service
 public class TimeBankAndPayOutCalculationService {

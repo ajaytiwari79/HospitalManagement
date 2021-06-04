@@ -13,8 +13,6 @@ import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

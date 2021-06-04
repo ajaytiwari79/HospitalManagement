@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.common.UserInfo;
-import com.kairos.dto.user.auth.UserDetailsDTO;
 import lombok.Getter;
 import lombok.Setter;
 

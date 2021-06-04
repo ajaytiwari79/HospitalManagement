@@ -23,7 +23,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.time_bank.AsyncTimeBankCalculationService;
-import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;

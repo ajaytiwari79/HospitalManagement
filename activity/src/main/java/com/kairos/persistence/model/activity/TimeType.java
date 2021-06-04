@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.enums.PriorityFor.NONE;
-import static com.kairos.enums.PriorityFor.PRESENCE;
 
 @Document(collection = "time_Type")
 @Getter

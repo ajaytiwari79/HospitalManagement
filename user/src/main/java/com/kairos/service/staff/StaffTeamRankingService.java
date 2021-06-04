@@ -26,7 +26,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.team.TeamType.MAIN;

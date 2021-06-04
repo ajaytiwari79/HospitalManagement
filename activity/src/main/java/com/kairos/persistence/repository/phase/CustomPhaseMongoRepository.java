@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.phase;
 
-
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.phase.Phase;
 import org.springframework.data.domain.Sort;

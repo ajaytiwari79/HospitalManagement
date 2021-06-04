@@ -82,7 +82,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.ActivityStateEnum.PUBLISHED;
 import static com.kairos.enums.TimeTypeEnum.ABSENCE;
-import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 import static com.kairos.service.activity.ActivityUtil.buildActivity;
 import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;

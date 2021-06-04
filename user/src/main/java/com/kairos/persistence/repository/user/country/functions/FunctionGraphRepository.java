@@ -7,7 +7,6 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentQuery
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;

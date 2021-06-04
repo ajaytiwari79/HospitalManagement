@@ -7,7 +7,6 @@ import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
@@ -21,7 +20,6 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.RelationTypeGraphRepository;
@@ -33,7 +31,6 @@ import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -49,7 +46,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
