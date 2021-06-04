@@ -62,8 +62,6 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllShiftByIntervalAndEmploymentId(Long employmentId, Date startDate, Date endDate);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds);
-
     List<ShiftWithActivityDTO> findOverlappedShiftsByEmploymentId(BigInteger shiftId, Long staffId, Date startDate, Date endDate);
 
     List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,List<Long> staffIds ,List<ShiftStatus> shiftStatus);

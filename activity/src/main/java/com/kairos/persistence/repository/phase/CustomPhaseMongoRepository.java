@@ -21,10 +21,7 @@ public interface CustomPhaseMongoRepository {
      List<PhaseDTO> getApplicablePlanningPhasesByUnit(Long unitId, Sort.Direction direction);
      List<PhaseDTO> getApplicablePlanningPhasesByUnitIds(List<Long> unitIds, Sort.Direction direction);
      List<PhaseDTO> getActualPhasesByUnit(Long unitId);
-     List<PhaseResponseDTO> getAllPlanningPhasesByUnit(Long unitId);
      Boolean checkPhaseByPhaseIdAndPhaseEnum(BigInteger phaseId, PhaseDefaultName phaseEnum);
      List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence);
      List<Phase> getPlanningPhasesByUnit(Long unitId);
-     List<Phase> getPlanningPhasesByCountry(Long countryId);
-     List<PhaseResponseDTO> findPlanningPhasesByCountry(Long countryId);
 }
