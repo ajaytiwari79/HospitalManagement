@@ -507,7 +507,7 @@ public class StaffRetrievalService {
         }
         User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
         staffAdditionalInfoQueryResult.setUnitWiseAccessRole(user.getUnitWiseAccessRole());
-        staffAdditionalInfoQueryResult.setStaffTeamRankingInfoData(staffTeamRankingService.getStaffTeamRankingInfo(staffId, startDate).stream().collect(Collectors.toList()));
+        staffAdditionalInfoQueryResult.setStaffTeamRankingInfoData(staffTeamRankingService.getStaffTeamRankingInfo(organizationId, staffId, startDate).stream().collect(Collectors.toList()));
         return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, reasonCodeIds,startDate);
     }
 

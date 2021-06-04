@@ -146,9 +146,9 @@
         @ApiOperation(value = "Remove Staff from Team")
         @PutMapping(value = "/team/{teamId}/remove_staffs")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> removeStaffFromTeam(@PathVariable Long teamId,@RequestBody List<Long> staffIds ) {
+        public ResponseEntity<Map<String, Object>> removeStaffFromTeam(@PathVariable Long unitId, @PathVariable Long teamId,@RequestBody List<Long> staffIds ) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.removeStaffsFromTeam(teamId,staffIds));
+                    teamService.removeStaffsFromTeam(unitId, teamId,staffIds));
         }
 
         @ApiOperation(value = "get staff of unit")

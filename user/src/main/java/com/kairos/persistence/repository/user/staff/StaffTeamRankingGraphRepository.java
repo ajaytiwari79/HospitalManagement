@@ -3,13 +3,10 @@ package com.kairos.persistence.repository.user.staff;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.staff.StaffTeamRanking;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -20,9 +17,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UN
 @Repository
 public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<StaffTeamRanking,Long> {
 
-    List<StaffTeamRanking> findByStaffIdAndDeletedFalse(Long staffId);
+    List<StaffTeamRanking> findByUnitIdAndStaffIdAndDeletedFalse(Long unitId, Long staffId);
 
-    List<StaffTeamRanking> findByStaffIdAndPublishedTrueAndDeletedFalse(Long staffId);
+    List<StaffTeamRanking> findByUnitIdAndStaffIdAndStaffIdAndPublishedTrueAndDeletedFalse(Long unitId, Long staffId);
 
     StaffTeamRanking findByDraftIdAndDeletedFalse(Long draftId);
 
@@ -33,13 +30,13 @@ public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<Sta
             "SET teamRankingInfo.activityId={1}")
     void updateActivityIdInTeamRanking(Long teamId, String activityId);
 
-    @Query("MATCH (staffTeamRanking:StaffTeamRanking{deleted:false})-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.staffId = {0} AND teamRankingInfo.teamId={1} " +
-            "SET teamRankingInfo.teamType={2}")
-    void updateTeamType(Long staffId, Long teamId, TeamType newTeamType);
+    @Query("MATCH (staffTeamRanking:StaffTeamRanking{deleted:false})-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE  staffTeamRanking.unitId={0} AND staffTeamRanking.staffId = {1} AND teamRankingInfo.teamId={2} " +
+            "SET teamRankingInfo.teamType={3}")
+    void updateTeamType(Long unitId, Long staffId, Long teamId, TeamType newTeamType);
 
-    @Query("MATCH (staffTeamRanking:StaffTeamRanking{deleted:false})-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.staffId = {0} AND date(staffTeamRanking.startDate)<=DATE({1}) AND (staffTeamRanking.endDate IS NULL OR date(staffTeamRanking.endDate)>=DATE({1})) " +
+    @Query("MATCH (staffTeamRanking:StaffTeamRanking{deleted:false})-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.unitId = {0} AND staffTeamRanking.staffId = {1} AND date(staffTeamRanking.startDate)<=DATE({2}) AND (staffTeamRanking.endDate IS NULL OR date(staffTeamRanking.endDate)>=DATE({2})) " +
             "RETURN staffTeamRanking,rel,teamRankingInfo")
-    StaffTeamRanking getApplicableStaffTeamRanking(Long staffId, String date);
+    StaffTeamRanking getApplicableStaffTeamRanking(Long unitId, Long staffId, String date);
 
     @Query("MATCH (staffTeamRanking:StaffTeamRanking) WHERE id(staffTeamRanking) IN {0} AND staffTeamRanking.published=false " +
             "SET staffTeamRanking.deleted=true")
