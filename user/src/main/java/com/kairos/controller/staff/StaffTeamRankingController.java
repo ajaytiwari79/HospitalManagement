@@ -37,7 +37,7 @@ public class StaffTeamRankingController {
 
     @ApiOperation(value = "delete staff_team_ranking")
     @DeleteMapping(value = "/staff_team_ranking/{id}")
-    public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> deleteStaffTeamRanking(@PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.deleteStaffTeamRanking(id));
     }
 

@@ -19,7 +19,7 @@ public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<Sta
 
     List<StaffTeamRanking> findByUnitIdAndStaffIdAndDeletedFalse(Long unitId, Long staffId);
 
-    List<StaffTeamRanking> findByUnitIdAndStaffIdAndStaffIdAndPublishedTrueAndDeletedFalse(Long unitId, Long staffId);
+    List<StaffTeamRanking> findByUnitIdAndStaffIdAndPublishedTrueAndDeletedFalse(Long unitId, Long staffId);
 
     StaffTeamRanking findByDraftIdAndDeletedFalse(Long draftId);
 
