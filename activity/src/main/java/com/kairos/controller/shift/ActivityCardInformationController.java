@@ -26,7 +26,7 @@ public class ActivityCardInformationController {
     @ApiOperation("create or update Activity Card Information")
     @PutMapping(value = "/activity_card_information_service/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateActivityCardInformation(@PathVariable Long unitId,@PathVariable Long staffId, @RequestBody @Valid ActivityCardInformation activityCardInformation) {
+    public ResponseEntity<Map<String, Object>> updateActivityCardInformation(@PathVariable Long unitId,@PathVariable(required = false) Long staffId, @RequestBody @Valid ActivityCardInformation activityCardInformation) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCardInformationService.updateActivityCardInformation(activityCardInformation));
     }
 

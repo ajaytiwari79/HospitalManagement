@@ -11,7 +11,6 @@ public class ActivityCardInformation extends MongoBaseEntity {
     private boolean countryAdminSetting;
     private Long unitId;
     private Long staffId;
-    @NotEmpty
     private Set<ActivityCardInformationSetting> activityCardInformationSettings;
 
 
