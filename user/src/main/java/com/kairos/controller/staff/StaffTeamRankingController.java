@@ -37,15 +37,15 @@ public class StaffTeamRankingController {
 
     @ApiOperation(value = "delete staff_team_ranking")
     @DeleteMapping(value = "/staff_team_ranking/{id}")
-    public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> deleteStaffTeamRanking(@PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.deleteStaffTeamRanking(id));
     }
 
     @ApiOperation("Get Staff Personalized team ranking")
     @GetMapping("/staff/{staffId}/staff_team_ranking")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffTeamRankings(@PathVariable Long staffId, @RequestParam(value = "includeDraft", required = false) boolean includeDraft) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.getStaffTeamRankings(staffId, includeDraft));
+    public ResponseEntity<Map<String, Object>> getStaffTeamRankings(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam(value = "includeDraft", required = false) boolean includeDraft) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffTeamRankingService.getStaffTeamRankings(unitId, staffId, includeDraft));
     }
 
     //For create staff team ranging manuale of all staff by unit

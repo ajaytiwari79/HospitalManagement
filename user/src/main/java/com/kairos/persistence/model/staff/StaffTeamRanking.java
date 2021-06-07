@@ -17,6 +17,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 @Setter
 @NoArgsConstructor
 public class StaffTeamRanking extends UserBaseEntity {
+    private Long unitId;
     private Long staffId;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -25,7 +26,8 @@ public class StaffTeamRanking extends UserBaseEntity {
     private Long draftId;
     private LocalDateTime updatedOn;
 
-    public StaffTeamRanking(Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo, boolean published){
+    public StaffTeamRanking(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Set<TeamRankingInfo> teamRankingInfo, boolean published){
+        this.unitId = unitId;
         this.staffId = staffId;
         this.startDate = startDate;
         this.endDate = endDate;

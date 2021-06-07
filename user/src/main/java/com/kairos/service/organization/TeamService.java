@@ -185,7 +185,7 @@ public class TeamService {
                 }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
-            staffTeamRankingService.addOrUpdateStaffTeamRanking(staffTeamDTO.getStaffId(), team, staffTeamRelationship, staffTeamRelationShipQueryResult);
+            staffTeamRankingService.addOrUpdateStaffTeamRanking(unitId, staffTeamDTO.getStaffId(), team, staffTeamRelationship, staffTeamRelationShipQueryResult);
         }
         return staffTeamDTOs;
     }
@@ -400,12 +400,12 @@ public class TeamService {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
         }
         if(isCollectionNotEmpty(staffTeamRelationshipList) || isCollectionNotEmpty(oldStaffTeams)) {
-            staffTeamRankingService.updateStaffTeamRankingFromPersonalInfo(staff.getId(), teams, staffTeamRelationshipList, oldStaffTeams);
+            staffTeamRankingService.updateStaffTeamRankingFromPersonalInfo(unitId, staff.getId(), teams, staffTeamRelationshipList, oldStaffTeams);
         }
     }
 
     @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
-    public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
+    public boolean removeStaffsFromTeam(Long unitId, Long teamId, List<Long> staffIds) {
         List<Long> validStaffIds = new ArrayList<>();
         List<Long> onlyTeamLeader = new ArrayList<>();
         List<Map<String,Object>> staffLeaderTypes = teamGraphRepository.getStaffLeaderTypeMap(teamId);
@@ -420,7 +420,7 @@ public class TeamService {
             } else {
                 validStaffIds.add(staffId);
             }
-            staffTeamRankingService.removeStaffTeamInfo(staffId, teamId);
+            staffTeamRankingService.removeStaffTeamInfo(unitId, staffId, teamId);
         }
         if(isCollectionNotEmpty(onlyTeamLeader)) {
             teamGraphRepository.assignStaffAsTeamLeaderOnly(onlyTeamLeader, teamId);

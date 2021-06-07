@@ -11,6 +11,7 @@ import java.util.Set;
 @Setter
 public class StaffTeamRankingDTO {
     private Long id;
+    private Long unitId;
     private Long staffId;
     private LocalDate startDate;
     private LocalDate endDate;
