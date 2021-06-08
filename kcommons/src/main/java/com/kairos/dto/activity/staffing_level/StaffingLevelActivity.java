@@ -56,6 +56,9 @@ public class StaffingLevelActivity {
         this.availableNoOfStaff = Math.max(availableNoOfStaff,0);
     }
 
+    public void setInitialUnderStaffing(int initialUnderStaffing) {
+        this.initialUnderStaffing = initialUnderStaffing;
+    }
 
     @JsonIgnore
     public void resetValueOnPhaseFlip(){
@@ -67,6 +70,7 @@ public class StaffingLevelActivity {
         this.initialUnderStaffing = this.remainingUnderStaffing;
         this.previousAvailableNoOfStaff = this.availableNoOfStaff;
     }
+
 
     @Override
     public boolean equals(Object o) {
