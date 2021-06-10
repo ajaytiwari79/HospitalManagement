@@ -274,7 +274,7 @@ public class AutoFillGapSettingsService {
                     break;
                 case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
                     activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
-                    if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() <= staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
+                    if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
                         activityId = null;
                     }
                     showError = false;
