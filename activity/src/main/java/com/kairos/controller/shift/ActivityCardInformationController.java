@@ -24,14 +24,14 @@ public class ActivityCardInformationController {
     private ActivityCardInformationService activityCardInformationService;
 
     @ApiOperation("create or update Activity Card Information")
-    @PutMapping(value = "/activity_card_information_service/{staffId}")
+    @PutMapping("/activity_card_information/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateActivityCardInformation(@PathVariable Long unitId,@PathVariable(required = false) Long staffId, @RequestBody @Valid ActivityCardInformation activityCardInformation) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCardInformationService.updateActivityCardInformation(activityCardInformation));
     }
 
     @ApiOperation("get Activity Card Information")
-    @GetMapping(value = "/activity_card_information_service/{staffId}")
+    @GetMapping("/activity_card_information/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityCardInformation(@PathVariable Long unitId,@PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCardInformationService.getActivityCardInformation(unitId, staffId));
