@@ -177,11 +177,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
-                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB,  CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
+                project(CHILD_ACTIVITY_IDS)
                         .and(TIME_TYPE_ACTIVITY_CAN_BE_COPIED_FOR_ORGANIZATION_HIERARCHY).arrayElementAt(0).as(ACTIVITY_CAN_BE_COPIED_FOR_ORGANIZATION_HIERARCHY)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(APPLICABLE_FOR_CHILD_ACTIVITIES),
-                match(Criteria.where(APPLICABLE_FOR_CHILD_ACTIVITIES).is(true))
+                match(Criteria.where(APPLICABLE_FOR_CHILD_ACTIVITIES).is(true)),
+                lookup(ACTIVITIES, UNDERSCORE_ID, CHILD_ACTIVITY_IDS, PARENT_ACTIVITY),
+                project(CHILD_ACTIVITY_IDS).and("parentActivity._id").arrayElementAt(0).as(PARENT_ACTIVITY_ID)
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();

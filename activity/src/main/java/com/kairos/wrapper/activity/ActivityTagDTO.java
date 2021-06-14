@@ -60,6 +60,8 @@ public class ActivityTagDTO implements Serializable {
     private String methodForCalculatingTime;
     private Map<String, TranslationInfo> translations=new HashMap<>();
     private BigInteger countryParentId;
+    //child's Parent activity Id
+    private BigInteger parentActivityId;
 
     public ActivityTagDTO() {
         //default constructor
