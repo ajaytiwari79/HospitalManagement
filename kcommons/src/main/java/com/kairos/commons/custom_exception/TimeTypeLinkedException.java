@@ -8,7 +8,7 @@ package com.kairos.commons.custom_exception;
 * */
 public class TimeTypeLinkedException extends RuntimeException {
 
-    private Object[] params;
+    private final transient Object[] params;
     public TimeTypeLinkedException(String message,Object... params) {
         super(message);
         this.params = params;
