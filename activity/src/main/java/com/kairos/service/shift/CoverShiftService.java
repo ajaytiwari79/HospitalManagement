@@ -3,8 +3,10 @@ package com.kairos.service.shift;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
+import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -29,10 +31,12 @@ import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutCalculationService;
+import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,11 +88,11 @@ public class CoverShiftService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private TimeBankCalculationService timeBankCalculationService;
+    private TimeBankService timeBankCalculationService;
     @Inject
     private OrganizationActivityService organizationActivityService;
     @Inject
-    private PayOutCalculationService payOutCalculationService;
+    private PayOutService payOutCalculationService;
     @Inject
     private PayOutRepository payOutRepository;
     @Inject
@@ -339,10 +343,8 @@ public class CoverShiftService {
         List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().containsKey(staffId)).collect(Collectors.toList());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, staffId, employmentId);
         staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
-        Map<LocalDate, DailyTimeBankEntry> dailyTimeBankEntryMap = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), coverShifts.stream().map(CoverShiftDTO::getDate).collect(Collectors.toList())).stream().collect(Collectors.toMap(DailyTimeBankEntry::getDate, v -> v));
-        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null, staffAdditionalInfoDTO.getEmployment().getId(), asDate(startDate), asDate(endDate), null);
-        updateTimeBankInCoverShifts(coverShifts, staffAdditionalInfoDTO, dailyTimeBankEntryMap, shiftWithActivityDTOS, planningPeriodInterval, shifts);
+        updateTimeBankInCoverShifts(coverShifts, staffAdditionalInfoDTO, shiftWithActivityDTOS, shifts);
         List<CoverShiftDTO> totalEligibleShifts = getEligibleShifts(shifts,unitId,staffId,employmentId,coverShifts);
         return new CoverShiftStaffDetails(totalRequests, totalInterests, totalEligibleShifts, totalDeclined);
     }
@@ -387,20 +389,21 @@ public class CoverShiftService {
         coverShiftMongoRepository.save(coverShift);
     }
 
-    private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<LocalDate, DailyTimeBankEntry> dailyTimeBankEntryMap, List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval planningPeriodInterval, List<Shift> shifts) {
+    private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = isCollectionEmpty(shifts) ? new HashMap<>() : organizationActivityService.getActivityWrapperMap(shifts, null);
+        Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
         for (CoverShiftDTO coverShiftDTO : coverShiftDTOS) {
-            DateTimeInterval interval = new DateTimeInterval(coverShiftDTO.getDate(), coverShiftDTO.getDate().plusDays(1));
-            List<ShiftWithActivityDTO> shiftWithActivityDTOList = shiftWithActivityDTOS.stream().filter(k -> asLocalDate(k.getStartDate()).equals(coverShiftDTO.getDate())).collect(Collectors.toList());
-            DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntryMap.get(coverShiftDTO.getDate()), planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), false);
+            DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.renewDailyTimeBank(staffAdditionalInfoDTO,shiftMap.get(coverShiftDTO.getShiftId()) , false);
             coverShiftDTO.setDeltaTimeBankMinutes(isNotNull(dailyTimeBankEntry) ? dailyTimeBankEntry.getDeltaTimeBankMinutes() : 0);
+            coverShiftDTO.setTimeBankCTADistributionList(isNotNull(dailyTimeBankEntry)?ObjectMapperUtils.copyCollectionPropertiesByMapper(dailyTimeBankEntry.getTimeBankCTADistributionList(), TimeBankCTADistributionDTO.class):new ArrayList<>());
             ShiftWithActivityDTO shift = shiftWithActivityDTOS.stream().filter(k -> k.getId().equals(coverShiftDTO.getShiftId())).findAny().orElse(new ShiftWithActivityDTO());
             shift.setStaffId(staffAdditionalInfoDTO.getId());
             shift.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
-            PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
-            payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
-            payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
+            payOutCalculationService.updatePayOut(staffAdditionalInfoDTO, shiftMap.get(coverShiftDTO.getShiftId()), activityWrapperMap);
+            PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(coverShiftDTO.getShiftId());
             coverShiftDTO.setTotalPayOutMinutes(payOutPerShift.getTotalPayOutMinutes());
+            coverShiftDTO.setPayOutPerShiftCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(payOutPerShift.getPayOutPerShiftCTADistributions(), PayOutCTADistributionDTO.class));
+
         }
     }
 
