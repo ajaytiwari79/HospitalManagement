@@ -721,6 +721,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                     break;
                 case STAFF_WITH_OVERLAPPING_SHIFTS:
                     criterias.add(Criteria.where(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    break;
                 default:break;
             }
         }
