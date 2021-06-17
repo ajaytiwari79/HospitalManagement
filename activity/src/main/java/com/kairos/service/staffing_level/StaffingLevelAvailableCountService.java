@@ -176,34 +176,38 @@ public class StaffingLevelAvailableCountService {
                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),null);
             }
         }else{
-            for (int i = 0; i < oldShift.getActivities().size(); i++) {
-                ShiftActivity oldShiftActivity = oldShift.getActivities().get(i);
-                if(isNotNull(shift)){
-                    Object[] objects = getShiftActivities(shift, oldShiftActivity);
-                    List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
-                    boolean durationSame = (boolean)objects[1];
-                    for (ShiftActivity shiftActivity : shiftActivities) {
-                        if(oldShiftActivity.getInterval().overlaps(shiftActivity.getInterval())){
-                            Object[] intervalsExcludeBreakInterval = getTimeIntervalsExcludeBreakInterval(oldShiftActivity, shiftActivity,shift.getBreakActivities(),oldShift.getBreakActivities());
-                            List<DateTimeInterval> timeIntervals = (List<DateTimeInterval>)intervalsExcludeBreakInterval[0];
-                            boolean breakDurationSame = (boolean)intervalsExcludeBreakInterval[1];
-                            if(isCollectionNotEmpty(timeIntervals)) {
-                                IntervalAndDurationWrapper intervalAndDurationWrapper = updateAcivityMap.getOrDefault(shiftActivity.getActivityId(), new IntervalAndDurationWrapper(durationSame, new ArrayList<>(),breakDurationSame,(DateTimeInterval) intervalsExcludeBreakInterval[2]));
-                                intervalAndDurationWrapper.getIntervals().addAll(timeIntervals);
-                                updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),intervalAndDurationWrapper);
-                            }
-                        }else {
-                            IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(durationSame,getTimeIntervalsExcludeBreakInterval(oldShiftActivity,oldShift.getBreakActivities()),false,null);
-                            updateAcivityMap.put(oldShiftActivity.getActivityId(),intervalAndDurationWrapper);
-                        }
-                    }
-                }else {
-                    IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(false,getTimeIntervalsExcludeBreakInterval(oldShiftActivity,oldShift.getBreakActivities()),false,null);
-                    updateAcivityMap.put(oldShiftActivity.getActivityId(),intervalAndDurationWrapper);
-                }
-            }
+            updateDeletedActivityMap(shift, oldShift, updateAcivityMap);
         }
         return updateAcivityMap;
+    }
+
+    private void updateDeletedActivityMap(Shift shift, Shift oldShift, Map<BigInteger, IntervalAndDurationWrapper> updateAcivityMap) {
+        for (int i = 0; i < oldShift.getActivities().size(); i++) {
+            ShiftActivity oldShiftActivity = oldShift.getActivities().get(i);
+            if(isNotNull(shift)){
+                Object[] objects = getShiftActivities(shift, oldShiftActivity);
+                List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
+                boolean durationSame = (boolean)objects[1];
+                for (ShiftActivity shiftActivity : shiftActivities) {
+                    if(oldShiftActivity.getInterval().overlaps(shiftActivity.getInterval())){
+                        Object[] intervalsExcludeBreakInterval = getTimeIntervalsExcludeBreakInterval(oldShiftActivity, shiftActivity,shift.getBreakActivities(),oldShift.getBreakActivities());
+                        List<DateTimeInterval> timeIntervals = (List<DateTimeInterval>)intervalsExcludeBreakInterval[0];
+                        boolean breakDurationSame = (boolean)intervalsExcludeBreakInterval[1];
+                        if(isCollectionNotEmpty(timeIntervals)) {
+                            IntervalAndDurationWrapper intervalAndDurationWrapper = updateAcivityMap.getOrDefault(shiftActivity.getActivityId(), new IntervalAndDurationWrapper(durationSame, new ArrayList<>(),breakDurationSame,(DateTimeInterval) intervalsExcludeBreakInterval[2]));
+                            intervalAndDurationWrapper.getIntervals().addAll(timeIntervals);
+                            updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),intervalAndDurationWrapper);
+                        }
+                    }else {
+                        IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(durationSame,getTimeIntervalsExcludeBreakInterval(oldShiftActivity,oldShift.getBreakActivities()),false,null);
+                        updateAcivityMap.put(oldShiftActivity.getActivityId(),intervalAndDurationWrapper);
+                    }
+                }
+            }else {
+                IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(false,getTimeIntervalsExcludeBreakInterval(oldShiftActivity,oldShift.getBreakActivities()),false,null);
+                updateAcivityMap.put(oldShiftActivity.getActivityId(),intervalAndDurationWrapper);
+            }
+        }
     }
 
     private Object[] getTimeIntervalsExcludeBreakInterval(ShiftActivity shiftActivity, ShiftActivity shiftActivity1, List<ShiftActivity> breakActivities, List<ShiftActivity> breakActivities1) {
@@ -264,35 +268,39 @@ public class StaffingLevelAvailableCountService {
                 updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),intervalAndDurationWrapper);
             }
         }else{
-            for (int i = 0; i < shift.getActivities().size(); i++) {
-                ShiftActivity shiftActivity = shift.getActivities().get(i);
-                if(isNotNull(oldShift)){
-                    Object[] objects = getShiftActivities(oldShift, shiftActivity);
-                    List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
-                    boolean durationSame = (boolean)objects[1];
-                    for (ShiftActivity oldShiftActivity : shiftActivities) {
-                        if(shiftActivity.getInterval().overlaps(oldShiftActivity.getInterval())){
-                            Object[] intervalsExcludeBreakInterval = getTimeIntervalsExcludeBreakInterval(shiftActivity,oldShiftActivity, oldShift.getBreakActivities(), shift.getBreakActivities());
-                            List<DateTimeInterval> timeIntervals = (List<DateTimeInterval>)intervalsExcludeBreakInterval[0];
-                            boolean breakDurationSame = (boolean)intervalsExcludeBreakInterval[1];
-                            if(isCollectionNotEmpty(timeIntervals)) {
-                                IntervalAndDurationWrapper intervalAndDurationWrapper = updateAcivityMap.getOrDefault(oldShiftActivity.getActivityId(),new IntervalAndDurationWrapper(durationSame,new ArrayList<>(),breakDurationSame,(DateTimeInterval) intervalsExcludeBreakInterval[2]));
-                                List<DateTimeInterval> dateTimeIntervals = intervalAndDurationWrapper.getIntervals();
-                                dateTimeIntervals.addAll(timeIntervals);
-                                updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),intervalAndDurationWrapper);
-                            }
-                        }else {
-                            IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(durationSame,getTimeIntervalsExcludeBreakInterval(shiftActivity, shift.getBreakActivities()),false,null);
-                            updateAcivityMap.put(shiftActivity.getActivityId(), intervalAndDurationWrapper);
-                        }
-                    }
-                }else {
-                    IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(false,getTimeIntervalsExcludeBreakInterval(shiftActivity,shift.getBreakActivities()),false,null);
-                    updateAcivityMap.put(shiftActivity.getActivityId(),intervalAndDurationWrapper);
-                }
-            }
+            updateCreatedActivityMap(shift, oldShift, updateAcivityMap);
         }
         return updateAcivityMap;
+    }
+
+    private void updateCreatedActivityMap(Shift shift, Shift oldShift, Map<BigInteger, IntervalAndDurationWrapper> updateAcivityMap) {
+        for (int i = 0; i < shift.getActivities().size(); i++) {
+            ShiftActivity shiftActivity = shift.getActivities().get(i);
+            if(isNotNull(oldShift)){
+                Object[] objects = getShiftActivities(oldShift, shiftActivity);
+                List<ShiftActivity> shiftActivities = (List<ShiftActivity>)objects[0];
+                boolean durationSame = (boolean)objects[1];
+                for (ShiftActivity oldShiftActivity : shiftActivities) {
+                    if(shiftActivity.getInterval().overlaps(oldShiftActivity.getInterval())){
+                        Object[] intervalsExcludeBreakInterval = getTimeIntervalsExcludeBreakInterval(shiftActivity,oldShiftActivity, oldShift.getBreakActivities(), shift.getBreakActivities());
+                        List<DateTimeInterval> timeIntervals = (List<DateTimeInterval>)intervalsExcludeBreakInterval[0];
+                        boolean breakDurationSame = (boolean)intervalsExcludeBreakInterval[1];
+                        if(isCollectionNotEmpty(timeIntervals)) {
+                            IntervalAndDurationWrapper intervalAndDurationWrapper = updateAcivityMap.getOrDefault(oldShiftActivity.getActivityId(),new IntervalAndDurationWrapper(durationSame,new ArrayList<>(),breakDurationSame,(DateTimeInterval) intervalsExcludeBreakInterval[2]));
+                            List<DateTimeInterval> dateTimeIntervals = intervalAndDurationWrapper.getIntervals();
+                            dateTimeIntervals.addAll(timeIntervals);
+                            updateAcivityMap.put(shift.getActivities().get(i).getActivityId(),intervalAndDurationWrapper);
+                        }
+                    }else {
+                        IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(durationSame,getTimeIntervalsExcludeBreakInterval(shiftActivity, shift.getBreakActivities()),false,null);
+                        updateAcivityMap.put(shiftActivity.getActivityId(), intervalAndDurationWrapper);
+                    }
+                }
+            }else {
+                IntervalAndDurationWrapper intervalAndDurationWrapper = new IntervalAndDurationWrapper(false,getTimeIntervalsExcludeBreakInterval(shiftActivity,shift.getBreakActivities()),false,null);
+                updateAcivityMap.put(shiftActivity.getActivityId(),intervalAndDurationWrapper);
+            }
+        }
     }
 
 

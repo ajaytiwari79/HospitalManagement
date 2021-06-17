@@ -459,7 +459,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                     .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
         }
         Aggregation aggregation = Aggregation.newAggregation(match(criteria.and(DRAFT).is(false)),
-                unwind("activities"),
+                unwind(ACTIVITIES),
                 match(Criteria.where(ACTIVITIES_ACTIVITY_ID).in(activityIds)),
                 new CustomAggregationOperation("{\n" +
                         "    \"$project\": {\n" +

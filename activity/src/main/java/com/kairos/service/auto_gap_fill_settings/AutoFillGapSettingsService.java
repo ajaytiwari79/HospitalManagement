@@ -36,8 +36,10 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.DO_NOT_ALLOW_TO_CAUSE_GAP;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
+import static com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule.*;
 import static com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario.*;
 
 @Service
@@ -250,44 +252,11 @@ public class AutoFillGapSettingsService {
 
     public ShiftActivityDTO getActivityToFillTheGap(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, AutoFillGapSettings autoFillGapSetting, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList) {
         ShiftActivityDTO shiftActivityDTO = null;
-        BigInteger activityId = null;
         boolean showError = false;
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : autoFillGapSetting.getSelectedAutoFillGapSettingsRules()) {
-            switch (autoFillGapSettingsRule) {
-                case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP :
-                    if(!NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE.equals(autoFillGapSetting.getAutoGapFillingScenario())) {
-                        activityId = shiftActivityAfterGap.getActivity().getRanking() < shiftActivityBeforeGap.getActivity().getRanking() ? shiftActivityAfterGap.getActivityId() : shiftActivityBeforeGap.getActivityId();
-                    } else {
-                        showError = true;
-                    }
-                    break;
-                case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
-                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
-                    showError = false;
-                    break;
-                case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                    if(!NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE.equals(autoFillGapSetting.getAutoGapFillingScenario())) {
-                        activityId = getHighestRankActivityOfAdjacentToGapSolvingProblems(shiftActivityBeforeGap, shiftActivityAfterGap, staffingLevelActivityWithDurationMap);
-                    } else {
-                        showError = true;
-                    }
-                    break;
-                case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
-                    if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
-                        activityId = null;
-                    }
-                    showError = false;
-                    break;
-                case HIGHEST_RANKED_ACTIVITY_AMONGST_THAT_ARE_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
-                    activityId = getHighestRankActivityOfSolvingProblems(staffAdditionalInfoDTO, activityList, autoFillGapSetting, staffingLevelActivityWithDurationMap);
-                    showError = false;
-                    break;
-                case DO_NOT_ALLOW_TO_CAUSE_GAP :
-                    exceptionService.actionNotPermittedException(DO_NOT_ALLOW_TO_CAUSE_GAP);
-                    break;
-                default:
-            }
+            Object[] activityIdAndShowError = getActivityIdAndShowError(autoFillGapSettingsRule, staffAdditionalInfoDTO, autoFillGapSetting, shiftActivityBeforeGap, shiftActivityAfterGap, staffingLevelActivityWithDurationMap, activityList);
+            BigInteger activityId = (BigInteger) activityIdAndShowError[0];
+            showError = (boolean) activityIdAndShowError[1];
             if(isNotNull(activityId)) {
                 shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
                 break;
@@ -300,6 +269,44 @@ public class AutoFillGapSettingsService {
             exceptionService.actionNotPermittedException(SYSTEM_NOT_FOUND_ACTIVITY_TO_GAP_FILLING_CONFIGURATION);
         }
         return shiftActivityDTO;
+    }
+
+    private Object[] getActivityIdAndShowError(AutoFillGapSettingsRule autoFillGapSettingsRule, StaffAdditionalInfoDTO staffAdditionalInfoDTO, AutoFillGapSettings autoFillGapSetting, ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList){
+        BigInteger activityId = null;
+        boolean showError = false;
+        switch (autoFillGapSettingsRule) {
+            case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP :
+                if(!NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE.equals(autoFillGapSetting.getAutoGapFillingScenario())) {
+                    activityId = shiftActivityAfterGap.getActivity().getRanking() < shiftActivityBeforeGap.getActivity().getRanking() ? shiftActivityAfterGap.getActivityId() : shiftActivityBeforeGap.getActivityId();
+                } else {
+                    showError = true;
+                }
+                break;
+            case HIGHEST_RANKED_ACTIVITY_IF_HIGHEST_IS_CAUSING_GAP_THEN_USE_SECOND_HIGHEST :
+                activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
+                break;
+            case HIGHEST_RANKED_ACTIVITY_PLANNED_ADJACENT_TO_THE_GAP_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                if(!NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE.equals(autoFillGapSetting.getAutoGapFillingScenario())) {
+                    activityId = getHighestRankActivityOfAdjacentToGapSolvingProblems(shiftActivityBeforeGap, shiftActivityAfterGap, staffingLevelActivityWithDurationMap);
+                } else {
+                    showError = true;
+                }
+                break;
+            case HIGHEST_RANKED_ACTIVITY_IF_IT_IS_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                activityId = getHighestRankActivity(staffAdditionalInfoDTO, activityList, autoFillGapSetting);
+                if(!(isNotNull(activityId) && staffingLevelActivityWithDurationMap.containsKey(activityId) && staffingLevelActivityWithDurationMap.get(activityId).getOverStaffingDurationInMinutes() < staffingLevelActivityWithDurationMap.get(activityId).getResolvingUnderOrOverStaffingDurationInMinutes())) {
+                    activityId = null;
+                }
+                break;
+            case HIGHEST_RANKED_ACTIVITY_AMONGST_THAT_ARE_SOLVING_MORE_PROBLEMS_THAN_CAUSING :
+                activityId = getHighestRankActivityOfSolvingProblems(staffAdditionalInfoDTO, activityList, autoFillGapSetting, staffingLevelActivityWithDurationMap);
+                break;
+            case DO_NOT_ALLOW_TO_CAUSE_GAP :
+                exceptionService.actionNotPermittedException(DO_NOT_ALLOW_TO_CAUSE_GAP);
+                break;
+            default:
+        }
+        return new Object[]{activityId,showError};
     }
 
     private BigInteger getHighestRankActivityOfAdjacentToGapSolvingProblems(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
