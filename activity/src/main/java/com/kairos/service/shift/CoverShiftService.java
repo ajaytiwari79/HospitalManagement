@@ -3,6 +3,7 @@ package com.kairos.service.shift;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
@@ -30,6 +31,7 @@ import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutCalculationService;
+import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelValidatorService;
@@ -90,7 +92,7 @@ public class CoverShiftService {
     @Inject
     private OrganizationActivityService organizationActivityService;
     @Inject
-    private PayOutCalculationService payOutCalculationService;
+    private PayOutService payOutCalculationService;
     @Inject
     private PayOutRepository payOutRepository;
     @Inject
@@ -391,17 +393,17 @@ public class CoverShiftService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = isCollectionEmpty(shifts) ? new HashMap<>() : organizationActivityService.getActivityWrapperMap(shifts, null);
         Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
         for (CoverShiftDTO coverShiftDTO : coverShiftDTOS) {
-            DateTimeInterval interval = new DateTimeInterval(coverShiftDTO.getDate(), coverShiftDTO.getDate().plusDays(1));
             DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.renewDailyTimeBank(staffAdditionalInfoDTO,shiftMap.get(coverShiftDTO.getShiftId()) , false);
             coverShiftDTO.setDeltaTimeBankMinutes(isNotNull(dailyTimeBankEntry) ? dailyTimeBankEntry.getDeltaTimeBankMinutes() : 0);
             coverShiftDTO.setTimeBankCTADistributionList(isNotNull(dailyTimeBankEntry)?ObjectMapperUtils.copyCollectionPropertiesByMapper(dailyTimeBankEntry.getTimeBankCTADistributionList(), TimeBankCTADistributionDTO.class):new ArrayList<>());
             ShiftWithActivityDTO shift = shiftWithActivityDTOS.stream().filter(k -> k.getId().equals(coverShiftDTO.getShiftId())).findAny().orElse(new ShiftWithActivityDTO());
             shift.setStaffId(staffAdditionalInfoDTO.getId());
             shift.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
-            PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
-            payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
-            payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
+            payOutCalculationService.updatePayOut(staffAdditionalInfoDTO, shiftMap.get(coverShiftDTO.getShiftId()), activityWrapperMap);
+            PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(coverShiftDTO.getShiftId());
             coverShiftDTO.setTotalPayOutMinutes(payOutPerShift.getTotalPayOutMinutes());
+            coverShiftDTO.setPayOutPerShiftCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(payOutPerShift.getPayOutPerShiftCTADistributions(), PayOutCTADistributionDTO.class));
+
         }
     }
 
