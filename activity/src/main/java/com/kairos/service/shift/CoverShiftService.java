@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
@@ -30,12 +29,10 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
-import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelValidatorService;
-import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -63,6 +60,7 @@ import static com.kairos.persistence.model.shift.CoverShift.ApprovalBy.PLANNER;
 @Service
 public class CoverShiftService {
 
+    public static final String COVER_SHIFT = "Cover Shift";
     private static final Logger LOGGER = LoggerFactory.getLogger(CoverShiftService.class);
 
     @Inject
@@ -293,7 +291,7 @@ public class CoverShiftService {
     public void showInterestInCoverShift(BigInteger id, Long staffId, Long employmentId) {
         CoverShift coverShift = coverShiftMongoRepository.findByIdAndDeletedFalse(id);
         if (isNull(coverShift)) {
-            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, "Cover Shift");
+            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
         if (coverShift.getApprovalBy().equals(CoverShift.ApprovalBy.AUTO_PICK)) {
             assignCoverShift(staffId, employmentId, coverShift);
@@ -308,7 +306,7 @@ public class CoverShiftService {
         ShiftDTO shift = shiftMongoRepository.findByIdAndDeletedFalse(id);
         CoverShift coverShift = coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(id, shift.getStaffId());
         if (isNull(coverShift)) {
-            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, "Cover Shift");
+            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
         validateApprovalSettings(coverShift);
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = assignCoverShift(staffId, employmentId, coverShift);
@@ -380,7 +378,7 @@ public class CoverShiftService {
     public void notInterestInCoverShift(BigInteger id, Long staffId) {
         CoverShift coverShift = coverShiftMongoRepository.findByIdAndDeletedFalse(id);
         if (isNull(coverShift)) {
-            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, "Cover Shift");
+            exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
         coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
         coverShift.getInterestedStaffs().remove(staffId);

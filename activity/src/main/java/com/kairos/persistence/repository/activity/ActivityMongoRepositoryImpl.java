@@ -768,15 +768,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private Aggregation getParentActivityAggregation(Criteria criteria,String activityIdsArray) {
         return Aggregation.newAggregation(
                     match(criteria),
-                    group().addToSet("activityId").as("activityIds"),
+                    group().addToSet(ACTIVITYID).as(ACTIVITY_IDS),
                     new CustomAggregationOperation("{ $project: { \n" +
                             "       \"activityIds\": { $concatArrays: [ \"$activityIds\", "+activityIdsArray+"] },\n" +
                             "       \"_id\":0\n" +
                             "       \n" +
                             "       } }"),
-                    lookup("activities","activityIds","_id","activities"),
-                    unwind("activities",true),
-                    replaceRoot("activities"),
+                    lookup(ACTIVITIES,ACTIVITY_IDS,"_id",ACTIVITIES),
+                    unwind(ACTIVITIES,true),
+                    replaceRoot(ACTIVITIES),
                     lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
                     lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID,PARENT_ACTIVITY),
                     project(NAME, GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,

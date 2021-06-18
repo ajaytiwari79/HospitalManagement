@@ -72,6 +72,7 @@ public class StaffingLevelValidatorService {
         int totalOverStaffingLevelResolve = staffingLevelActivityWithDurationMapForUnderStaffing.values().stream().mapToInt(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).sum();
         int totalUnderStaffingResolved = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).sum();
         int totalOverStaffingCreated = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getOverStaffingDurationInMinutes).sum();
+        boolean validStaffingLevel = true;
         if (staffingLevelActivityWithDurationMapForUnderStaffing.isEmpty()) {
             if (totalUnderStaffingResolved < totalOverStaffingCreated) {
                 if(coverShiftEligibility) return false;
@@ -83,12 +84,17 @@ public class StaffingLevelValidatorService {
                 exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING_DELETE);
             }
         } else {
-            if (totalUnderStaffingCreated > totalUnderStaffingResolved || (allowedMaxOverStaffing != null && allowedMaxOverStaffing < totalOverStaffingCreated)) {
-                if(coverShiftEligibility) return false;
-                suggestError(totalUnderStaffingCreated, totalUnderStaffingResolved, replacedActivity == null ?MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY   : gapFilling ? MESSAGE_SHIFT_OVERSTAFFING_GAP :MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY);
-            } else if (totalUnderStaffingCreated == totalUnderStaffingResolved) {
-                return isHigherActivity(oldShift, activityWrapperMap, replacedActivity,coverShiftEligibility);
-            }
+            validStaffingLevel = isValidStaffingLevel(allowedMaxOverStaffing, gapFilling, replacedActivity, coverShiftEligibility, totalUnderStaffingCreated, totalUnderStaffingResolved, totalOverStaffingCreated, oldShift, activityWrapperMap);
+        }
+        return validStaffingLevel;
+    }
+
+    private boolean isValidStaffingLevel(Short allowedMaxOverStaffing, Boolean gapFilling, ShiftActivityDTO replacedActivity, boolean coverShiftEligibility, int totalUnderStaffingCreated, int totalUnderStaffingResolved, int totalOverStaffingCreated, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        if (totalUnderStaffingCreated > totalUnderStaffingResolved || (allowedMaxOverStaffing != null && allowedMaxOverStaffing < totalOverStaffingCreated)) {
+            if(coverShiftEligibility) return false;
+            suggestError(totalUnderStaffingCreated, totalUnderStaffingResolved, replacedActivity == null ?MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY   : gapFilling ? MESSAGE_SHIFT_OVERSTAFFING_GAP :MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY);
+        } else if (totalUnderStaffingCreated == totalUnderStaffingResolved) {
+            return isHigherActivity(oldShift, activityWrapperMap, replacedActivity,coverShiftEligibility);
         }
         return true;
     }
