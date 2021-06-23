@@ -350,7 +350,7 @@ public class StaffingLevelUtil {
             updateActivities(staffingLevelPublishDTO, staffingLevelInterval);
         }
         for (int i = 0; i < staffingLevel.getAbsenceStaffingLevelInterval().size(); i++) {
-            updateActivities(staffingLevelPublishDTO, staffingLevelIntervals.get(i));
+            updateActivities(staffingLevelPublishDTO, staffingLevel.getAbsenceStaffingLevelInterval().get(i));
         }
     }
 
