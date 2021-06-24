@@ -16,6 +16,7 @@ import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ public class CompanyDefaultDataService {
     @Inject private CountryGraphRepository countryGraphRepository;
 
 
+    @Async
     public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId, List<TimeSlot> timeSlots) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
@@ -73,6 +75,7 @@ public class CompanyDefaultDataService {
         });
     }
 
+    @Async
     public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap, List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
             orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
