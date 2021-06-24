@@ -241,7 +241,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategoryAndRole(Long countryId, String orgCategory, String role);
 
     @Query("MATCH (org:Organization)-[r:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(ag:AccessGroup{deleted:false}) WHERE id(org)={0} AND ag.role={1}\n" +
-            "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role")
+            "RETURN distinct id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role")
     List<AccessGroupQueryResult> getOrganizationAccessGroupByRole(Long organizationId, String role);
 
     @Query("MATCH (org:Unit)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(ag:AccessGroup) WHERE id(org)={0} and id(ag) IN {1} \n" +
