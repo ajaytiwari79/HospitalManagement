@@ -2,6 +2,7 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -162,7 +163,11 @@ public class ShiftBreakService implements KPIService {
         Date startdate = placeBreakAfterThisDate.after(eligibleBreakInterval.getStartDate()) ? eligibleBreakInterval.getStartDate() : placeBreakAfterThisDate;
         Date endDate = placeBreakAfterThisDate.after(eligibleBreakInterval.getEndDate()) ? placeBreakAfterThisDate : eligibleBreakInterval.getEndDate();
         eligibleBreakInterval = new DateTimeInterval(startdate, endDate);
-        if (!eligibleBreakInterval.containsInterval(breakActivity.getInterval()) || !breakSettings.getBreakDurationInMinute().equals(breakActivity.getInterval().getMinutes())) {
+        if(!breakSettings.getBreakDurationInMinute().equals(breakActivity.getInterval().getMinutes())){
+            breakActivity.setDurationMinutes(breakSettings.getBreakDurationInMinute().intValue());
+            breakActivity.setEndDate(DateUtils.addMinutes(breakActivity.getStartDate(), breakActivity.getDurationMinutes()));
+        }
+        if (!eligibleBreakInterval.containsInterval(breakActivity.getInterval())) {
             exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
         }
         return breakActivity;
