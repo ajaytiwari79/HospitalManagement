@@ -20,7 +20,7 @@ public class CoverShiftDTO {
     private String commentForCandidates;
     private ApprovalBy approvalBy;
     private Map<Long, Date> requestedStaffs;
-    private Map<Long, Date> interestedStaffs;
+    private Map<Long, StaffInterest> interestedStaffs;
     private Long staffId;
     private BigInteger shiftId;
     private LocalDate date;

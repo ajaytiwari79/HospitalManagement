@@ -2,6 +2,7 @@ package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.CoverShiftDTO;
 import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
+import com.kairos.dto.activity.shift.StaffInterest;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
 import com.kairos.service.shift.ShiftService;
@@ -84,8 +85,8 @@ public class CoverShiftController {
     @ApiOperation("update cover shift setting by unit")
     @PutMapping(value = "/show_interest/{id}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId,@RequestParam(value = "employmentId",required = false) Long employmentId) {
-        coverShiftService.showInterestInCoverShift(id,staffId,employmentId);
+    public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger id, @RequestParam("staffId") Long staffId, @RequestParam(value = "employmentId",required = false) Long employmentId, @RequestBody StaffInterest staffInterest) {
+        coverShiftService.showInterestInCoverShift(id,staffId,employmentId,staffInterest);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
