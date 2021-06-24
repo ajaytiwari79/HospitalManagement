@@ -288,7 +288,7 @@ public class CoverShiftService {
         shiftMongoRepository.save(shift);
     }
 
-    public void showInterestInCoverShift(BigInteger id, Long staffId, Long employmentId) {
+    public void showInterestInCoverShift(BigInteger id, Long staffId, Long employmentId, StaffInterest staffInterest) {
         CoverShift coverShift = coverShiftMongoRepository.findByIdAndDeletedFalse(id);
         if (isNull(coverShift)) {
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
@@ -297,7 +297,7 @@ public class CoverShiftService {
             assignCoverShift(staffId, employmentId, coverShift);
 
         }
-        coverShift.getInterestedStaffs().put(staffId, DateUtils.getDate());
+        coverShift.getInterestedStaffs().put(staffId, new StaffInterest(DateUtils.getDate(),staffInterest.getAccountType()));
         coverShift.getDeclinedStaffIds().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
     }
