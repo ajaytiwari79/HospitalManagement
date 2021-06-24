@@ -97,7 +97,7 @@ public class OrganizationServiceService {
         return organizationServiceRepository.findOne(id);
     }
 
-    @Cacheable(value = "getAllOrganizationService", key = "#countryId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getAllOrganizationService", key = "#countryId", cacheManager = "cacheManager")
     public Iterable<OrganizationService> getAllOrganizationService(Long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
         Iterable<OrganizationService> organizationServices = organizationServiceRepository.findAllById(serviceIds);

@@ -591,7 +591,7 @@ public class OrganizationService {
         return true;
     }
 
-    @Cacheable(value = "fetchParentOrganization", key = "#unitId", cacheManager = "cacheManager")
+    //@Cacheable(value = "fetchParentOrganization", key = "#unitId", cacheManager = "cacheManager")
     public Organization fetchParentOrganization(Long unitId) {
         Long parentOrgId = organizationBaseRepository.findParentOrgId(unitId);
         Organization parent=  organizationGraphRepository.findOne(parentOrgId);
