@@ -287,7 +287,7 @@ public class AccessPageService {
         return accessPage.getTranslations();
     }
 
-    @Cacheable(value = "getTabHierarchy", key = "#languageId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getTabHierarchy", key = "#languageId", cacheManager = "cacheManager")
     public List<AccessPageDTO> getTabHierarchy(Long languageId) {
         List<AccessPageDTO> mainTabs = prepareAccessPageDTOList(accessPageRepository.getMainTabsWithHelperText(languageId));
         for (AccessPageDTO accessPageDTO : mainTabs) {

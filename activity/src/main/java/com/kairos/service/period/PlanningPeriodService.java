@@ -161,7 +161,7 @@ public class PlanningPeriodService {
     }
 
     // To fetch list of planning periods
-    @Cacheable(value = "getPlanningPeriods", key = "#unitId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getPlanningPeriods", key = "#unitId", cacheManager = "cacheManager")
     public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
         // Prepare map for phases with id as key and sequence as value
