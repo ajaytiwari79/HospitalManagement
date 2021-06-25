@@ -103,6 +103,7 @@ public class ActivityIntegrationService {
         genericRestClient.publish(defaultKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/default_kpi_setting", null);
     }
 
+    @Async
     public void createDefaultKPISettingForStaff(DefaultKPISettingDTO defaultKPISettingDTO, Long unitId) {
         genericRestClient.publish(defaultKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff_default_kpi_setting", null);
     }

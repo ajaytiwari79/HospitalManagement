@@ -14,6 +14,7 @@ import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public class CompanyDefaultDataService {
     @Inject private CountryGraphRepository countryGraphRepository;
 
 
+  @Async  
     public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
@@ -65,7 +67,9 @@ public class CompanyDefaultDataService {
         });
     }
 
-    public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+
+  @Async  
+  public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
             orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), orgTypeAndSubTypeDTO);
