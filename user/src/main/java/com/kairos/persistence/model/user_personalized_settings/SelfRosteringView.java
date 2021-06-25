@@ -20,6 +20,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @AllArgsConstructor
 public class SelfRosteringView extends UserBaseEntity {
 
+    private static final long serialVersionUID = -6081093931670719715L;
     private AbsenceViewSettings absenceViewSettings;
 
 }

@@ -3,15 +3,11 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.service.shift.ShiftValidatorService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
@@ -25,7 +21,7 @@ public class ShiftEscalationService implements KPIService{
     private KPIBuilderCalculationService kpiBuilderCalculationService;
     @Inject private ShiftValidatorService shiftValidatorService;
 
-    public double getEscalatedShiftsOrResolvedShifts(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public double getEscalatedShiftsOrResolvedShifts(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, true);
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
@@ -56,7 +52,7 @@ public class ShiftEscalationService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
     }
 }

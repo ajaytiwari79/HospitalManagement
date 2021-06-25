@@ -13,6 +13,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SystemLanguage extends UserBaseEntity {
+    private static final long serialVersionUID = 2167563003452246337L;
     private String name;
     private String code;
     private boolean active;

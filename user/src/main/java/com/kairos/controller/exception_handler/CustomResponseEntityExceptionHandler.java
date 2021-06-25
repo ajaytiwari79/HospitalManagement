@@ -7,6 +7,7 @@ import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.wrapper.ResponseEnvelope;
 import com.mindscapehq.raygun4java.core.RaygunClient;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -18,6 +19,7 @@ import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -33,6 +35,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -345,7 +349,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
     // 403
-    @ExceptionHandler({AccessDeniedException.class, InvalidRequestException.class})
+    @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDeniedException(final Exception ex, final WebRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
@@ -354,13 +358,30 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return new ResponseEntity<Object>(errorMessage, new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler({InvalidRequestException.class})
+    public ResponseEntity<Object> handleAccessDeniedException(final InvalidRequestException ex, final WebRequest request) {
+        logger.error(ERROR_IN_USER_SERVICE + " ", ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setMessage(ex.getMessage());
+        return new ResponseEntity<Object>(errorMessage, new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
 
-    // 409
 
-    @ExceptionHandler({DuplicateDataException.class, DataAccessException.class, InvalidDataAccessApiUsageException.class})
+    @ExceptionHandler({DuplicateDataException.class})
+    protected ResponseEntity<Object> handleConflict(final DuplicateDataException ex, final WebRequest request) {
+        logger.error(ERROR_IN_USER_SERVICE + " ", ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setMessage(ex.getMessage());
+        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler({DataAccessException.class, InvalidDataAccessApiUsageException.class})
     protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
-        final String bodyOfResponse = "This should be application specific";
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(ex.getMessage());
@@ -376,26 +397,61 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
-        mailService.sendMailToBackendOnException(ex);
-        if (envConfigCommon.getCurrentProfile().equals(LOCAL_PROFILE)) {
+
+        if(!envConfigCommon.getCurrentProfile().equals(LOCAL_PROFILE) && !(ex instanceof CannotCreateTransactionException) && !(ex instanceof HttpServerErrorException) && !(ex instanceof ClientAbortException) && !(ex instanceof ResourceAccessException)) {
             raygunClient.send(ex);
+            mailService.sendMailToBackendOnException(ex);
         }
         return errorMessage;//handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({DataNotFoundByIdException.class, AddressNotVerifiedByTomTom.class,
-            ZipCodeNotFound.class, CitizenNotFoundException.class})
+    @ExceptionHandler({
+            ZipCodeNotFound.class})
     @ResponseBody
-    public ResponseEnvelope handleNotFound(RuntimeException ex, HttpServletRequest request) {
+    public ResponseEnvelope handleNotFound(ZipCodeNotFound ex, HttpServletRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({
+            CitizenNotFoundException.class})
+    @ResponseBody
+    public ResponseEnvelope handleNotFound(CitizenNotFoundException ex, HttpServletRequest request) {
+        logger.error(ERROR_IN_USER_SERVICE + " ", ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
+    }
+
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({AddressNotVerifiedByTomTom.class})
+    @ResponseBody
+    public ResponseEnvelope handleNotFound(AddressNotVerifiedByTomTom ex, HttpServletRequest request) {
+        logger.error(ERROR_IN_USER_SERVICE + " ", ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({DataNotFoundByIdException.class})
+    @ResponseBody
+    public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex, HttpServletRequest request) {
+        logger.error(ERROR_IN_USER_SERVICE + " ", ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
+    }
+
+
+    private ResponseEnvelope getResponseEnvelope(HttpServletRequest request, String message) {
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return errorMessage;
-
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -403,12 +459,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ResponseBody
     public ResponseEnvelope actionNotPermittedExceptionHandler(ActionNotPermittedException ex, HttpServletRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -416,25 +468,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ResponseBody
     public ResponseEnvelope taskDemandExceptionHandler(TaskDemandException ex, HttpServletRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(value = DataNotMatchedException.class)
     @ResponseBody
-    public ResponseEnvelope dataNotMatchedExceptionHandler(RuntimeException ex, HttpServletRequest request) {
+    public ResponseEnvelope dataNotMatchedExceptionHandler(DataNotMatchedException ex, HttpServletRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -442,12 +486,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ResponseBody
     public ResponseEnvelope flsCredentialExceptionHandler(FlsCredentialException ex, HttpServletRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -455,12 +495,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ResponseBody
     public ResponseEnvelope unitNotFoundExceptionHandler(UnitNotFoundException ex, HttpServletRequest request) {
         logger.error("Invalid unit id ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        return getResponseEnvelope(request, message);
     }
 
 }

@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,6 +53,10 @@ public class PriorityGroupDTO {
 
     public List<Long> getExpertiseIds() {
         return expertiseIds=Optional.ofNullable(expertiseIds).orElse(new ArrayList<>());
+    }
+
+    public Map<String, TranslationInfo> getTranslations() {
+        return isNull(translations) ? new HashMap<>() : translations;
     }
 
 }

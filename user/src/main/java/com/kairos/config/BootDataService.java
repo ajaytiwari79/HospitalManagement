@@ -12,12 +12,12 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
-import com.kairos.persistence.model.kpermissions.KPermissionAction;
-import com.kairos.persistence.model.kpermissions.KPermissionModel;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBuilder;
+import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.Position;
@@ -34,7 +34,6 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
-import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -64,9 +63,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
@@ -118,8 +114,6 @@ public class BootDataService {
     @Inject
     CurrencyGraphRepository currencyGraphRepository;
     @Inject
-    TimeSlotGraphRepository timeSlotGraphRepository;
-      @Inject
     private OpenningHourService openningHourService;
     @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
@@ -181,7 +175,7 @@ public class BootDataService {
 
             userBaseRepository.createFirstDBNode();
 
-            createStandardTimeSlots();
+            //createStandardTimeSlots();
             createMasterSkills();
             createOrganizationServices();
             createCountries();
@@ -275,17 +269,6 @@ public class BootDataService {
 
     }*/
 
-    private void createStandardTimeSlots() {
-        String timeSlotsNames[] = new String[]{"Day", "Evening", "Night"};
-        List<TimeSlot> standardTimeSlots = new ArrayList<>();
-        for (String timeSlotName : timeSlotsNames) {
-            TimeSlot timeSlot = new TimeSlot();
-            timeSlot.setName(timeSlotName);
-            timeSlot.setSystemGeneratedTimeSlots(true);
-            standardTimeSlots.add(timeSlot);
-        }
-        timeSlotGraphRepository.saveAll(standardTimeSlots);
-    }
 
     private void createGeoGraphicalData() {
         createRegion();
@@ -435,7 +418,6 @@ public class BootDataService {
          ContactAddress contactAddress = createContactAddress();
          kairosCountryLevel.setContactAddress(contactAddress);
 
-        organizationService.createOrganization(kairosCountryLevel,  true);
 
         createSuperAdminAccessGroup();
         createPosition(adminAsStaff);
@@ -573,9 +555,6 @@ public class BootDataService {
         kairosRegionLevel.setBoardingCompleted(true);
         ContactAddress contactAddress = getContactAddress();
         kairosRegionLevel.setContactAddress(contactAddress);
-        OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
-        organizationService.createOrganization(kairosRegionLevel,  true);
-
         //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
     }
 

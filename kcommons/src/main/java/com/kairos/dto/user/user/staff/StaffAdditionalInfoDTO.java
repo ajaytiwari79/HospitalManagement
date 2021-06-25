@@ -1,30 +1,34 @@
 package com.kairos.dto.user.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
+import com.kairos.dto.user.staff.staff.TeamRankingInfoDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalTime;
 
-
+import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.asLocalTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
 
@@ -37,6 +41,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @NoArgsConstructor
 public class StaffAdditionalInfoDTO {
 
+    private String firstName;
+    private String lastName;
     private String name;
     private long id;
     private List<Long> teams;
@@ -53,7 +59,7 @@ public class StaffAdditionalInfoDTO {
     private ZoneId unitTimeZone;
     private int staffAge;
     //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
-    private List<TimeSlotWrapper> timeSlotSets;
+    private List<TimeSlotDTO> timeSlotSets;
     private Long staffUserId;
     private String cprNumber;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
@@ -66,6 +72,14 @@ public class StaffAdditionalInfoDTO {
     private boolean nightWorker;
     private StaffStatusEnum currentStatus;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private OrganizationTypeDTO organizationType;
+    private OrganizationTypeDTO organizationSubType;
+    private Set<BigInteger> mainTeamActivities;
+    private List<TeamDTO> teamsData;
+    private Set<Long> employmentIds = new HashSet<>();
+    private ShiftActivityDTO replacedActivity;
+    private List<TeamRankingInfoDTO> staffTeamRankingInfoData;
+    private Boolean canRankTeam;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;
@@ -96,7 +110,7 @@ public class StaffAdditionalInfoDTO {
 
     public String getTimeSlotByShiftStartTime(Date startDate){
         LocalTime shiftTime = asLocalTime(startDate);
-        for (TimeSlotWrapper timeSlotSet : this.timeSlotSets) {
+        for (TimeSlotDTO timeSlotSet : this.timeSlotSets) {
             LocalTime startTime = LocalTime.of(timeSlotSet.getStartHour(),timeSlotSet.getStartMinute());
             LocalTime endTime = LocalTime.of(timeSlotSet.getEndHour(),timeSlotSet.getEndMinute());
             if(!shiftTime.isBefore(startTime) && shiftTime.isBefore(endTime) || (startTime.isAfter(endTime) && (!startTime.isAfter(shiftTime) || shiftTime.isBefore(endTime)))){
@@ -130,6 +144,10 @@ public class StaffAdditionalInfoDTO {
             }
         }
         return roles;
+    }
+
+    public List<SkillLevelDTO> getSkillsByLocalDate(LocalDate localDate){
+        return isCollectionNotEmpty(this.skillLevelDTOS) ? this.skillLevelDTOS.stream().filter(skillLevelDTO -> skillLevelDTO.isValidSkillsByLocalDate(localDate)).collect(Collectors.toList()) : new ArrayList<>();
     }
 
     public Long getUnitId() {

@@ -1,13 +1,7 @@
 package com.kairos.service.region;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.organization.RegionDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.region.*;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -320,19 +314,5 @@ public class RegionService {
 
         });
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfRegion(Long regionId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Region region =regionGraphRepository.findOne(regionId);
-        region.setTranslatedNames(translatedNames);
-        region.setTranslatedDescriptions(translatedDescriptios);
-        regionGraphRepository.save(region);
-        return region.getTranslatedData();
     }
 }

@@ -93,7 +93,6 @@ public final class ApiConstants {
     public static final String CURRENT_USER_ACCESS_ROLE = "/current_user/access_role";
     public static final String ACCESS_ROLE_AND_REASON_CODE = "/current_user/access_role_and_reason_codes";
     public static final String TIME_SLOT_URL = "/time_slot/{timeSlotId}";
-    public static final String CURRENT_TIME_SLOTS = "/current/time_slots";
     public static final String GET_CTA_BY_EMPLOYMENT_ID = "/cta_by_employment/{employmentId}";
     public static final String WTA_RULE_INFO = "/WTARelatedInfo";
     public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO = "/getWtaTemplateDefaultDataInfo";
@@ -106,7 +105,6 @@ public final class ApiConstants {
     public static final String GET_CLIENT_INFO = "/client/getClientInfo";
     public static final String CLIENT_CITIZEN_ID_UNIT_ID_TASK_PREREQUISITES = CLIENT_CITIZEN_ID + "/{unitId}/task_prerequisites";
     public static final String CLIENT_ORGANIZATION_CLIENTS = "/client/organization_clients";
-    public static final String ORGANIZATION_CLIENTS_IDS = "/client/organization_clients/ids";
     public static final String CLIENT_CLIENT_IDS = "/client/client_ids";
     public static final String GET_CLIENT_STAFF_INFO_BY_CLIENT_ID = CLIENT_ID_URL + "/getClientStaffInfo";
     public static final String GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID = CLIENT_CITIZEN_ID + STAFF_WITH_STAFF_ID + "/getStaffCitizenHouseholds";
@@ -152,13 +150,12 @@ public final class ApiConstants {
 
     public static final String STAFF_EMPLOYMENT_BY_EMPLOYMENT_ID = STAFF_URL + "/staff_employment/{employmentId}";
 
-    public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
+    public static final String UNIT_LOCATION = "/unit_location";
     public static final String GET_UNIT_BY_EMPLOYMENT = GET_EMPLOYMENT + "/get_unit";
 
     // /staff_by_employment_type
     public static final String STAFF_BY_KPI_FILTER = "/staff_by_kpi_filter";
     public static final String KPI_DEFAULT_DATA = "/kpi_default_data";
-    public static final String KPI_ALL_DEFAULT_DATA = "/kpi_all_default_data";
     public static final String KPI_FILTER_DEFAULT_DATA = "/kpi_filter_default_data";
 
     //Scheduler

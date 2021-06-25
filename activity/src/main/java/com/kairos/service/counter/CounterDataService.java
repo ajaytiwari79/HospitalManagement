@@ -28,12 +28,14 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -46,11 +48,14 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.shift.ShiftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +76,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.activity.counter.enums.CounterType.ABSENCES_PER_INTERVAL;
 import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.reason_code.ReasonCodeType.FORCEPLAN;
 import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
 import static java.util.stream.Collectors.toList;
 
@@ -86,6 +92,12 @@ public class CounterDataService {
     private ExceptionService exceptionService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private ReasonCodeService reasonCodeService;
+    @Inject
+    private TimeSlotMongoRepository timeSlotMongoRepository;
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -134,6 +146,8 @@ public class CounterDataService {
                 if(isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException | ExecutionException ex) {
                 LOGGER.error("error while generate KPI  data",ex);
+                String[] messages = ex.getMessage().split(": ");
+                throw new RuntimeException(messages[1]);
             }
         }
         return isNotNull(kpisData) ? kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData)) : new HashMap<>();
@@ -208,6 +222,13 @@ public class CounterDataService {
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
+        defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, FORCEPLAN));
+        TimeSlotSetDTO timeSlotSetDTO = timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING);
+        if(isNull(timeSlotSetDTO)){
+            exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
+        }
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetDTO.getTimeSlots());
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;

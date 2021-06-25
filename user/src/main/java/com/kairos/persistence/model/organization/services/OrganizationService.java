@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrganizationService extends UserBaseEntity {
+public class OrganizationService extends UserBaseEntity implements Serializable {
+    private static final long serialVersionUID = 6470037280579995989L;
     @NotBlank(message = ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY)
     private String name;
 

@@ -5,11 +5,8 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
@@ -17,15 +14,17 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.neo4j.util.IterableUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +74,7 @@ public class OrganizationServiceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
 
+    @CacheEvict(value = "getAllOrganizationService", key = "#countryId")
     public Map<String, Object> updateOrganizationService(long id, String name, String description, Long countryId) {
         if (isNull(name) || name.trim().isEmpty()) {
             exceptionService.actionNotPermittedException(ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY);
@@ -97,30 +97,19 @@ public class OrganizationServiceService {
         return organizationServiceRepository.findOne(id);
     }
 
-
-    public List<Map<String,Object>> getAllOrganizationService(long countryId) {
+    //@Cacheable(value = "getAllOrganizationService", key = "#countryId", cacheManager = "cacheManager")
+    public Iterable<OrganizationService> getAllOrganizationService(Long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
-        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
+        Iterable<OrganizationService> organizationServices = organizationServiceRepository.findAllById(serviceIds);
+        organizationServices.forEach(organizationService -> {
+            if(isCollectionNotEmpty(organizationService.getOrganizationSubService())) {
+                organizationService.setOrganizationSubService(organizationService.getOrganizationSubService().stream().filter(i -> i.isEnabled()).collect(Collectors.toList()));
+            }
+        });
+        return organizationServices;
+     }
 
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description",result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
-    }
-
+    @CacheEvict(value = "getAllOrganizationService", allEntries = true)
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
@@ -162,6 +151,7 @@ public class OrganizationServiceService {
 
     }
 
+    @CacheEvict(value = "getAllOrganizationService", allEntries = true)
     public Map<String, Object> addCountrySubService(final long serviceId, OrganizationService subService) {
         OrganizationService organizationService = organizationServiceRepository.findById(serviceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         String name = "(?i)" + subService.getName();
@@ -184,6 +174,7 @@ public class OrganizationServiceService {
 
     }
 
+    @CacheEvict(value = "getAllOrganizationService", allEntries = true)
     public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName) {
 
         return unitGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
@@ -191,15 +182,18 @@ public class OrganizationServiceService {
 
     }
 
+    @CacheEvict(value = "getAllOrganizationService", allEntries = true)
     public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId, long organizationId, String customName) {
             return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
     }
 
+    @CacheEvict(value = "getAllOrganizationService", allEntries = true)
     private Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
         return unitGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
 
-    public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected) {
+
+    public Map<String, Object> updateServiceToOrganization(Long id, Long organizationServiceId, boolean isSelected) {
         Unit unit=unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND,"Unit",id)));
         OrganizationService organizationService = organizationServiceRepository.findById(organizationServiceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         if (isSelected) {
@@ -220,29 +214,13 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Map<String,Object>> getOrgServicesByOrgType(long orgType) {
+    public List<OrganizationServiceDTO> getOrgServicesByOrgType(long orgType) {
         List<Long> organizationServiceIds = organizationServiceRepository.getAllOrganizationServiceId(orgType);
         List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(organizationServiceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
-
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description",result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
     }
 
+    @CacheEvict(value = "getAllOrganizationService", allEntries = true)
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
         OrganizationType organizationType = organizationTypeGraphRepository.findOne(orgTypeId);
         List<Object> objectList = new ArrayList<>();
@@ -250,7 +228,7 @@ public class OrganizationServiceService {
             if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
                 LOGGER.info("Already Selected now Deselecting ");
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
@@ -259,12 +237,20 @@ public class OrganizationServiceService {
             } else {
                 LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
                 }
             }
+            objectList.forEach(objectMap->{
+                Map<String, Object> map = (Map<String, Object>)objectMap;
+                ((List)map.get("children")).forEach(child->{
+                    Map<String, Object> childMap = (Map<String, Object>)child;
+                    TranslationUtil.convertTranslationFromStringToMap(childMap);
+                });
+                TranslationUtil.convertTranslationFromStringToMap(map);
+            });
         }
         return objectList;
     }
@@ -274,8 +260,8 @@ public class OrganizationServiceService {
 
     }
 
-
-    public OrganizationService createCountryOrganizationService(long countryId, OrganizationService organizationService) {
+    @CacheEvict(value = "getAllOrganizationService", key = "#countryId")
+    public OrganizationService createCountryOrganizationService(Long countryId, OrganizationService organizationService) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             return null;
@@ -296,24 +282,26 @@ public class OrganizationServiceService {
     public Map<String, Object> organizationServiceData(long id) {
         List<Long> allUnitIds=organizationBaseRepository.fetchAllUnitIds(id);
         List<Map<String, Object>> services=(allUnitIds.size()==1 && allUnitIds.get(0).equals(id))?unitGraphRepository.getServicesForUnit(id):unitGraphRepository.getServicesForUnits(allUnitIds);
+        services = ObjectMapperUtils.copyCollectionPropertiesByMapper(services, HashedMap.class);
         List<Map<String, Object>> avialableService = null;
         List<Map<String, Object>> selectedService = null;
         for(Map<String,Object> map : services){
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES))){
-                avialableService = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES);
+            Map<String, Object> service =(Map<String, Object>) map.get("data");
+            if(isNotNull(service.get(AVAILABLE_SERVICES))){
+                avialableService = (List<Map<String,Object>>)service.get(AVAILABLE_SERVICES);
             }
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES))){
-                selectedService = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES);
+            if(isNotNull(service.get(SELECTED_SERVICES))){
+                selectedService = (List<Map<String,Object>>)service.get(SELECTED_SERVICES);
             }
+            TranslationUtil.convertTranslationFromStringToMap(service);
         }
         Map<String,Object> organizationServiceMap = new HashMap<>();
         organizationServiceMap.put(AVAILABLE_SERVICES,avialableService);
         organizationServiceMap.put(SELECTED_SERVICES,selectedService);
-
-
         return organizationServiceMap;
 
     }
+
 
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
         Map<String, Object> response = new HashMap<>();
@@ -387,26 +375,5 @@ public class OrganizationServiceService {
     public List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId){
         return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        OrganizationService service = organizationServiceRepository.findOne(serviceId);
-        service.setTranslatedNames(translatedNames);
-        service.setTranslatedDescriptions(translatedDescriptios);
-        organizationServiceRepository.save(service);
-        return service.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> getTranslatedData(Long serviceId) {
-        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
-        return organizationService.getTranslatedData();
-    }
-
-
 
 }

@@ -24,6 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LE
 @Setter
 @NoArgsConstructor
 public class PayGroupArea extends UserBaseEntity {
+    private static final long serialVersionUID = 1900074878897740934L;
     private String name;
     private String description;
     @Relationship(type = IN_LEVEL)

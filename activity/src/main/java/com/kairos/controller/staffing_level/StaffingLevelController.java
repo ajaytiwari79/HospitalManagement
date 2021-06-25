@@ -9,6 +9,7 @@ import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.service.staffing_level.ImportStaffingLevelService;
 import com.kairos.service.staffing_level.StaffingLevelGraphConfigurationService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.Message;
@@ -44,6 +45,7 @@ public class StaffingLevelController {
 
     private static  final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelController.class);
     @Inject private StaffingLevelService staffingLevelService;
+    @Inject private ImportStaffingLevelService importStaffingLevelService;
     @Inject private StaffingLevelGraphConfigurationService staffingLevelGraphConfigurationService;
 
 
@@ -137,7 +139,7 @@ public class StaffingLevelController {
     @ApiOperation("update staffing level from csv")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     private ResponseEntity<Map<String, Object>> updateStaffingLevelFromCSV(@RequestParam("file") MultipartFile multipartFile,@PathVariable Long unitId) throws Exception{
-        staffingLevelService.processStaffingLevel(multipartFile,unitId);
+        importStaffingLevelService.processStaffingLevel(multipartFile,unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
@@ -209,7 +211,7 @@ public class StaffingLevelController {
 
     @PutMapping(value = "/set_initial")
     @ApiOperation("update staffing level graph configuration")
-    public ResponseEntity<Map<String, Object>> updateInitialInStaffingLevel(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
+    public ResponseEntity<Map<String, Object>> updateInitialInStaffingLevel(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateInitialInStaffingLevel());
     }
 }

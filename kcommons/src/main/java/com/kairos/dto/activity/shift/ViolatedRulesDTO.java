@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -19,7 +20,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ViolatedRulesDTO {
+public class ViolatedRulesDTO implements Serializable {
 
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
     private List<ActivityRuleViolation> activities = new ArrayList<>();

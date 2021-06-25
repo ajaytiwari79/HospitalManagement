@@ -1,5 +1,6 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.rule_validator.Specification;
 
 import java.util.Collections;
@@ -24,7 +25,7 @@ public class OrActivitySpecification<T> extends AbstractActivitySpecification<T>
     }
 
     @Override
-    public void validateRules(T t) {
+    public void validateRules(T t, RuleExecutionType ruleExecutionType) {
         boolean valid = specification1.isSatisfied(t) || specification2.isSatisfied(t);
     }
 

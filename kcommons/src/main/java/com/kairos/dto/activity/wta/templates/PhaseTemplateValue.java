@@ -3,6 +3,7 @@ package com.kairos.dto.activity.wta.templates;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Objects;
 
@@ -14,7 +15,8 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PhaseTemplateValue {
+public class PhaseTemplateValue implements Serializable {
+    private static final long serialVersionUID = 213213212232l;
     private BigInteger phaseId;
     private String phaseName;
     private short staffValue;

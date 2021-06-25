@@ -38,6 +38,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class Staff extends UserBaseEntity {
+    private static final long serialVersionUID = -2082354170738899004L;
     @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
@@ -101,7 +102,7 @@ public class Staff extends UserBaseEntity {
     private StaffStatusEnum currentStatus;
     @KPermissionField
     private Long inactiveFrom;
-    private long organizationId;
+    private Long organizationId;
     @KPermissionField
     private Language language;
     // Visitour Speed Profile
@@ -123,6 +124,7 @@ public class Staff extends UserBaseEntity {
     @Relationship(type = BELONGS_TO_TAGS)
     @KPermissionField
     private List<Tag> tags;
+    private boolean canRankTeam;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
         this.email = email;

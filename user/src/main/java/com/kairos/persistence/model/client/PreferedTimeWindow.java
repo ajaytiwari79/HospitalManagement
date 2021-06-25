@@ -18,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class PreferedTimeWindow extends UserBaseEntity {
 
+    private static final long serialVersionUID = -326961896849949550L;
     private String name;
     @Convert(LocalTimeConverter.class)
     private LocalTime fromTime;

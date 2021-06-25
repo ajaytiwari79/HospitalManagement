@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ScheduleTimeByTimeTypeDTO {
+public class ScheduleTimeByTimeTypeDTO implements Serializable {
 
     private int totalMin;
     private BigInteger timeTypeId;

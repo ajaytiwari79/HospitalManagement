@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.open_shift;
 
-public enum BringVehicle {
+import java.io.Serializable;
+
+public enum BringVehicle implements Serializable {
     CAR,BICYCLE,NONE
 }

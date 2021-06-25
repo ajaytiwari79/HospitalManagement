@@ -27,19 +27,7 @@ jar{
 
 dependencies {
     implementation project(':kcommons')
-    compile("org.aspectj:aspectjweaver:1.8.8")
-    compile 'javax.validation:validation-api:2.0.0.Final'
-    compile 'org.apache.commons:commons-lang3:3.7'
-    compile group: 'org.springframework', name: 'spring-context', version: '5.0.9.RELEASE'
-    compile group: 'org.springframework', name: 'spring-beans', version: '5.0.9.RELEASE'
-    compile group: 'javax.inject', name: 'javax.inject', version: '1'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile group: 'org.springframework', name: 'spring-web', version: '5.0.9.RELEASE'
-    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.10'
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
-    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.0.8.RELEASE'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
-    //compile('org.springframework.boot:spring-boot-starter-data-neo4j')
 }
 
 sonarqube {

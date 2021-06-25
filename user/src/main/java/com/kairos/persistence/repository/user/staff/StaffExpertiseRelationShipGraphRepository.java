@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepository<StaffExpertiseRelationShip, Long> {
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(staff) = {0} AND id(orgService) IN {1}\n" +
-            "RETURN DISTINCT id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths ")
+            "RETURN DISTINCT id(rel) as id, id(expertise) as expertiseId, expertise.translations as translations, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths ")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndServices(Long staffId, Set<Long> serviceIds);
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND id(expertise)={1}" +

@@ -1,11 +1,8 @@
 package com.kairos.service.system_setting;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.system_setting.CountryLanguageSettingRelationship;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;
@@ -21,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -126,11 +121,7 @@ public class SystemLanguageService {
     }
 
     public List<SystemLanguageDTO> getListOfSystemLanguage() {
-        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.getListOfSystemLanguage(), SystemLanguageDTO.class);
-        systemLanguageDTOS.forEach(systemLanguageDTO -> {
-            systemLanguageDTO.setTranslations(TranslationUtil.getTranslatedData(systemLanguageDTO.getTranslatedNames(),systemLanguageDTO.getTranslatedDescriptions()));
-        });
-        return systemLanguageDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.getListOfSystemLanguage(), SystemLanguageDTO.class);
     }
 
     public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultLanguage, Boolean selected) {
@@ -183,12 +174,7 @@ public class SystemLanguageService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
-        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
-        systemLanguageDTOS.forEach(systemLanguageDTO -> {
-            systemLanguageDTO.setCountryId(countryId);
-            systemLanguageDTO.setTranslations(TranslationUtil.getTranslatedData(systemLanguageDTO.getTranslatedNames(),systemLanguageDTO.getTranslatedDescriptions()));
-        });
-        return systemLanguageDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
     }
 
     public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId) {
@@ -224,20 +210,6 @@ public class SystemLanguageService {
 
     public SystemLanguage getSystemLanguageByName(String name) {
         return systemLanguageGraphRepository.findSystemLanguageByName(name);
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long systemLanguageId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        SystemLanguage systemLanguage =systemLanguageGraphRepository.findOne(systemLanguageId);
-        systemLanguage.setTranslatedNames(translatedNames);
-        systemLanguage.setTranslatedDescriptions(translatedDescriptios);
-        systemLanguageGraphRepository.save(systemLanguage);
-        return systemLanguage.getTranslatedData();
     }
 
 }

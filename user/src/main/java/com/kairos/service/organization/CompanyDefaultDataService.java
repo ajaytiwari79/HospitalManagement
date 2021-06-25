@@ -7,13 +7,11 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.GdprIntegrationService;
 import org.springframework.scheduling.annotation.Async;
@@ -32,8 +30,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CompanyDefaultDataService {
     @Inject
-    private TimeSlotService timeSlotService;
-    @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private VRPClientService vrpClientService;
@@ -42,15 +38,13 @@ public class CompanyDefaultDataService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    private ReasonCodeService reasonCodeService;
-    @Inject
     private GdprIntegrationService gdprIntegrationService;
     @Inject private EmploymentTypeService employmentTypeService;
     @Inject private CountryGraphRepository countryGraphRepository;
 
 
-    @Async
-    public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId, List<TimeSlot> timeSlots) {
+  @Async  
+    public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
         List<Long> employmentTypeIds = employmentTypes.stream().map(UserBaseEntity::getId).collect(Collectors.toList());
@@ -66,23 +60,21 @@ public class CompanyDefaultDataService {
             activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()),
                             null, parentId, null), unit.getId());
-            timeSlotService.createDefaultTimeSlots(unit, timeSlots);
             vrpClientService.createDefaultPreferredTimeWindow(unit);
             activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
-            reasonCodeService.createReasonCodeForUnit(unit, parentId);
             gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
         });
     }
 
-    @Async
-    public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap, List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+
+  @Async  
+  public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
             orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), orgTypeAndSubTypeDTO);
             unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
-            timeSlotService.createDefaultTimeSlots(organization, timeSlots);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());

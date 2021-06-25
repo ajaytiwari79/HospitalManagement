@@ -26,7 +26,7 @@ public class VrpTaskPlanningSolver {
     public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
     public static String defaultDrl = "optaplanner-vrp-taskplanning/src/main/resources/drl/vrp_task_rules.drl";
     public static String config_on_request = "/opt/kairos/kairos-user/planner/optaplanner-vrp-taskplanning/src/main/resources/config/configuration_for_request.xml";
-    private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
+    public  static final Logger LOGGER = LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     Solver<VrpTaskPlanningSolution> solver;
     SolverFactory<VrpTaskPlanningSolution> solverFactory;
 
@@ -47,7 +47,7 @@ public class VrpTaskPlanningSolver {
         }
         solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
-            log.info("no of drool files"+drlFileList.size());
+            LOGGER.info("no of drool files"+drlFileList.size());
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
             solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
             //solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
@@ -72,7 +72,7 @@ public class VrpTaskPlanningSolver {
 
     public void solve(VrpTaskPlanningSolution problem,boolean addBreaks) throws IOException {
         problem.getTasks().stream().map(t->t.getCity()+"---"+t.getStreetName()).collect(Collectors.toSet()).forEach(b->{
-            log.info("city---street:     "+b);
+            LOGGER.info("city---street:     "+b);
         });
         printProblemInfo(problem);
         if(addBreaks) {
@@ -86,7 +86,7 @@ public class VrpTaskPlanningSolver {
         });
         //TODO ease efficiency for debugging
         //problem.getEmployees().forEach(e->e.setEfficiency(100));
-        log.info("Number of tasks:"+problem.getTasks().size());
+        LOGGER.info("Number of tasks:"+problem.getTasks().size());
         LocationPair locationPair = new ArrayList<LocationPair>(problem.getLocationsDistanceMatrix().getTable().keySet()).get(2);
         LocationPairDifference locationsDifference = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair);
         LocationPairDifference locationsDifference2 = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair.getReversePair());
@@ -100,7 +100,7 @@ public class VrpTaskPlanningSolver {
             solution = solver.solve(problem);
 
         }catch (Exception e){
-            //e.printStackTrace();
+            //logger.error(e.getMessage());
             throw  e;
         }
         getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
@@ -110,7 +110,7 @@ public class VrpTaskPlanningSolver {
 
     private void printSolutionInformation(VrpTaskPlanningSolution solution) {
 
-        log.info("---------------Printing SOlution Information.-----");
+        LOGGER.info("---------------Printing SOlution Information.-----");
         int totalDrivingTime=0;
         StringBuilder sbs= new StringBuilder("Locs data:\n");
         StringBuilder sbTom= new StringBuilder("Locs data for tomtom:\n");
@@ -121,21 +121,21 @@ public class VrpTaskPlanningSolver {
         }*/
         for(Shift shift: solution.getShifts()){
             StringBuffer sb= new StringBuffer(shift+":::"+(shift.getNumberOfTasks()<10?0+""+shift.getNumberOfTasks():shift.getNumberOfTasks())+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
-            log.info(sb.toString());
+            LOGGER.info(sb.toString());
             sbs.append(shift.getId()+":"+getLocationList(shift).toString()+"\n");
             sbTom.append(shift.getId()+":"+getLocationListForTomTom(shift).toString()+"\n");
             shiftChainInfo.append(shift.getId()+":"+getShiftChainInfo(shift)+"\n");
             totalDrivingTime+=shift.getChainDrivingTime();
         }
-        log.info(sbs.toString());
-        log.info(sbTom.toString());
-        log.info(shiftChainInfo.toString());
-        log.info("total driving time:"+totalDrivingTime);
+        LOGGER.info(sbs.toString());
+        LOGGER.info(sbTom.toString());
+        LOGGER.info(shiftChainInfo.toString());
+        LOGGER.info("total driving time:"+totalDrivingTime);
 
-        log.info("per employee mins:");
+        LOGGER.info("per employee mins:");
         Map<String,IntSummaryStatistics> map=solution.getShifts().stream().collect(Collectors.groupingBy(s->s.getEmployee().getName(),Collectors.summarizingInt(s->s.getChainDuration())));
         map.entrySet().forEach(e->{
-            log.info(e.getKey()+"---"+e.getValue().getSum());
+            LOGGER.info(e.getKey()+"---"+e.getValue().getSum());
         });
 
         printBreaksInfo(solution.getShifts());
@@ -146,15 +146,15 @@ public class VrpTaskPlanningSolver {
         Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
 
         toDisplayString(new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()});
-        log.info("---------------Printing Solution Information Completed-----");
+        LOGGER.info("---------------Printing Solution Information Completed-----");
     }
 
     private void printBreaksInfo(List<Shift> shifts) {
-        log.info("Breaks info.");
+        LOGGER.info("Breaks info.");
         shifts.forEach(s->{
-            log.info(s.getId()+"-"+s.getEmployee().getName()+"->"+s.getBreak()+(s.getBreak()==null?"":s.getBreak().getPlannedStartTime()));
+            LOGGER.info(s.getId()+"-"+s.getEmployee().getName()+"->"+s.getBreak()+(s.getBreak()==null?"":s.getBreak().getPlannedStartTime()));
         });
-        log.info("-------------");
+        LOGGER.info("-------------");
     }
 
     private void addBreaks(VrpTaskPlanningSolution problem) {
@@ -169,15 +169,15 @@ public class VrpTaskPlanningSolver {
     }
 
     private void printProblemInfo(VrpTaskPlanningSolution problem) {
-        log.info("Tasks details:");
+        LOGGER.info("Tasks details:");
         problem.getTasks().forEach(t->{
-            log.info(t+"-----"+t.getSkills());
+            LOGGER.info(t+"-----"+t.getSkills());
         });
         Map<String,List<Task>> map=problem.getTasks().stream().collect(Collectors.groupingBy(t->t.getSkills()==null?"break":t.getSkills().toString()));
         for(Map.Entry<String,List<Task>> e:map.entrySet()){
-            log.info(e.getKey()+"----------"+e.getValue().stream().mapToInt(t->t.getDuration()).sum()+"------"+e.getValue());
+            LOGGER.info(e.getKey()+"----------"+e.getValue().stream().mapToInt(t->t.getDuration()).sum()+"------"+e.getValue());
         }
-        log.info("Tasks details Done.");
+        LOGGER.info("Tasks details Done.");
 
     }
 
@@ -191,18 +191,18 @@ public class VrpTaskPlanningSolver {
         VrpTaskPlanningSolution solution=null;
         try {
             //TODO put submiss id here
-            log.info("Starting vrp solver on this thread with problem:"+problem.getSolverConfigId());
+            LOGGER.info("Starting vrp solver on this thread with problem:"+problem.getSolverConfigId());
             solution = solver.solve(problem);
             DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 
             director.setWorkingSolution(solution);
             Map<Object,Indictment> indictmentMap=(Map)director.getIndictmentMap();
             printSolutionInformation( solution);
-            //log.info(solver.explainBestScore());
+            //LOGGER.info(solver.explainBestScore());
             //getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
             return new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()};
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
             //throw  e;
         }
         return null;
@@ -274,11 +274,11 @@ public class VrpTaskPlanningSolver {
         Map<Task, Indictment> indictmentMap = (Map<Task, Indictment>) array[1];
         Collection<ConstraintMatchTotal> constraintMatchTotals = (Collection<ConstraintMatchTotal>) array[2];
         constraintMatchTotals.forEach(constraintMatchTotal -> {
-            log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
+            LOGGER.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
             constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
                 constraintMatch.getJustificationList().forEach(o -> {
 
-                    log.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift()+""+((Task)o).getSkills():""));
+                    LOGGER.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift()+""+((Task)o).getSkills():""));
                 });
             });
 

@@ -13,6 +13,7 @@ import java.util.Set;
 
 @Document
 public class PayRoll extends MongoBaseEntity {
+    private static final long serialVersionUID = -2596330131766559085L;
     private String name;
     private int code;
     private boolean active;

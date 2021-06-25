@@ -10,7 +10,6 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.action.Action;
 import com.kairos.persistence.model.action.ActionInfo;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.action.ActionInfoRepository;
@@ -96,7 +95,8 @@ public class ActionService {
     public Map<String,Object> getCountBeforeAfterDate(Long unitId, Long staffId, Date shiftDate) {
         Map<String,Integer> beforeMap = new HashMap<String,Integer>(){{put(AVAILABILITY,0);put(UNAVAILABILITY,0);put(STOP_BRICK,0);}};
         Map<String,Integer> afterMap = new HashMap<>(beforeMap);
-        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(shiftDate),getEndOfDay(shiftDate));
+        Set<TimeTypeEnum> timetypes = newHashSet(TimeTypeEnum.UNAVAILABLE_TIME,TimeTypeEnum.AVAILABLE_TIME, TimeTypeEnum.STOP_BRICK);
+        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffIdAndByTimeType(staffId,getStartOfDay(shiftDate),getEndOfDay(shiftDate), timetypes);
         shifts.forEach(shift -> {
             if(!shift.getEndDate().after(getEndOfDay(shiftDate))) {
                 List<TimeTypeEnum> timeTypeEnums = shift.getActivities().stream().map(ShiftActivity::getSecondLevelTimeType).collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class ActionService {
         Map<String,Object> response = new HashMap<>();
         response.put(BEFORE,beforeMap);
         response.put(AFTER,afterMap);
-        setTimeTypeActivityNameInMap(unitId, response);
+        //setTimeTypeActivityNameInMap(unitId, response);
         return response;
     }
 
@@ -122,16 +122,6 @@ public class ActionService {
         } else if (timeTypeEnums.contains(TimeTypeEnum.STOP_BRICK)) {
             map.put(STOP_BRICK, map.get(STOP_BRICK)+1);
         }
-    }
-
-    private void setTimeTypeActivityNameInMap(Long unitId, Map<String,Object> response){
-        //TODO As discuss with priya configure only one activity of availability and unavailability at unit
-        List<Activity> availabilityActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.AVAILABLE_TIME, newHashSet(unitId));
-        response.put(AVAILABILITY_NAME, isCollectionNotEmpty(availabilityActivities) ? availabilityActivities.get(0).getName() : "");
-        List<Activity> unavailabilityActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.UNAVAILABLE_TIME, newHashSet(unitId));
-        response.put(UNAVAILABILITY_NAME, isCollectionNotEmpty(unavailabilityActivities) ? unavailabilityActivities.get(0).getName() : "");
-        List<Activity> stopBrickActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.STOP_BRICK, newHashSet(unitId));
-        response.put(STOP_BRICK_NAME, isCollectionNotEmpty(stopBrickActivities) ? stopBrickActivities.get(0).getName() : "");
     }
 
     public List<ShiftWithViolatedInfoDTO> removeBeforeAfterShiftByTimeType(Long staffId, TimeTypeEnum timeTypeEnum, boolean before, boolean removeNearestOne, Date shiftDate) {

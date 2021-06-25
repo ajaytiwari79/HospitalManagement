@@ -5,7 +5,6 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationConfiguration;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
-import com.kairos.persistence.cta_compensation_setting.CTACompensationSetting;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.cta.CountryCTAService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
@@ -226,7 +225,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "Get CTA by Organization sub type  by using sub type Id")
     @GetMapping(value = COUNTRY_URL + "/cta/organization_sub_type/{organizationSubTypeId}")
-    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable Long countryId,@PathVariable long organizationSubTypeId) {
+    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable Long countryId,@PathVariable Long organizationSubTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(countryId,organizationSubTypeId));
     }
 
@@ -241,7 +240,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "link and unlink cta with org sub-type")
     @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable long countryId, @PathVariable BigInteger ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked)  {
+    public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable Long countryId, @PathVariable BigInteger ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable Long organizationSubTypeId, @RequestParam(value = "checked") boolean checked)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.setCTAWithOrganizationType(countryId, ctaId,collectiveTimeAgreementDTO, organizationSubTypeId, checked));
     }
 
@@ -252,7 +251,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "create default cta ruletemplate ")
     @PostMapping(value = COUNTRY_URL + "/default_cta")
-    public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable long countryId)  {
+    public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable Long countryId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.createDefaultCtaRuleTemplate(countryId));
     }
 
@@ -353,6 +352,19 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> updateTranslationDataOfCTATemplatesOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCtaRuleTranslations(id,translations));
     }
+
+    @GetMapping(value = COUNTRY_URL+"/cta/default-data")
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTAByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultDataForCTATemplate(countryId,null));
+    }
+
+    @GetMapping(value = UNIT_URL+"/cta/default-data")
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTAByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultDataForCTATemplate(null,unitId));
+    }
+
 
 }
 

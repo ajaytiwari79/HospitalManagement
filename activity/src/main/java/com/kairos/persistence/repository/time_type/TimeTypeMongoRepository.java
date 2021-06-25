@@ -17,10 +17,10 @@ import java.util.List;
 public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, BigInteger> ,CustomTimeTypeMongoRepository {
 
     @Query("{'upperLevelTimeTypeId':{'$exists':false},'deleted' : false,'countryId':?0}")
-    List<TimeType> getTopLevelTimeType(Long countryId);
+    List<TimeTypeDTO> getTopLevelTimeType(Long countryId);
 
     @Query("{'upperLevelTimeTypeId':{'$exists':true},'deleted' : false,'countryId':?0}")
-    List<TimeType> findAllLowerLevelTimeType(Long countryId);
+    List<TimeTypeDTO> findAllLowerLevelTimeType(Long countryId);
 
     @Query("{label:{$in:?0},countryId:?1,deleted : false}")
     TimeType findByLabelsAndCountryId(List<String> label, Long countryId);

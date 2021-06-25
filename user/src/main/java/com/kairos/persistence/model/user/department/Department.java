@@ -18,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MANAG
 @NodeEntity
 public class Department extends UserBaseEntity {
 
+    private static final long serialVersionUID = 7093818153758836139L;
     private String name;
 
     @Relationship(type = HAS_STAFF)

@@ -26,7 +26,6 @@ import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.Shortcuts.ShortcutService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
@@ -49,7 +48,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Service
-public class CounterDistService extends MongoBaseService {
+public class CounterDistService {
     @Inject
     private CounterRepository counterRepository;
     @Inject

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 /**
  * Created By G.P.Ranjan on 1/7/19
@@ -13,10 +15,16 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProtectedDaysOffSettingDTO {
+public class ProtectedDaysOffSettingDTO implements Serializable {
+    private static final long serialVersionUID = 9148594489091221237L;
     private BigInteger id;
     private Long unitId;
     private ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings;
+    private BigInteger holidayId;
+    private LocalDate publicHolidayDate;
+    private boolean protectedDaysOff;
+    private BigInteger dayTypeId;
+    private Long expertiseId;
 
     public ProtectedDaysOffSettingDTO(BigInteger id, Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         this.id=id;

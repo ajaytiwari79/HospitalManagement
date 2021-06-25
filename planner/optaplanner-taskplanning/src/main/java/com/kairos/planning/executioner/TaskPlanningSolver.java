@@ -24,6 +24,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -233,6 +234,7 @@ public class TaskPlanningSolver {
 					new StringReader( xmlString ) ) );
 
 			TransformerFactory tranFactory = TransformerFactory.newInstance();
+			tranFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 			Transformer aTransformer = tranFactory.newTransformer();
 			Source src = new DOMSource( document );
 			Result dest = new StreamResult( new File("E:\\temp\\"+fileName+".xml") );

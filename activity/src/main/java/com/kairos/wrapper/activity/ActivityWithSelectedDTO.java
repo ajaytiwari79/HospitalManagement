@@ -6,6 +6,7 @@ import com.kairos.commons.annotation.PermissionClass;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +17,8 @@ import java.util.List;
 @Getter
 @Setter
 @PermissionClass(name = "Activity")
-public class ActivityWithSelectedDTO {
+public class ActivityWithSelectedDTO implements Serializable {
+    private static final long serialVersionUID = 7426135099733771383L;
     private List<ActivityTagDTO> allActivities;
     private List<ActivityTagDTO> selectedActivities;
 }

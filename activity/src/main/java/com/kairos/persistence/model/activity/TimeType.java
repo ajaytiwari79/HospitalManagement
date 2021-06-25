@@ -1,10 +1,7 @@
 package com.kairos.persistence.model.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
-import com.kairos.enums.OrganizationHierarchy;
-import com.kairos.enums.PriorityFor;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
 import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
@@ -14,20 +11,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.enums.PriorityFor.PRESENCE;
+import static com.kairos.enums.PriorityFor.NONE;
 
 @Document(collection = "time_Type")
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeType extends MongoBaseEntity{
+public class TimeType extends MongoBaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 3265660403399363722L;
     private Long countryId;
     private TimeTypes timeTypes;
     private BigInteger upperLevelTimeTypeId;
@@ -52,10 +51,11 @@ public class TimeType extends MongoBaseEntity{
     private List<Long> levels;
     private List<Long> employmentTypes;
     private boolean breakNotHeldValid;
-    private BigInteger activityPriorityId;
-    private PriorityFor priorityFor = PRESENCE;
+    private PriorityFor priorityFor = NONE;
     private boolean sicknessSettingValid;
     private Map<String,BigInteger> upperLevelTimeTypeDetails;
+    //this setting for unity graph
+    private UnityActivitySetting unityActivitySetting;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;

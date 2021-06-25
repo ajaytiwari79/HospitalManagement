@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 public class ActivityPriority extends MongoBaseEntity {
 
+    private static final long serialVersionUID = 2006631334246625719L;
     private Long countryId;
     private Long organizationId;
     private String name;

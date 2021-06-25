@@ -35,6 +35,7 @@ import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
@@ -88,9 +89,9 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
         List<DateTimeInterval> dateTimeIntervals =getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,null);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),new ArrayList<>(),filterBasedCriteria,true);
-        DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(staffEmploymentTypeDTO);
-        List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
-        Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
+        DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getDefaultDataForKPI(staffEmploymentTypeDTO);
+        List<BigInteger> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
+        Map<BigInteger, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         Set<DayOfWeek> daysOfWeek = counterHelperService.getDayOfWeek(dayTypeIds,daysTypeIdAndDayTypeMap);
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));

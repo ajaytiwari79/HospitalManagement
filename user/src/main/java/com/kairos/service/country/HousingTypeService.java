@@ -1,12 +1,9 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
-import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -14,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -53,13 +48,8 @@ public class HousingTypeService {
     }
 
     public List<HousingTypeDTO> getHousingTypeByCountryId(long countryId) {
-        List<HousingType> housingTypes =housingTypeGraphRepository.findHousingTypeByCountry(countryId);
-        List<HousingTypeDTO> housingTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(housingTypes,HousingTypeDTO.class);
-        housingTypeDTOS.forEach(housingTypeDTO -> {
-            housingTypeDTO.setCountryId(countryId);
-            housingTypeDTO.setTranslations(TranslationUtil.getTranslatedData(housingTypeDTO.getTranslatedNames(),housingTypeDTO.getTranslatedDescriptions()));
-        });
-        return housingTypeDTOS;
+        List<HousingType> housingTypes = housingTypeGraphRepository.findHousingTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(housingTypes, HousingTypeDTO.class);
     }
 
     public HousingTypeDTO updateHousingType(long countryId, HousingTypeDTO housingTypeDTO) {
@@ -85,16 +75,5 @@ public class HousingTypeService {
             exceptionService.dataNotFoundByIdException("error.HousingType.notfound");
         }
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long housingTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        HousingType housingType =housingTypeGraphRepository.findOne(housingTypeId);
-        housingType.setTranslatedNames(translatedNames);
-        housingType.setTranslatedDescriptions(translatedDescriptions);
-        housingTypeGraphRepository.save(housingType);
-        return housingType.getTranslatedData();
     }
 }

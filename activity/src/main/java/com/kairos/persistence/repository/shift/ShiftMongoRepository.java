@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
@@ -9,10 +10,12 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 30/8/17.
@@ -39,8 +42,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, List<Long> unitIds);
 
 
-    @Query("{'deleted':false,'unitId':?2, 'disabled':false, '_id':{'$ne':?3},'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
-    List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(Date startDate, Date endDate, Long unitId,BigInteger shiftId);
+    @Query("{'deleted':false,'unitId':?2, 'disabled':false,'startDate':{$lte:?1} , 'endDate': {$gte:?0}}")
+    List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(LocalDate startDate, LocalDate endDate, Long unitId);
 
     List<Shift> findAllByIdInAndDeletedFalseOrderByStartDateAsc(List<BigInteger> shiftIds);
 
@@ -49,6 +52,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, 'startDate':{$lt:?2} , 'endDate': {$gt:?1}}")
     List<Shift> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, 'startDate':{$lt:?2} , 'endDate': {$gt:?1}}")
+    List<Shift> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, Date startDate, Date endDate);
 
 
     @Query("{'deleted':false,'disabled':false, 'unitId':?2,'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
@@ -80,13 +86,15 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,employmentId:?0, startDate:{$gte:?1}}")
     List<Shift> findAllShiftsByEmploymentIdAfterDate(Long employmentId, Date startDate);
 
-    Shift findByIdAndDeletedFalse(BigInteger shiftId);
-
     @Query(value = "{deleted:false,staffId:?0,shiftType:?1, startDate:{$gte:?2}}",exists = true)
     boolean alreadySickReportedForStaff(Long staffId, ShiftType shiftType,Date selectedDate);
 
     @Query(value = "{deleted:false,staffId:?0,unitId:?3,disabled:false,startDate:{ $gte :?1,$lte :?2}}")
     List<ShiftDTO> findAllShiftsByStaffIdsAndDateAndUnitId(Long staffId, Date startDate, Date endDate,Long unitId);
 
+    @Query(value = "{'activities.secondLevelTimeType':{$in:?3},staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
+    List<Shift> findShiftBetweenDurationByStaffIdAndByTimeType(Long staffId, Date startDate, Date endDate, Set<TimeTypeEnum> timeTypeEnumSet);
+
+    ShiftDTO findByIdAndDeletedFalse(BigInteger id);
 
 }

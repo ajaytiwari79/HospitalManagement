@@ -10,6 +10,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY = "activity";
     public static final String ACTION = "action";
     public static final String EXCEPTION_INVALIDREQUEST = "exception.invalidRequest";
+    public static final String EXCEPTION_INVALID_USER  ="exception.invalidUser";
     public static final String EXCEPTION_ALREADYINUSE = "exception.alreadyInUse";
     public static final String ERROR_WTA_INVALID  = "error.wta.invalid";
     public static final String PRIORITY_GROUP = "priority-group";
@@ -50,6 +51,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_REGION_CODE_NOTEMPTY = "error.Region.code.notEmpty";
     public static final String ERROR_REGION_GEOFENCE_NOTEMPTY = "error.Region.geoFence.notEmpty";
     public static final String ERROR_PROVINCE_NAME_NOTEMPTY = "error.Province.name.notEmpty";
+    public static final String ERROR_DAYTYPE_NAME_NOTEMPTY  = "error.DayType.name.notEmpty ";
     public static final String ERROR_PROVINCE_CODE_NOTEMPTY = "error.Province.code.notEmpty";
     public static final String ERROR_PROVINCE_GEOFENCE_NOTEMPTY = "error.Province.geoFence.notEmpty";
     public static final String ERROR_MUNICIPALITY_NAME_NOTEMPTY = "error.Municipality.name.notEmpty";
@@ -162,6 +164,20 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_DELETE = "message.shift.delete";
     public static final String MESSAGE_PHASE_AUTHORITY_ABSENT = "message.phase.authority.absent";
     public static final String MESSAGE_SHIFT_OVERSTAFFING = "message.shift.overStaffing";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_GAP = "message.shift.overStaffing.gap";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_ADD = "message.shift.staffing.level.add";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_DELETE = "message.shift.staffing.level.delete";
+    public static final String MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY = "message.shift.staffing.level.replace.without.activity";
+    public static final String MESSAGE_SHIFT_STAFFING_LEVEL_PHASE_SETTING="message.shift.staffing.level.phase.setting";
+    public static final String MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY="message.shift.staffing.level.replace.with.activity";
+
+
+
+
+
+
+
+
     public static final String MESSAGE_SHIFT_UNDERSTAFFING = "message.shift.underStaffing";
     public static final String MESSAGE_STAFFINGLEVEL_ACTIVITY = "message.staffingLevel.activity";
     public static final String MESSAGE_SHIFTTEMPLATE_ABSENT = "message.shiftTemplate.absent";
@@ -211,7 +227,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_NOTELIGIBLE_FOR_ABSENCE = "activity.notEligible.for.absence";
     public static final String ACTIVITY_NOT_ELIGIBLE_DAYTYPE = "activity.not.eligible.dayType";
     public static final String DATE_OUT_OF_RANGE = "date.out.of.range";
-    public static final String STAFFINGLEVELTEMPLATE_NOT_FOUND = "staffingLevelTemplate.not.found";
+    public static final String STAFFINGLEVEL_NOT_FOUND = "staffingLevelTemplate.not.found";
 
 
     public static final String MESSAGE_EXCEPTION_SCHEDULER = "message.exception.scheduler";
@@ -396,9 +412,36 @@ public class ActivityMessagesConstants {
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
+    public static final String SICK_ACTIVITY_NOT_FOUND="sick.not.found";
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
     public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
+    public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
+    public static final String ERROR_PUBLISH_DATE_INVALID = "error.auto.fill.gap.setting.publish.date.invalid";
+    public static final String MAIN_TEAM_ABSENT = "error.main.team.absent";
+    public static final String HIGHEST_RANK_ACTIVITY_ABSENT = "error.highest.team.absent";
+    public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
+    public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
+    public static final String ERROR_COVER_SHIFT_SETTING_NOT_FOUND = "error.cover.shift.setting.not.found";
+    public static final String ERROR_COVER_SHIFT_SETTING_ID_NOT_FOUND = "error.cover.shift.setting.id.not.found";
+    public static final String ERROR_COVER_SHIFT_SETTING_ALREADY_EXIST_FOR_UNIT = "error.cover.shift.setting.already.exist.for.unit";
+    public static final String ERROR_COVER_SHIFT_SETTING_UNIT_ID_INVALID = "error.cover.shift.setting.unit.id.invalid";
 
+    //Ranking Error Messages
+    public static final String MESSAGE_RANKING_EMPTY="ranking.absent";
+    public static final String MESSAGE_DRAFT_COPY_CREATED="draft.already.exists";
+    public static final String MESSAGE_RANKING_ALREADY_PUBLISHED="ranking.already.published";
+    public static final String MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE="draft.copy.overlapped.published";
+    public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
+    public static final String MESSAGE_REASONCODE_NAME_ALREADYEXIST = "message.reasonCode.name.alreadyExist";
+    public static final String MESSAGE_REASONCODE_ID_NOTFOUND = "message.reasonCode.id.notFound";
+    public static final String TIMESLOT_NOT_FOUND_FOR_UNIT = "timeslot.not.found";
 
+    public static final String GAP_FILLING_CONFIGURATION_ABSENT = "gap.filling.configuration.absent";
+    public static final String SHIFT_STATE_NOT_FOUND_TANDA = "message.shift.state.t&A";
+
+    public static final String SYSTEM_NOT_FOUND_ACTIVITY_TO_GAP_FILLING_CONFIGURATION = "system.not.found.activity.to.gap.filling.configuration";
+    public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.not.configuration";
+    public static final String GAP_FILLING_CONFIGURATION_INCORRECTLY = "gap.filling.configuration.incorrectly";
+    public static final String DO_NOT_ALLOW_TO_CAUSE_GAP = "do.not.allow.to.cause.gap";
 }

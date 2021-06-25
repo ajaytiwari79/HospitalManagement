@@ -19,6 +19,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @Setter
 @NoArgsConstructor
 public class StaffChildDetail extends UserBaseEntity {
+    private static final long serialVersionUID = 349713961690696674L;
     @KPermissionField
     private String name;
     @KPermissionField

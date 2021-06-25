@@ -5,7 +5,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
-import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
@@ -14,7 +15,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 @Transactional
-public class StaffingLevelTemplateService extends MongoBaseService {
+public class StaffingLevelTemplateService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffingLevelService.class);
     @Inject
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
@@ -46,6 +47,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    @Inject
+    private DayTypeService dayTypeService;
 
     /**
      * @param staffingLevelTemplateDTO
@@ -67,6 +70,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
         staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
         staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
+        removeLogsFromTemplate(staffingLevelTemplate);
         staffingLevelTemplateRepository.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
         staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()
@@ -74,6 +78,12 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
         return staffingLevelTemplateDTO;
 
+    }
+
+    private void removeLogsFromTemplate(StaffingLevelTemplate staffingLevelTemplate) {
+        for (StaffingLevelInterval staffingLevelInterval : staffingLevelTemplate.getPresenceStaffingLevelInterval()) {
+            staffingLevelInterval.setStaffingLevelIntervalLogs(new TreeSet<>());
+        }
     }
 
     /**
@@ -96,7 +106,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         if (Optional.ofNullable(staffingLevelTemplate).isPresent()) {
             BeanUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
             staffingLevelTemplate.setId(staffingTemplateId);
-            this.save(staffingLevelTemplate);
+            staffingLevelTemplateRepository.save(staffingLevelTemplate);
             staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplate.getPresenceStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
             } else {
@@ -122,18 +132,19 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(proposedDate).isPresent()){
             return staffingLevelTemplateRepository.findAllByUnitIdAndDeletedFalse(unitId);
         }
-        List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
-        List<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toList());
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeByDate(UserContext.getUserDetails().getCountryId(),proposedDate);
+        List<BigInteger> dayTypeIds = dayTypes.stream().map(DayTypeDTO::getId).collect(Collectors.toList());
 
-        Optional<DayType> holidayDayType = dayTypes.stream().filter(DayType::isHolidayType).findFirst();
+        Optional<DayTypeDTO> holidayDayType = dayTypes.stream().filter(DayTypeDTO::isHolidayType).findFirst();
         LocalDate localDate = DateUtils.asLocalDate(proposedDate);
 
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = Day.valueOf(day);
         if(!holidayDayType.isPresent()) {
-            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+
+            return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }else {
-            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
+            return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
         }
         }
 

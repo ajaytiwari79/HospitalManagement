@@ -22,6 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CIVIL
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CitizenStatus extends UserBaseEntity {
 
+    private static final long serialVersionUID = 644786606504139799L;
     @NotBlank(message = ERROR_CITIZENSTATUS_NAME_NOTEMPTY)
     String name;
     String description;

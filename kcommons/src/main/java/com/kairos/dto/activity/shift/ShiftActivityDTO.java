@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -30,7 +31,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @Setter
 @Builder
 @AllArgsConstructor
-public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
+public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>, Serializable {
 
     private Set<ShiftStatus> status;
     private String message;
@@ -44,10 +45,12 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private int scheduledMinutes;
     private int durationMinutes;
     private String activityName;
+    private String shortName;
+    private String ultraShortName;
     //used in T&A view
-    private Long reasonCodeId;
+    private BigInteger reasonCodeId;
     //used for adding absence type of activities.
-    private Long absenceReasonCodeId;
+    private BigInteger absenceReasonCodeId;
     private String remarks;
     //please don't use this id for any functionality this only for frontend
     private BigInteger id;
@@ -91,19 +94,29 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private BigInteger timeTypeId;
     private String methodForCalculatingTime;
     private ViolatedRulesDTO violatedRules;
+    private boolean skipRules;
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
         this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
     }
 
-    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, Long absenceReasonCodeId) {
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, BigInteger absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
         this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
         this.activityName = activityName;
         this.absenceReasonCodeId=absenceReasonCodeId;
     }
+
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId,boolean skipRules) {
+        this.activityId = activityId;
+        this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+        this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
+        this.activityName = activityName;
+        this.skipRules = skipRules;
+    }
+
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, String message, boolean success){
         this.activityName=activityName;
         this.startDate=isNull(startDate) ? null : roundDateByMinutes(startDate,15);

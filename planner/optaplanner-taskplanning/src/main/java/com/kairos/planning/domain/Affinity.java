@@ -16,7 +16,9 @@
 
 package com.kairos.planning.domain;
 
-public enum Affinity {
+import java.io.Serializable;
+
+public enum Affinity implements Serializable {
     NONE(4),
     LOW(3),
     MEDIUM(2),

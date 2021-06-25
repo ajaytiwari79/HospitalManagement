@@ -1,6 +1,8 @@
 package com.kairos.enums.gdpr;
 
-public enum  SuggestedDataStatus {
+import java.io.Serializable;
+
+public enum  SuggestedDataStatus implements Serializable {
 
     PENDING("Pending"), APPROVED("Approved"), REJECTED("Rejected");
 

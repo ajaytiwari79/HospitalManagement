@@ -28,6 +28,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_P
 @NoArgsConstructor
 public class AccessPage extends UserBaseEntity {
 
+    private static final long serialVersionUID = -937515551779525588L;
     @NotNull(message = ERROR_NAME_NOTNULL)
     private String name;
     private boolean isModule;

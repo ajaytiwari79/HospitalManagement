@@ -12,5 +12,5 @@ import java.util.List;
 public interface CustomStaffingLevelTemplateRepository {
 
     boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId);
-    List<StaffingLevelTemplateDTO> findByUnitIdDayTypeAndDate(Long unitID, Date proposedStartDate, Date proposedEndDate, List<Long> dayTypeIds, List<String> days);
+    List<StaffingLevelTemplateDTO> findByUnitIdAndDayTypeAndDate(Long unitID, Date proposedStartDate, Date proposedEndDate, List<BigInteger> dayTypeIds, List<String> days);
 }

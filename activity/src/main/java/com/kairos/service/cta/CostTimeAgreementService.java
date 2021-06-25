@@ -5,19 +5,29 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.cta.*;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -30,13 +40,19 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.PlannedTimeTypeService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +66,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -87,6 +104,13 @@ public class CostTimeAgreementService {
     @Inject
     private TimeBankService timeBankService;
     @Inject private CTACompensationSettingService ctaCompensationSettingService;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
+    @Inject private PhaseService phaseService;
+    @Inject private TimeTypeService timeTypeService;
+    @Inject private PlannedTimeTypeService plannedTimeTypeService;
 
 
     /**
@@ -220,9 +244,6 @@ public class CostTimeAgreementService {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
         ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
-            if(isNull(ctaRuleTemplateDTO.getTranslations())){
-                ctaRuleTemplateDTO.setTranslations(new HashMap<>());
-            }
             ctaRuleTemplateDTO.setUnitId(unitId);
         });
         return ctaRuleTemplateDTOS;
@@ -240,11 +261,6 @@ public class CostTimeAgreementService {
         if (ctaResponseDTO != null) {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
-        ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
-             if(isNull(ctaRuleTemplateDTO.getTranslations())){
-                 ctaRuleTemplateDTO.setTranslations(new HashMap<>());
-             }
-        });
         return ctaRuleTemplateDTOS;
     }
 
@@ -259,8 +275,11 @@ public class CostTimeAgreementService {
 
 
 
+    @CacheEvict(value = "getAccumulatedTimebankAndDelta", key = "{#employmentId, true}")
     public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO,Boolean save) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        staffAdditionalInfoDTO.getEmployment().getExpertise().setProtectedDaysOffSettings(protectedDaysOffService.getProtectedDaysOffByExpertiseId(UserContext.getUserDetails().getCountryId()));
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         validateEmploymentCTAWhileUpdate(ctaDTO,staffAdditionalInfoDTO,oldCTA);
         CTAResponseDTO responseCTA = null;
@@ -504,13 +523,7 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
-       List<CTAResponseDTO> ctaResponseDTOS =costTimeAgreementRepository.findCTAByCountryId(countryId);
-       ctaResponseDTOS.forEach(ctaResponseDTO -> {
-           if(isNull(ctaResponseDTO.getTranslations())){
-               ctaResponseDTO.setTranslations(new HashMap<>());
-           }
-       });
-       return ctaResponseDTOS;
+       return costTimeAgreementRepository.findCTAByCountryId(countryId);
     }
 
     /**
@@ -520,9 +533,6 @@ public class CostTimeAgreementService {
     public List<CTAResponseDTO> loadAllCTAByUnit(Long unitId) {
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.findCTAByUnitId(unitId);
         ctaResponseDTOS.forEach(ctaResponseDTO -> {
-            if(isNull(ctaResponseDTO.getTranslations())){
-                ctaResponseDTO.setTranslations(new HashMap<>());
-            }
             ctaResponseDTO.setUnitId(unitId);
         });
         return ctaResponseDTOS;
@@ -656,9 +666,11 @@ public class CostTimeAgreementService {
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
-        /*Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
-        ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getEmploymentId())));
-        */return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
+        if(isCollectionNotEmpty(ctaResponseDTOS)){
+            CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaResponseDTOS.get(0).getOrganizationParentId());
+            ctaResponseDTOS.forEach(ctaResponseDTO -> ctaResponseDTO.setTranslations(costTimeAgreement.getTranslations()));
+        }
+        return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
     }
 
     public CTAResponseDTO getDefaultCTA(Long unitId, Long expertiseId) {
@@ -734,8 +746,7 @@ public class CostTimeAgreementService {
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplatesByEmploymentId(Long employmentId, Date startDate, Date endDate) {
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdBetweenDate(employmentId, startDate, endDate);
-        List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(toList());
-        ruleTemplates = ruleTemplates.stream().filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
+        List<CTARuleTemplateDTO> ruleTemplates = ctaResponseDTOS.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).filter(ObjectUtils.distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
         return ruleTemplates;
     }
 
@@ -758,5 +769,92 @@ public class CostTimeAgreementService {
         return costTimeAgreement.getTranslations();
     }
 
+    public void updateCTADates(List<CostTimeAgreement> costTimeAgreements1, EmploymentLinesDTO employmentLinesDTO) {
+        for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
+            if(costTimeAgreement.getStartDate().isAfter(employmentLinesDTO.getStartDate())){
+                costTimeAgreement.setStartDate(employmentLinesDTO.getStartDate());
+            }
+        }
+        if(isNull(employmentLinesDTO.getEndDate()) && !costTimeAgreements1.isEmpty()){
+            costTimeAgreements1.get(costTimeAgreements1.size()-1).setEndDate(null);
+        }else {
+            for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
+                if(isNull(costTimeAgreement.getEndDate())){
+                    break;
+                }else if(costTimeAgreement.getEndDate().isBefore(employmentLinesDTO.getEndDate())){
+                    costTimeAgreement.setEndDate(employmentLinesDTO.getEndDate());
+                    break;
+                }
+            }
+        }
+    }
+
+    public void updateDatesOnCTA(List<CostTimeAgreement> costTimeAgreements1) {
+        for (int i = 1; i < costTimeAgreements1.size(); i++) {
+            CostTimeAgreement first = costTimeAgreements1.get(i-1);
+            CostTimeAgreement second = costTimeAgreements1.get(i);
+            first.setEndDate(second.getStartDate().minusDays(1));
+            if(first.getStartDate().equals(second.getStartDate())){
+                first.setEndDate(first.getStartDate());
+                second.setStartDate(first.getEndDate().plusDays(1));
+            }
+        }
+    }
+
+    public Set<Long> filterStaffByCTATemplateAccountType(StaffFilterDTO staffFilterDTO, Set<Long> staffIds, Map<FilterType, Set<String>> filterTypeMap) {
+        Set<Long> filteredStaffIds = staffIds;
+        if(filterTypeMap.containsKey(CTA_ACCOUNT_TYPE)){
+            List<CTAResponseDTO> allCTAs = costTimeAgreementRepository.getParentCTAByUpIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(longs -> longs.stream()).filter(longs -> isNotNull(longs)).collect(Collectors.toList()));
+            Map<Long,List<CTAResponseDTO>>  ctagroup = allCTAs.stream().collect(Collectors.groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId(),Collectors.toList()));
+            Set<Long> staffFilterDTOList = new HashSet<>();
+            for(Long staffId:staffIds) {
+                FilterStaff(staffFilterDTO, filterTypeMap, ctagroup, staffFilterDTOList, staffId);
+            }
+            filteredStaffIds = staffFilterDTOList;
+
+        }
+        return filteredStaffIds;
+    }
+
+    private void FilterStaff(StaffFilterDTO staffFilterDTO, Map<FilterType, Set<String>> filterTypeMap, Map<Long, List<CTAResponseDTO>> ctagroup, Set<Long> staffFilterDTOList, Long staffId) {
+        List<Long> employmentIDs=staffFilterDTO.getMapOfStaffAndEmploymentIds().get(staffId);
+        for(Long employmentID:employmentIDs) {
+            List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
+            for(CTAResponseDTO ctaResponseDTO:CTAs) {
+                for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
+                    if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
+                        staffFilterDTOList.add(staffId);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public Map<String,Object> getDefaultDataForCTATemplate(Long countryId,Long unitId) {
+        List<ActivityWithCTAWTASettingsDTO> activityTypeDTOS;
+        List<PhaseDTO> phases;
+        if (Optional.ofNullable(unitId).isPresent()) {
+            countryId = UserContext.getUserDetails().getCountryId();
+            activityTypeDTOS = activityService.findAllActivityWithCtaWtaSettingByUnit(unitId);
+            phases = phaseService.getDefaultPhasesByUnit(unitId);
+        } else {
+            activityTypeDTOS = activityService.findAllActivityWithCtaWtaSettingByCountry(countryId);
+            phases = phaseService.getPhasesByCountryId(countryId);
+        }
+        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(ActivityWithCTAWTASettingsDTO::getCategoryId).collect(Collectors.toSet());
+        List<ActivityCategory> activityCategories = activityService.findAllActivityCategoriesByCountry(activityCategoriesIds);
+        List<TimeTypeDTO> timeType = timeTypeService.getAllTimeType(null,countryId);
+        List<PresenceTypeDTO> plannedTime = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
+        Map<String,Object> response = new HashMap();
+        response.put("phases",phases);
+        response.put("dayTypes",dayTypes);
+        response.put("plannedTime",plannedTime);
+        response.put("timeTypes",timeType);
+        response.put("activityTypes",activityTypeDTOS);
+        response.put("activityCategories",activityCategories);
+        return response;
+    }
 }
 

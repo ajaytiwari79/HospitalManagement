@@ -1,11 +1,13 @@
 package com.kairos.enums.wta;
 
+import java.io.Serializable;
+
 /**
  * @author pradeep
  * @date - 11/4/18
  */
 
-public enum WTATemplateType {
+public enum WTATemplateType implements Serializable {
     AVERAGE_SHEDULED_TIME("Average Sheduled Time"),
     CONSECUTIVE_WORKING_PARTOFDAY("Consecutive Working"),
     DAYS_OFF_IN_PERIOD("Days Off In Period"),

@@ -24,7 +24,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class EmployeeLimit extends UserBaseEntity {
 
-   @NotBlank(message="error.EmployeeLimit.name.notEmpty")
+    private static final long serialVersionUID = -5088666689143062805L;
+    @NotBlank(message="error.EmployeeLimit.name.notEmpty")
     private String name;
     private String description;
     private int  minimum;

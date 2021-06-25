@@ -5,13 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class ConstraintSetting {
+public class ConstraintSetting implements Serializable {
 
+    private static final long serialVersionUID = 8571863772715127711L;
     private ScoreLevel scoreLevel;
     private int constraintWeight;
     private boolean mandatory;

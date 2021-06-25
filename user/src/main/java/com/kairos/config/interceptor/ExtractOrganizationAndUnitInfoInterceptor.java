@@ -1,7 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
@@ -36,7 +34,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        getCurrentUserDetails();
         String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
         String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
         LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
@@ -49,17 +46,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             UserContext.setTabId(tabId);
         }
         return isNotNull(request);
-    }
-
-    private void getCurrentUserDetails() {
-        try {
-            CurrentUserDetails currentUserDetails = ObjectMapperUtils.copyPropertiesByMapper(userService.getCurrentUser(), CurrentUserDetails.class);
-            if(isNotNull(UserContext.getUserDetails()) && isNotNull(currentUserDetails)) {
-                UserContext.setUserDetails(currentUserDetails);
-            }
-        } catch (Exception e) {
-            LOGGER.error("exception {}",e);
-        }
     }
 
     private void updateOrganizationId(String orgIdString) {

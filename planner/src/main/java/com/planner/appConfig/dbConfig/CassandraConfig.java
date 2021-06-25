@@ -50,7 +50,7 @@ public class CassandraConfig{//} extends AbstractCassandraConfiguration {
         try {
             mappingCassandraConverter = new MappingCassandraConverter(cassandraMapping());
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         mappingCassandraConverter.setCustomConversions(customConversions());

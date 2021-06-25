@@ -1,9 +1,7 @@
 package com.kairos.controller.questionnaire_template;
 
-
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

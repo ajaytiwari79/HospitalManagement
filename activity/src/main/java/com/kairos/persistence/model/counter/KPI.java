@@ -14,6 +14,7 @@ import java.math.BigInteger;
 
 @Document(collection = "counter")
 public class KPI extends Counter {
+    private static final long serialVersionUID = -2910586225891481577L;
     protected ChartType chart;
     protected CounterSize size;
 
