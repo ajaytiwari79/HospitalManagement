@@ -330,7 +330,7 @@ public class StaffRetrievalService {
     }
 
 
-    public Map<String, Object> getStaffWithFilter(Long unitId, long id, StaffFilterDTO staffFilterDTO, String moduleId) {
+    public Map<String, Object> getStaffWithFilter(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
         List<AccessGroup> roles = null;
         Map<String, Object> map = new HashMap<>();
         map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId, null, null,false,null).getStaffList());

@@ -272,8 +272,8 @@ public class StaffController {
 
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
     @ApiOperation("get staff")
-    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId, @RequestParam long id, @RequestParam String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffWithFilter(unitId, id, staffFilterDTO, moduleId));
+    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId,  @RequestParam String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffWithFilter(unitId, staffFilterDTO, moduleId));
     }
 
 
