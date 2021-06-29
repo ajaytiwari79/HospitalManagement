@@ -175,7 +175,6 @@ public class ShiftBreakService implements KPIService {
 
     private ShiftActivity getBreakByShiftActivity(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakSettings breakSetting, boolean placeBreakAnyWhereInShift, ShiftActivity breakActivity, Date placeBreakAfterThisDate) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            //if(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid()) {
             if (isCollectionNotEmpty(shiftActivity.getChildActivities())) {
                 for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
                     breakActivity = getBreakActivityAfterCalculation(activityWrapperMap, breakSetting, placeBreakAnyWhereInShift, placeBreakAfterThisDate, childActivity, staffAdditionalInfoDTO);
@@ -183,7 +182,9 @@ public class ShiftBreakService implements KPIService {
             } else {
                 breakActivity = getBreakActivityAfterCalculation(activityWrapperMap, breakSetting, placeBreakAnyWhereInShift, placeBreakAfterThisDate, shiftActivity, staffAdditionalInfoDTO);
             }
-            //}
+            if(isNotNull(breakActivity)){
+                break;
+            }
         }
         return breakActivity;
     }
