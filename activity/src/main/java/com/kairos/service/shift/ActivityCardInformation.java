@@ -18,6 +18,7 @@ public class ActivityCardInformation extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private Set<ActivityCardInformationSetting> activityCardInformationSettings;
+    private int maxLimit;
 
 
 
