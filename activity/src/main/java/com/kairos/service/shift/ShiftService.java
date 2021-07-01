@@ -610,6 +610,9 @@ public class ShiftService {
             shiftMongoRepository.delete(shift);
             return new ArrayList<>();
         }
+        if(isNotNull(shift.getCoverShiftDate())){
+            exceptionService.actionNotPermittedException(ERROR_COVER_SHIFT_SETTING_ALREADY_EXIST_FOR_UNIT);
+        }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
         staffAdditionalInfoDTO.setReplacedActivity(shiftDTO.getReplacedActivity());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());

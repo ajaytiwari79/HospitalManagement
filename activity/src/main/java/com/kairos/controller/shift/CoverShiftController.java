@@ -93,8 +93,8 @@ public class CoverShiftController {
     @ApiOperation("update cover shift setting by unit")
     @PutMapping(value = "/remove_interest/{id}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> removeInterestInCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId) {
-        coverShiftService.notInterestInCoverShift(id,staffId);
+    public ResponseEntity<Map<String, Object>> removeInterestInCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId,@RequestParam(value = "selectedDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedDate) {
+        coverShiftService.notInterestInCoverShift(id,staffId,selectedDate);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
