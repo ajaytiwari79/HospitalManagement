@@ -263,8 +263,11 @@ public class ShiftService extends MongoBaseService {
         shift.setShiftType(shiftType);
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
         shiftFunctionService.updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
+        Phase newPhase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
+        } else if(shift.isDraft() && newHashSet(PhaseDefaultName.PUZZLE, PhaseDefaultName.REQUEST).contains(newPhase.getPhaseEnum())) {
+            shift.setDraft(false);
         }
         if(isNull(shift.getDraftShift())) {
             if (!shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
@@ -284,7 +287,6 @@ public class ShiftService extends MongoBaseService {
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         shiftMongoRepository.save(shift);
-        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
         staffActivityDetailsService.updateStaffActivityDetails(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), (isNull(shift.getId()) || isNull(oldShift) || isCollectionEmpty(oldShift.getActivities())) ? null : oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
