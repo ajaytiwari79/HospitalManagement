@@ -160,7 +160,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		 * */
 		entity.setUpdatedAt(DateUtils.getDate());
 		mongoOperations.save(entity);
-		AuditLogging.doAudit(oldEntity,entity);
+		//AuditLogging.doAudit(oldEntity,entity);
 		return entity;
 	}
 

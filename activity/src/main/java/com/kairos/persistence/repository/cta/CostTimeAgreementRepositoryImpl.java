@@ -90,7 +90,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
+                match(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).exists(false).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
                 lookup("tag", "tags", "_id", "tags"),
                 lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
                 );

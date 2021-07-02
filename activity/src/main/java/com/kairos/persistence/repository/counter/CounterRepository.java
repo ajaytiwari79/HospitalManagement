@@ -248,12 +248,15 @@ public class CounterRepository{
     }
 
     public List<KPICategoryDTO> getKPICategory(List<BigInteger> categoryIds, ConfLevel level, Long refId) {
+        List<KPICategory> kpiCategories = getKpiCategories(categoryIds, level, refId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiCategories, KPICategoryDTO.class);
+    }
+    public List<KPICategory> getKpiCategories(List<BigInteger> categoryIds, ConfLevel level, Long refId) {
         String queryField = getRefQueryField(level);
         Criteria matchCriteria = categoryIds == null ? Criteria.where(DELETED).is(false).and(queryField).is(refId) : Criteria.where(DELETED).is(false).and("_id").in(categoryIds).and(queryField).is(refId);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPICategory.class), KPICategoryDTO.class);
+        return mongoTemplate.find(query, KPICategory.class);
     }
-
 
     public void removeCategoryKPIEntries(List<BigInteger> categoryIds, List<BigInteger> kpiIds) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(CATEGORY_ID).in(categoryIds).and(KPI_ID1).in(kpiIds));
