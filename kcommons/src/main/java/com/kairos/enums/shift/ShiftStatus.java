@@ -1,12 +1,10 @@
 package com.kairos.enums.shift;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 

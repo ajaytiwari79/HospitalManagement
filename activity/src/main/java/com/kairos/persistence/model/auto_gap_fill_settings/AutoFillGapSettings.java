@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 @Getter
 @Setter

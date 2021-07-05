@@ -37,10 +37,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.ActivityMessagesConstants.DO_NOT_ALLOW_TO_CAUSE_GAP;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
-import static com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule.*;
 import static com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario.*;
 
 @Service
