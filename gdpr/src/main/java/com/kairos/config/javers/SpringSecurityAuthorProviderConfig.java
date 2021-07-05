@@ -17,10 +17,10 @@ class SpringSecurityAuthorProviderConfig implements AuthorProvider {
         String userName = null;
         if (auth == null) {
             return "unauthenticated";
-        }else if (UserContext.getUserDetails() != null) {
+        } else if (UserContext.getUserDetails() != null) {
             userName = UserContext.getUserDetails().getFirstName() + " " + UserContext.getUserDetails().getLastName();
             return auth.getName() + "-" + userName;
-        }else {
+        } else {
             return auth.getName();
         }
     }

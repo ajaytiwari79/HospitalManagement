@@ -85,7 +85,7 @@ public class JaversCommonService {
     private List<Object> getFieldsValue(CdoSnapshot historyMap, List<String> fields, Long ownerId, Class ownerClass) throws ClassNotFoundException {
         List<Object> fieldValues = new ArrayList<>();
         for (String field : fields) {
-            if ( historyMap.getState().getPropertyValue(field) instanceof InstanceId) {
+            if (historyMap.getState().getPropertyValue(field) instanceof InstanceId) {
                 Class<?> clazz = Class.forName(((InstanceId) historyMap.getState().getPropertyValue(field)).getTypeName());
                 fieldValues.add(findOne(((long) ((InstanceId) historyMap.getPropertyValue(field)).getCdoId()), clazz));
             } else if (historyMap.getState().getPropertyValue(field) instanceof ValueObjectId) {
@@ -117,7 +117,7 @@ public class JaversCommonService {
         return query.getSingleResult();
     }
 
-    private  List<MetaDataCommonResponseDTO> findAllByIds(ArrayList<InstanceId> instanceIds, Class clazz) {
+    private List<MetaDataCommonResponseDTO> findAllByIds(ArrayList<InstanceId> instanceIds, Class clazz) {
         List<Long> ids = new ArrayList<>();
         instanceIds.stream().map(InstanceId::getCdoId).forEach(o -> ids.add((long) o));
         TypedQuery<MetaDataCommonResponseDTO> query = entityManager.createQuery("select NEW com.kairos.response.dto.common.MetaDataCommonResponseDTO(t.id,t.name)  from " + clazz.getSimpleName() + " t where t.id in (:ids)", MetaDataCommonResponseDTO.class);

@@ -15,7 +15,7 @@ public class RestClientUrlUtil {
     private static String userServiceUrl;
     private static String plannerServiceUrl;
     private static String schedulerServiceUrl;
-    private static final String UNIT ="unit/";
+    private static final String UNIT = "unit/";
 
     @Value("${gateway.plannerservice.url}")
     public void setPlannerServiceUrl(String plannerServiceUrl) {

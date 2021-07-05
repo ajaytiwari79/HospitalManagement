@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-class User{
+class User {
     private Long id;
 
     private String cprNumber;
@@ -48,7 +48,7 @@ class User{
      * @return
      */
     public String getUserName() {
-        if (userName!=null){
+        if (userName != null) {
             return userName.toLowerCase();
         }
         return userName;
@@ -65,15 +65,15 @@ class User{
     }
 
     public int getAge() {
-        if (cprNumber==null){
+        if (cprNumber == null) {
             return this.age;
 
         }
-        if (cprNumber.length()==9){
-            cprNumber = "0"+cprNumber;
+        if (cprNumber.length() == 9) {
+            cprNumber = "0" + cprNumber;
         }
         //System.out.print("\n CPR: ----"+cprNumber+"---\n");
-        if (cprNumber!=null){
+        if (cprNumber != null) {
             this.age = CPRUtil.getAgeFromCPRNumber(cprNumber);
         }
         return this.age;
@@ -114,7 +114,7 @@ class User{
                 ", accessToken='" + accessToken + '\'' +
                 ", otp=" + otp +
                 ", isPasswordUpdated=" + isPasswordUpdated +
-                '}'+
+                '}' +
                 '}';
     }
 }

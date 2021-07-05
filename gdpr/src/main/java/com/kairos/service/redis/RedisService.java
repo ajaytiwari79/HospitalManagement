@@ -30,7 +30,7 @@ public class RedisService extends CommonsExceptionUtil {
     private EnvConfigCommon envConfigCommon;
 
     public void saveTokenInRedis(String userName, String accessToken) {
-        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
+        if (!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
             Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
             String tokenKey = getTokenKey(accessToken);
             if (Optional.ofNullable(userTokens).isPresent()) {
@@ -46,15 +46,14 @@ public class RedisService extends CommonsExceptionUtil {
 
 
     public void invalidateAllTokenOfUser(String userName) {
-        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
+        if (!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
             valueOperations.delete(userName);
         }
     }
 
 
-
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
-        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
+        if (!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
             Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
             boolean validToken = false;
             if (userTokens != null) {
@@ -64,11 +63,12 @@ public class RedisService extends CommonsExceptionUtil {
                 }
             }
             return validToken;
-        } return true;
+        }
+        return true;
     }
 
-    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName,  String accessToken) {
-        if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
+    public boolean removeUserTokenFromRedisByUserNameAndToken(String userName, String accessToken) {
+        if (!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
             boolean tokenRemoved = false;
             Map<String, String> userTokens = valueOperations.opsForValue().get(userName);
             if (Optional.ofNullable(userTokens).isPresent()) {

@@ -17,11 +17,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/configuration/ui", "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs").authenticated()
-                .antMatchers("/resources/**", "/webjars/**","/static/**","/css/**","/js/**","/images/**").permitAll()
+                .antMatchers("/resources/**", "/webjars/**", "/static/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/public/legal/**/**").permitAll();
     }
-
 
 
 }

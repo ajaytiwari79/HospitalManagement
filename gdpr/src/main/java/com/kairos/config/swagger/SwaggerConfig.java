@@ -25,7 +25,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableSwagger2
 @Configuration
 @EnableAutoConfiguration
-@Profile({"local","development","qa","production"})
+@Profile({"local", "development", "qa", "production"})
 public class SwaggerConfig {
 
     @Bean
@@ -40,7 +40,7 @@ public class SwaggerConfig {
                 .globalOperationParameters(additionalParametersCriteria());
     }
 
-    private List<Parameter> additionalParametersCriteria(){
+    private List<Parameter> additionalParametersCriteria() {
         ParameterBuilder paramsBuilder = new ParameterBuilder();
         List<Parameter> parametersList = new ArrayList<>();
         parametersList.add(
@@ -66,7 +66,7 @@ public class SwaggerConfig {
      */
     private Predicate<String> postManagePaths() {
         return or(
-                regex(API_V1 +".*")
+                regex(API_V1 + ".*")
         );
     }
 
