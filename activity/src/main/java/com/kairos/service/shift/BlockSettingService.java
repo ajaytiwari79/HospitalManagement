@@ -23,7 +23,7 @@ import static com.kairos.constants.ActivityMessagesConstants.ERROR_BLOCK_SETTING
 
 
 /**
- * Created By G.P.Ranjan on 3/12/19
+ * Created By Pavan on 13/06/21
  **/
 @Service
 public class BlockSettingService {
