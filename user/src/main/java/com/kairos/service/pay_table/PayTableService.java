@@ -242,6 +242,7 @@ public class PayTableService {
     }
 
     private List<PayGradeResponse> createCopyOfPayTableAndAddPayGrade(PayTable payTable, PayGradeDTO payGradeDTO, List<PayGradePayGroupAreaRelationShip> payGradesPayGroupAreaRelationShips) {
+        payTableGraphRepository.deleteOldDraftPayTable(payTable.getId());
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         PayTable copiedPayTable = initializeCopiedPayTable(payTable);
         if (payGradeDTO != null) {
@@ -440,7 +441,7 @@ public class PayTableService {
     private List<PayGradeResponse> updatePayGradeInPublishedPayTable(PayTable payTable, PayGradeDTO payGradeDTO, Long payGradeId) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         List<PayGrade> payGradesObjects = new ArrayList<>();
-        // creating a new PayTable
+        payTableGraphRepository.deleteOldDraftPayTable(payTable.getId());
         PayTable payTableByMapper = preparePayTableByMapper(payTable);
         Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreaIds);
