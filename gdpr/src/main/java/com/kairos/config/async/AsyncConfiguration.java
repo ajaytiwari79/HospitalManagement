@@ -15,12 +15,11 @@ import java.util.concurrent.Executors;
 class AsyncConfiguration implements AsyncConfigurer {
 
 
-    @Bean(name = "executorService", destroyMethod = "shutdown")
-    public ExecutorService executorService() {
-        return Executors.newWorkStealingPool(5);
+    @Bean(name ="executorService",destroyMethod ="shutdown")
+    public ExecutorService executorService(){
+        return  Executors.newWorkStealingPool(5);
 
     }
-
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

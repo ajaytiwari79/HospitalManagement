@@ -73,7 +73,7 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
         } catch (OAuth2Exception failed) {
             SecurityContextHolder.clearContext();
 
-            LOGGER.debug("Authentication request failed: ", failed);
+            LOGGER.debug("Authentication request failed: " ,failed);
 
             eventPublisher.publishAuthenticationFailure(new BadCredentialsException(failed.getMessage(), failed),
                     new PreAuthenticatedAuthenticationToken("access-token", "N/A"));
@@ -136,11 +136,11 @@ public class CustomBasicAuthenticationFilter extends OAuth2AuthenticationProcess
 
     private static final class NullEventPublisher implements AuthenticationEventPublisher {
         public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
-            // method publish expection message
+        // method publish expection message
         }
 
         public void publishAuthenticationSuccess(Authentication authentication) {
-            // default method need to publish success authentication
+        // default method need to publish success authentication
         }
     }
 

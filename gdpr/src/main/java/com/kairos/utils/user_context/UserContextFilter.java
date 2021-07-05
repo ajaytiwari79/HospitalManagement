@@ -12,14 +12,13 @@ import java.io.IOException;
 @Component
 class UserContextFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(UserContextFilter.class);
-
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        UserContext.setCorrelationId(httpServletRequest.getHeader(UserContext.CORRELATION_ID));
-        UserContext.setAuthToken(httpServletRequest.getHeader(UserContext.AUTH_TOKEN));
+        UserContext.setCorrelationId(  httpServletRequest.getHeader(UserContext.CORRELATION_ID) );
+        UserContext.setAuthToken( httpServletRequest.getHeader(UserContext.AUTH_TOKEN) );
         logger.debug("Exiting the UserContextFilter");
         filterChain.doFilter(httpServletRequest, servletResponse);
     }

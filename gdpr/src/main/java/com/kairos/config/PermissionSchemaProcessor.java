@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PermissionSchemaProcessor implements BeanPostProcessor {
+public class PermissionSchemaProcessor  implements BeanPostProcessor {
 
     private UserRestClient userRestClient;
 
@@ -21,12 +21,12 @@ public class PermissionSchemaProcessor implements BeanPostProcessor {
     public PermissionSchemaProcessor(List<Map<String, Object>> data, UserRestClient userRestClient, String userServiceUrl, String kpermissionDataPublish) {
         this.userRestClient = userRestClient;
         this.userServiceUrl = userServiceUrl;
-        if ("true".equalsIgnoreCase(kpermissionDataPublish)) {
-            publishPermissionSchemaToUserService(userRestClient, data);
+        if("true".equalsIgnoreCase(kpermissionDataPublish)) {
+             publishPermissionSchemaToUserService(userRestClient, data);
         }
     }
 
-    private void publishPermissionSchemaToUserService(UserRestClient userRestClient, List<Map<String, Object>> data) {
+    private void publishPermissionSchemaToUserService(UserRestClient userRestClient, List<Map<String, Object>> data){
         /*userRestClient.publishRequest(data, userServiceUrl, IntegrationOperation.CREATE, "create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });*/
     }

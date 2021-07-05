@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class ComparisonUtils {
+public class ComparisonUtils{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonUtils.class);
 
@@ -66,7 +66,7 @@ public class ComparisonUtils {
                 });
             }
         } catch (Exception ex) {
-            LOGGER.info("Error in getMetadataNameListInLowerCase  {0} ", ex.getCause());
+            LOGGER.info("Error in getMetadataNameListInLowerCase  {0} " , ex.getCause());
         }
         return lowerCaseNewNameList;
     }

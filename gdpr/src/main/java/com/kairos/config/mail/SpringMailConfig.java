@@ -17,7 +17,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
  */
 
 @Configuration
-@PropertySource({"classpath:application-${spring.profiles.active}.properties"})
+@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 class SpringMailConfig implements ApplicationContextAware, EnvironmentAware {
 
     private ApplicationContext applicationContext;
@@ -61,6 +61,7 @@ class SpringMailConfig implements ApplicationContextAware, EnvironmentAware {
 //        emailTemplateResolver.setOrder(1);
 //        return emailTemplateResolver;
 //    }
+
 
 
 }

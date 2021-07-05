@@ -19,7 +19,6 @@ import java.util.Locale;
 public class AppLanguageConfig implements WebMvcConfigurer {
     /**
      * This method is use to get MessageSource.
-     *
      * @return MessageSource.
      */
     @Bean
@@ -35,7 +34,6 @@ public class AppLanguageConfig implements WebMvcConfigurer {
 
     /**
      * This method is use to get LocaleResolver.
-     *
      * @return LocaleResolver.
      */
     @Bean
@@ -47,7 +45,6 @@ public class AppLanguageConfig implements WebMvcConfigurer {
 
     /**
      * This method is use to get LocaleChangeInterceptor.
-     *
      * @return LocaleChangeInterceptor.
      */
     @Bean
