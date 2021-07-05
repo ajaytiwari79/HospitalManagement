@@ -13,6 +13,7 @@ import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
@@ -390,7 +391,7 @@ public class CoverShiftService {
 
     private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts) {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = isCollectionEmpty(shifts) ? new HashMap<>() : organizationActivityService.getActivityWrapperMap(shifts, null);
-        Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
+        Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(MongoBaseEntity::getId,Function.identity()));
         for (CoverShiftDTO coverShiftDTO : coverShiftDTOS) {
             Shift shift = shiftMap.get(coverShiftDTO.getShiftId());
             shift.setStaffId(staffAdditionalInfoDTO.getId());

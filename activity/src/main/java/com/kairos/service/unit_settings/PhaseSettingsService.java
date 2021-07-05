@@ -9,7 +9,6 @@ import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.phase.PhaseService;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
