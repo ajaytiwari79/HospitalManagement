@@ -9,4 +9,7 @@ import java.math.BigInteger;
 public interface ActivityCardInformationRepository extends MongoBaseRepository<ActivityCardInformation, BigInteger> {
     @Query("{unitId:?0,deleted:false,staffId:?1}")
     ActivityCardInformation findByUnitIdAndStaffId(Long unitId,Long staffId);
+
+    @Query("{unitId:?0,deleted:false,countryAdminSetting:?1}")
+    ActivityCardInformation findByUnitIdAndCountryAdminSetting(Long unitId,boolean countryAdminSetting);
 }
