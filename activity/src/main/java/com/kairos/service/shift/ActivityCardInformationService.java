@@ -19,7 +19,7 @@ public class ActivityCardInformationService {
     public Map<String,ActivityCardInformation> getActivityCardInformation(Long unitId, Long staffId){
         Map<String,ActivityCardInformation> stringActivityCardInformationMap = new HashMap<String, ActivityCardInformation>(){{
             put("staffActivityCardInformation",activityCardInformationRepository.findByUnitIdAndStaffId(unitId,staffId));
-            put("countryActivityCardInformation",activityCardInformationRepository.findByUnitIdAndStaffId(unitId,staffId));
+            put("countryActivityCardInformation",activityCardInformationRepository.findByUnitIdAndCountryAdminSetting(unitId,true));
         }};
         return stringActivityCardInformationMap;
     }
