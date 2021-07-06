@@ -195,7 +195,7 @@ public class ShiftBreakService implements KPIService {
         boolean breakAllowed = activity.getActivityRulesSettings().isBreakAllowed();
         if (breakAllowed) {
             boolean breakCanbePlace = shiftActivity.getEndDate().after(placeBreakAfterThisDate);
-            breakCanbePlace = breakCanbePlace ? new DateTimeInterval(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, shiftActivity.getEndDate()).getMinutes() > breakSetting.getBreakDurationInMinute() : breakCanbePlace;
+            breakCanbePlace = breakCanbePlace ? new DateTimeInterval(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, shiftActivity.getEndDate()).getMinutes() >= breakSetting.getBreakDurationInMinute() : breakCanbePlace;
             if (breakCanbePlace && !placeBreakAnyWhereInShift) {
                 Date startDate = roundDateByMinutes(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, 15);
                 Date endDate = asDate(asZonedDateTime(startDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
