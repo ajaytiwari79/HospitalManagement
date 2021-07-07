@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.day_type;
 
+import com.kairos.dto.user.country.agreement.cta.cta_response.SectorWiseDayTypeInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 
 @Getter
@@ -26,4 +28,5 @@ public class CountryHolidayCalender extends MongoBaseEntity {
     private boolean isEnabled = true;
     private String googleCalId;
     private Long countryId;
+    private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
 }
