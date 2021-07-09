@@ -1,5 +1,6 @@
 package com.kairos.controller.shift;
 
+import com.kairos.enums.shift.ViewType;
 import com.kairos.service.shift.ActivityCardInformation;
 import com.kairos.service.shift.ActivityCardInformationService;
 import com.kairos.utils.response.ResponseHandler;
@@ -33,7 +34,7 @@ public class ActivityCardInformationController {
     @ApiOperation("get Activity Card Information")
     @GetMapping("/activity_card_information/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityCardInformation(@PathVariable Long unitId,@PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCardInformationService.getActivityCardInformation(unitId, staffId));
+    public ResponseEntity<Map<String, Object>> getActivityCardInformation(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam ViewType viewType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCardInformationService.getActivityCardInformation(unitId, staffId,viewType));
     }
 }
