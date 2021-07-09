@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface CoverShiftMongoRepository extends MongoBaseRepository<CoverShift, BigInteger> {
@@ -15,6 +16,10 @@ public interface CoverShiftMongoRepository extends MongoBaseRepository<CoverShif
 
     CoverShift findByIdAndDeletedFalse(BigInteger id);
 
-    @Query("{deleted:false,date:{$gte:?0,$lte:?1}}")
+    @Query("{deleted:false,assignedStaffId:{$exists:false},date:{$gte:?0,$lte:?1}}")
     List<CoverShiftDTO> findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(LocalDate startDate, LocalDate endDate);
+
+    List<CoverShift> findAllByDateAndDeletedFalse(LocalDate selectedDate);
+
+    List<CoverShift> findAllByIdInAndDeletedFalse(Collection<BigInteger> id);
 }

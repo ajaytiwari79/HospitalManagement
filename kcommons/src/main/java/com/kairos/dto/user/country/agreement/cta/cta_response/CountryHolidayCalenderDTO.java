@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * @author pradeep
@@ -33,4 +34,5 @@ public class CountryHolidayCalenderDTO implements Serializable {
     private boolean allowTimeSettings;
     private DayTypeDTO dayTypeDTO;
     private Long countryId;
+    private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
 }

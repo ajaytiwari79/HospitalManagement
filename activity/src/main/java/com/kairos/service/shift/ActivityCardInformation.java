@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 @Document
@@ -20,6 +19,8 @@ public class ActivityCardInformation extends MongoBaseEntity {
     private Long staffId;
     private Set<ActivityCardInformationSetting> activityCardInformationSettings;
     private ViewType viewType;
+    private int maxLimit;
+
 
 
 
