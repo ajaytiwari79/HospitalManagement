@@ -119,7 +119,8 @@ public class StaffingLevelAvailableCountService {
         if (isNotNull(intervalAndDurationWrapper) && isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())) {
             DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
             Optional<DateTimeInterval> dateTimeIntervalOptional = intervalAndDurationWrapper.getIntervals().stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
-            if (dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes() == interval.getMinutes() && staffingLevelActivity.getAvailableNoOfStaff() <= staffingLevelActivity.getMinNoOfStaff()) {
+            boolean underStaffing = staffingLevelActivity.getAvailableNoOfStaff() < staffingLevelActivity.getMinNoOfStaff();
+            if (underStaffing && dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes() == interval.getMinutes() && staffingLevelActivity.getAvailableNoOfStaff() <= staffingLevelActivity.getMinNoOfStaff()) {
                 staffingLevelActivity.setRemainingUnderStaffing(Math.min(staffingLevelActivity.getRemainingUnderStaffing() + 1, staffingLevelActivity.getMinNoOfStaff()));
                 if (staffingLevelActivity.getMinNoOfStaff() != staffingLevelActivity.getAvailableNoOfStaff()) {
                     staffingLevelActivity.setInitialUnderStaffing(staffingLevelActivity.getRemainingUnderStaffing());
@@ -149,8 +150,8 @@ public class StaffingLevelAvailableCountService {
         if (isNotNull(intervalAndDurationWrapper) && isCollectionNotEmpty(intervalAndDurationWrapper.getIntervals())) {
             DateTimeInterval interval = staffingLevelInterval.getStaffingLevelDuration().getInterval(asLocalDate(staffingLevel.getCurrentDate()));
             Optional<DateTimeInterval> dateTimeIntervalOptional = intervalAndDurationWrapper.getIntervals().stream().filter(dateTimeInterval -> dateTimeInterval.overlaps(interval)).findFirst();
-            int overStaffingCount = staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff();
-            if (overStaffingCount > 0 && dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes() == interval.getMinutes() && staffingLevelActivity.getAvailableNoOfStaff() >= staffingLevelActivity.getMaxNoOfStaff()) {
+            boolean overStaffing = staffingLevelActivity.getAvailableNoOfStaff() > staffingLevelActivity.getMaxNoOfStaff();
+            if (overStaffing && dateTimeIntervalOptional.isPresent() && dateTimeIntervalOptional.get().overlap(interval).getMinutes() == interval.getMinutes() && staffingLevelActivity.getAvailableNoOfStaff() >= staffingLevelActivity.getMaxNoOfStaff()) {
                 staffingLevelActivity.setRemainingOverStaffing(Math.min(staffingLevelActivity.getRemainingOverStaffing() + 1, staffingLevelActivity.getMaxNoOfStaff()));
                 if (staffingLevelActivity.getMaxNoOfStaff() != staffingLevelActivity.getAvailableNoOfStaff()) {
                     staffingLevelActivity.setInitialOverStaffing(staffingLevelActivity.getRemainingOverStaffing());
@@ -225,6 +226,8 @@ public class StaffingLevelAvailableCountService {
             Optional<ShiftActivity> optionalBreakActivity1 = breakActivities1.stream().filter(breakActivity -> !breakActivity.isBreakNotHeld() && breakActivity.getInterval().overlaps(timeInterval)).findFirst();
             if (optionalBreakActivity1.isPresent()) {
                 timeIntervals.addAll(timeInterval.minusInterval(optionalBreakActivity1.get().getInterval()));
+            }else{
+                timeIntervals.add(timeInterval);
             }
         }
         boolean breakDurationSame = false;
