@@ -1,13 +1,14 @@
-package com.kairos.persistence.repository.custom_repository;
+package com.kairos.persistence.repository.counter;
 
 import com.kairos.commons.audit_logging.AuditLogging;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.common.MongoSequence;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.counter.FibonacciKPI;
+import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.MongoBaseEntity;
+import com.kairos.persistence.model.counter.MongoSequence;
 import com.mongodb.client.MongoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,9 +144,8 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 			oldEntity = createEntity(entity);
 		}
 		if(entity.getId() == null){
-			if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
-				className = entity.getClass().getSuperclass().getSimpleName();
+			if(entity.getClass().equals(FibonacciKPI.class)){
+				className = KPI.class.getSimpleName();
 			}
 			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
 			entity.setCreatedAt(DateUtils.getDate());
