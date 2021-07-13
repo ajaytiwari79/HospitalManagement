@@ -66,6 +66,7 @@ import com.kairos.persistence.repository.user.employment.EmploymentGraphReposito
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
@@ -166,6 +167,7 @@ public class StaffRetrievalService {
     @Inject private GroupService groupService;
     @Inject private EngineerTypeService engineerTypeService;
     @Inject private StaffTeamRankingService staffTeamRankingService;
+    @Inject private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
 
 
     public Map<String, Object> getDefaultDataOfStaff(long staffId, long unitId) {
@@ -752,7 +754,9 @@ public class StaffRetrievalService {
     }
 
     public <T> FilteredStaffsAndRequiredDataFilterDTO getAllStaffForUnitWithEmploymentStatus(final Long loggedInUserId, long unitId, StaffFilterDTO staffFilterDetails,boolean showAllStaffs) {
-
+        if(isNotNull(staffFilterDetails.getStaffFavouriteFiltersId()) && isNotNull(staffFilterDetails.getStaffId())){
+            staffFavouriteFilterGraphRepository.updateUsedCount(staffFilterDetails.getStaffId(),staffFilterDetails.getStaffFavouriteFiltersId());
+        }
         LOGGER.info("filters received are {} ", staffFilterDetails.getFiltersData());
         LocalDate dateToday = getCurrentLocalDate();
         final Map<FilterType, Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(), staffFilterDetails.getFiltersData());
