@@ -1,12 +1,12 @@
 package com.kairos.service.shift;
 
+import com.kairos.enums.shift.ViewType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 @Document
@@ -18,6 +18,9 @@ public class ActivityCardInformation extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private Set<ActivityCardInformationSetting> activityCardInformationSettings;
+    private ViewType viewType;
+    private int maxLimit;
+
 
 
 

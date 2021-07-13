@@ -348,7 +348,7 @@ public class FunctionalPaymentService {
                     toBreakInNewList.add(functionalPayment);
                 }
             } else {
-                if (functionalPayment.getEndDate() != null || (functionalPayment.getStartDate().isAfter(startDate.minusDays(1)) && functionalPayment.getEndDate().isBefore(startDate.plusDays(1)))) {
+                if (functionalPayment.getEndDate() != null && functionalPayment.getStartDate().isAfter(startDate.minusDays(1)) && functionalPayment.getEndDate().isBefore(startDate.plusDays(1))) {
                     toUpdateInExisting.add(functionalPayment);
                 } else {
                     toBreakInNewList.add(functionalPayment);

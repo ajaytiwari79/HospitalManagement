@@ -84,4 +84,9 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "OR ({2} IS NOT NULL AND  (DATE({2}) >= DATE(payTable.startDateMillis) AND (payTable.endDateMillis is null OR DATE({1}) <= DATE(payTable.endDateMillis)) ))) \n" +
             "RETURN payTable")
     List<PayTable> findAllActivePayTable(Long levelId,String startDate,String endDate,String employmentStartDate);
+
+    @Query("MATCH(payTable:PayTable)-[rel:HAS_TEMP_PAY_TABLE]->(draftPayTable:PayTable{deleted:false}) WHERE id(payTable)={0} \n" +
+            "SET draftPayTable.deleted=true \n" +
+            "DELETE rel")
+    PayTable deleteOldDraftPayTable(Long parentId);
 }

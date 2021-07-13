@@ -13,6 +13,7 @@ import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
@@ -335,7 +336,7 @@ public class CoverShiftService {
 
     public CoverShiftStaffDetails getCoverShiftStaffDetails(LocalDate startDate, LocalDate endDate, Long unitId, Long staffId, Long employmentId) {
         List<CoverShiftDTO> coverShifts = coverShiftMongoRepository.findAllByDateGreaterThanEqualsAndLessThanEqualsAndDeletedFalse(startDate, endDate).stream().sorted(Comparator.comparing(CoverShiftDTO::getDate)).collect(Collectors.toList());
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate, endDate.plusDays(1), unitId);
+        List<Shift> shifts = (List<Shift>) shiftMongoRepository.findAllById(coverShifts.stream().map(CoverShiftDTO::getShiftId).collect(Collectors.toList()));
         List<CoverShiftDTO> totalRequests = coverShifts.stream().filter(k -> k.getRequestedStaffs().containsKey(staffId)).collect(Collectors.toList());
         List<CoverShiftDTO> totalInterests = coverShifts.stream().filter(k -> k.getInterestedStaffs().containsKey(staffId)).collect(Collectors.toList());
         List<CoverShiftDTO> totalDeclined = coverShifts.stream().filter(k -> k.getDeclinedStaffIds().containsKey(staffId)).collect(Collectors.toList());
@@ -375,20 +376,22 @@ public class CoverShiftService {
         return shiftList;
     }
 
-    public void notInterestInCoverShift(BigInteger id, Long staffId) {
-        CoverShift coverShift = coverShiftMongoRepository.findByIdAndDeletedFalse(id);
-        if (isNull(coverShift)) {
+    public void notInterestInCoverShift(BigInteger id, Long staffId, LocalDate selectedDate) {
+        List<CoverShift> coverShifts=selectedDate!=null?coverShiftMongoRepository.findAllByDateAndDeletedFalse(selectedDate):coverShiftMongoRepository.findAllByIdInAndDeletedFalse(Arrays.asList(id));
+        if (isCollectionEmpty(coverShifts)) {
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
-        coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
-        coverShift.getInterestedStaffs().remove(staffId);
-        coverShift.getRequestedStaffs().remove(staffId);
-        coverShiftMongoRepository.save(coverShift);
+        for(CoverShift coverShift:coverShifts){
+            coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
+            coverShift.getInterestedStaffs().remove(staffId);
+            coverShift.getRequestedStaffs().remove(staffId);
+        }
+        coverShiftMongoRepository.saveEntities(coverShifts);
     }
 
     private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts) {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = isCollectionEmpty(shifts) ? new HashMap<>() : organizationActivityService.getActivityWrapperMap(shifts, null);
-        Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
+        Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(MongoBaseEntity::getId,Function.identity()));
         for (CoverShiftDTO coverShiftDTO : coverShiftDTOS) {
             Shift shift = shiftMap.get(coverShiftDTO.getShiftId());
             shift.setStaffId(staffAdditionalInfoDTO.getId());

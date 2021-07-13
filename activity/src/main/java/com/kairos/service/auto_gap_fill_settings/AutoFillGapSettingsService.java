@@ -14,6 +14,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
 import com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.auto_gap_fill_settings.AutoFillGapSettings;
 import com.kairos.persistence.model.phase.Phase;
@@ -36,10 +37,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.ActivityMessagesConstants.DO_NOT_ALLOW_TO_CAUSE_GAP;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
-import static com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule.*;
 import static com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario.*;
 
 @Service
@@ -258,7 +257,9 @@ public class AutoFillGapSettingsService {
             BigInteger activityId = (BigInteger) activityIdAndShowError[0];
             showError = (boolean) activityIdAndShowError[1];
             if(isNotNull(activityId)) {
-                shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
+                Activity activity=activityMongoRepository.findOne(activityId);
+                shiftActivityDTO = new ShiftActivityDTO(activity.getName(), shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), activityId, null);
+                shiftActivityDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
                 break;
             }
         }
