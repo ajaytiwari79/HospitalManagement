@@ -17,7 +17,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.DailyTimeBankEntry;
 import com.kairos.persistence.model.FibonacciKPICalculation;
@@ -35,6 +34,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 
 @Service
 public class PlannedHoursVsTimeBankService implements CounterService {
@@ -110,10 +111,10 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.groupingBy(StaffKpiFilterDTO::getUnitId, Collectors.toList()));
         List<DailyTimeBankEntry> employmentAndDailyTimeBank = getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toList()), dateTimeIntervals.get(0).getStartLocalDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate(), daysOfWeek);
         switch (applicableKPI.getKpiRepresentation()) {
-            case KPIRepresentation.REPRESENT_PER_STAFF:
+            case REPRESENT_PER_STAFF:
                 staffDeltaHours = getstaffPlannedAndTimeBankHoursPerStaff(staffIds, dateTimeIntervals, staffKpiFilterDTOS);
                 break;
-            case KPIRepresentation.REPRESENT_TOTAL_DATA:
+            case REPRESENT_TOTAL_DATA:
                 staffDeltaHours = getstaffPlannedAndTimeBankHoursOfUnits(dateTimeIntervals, unitIds,  unitAndStaffKpiFilterMap, employmentAndDailyTimeBank);
                 break;
             default:
@@ -203,7 +204,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
 
     private List<CommonKpiDataUnit> getKpiDataUnits(Map<Object, Double> staffPlannedHours,Map<Object, Double> staffPlannedHoursAndTimeBankHours, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<CommonKpiDataUnit> kpiDataUnits = ObjectUtils.newArrayList();
-        if(KPIRepresentation.REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
+        if(REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
             Map<String, Long> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getFullName, StaffKpiFilterDTO::getId));
             List<BarLineChartKPiDateUnit> barLineChartKPiDateUnits = new ArrayList<>();
             staffPlannedHoursAndTimeBankHours.entrySet().forEach(entry -> barLineChartKPiDateUnits.add(new BarLineChartKPiDateUnit(entry.getKey().toString(), staffIdAndNameMap.get(entry.getKey()), entry.getValue(), staffPlannedHours.get(staffIdAndNameMap.get(entry.getKey())))));
@@ -223,7 +224,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursVsTimeBankKpiStaffs(organizationId, filterBasedCriteria ,applicableKPI);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
     }
 
     @Override

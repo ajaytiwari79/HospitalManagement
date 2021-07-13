@@ -56,4 +56,7 @@ public class UserIntegrationService {
     public boolean isExistOrganization(Long referenceId) {
         return false;
     }
+    public Long getStaffIdByUserId(Long refId) {
+        return null;
+    }
 }

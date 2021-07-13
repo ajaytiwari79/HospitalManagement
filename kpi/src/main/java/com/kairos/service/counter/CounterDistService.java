@@ -27,13 +27,8 @@ import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.*;
-import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.Shortcuts.ShortcutService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.exception.ExceptionService;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

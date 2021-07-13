@@ -11,11 +11,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.ApplicableKPI;
-import com.kairos.persistence.repository.day_type.CountryCalenderRepo;
-import com.kairos.persistence.repository.day_type.DayTypeRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.day_type.CountryHolidayCalenderService;
-import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 

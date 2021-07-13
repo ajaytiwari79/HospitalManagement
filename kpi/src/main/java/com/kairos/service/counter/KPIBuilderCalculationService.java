@@ -56,6 +56,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.enums.kpi.CalculationType.*;
+import static com.kairos.enums.kpi.CalculationType.TOTAL_PLANNED_HOURS;
+import static com.kairos.enums.kpi.KPIRepresentation.*;
+import static com.kairos.enums.kpi.YAxisConfig.*;
+import static com.kairos.enums.shift.TodoStatus.*;
+import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
 import static java.util.Map.Entry.comparingByKey;
 
 @Getter
@@ -111,7 +117,7 @@ public class KPIBuilderCalculationService implements CounterService {
             exceptionService.dataNotFoundException(KPIMessagesConstants.EXCEPTION_INVALIDREQUEST);
         }
         double total = 0;
-        if (YAxisConfig.PLANNED_TIME.equals(yAxisConfig)) {
+        if (PLANNED_TIME.equals(yAxisConfig)) {
             total = getTotalByPlannedTime(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
         } else {
             total = getActivityAndTimeTypeTotalByCalulationType(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
@@ -137,7 +143,7 @@ public class KPIBuilderCalculationService implements CounterService {
             exceptionService.dataNotFoundException(KPIMessagesConstants.EXCEPTION_INVALIDREQUEST);
         }
         CalculationType calculationType = ((List<CalculationType>) ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_TYPE), CalculationType.class)).get(0);
-        if (!calculationType.equals(CalculationType.TOTAL_MINUTES)) {
+        if (!calculationType.equals(TOTAL_MINUTES)) {
             exceptionService.illegalArgumentException(KPIMessagesConstants.CALCULATION_TYPE_NOT_VALID);
         }
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, true);
@@ -177,31 +183,31 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         Function<ShiftActivityDTO, Integer> methodParam = null;
         switch (kpiCalculationRelatedInfo.getCalculationType()) {
-            case CalculationType.PLANNED_HOURS_TIMEBANK:
+            case PLANNED_HOURS_TIMEBANK:
                 methodParam = ShiftActivityDTO::getPlannedMinutesOfTimebank;
                 break;
-            case CalculationType.PAYOUT:
+            case PAYOUT:
                 methodParam = ShiftActivityDTO::getPlannedMinutesOfPayout;
                 break;
-            case CalculationType.TOTAL_PLANNED_HOURS:
+            case TOTAL_PLANNED_HOURS:
                 methodParam = ShiftActivityDTO::getTotalPlannedMinutes;
                 break;
-            case CalculationType.SCHEDULED_HOURS:
+            case SCHEDULED_HOURS:
                 methodParam = ShiftActivityDTO::getScheduledMinutes;
                 break;
-            case CalculationType.COLLECTIVE_TIME_BONUS_PAYOUT:
+            case COLLECTIVE_TIME_BONUS_PAYOUT:
                 methodParam = ShiftActivityDTO::getPayoutCtaBonusMinutes;
                 break;
-            case CalculationType.COLLECTIVE_TIME_BONUS_TIMEBANK:
+            case COLLECTIVE_TIME_BONUS_TIMEBANK:
                 methodParam = ShiftActivityDTO::getTimeBankCtaBonusMinutes;
                 break;
-            case CalculationType.TOTAL_COLLECTIVE_BONUS:
+            case TOTAL_COLLECTIVE_BONUS:
                 methodParam = ShiftActivityDTO::getTotalCtaBonusMinutes;
                 break;
-            case CalculationType.DURATION_HOURS:
+            case DURATION_HOURS:
                 methodParam = ShiftActivityDTO::getDurationMinutes;
                 break;
-            case CalculationType.TOTAL_MINUTES:
+            case TOTAL_MINUTES:
                 methodParam = ShiftActivityDTO::getMinutes;
                 break;
             default:
@@ -261,7 +267,7 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<CommonKpiDataUnit> getKpiDataUnits(double multiplicationFactor, Map<Object, Double> staffTotalHours, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         for (Map.Entry<Object, Double> entry : staffTotalHours.entrySet()) {
-            if (KPIRepresentation.REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation()) || KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation())) {
+            if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation()) || INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation())) {
                 Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
             } else {
@@ -275,7 +281,7 @@ public class KPIBuilderCalculationService implements CounterService {
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         for (Map.Entry<Object, List<ClusteredBarChartKpiDataUnit>> entry : objectListMap.entrySet()) {
-            if (KPIRepresentation.REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
+            if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue()));
             } else {
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(KPIUtils.getKpiDateFormatByIntervalUnit(entry.getKey().toString(), applicableKPI.getFrequencyType(), applicableKPI.getKpiRepresentation()), entry.getKey().toString(), entry.getValue()));
@@ -296,7 +302,7 @@ public class KPIBuilderCalculationService implements CounterService {
     public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi, applicableKPI);
         XAxisConfig xAxisConfig = (XAxisConfig) ((List) ObjectMapperUtils.copyCollectionPropertiesByMapper(filterBasedCriteria.get(FilterType.CALCULATION_UNIT), XAxisConfig.class)).get(0);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), xAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(xAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), xAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(xAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
 
@@ -321,8 +327,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private <T, E> Map<T, E> calculateDataByKpiRepresentation(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Map<T, E> staffTotalHours;
         switch (kpiCalculationRelatedInfo.getApplicableKPI().getKpiRepresentation()) {
-            case KPIRepresentation.REPRESENT_PER_STAFF:
-            case KPIRepresentation.INDIVIDUAL_STAFF:
+            case REPRESENT_PER_STAFF:
+            case INDIVIDUAL_STAFF:
                 staffTotalHours = getStaffTotalByRepresentPerStaff(kpiCalculationRelatedInfo);
                 break;
             case REPRESENT_TOTAL_DATA:
@@ -365,19 +371,19 @@ public class KPIBuilderCalculationService implements CounterService {
         for (YAxisConfig yAxisConfig : kpiCalculationRelatedInfo.getYAxisConfigs()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(null);
             switch (yAxisConfig) {
-                case YAxisConfig.ACTIVITY:
+                case ACTIVITY:
                     subClusteredBarValue.addAll(getActivitySubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
                     break;
-                case YAxisConfig.TIME_TYPE:
+                case TIME_TYPE:
                     subClusteredBarValue.addAll(getTimeTypeSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
                     break;
-                case YAxisConfig.PLANNED_TIME:
+                case PLANNED_TIME:
                     subClusteredBarValue.addAll(getPlannedTimeSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
                     break;
-                case YAxisConfig.PLANNING_QUALITY_LEVEL:
+                case PLANNING_QUALITY_LEVEL:
                     subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo));
                     break;
-                case YAxisConfig.ABSENCE_REQUEST:
+                case ABSENCE_REQUEST:
                     List<TodoDTO> todoDTOList = kpiCalculationRelatedInfo.getTodosByStaffIdAndInterval(staffId, dateTimeInterval);
                     List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = absencePlanningKPIService.getActivityStatusCount(todoDTOList, kpiCalculationRelatedInfo.getXAxisConfigs().get(0));
                     subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
@@ -395,7 +401,7 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(calculationType);
-            if (ObjectUtils.newHashSet(CalculationType.SCHEDULED_HOURS, CalculationType.PLANNED_HOURS_TIMEBANK, CalculationType.DURATION_HOURS, CalculationType.TOTAL_MINUTES, CalculationType.COLLECTIVE_TIME_BONUS_TIMEBANK, CalculationType.PAYOUT, CalculationType.COLLECTIVE_TIME_BONUS_PAYOUT, CalculationType.TOTAL_COLLECTIVE_BONUS, CalculationType.TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.getCurrentCalculationType())) {
+            if (ObjectUtils.newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK, DURATION_HOURS, TOTAL_MINUTES, COLLECTIVE_TIME_BONUS_TIMEBANK, CalculationType.PAYOUT, COLLECTIVE_TIME_BONUS_PAYOUT, TOTAL_COLLECTIVE_BONUS, TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.getCurrentCalculationType())) {
                 if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.ACTIVITY_IDS))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(calculationType.value, value));
@@ -451,7 +457,7 @@ public class KPIBuilderCalculationService implements CounterService {
         long count = 0;
         if (ObjectUtils.isNotNull(approvalTime)) {
             for (TodoDTO todoDTO : todoDTOS) {
-                if (TodoStatus.APPROVE.equals(todoDTO.getStatus()) || TodoStatus.DISAPPROVE.equals(todoDTO.getStatus()))
+                if (APPROVE.equals(todoDTO.getStatus()) || DISAPPROVE.equals(todoDTO.getStatus()))
                     localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
                 if (ObjectUtils.isNotNull(localDate)) {
                     LocalDate endDate = add(DateUtils.asLocalDate(todoDTO.getRequestedOn()), approvalTime, kpiCalculationRelatedInfo);
@@ -491,10 +497,10 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private LocalDate getApproveOrDisApproveDateFromTODO(LocalDate localDate, TodoDTO todoDTO) {
         switch (todoDTO.getStatus()) {
-            case TodoStatus.APPROVE:
+            case APPROVE:
                 localDate = DateUtils.asLocalDate(DateUtils.asDate(todoDTO.getApprovedOn()));
                 break;
-            case TodoStatus.DISAPPROVE:
+            case DISAPPROVE:
                 localDate = DateUtils.asLocalDate(DateUtils.asDate(todoDTO.getDisApproveOn()));
                 break;
             default:
@@ -507,7 +513,7 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(calculationType);
-            if (ObjectUtils.newHashSet(CalculationType.SCHEDULED_HOURS, CalculationType.PLANNED_HOURS_TIMEBANK, CalculationType.DURATION_HOURS, CalculationType.TOTAL_MINUTES, CalculationType.COLLECTIVE_TIME_BONUS_TIMEBANK, CalculationType.PAYOUT, CalculationType.COLLECTIVE_TIME_BONUS_PAYOUT, CalculationType.TOTAL_COLLECTIVE_BONUS, CalculationType.TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.getCurrentCalculationType())) {
+            if (ObjectUtils.newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK, DURATION_HOURS, TOTAL_MINUTES, COLLECTIVE_TIME_BONUS_TIMEBANK, CalculationType.PAYOUT, COLLECTIVE_TIME_BONUS_PAYOUT, TOTAL_COLLECTIVE_BONUS, TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.getCurrentCalculationType())) {
                 if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.TIME_TYPE))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
@@ -527,7 +533,7 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(calculationType);
-            if (ObjectUtils.newHashSet(CalculationType.SCHEDULED_HOURS, CalculationType.PLANNED_HOURS_TIMEBANK, CalculationType.DURATION_HOURS, CalculationType.TOTAL_MINUTES, CalculationType.COLLECTIVE_TIME_BONUS_TIMEBANK, CalculationType.PAYOUT, CalculationType.COLLECTIVE_TIME_BONUS_PAYOUT, CalculationType.TOTAL_COLLECTIVE_BONUS, CalculationType.TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.getCurrentCalculationType())) {
+            if (ObjectUtils.newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK, DURATION_HOURS, TOTAL_MINUTES, COLLECTIVE_TIME_BONUS_TIMEBANK, CalculationType.PAYOUT, COLLECTIVE_TIME_BONUS_PAYOUT, TOTAL_COLLECTIVE_BONUS, TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.getCurrentCalculationType())) {
                 if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.PLANNED_TIME_TYPE))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));

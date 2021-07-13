@@ -17,14 +17,9 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.utils.counter.FibonacciCalculationUtil;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -36,7 +31,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
+import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 
 @Service
 public class PlannedHoursCalculationService implements CounterService {
@@ -106,12 +101,12 @@ public class PlannedHoursCalculationService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     private void getKpiDataUnits(double multiplicationFactor, Map<Object, Double> staffRestingHours, List<CommonKpiDataUnit> kpiDataUnits, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         for (Map.Entry<Object, Double> entry : staffRestingHours.entrySet()) {
-            if (KPIRepresentation.REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())){
+            if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())){
                 Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
             }else{
@@ -125,10 +120,10 @@ public class PlannedHoursCalculationService implements CounterService {
         Map<Object, Double> staffplannedHours;
         Double plannedHours = 0d;
         switch (applicableKPI.getKpiRepresentation()) {
-            case KPIRepresentation.REPRESENT_PER_STAFF:
+            case REPRESENT_PER_STAFF:
                 staffplannedHours = getStaffPlannedHoursByRepresentPerStaff(staffIds, shifts);
                 break;
-            case KPIRepresentation.REPRESENT_TOTAL_DATA:
+            case REPRESENT_TOTAL_DATA:
                 staffplannedHours = getStaffPlannedHoursByRepresentTotalData(staffIds, dateTimeIntervals, shifts, plannedHours);
                 break;
             default:

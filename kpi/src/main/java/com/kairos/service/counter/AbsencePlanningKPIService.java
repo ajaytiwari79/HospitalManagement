@@ -42,6 +42,8 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import static com.kairos.enums.kpi.KPIRepresentation.*;
+import static com.kairos.enums.shift.TodoStatus.*;
 
 @Service
 public class AbsencePlanningKPIService implements CounterService {
@@ -72,7 +74,7 @@ public class AbsencePlanningKPIService implements CounterService {
         List<TodoDTO> todoDTOS = todoRepository.findAllByKpiFilter(unitIds.get(0), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), staffIds, todoStatus);
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectDoubleMap = calculateDataByKpiRepresentation(staffIds, dateTimeIntervals, applicableKPI, todoDTOS, defaultKpiDataDTO.getTimeSlotDTOS());
 
-        if(ObjectUtils.newHashSet(KPIRepresentation.REPRESENT_PER_STAFF, KPIRepresentation.REPRESENT_PER_INTERVAL, KPIRepresentation.REPRESENT_TOTAL_DATA).contains(applicableKPI.getKpiRepresentation())){
+        if(ObjectUtils.newHashSet(REPRESENT_PER_STAFF, REPRESENT_PER_INTERVAL, REPRESENT_TOTAL_DATA).contains(applicableKPI.getKpiRepresentation())){
             KPIUtils.getKpiDataUnits(objectDoubleMap, kpiDataUnits, applicableKPI, defaultKpiDataDTO.getStaffKpiFilterDTOs());
             KPIUtils.sortKpiDataByDateTimeInterval(kpiDataUnits);
         }
@@ -140,16 +142,16 @@ public class AbsencePlanningKPIService implements CounterService {
         int requested = 0;
         for (TodoDTO todoDTO : todoDTOS) {
             switch (todoDTO.getStatus()) {
-                case TodoStatus.REQUESTED:
+                case REQUESTED:
                     requested++;
                     break;
-                case TodoStatus.DISAPPROVE:
+                case DISAPPROVE:
                     disapprove++;
                     break;
-                case TodoStatus.PENDING:
+                case PENDING:
                     pending++;
                     break;
-                case TodoStatus.APPROVE:
+                case APPROVE:
                     approve++;
                     break;
                 default:
@@ -175,13 +177,13 @@ public class AbsencePlanningKPIService implements CounterService {
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<TodoDTO> todoDTOS, List<TimeSlotDTO> timeSlotDTOS) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectAndActivityStatusCountMap;
         switch (applicableKPI.getKpiRepresentation()) {
-            case KPIRepresentation.REPRESENT_PER_STAFF:
+            case REPRESENT_PER_STAFF:
                 objectAndActivityStatusCountMap = getTodoCountByRepresentPerStaff(staffIds, todoDTOS);
                 break;
-            case KPIRepresentation.REPRESENT_PER_INTERVAL:
+            case REPRESENT_PER_INTERVAL:
                 objectAndActivityStatusCountMap = getTodoCountByRepresentPerInterval(dateTimeIntervals, todoDTOS, applicableKPI.getFrequencyType());
                 break;
-            case KPIRepresentation.REPRESENT_TOTAL_DATA:
+            case REPRESENT_TOTAL_DATA:
                 objectAndActivityStatusCountMap = getTodoCountByRepresentTotalData(dateTimeIntervals, todoDTOS);
                 break;
             default:
@@ -201,8 +203,8 @@ public class AbsencePlanningKPIService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getAbsencePlanningKpiData(organizationId, filterBasedCriteria, applicableKPI);
-        ChartType chartType = KPIRepresentation.COLUMN_TIMESLOT.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : ChartType.STACKED_CHART;
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : chartType, XAxisConfig.COUNT, RepresentationUnit.NUMBER, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        ChartType chartType = COLUMN_TIMESLOT.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : ChartType.STACKED_CHART;
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : chartType, XAxisConfig.COUNT, RepresentationUnit.NUMBER, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override

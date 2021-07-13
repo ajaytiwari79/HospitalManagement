@@ -28,8 +28,6 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +39,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.enums.kpi.KPIRepresentation.*;
+import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_INTERVAL;
 
 @Service
 public class DayTypeAndTimeSlotKpiService implements CounterService {
@@ -156,7 +157,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria ,applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     //use for return hours of timeslot
@@ -215,13 +216,13 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, TimeSlotDTO timeSlotDTO, List<BigInteger> dayTypeIds, Map<BigInteger, DayTypeDTO> daysTypeIdAndDayTypeMap,List<ShiftWithActivityDTO> shifts){
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap;
         switch (applicableKPI.getKpiRepresentation()) {
-            case KPIRepresentation.REPRESENT_PER_STAFF:
+            case REPRESENT_PER_STAFF:
                 objectListMap= getTotalHoursOfTimeSlotByStaff(staffIds,shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap);
                 break;
-            case KPIRepresentation.REPRESENT_TOTAL_DATA:
+            case REPRESENT_TOTAL_DATA:
                 objectListMap = getTotalHoursOfTimeSlotByTotalData(shifts,timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals);
                 break;
-            case KPIRepresentation.REPRESENT_PER_INTERVAL:
+            case REPRESENT_PER_INTERVAL:
                 objectListMap = getTotalHoursOfTimeSlotByInterval(timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap,applicableKPI.getFrequencyType());
                 break;
             default:

@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.service.activity.TimeTypeService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +17,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
-import static com.kairos.enums.FilterType.CALCULATION_UNIT;
 
 @Service
 public class UnavailabilityCalculationKPIService implements KPIService{
@@ -57,13 +54,13 @@ public class UnavailabilityCalculationKPIService implements KPIService{
     private double getTotalByCalculationUnitOfUnavailibilityShift(KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, List<ShiftActivityDTO> shiftActivityDTOS, double total) {
         XAxisConfig calculationUnit = (XAxisConfig) ((List) ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_UNIT), XAxisConfig.class)).get(0);
         switch (calculationUnit) {
-            case XAxisConfig.COUNT:
+            case COUNT:
                 total = shiftActivityDTOS.size();
                 break;
-            case XAxisConfig.PERCENTAGE_OF_TIMES:
+            case PERCENTAGE_OF_TIMES:
                 total = !filterShiftActivity.getShiftActivityDTOS().isEmpty() ? (double) shiftActivityDTOS.size() * 100 / filterShiftActivity.getShiftActivityDTOS().size() : filterShiftActivity.getShiftActivityDTOS().size();
                 break;
-            case XAxisConfig.PERCENTAGE_OF_HOURS:
+            case PERCENTAGE_OF_HOURS:
                 Set<BigInteger> shiftIds = filterShiftActivity.getShiftActivityDTOS().stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
                 long sumOfShifts = filterShiftActivity.getShifts().stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().filter(shiftActivityDTO -> shiftIds.contains(shiftActivityDTO.getActivityId()))).mapToLong(shiftActivityDTO -> new DateTimeInterval(shiftActivityDTO.getStartDate(), shiftActivityDTO.getEndDate()).getHours()).sum();
                 total = sumOfShifts > 0 ? (total * 100 / sumOfShifts) : sumOfShifts;

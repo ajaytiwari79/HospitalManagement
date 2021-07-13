@@ -44,6 +44,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.enums.kpi.YAxisConfig.*;
+import static com.kairos.enums.kpi.YAxisConfig.CHILD_CARE_DAYS;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -124,7 +127,7 @@ public class KPICalculationRelatedInfo {
     }
 
     public void getActivityTodoList() {
-        if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(YAxisConfig.PLANNING_QUALITY_LEVEL, CalculationType.ABSENCE_REQUEST))) {
+        if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(PLANNING_QUALITY_LEVEL, CalculationType.ABSENCE_REQUEST))) {
             todoDTOS = kpiBuilderCalculationService.getTodoService().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
         }
@@ -132,7 +135,7 @@ public class KPICalculationRelatedInfo {
 
 
     public void getTimeTypeTodoList(){
-        if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(YAxisConfig.TIME_TYPE))) {
+        if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(TIME_TYPE))) {
             getUpdateTodoStatus();
             getUpdateTodoDTOSByDayOfWeek(todoDTOS);
             getTimeTodoListMap();
@@ -197,7 +200,7 @@ public class KPICalculationRelatedInfo {
         }
     }
     private void getActivityIdMap(){
-        if(CalculationType.TODO_STATUS.equals(calculationTypes.get(0)) && CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(YAxisConfig.TIME_TYPE))) {
+        if(CalculationType.TODO_STATUS.equals(calculationTypes.get(0)) && CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(TIME_TYPE))) {
             Set<BigInteger> timeTypeIds = ObjectUtils.isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE)) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.TIME_TYPE)) : new HashSet<>();
             Set<BigInteger> lowerLevelTimeTypeIds = kpiBuilderCalculationService.getTimeTypeService().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
             List<Activity> activities = kpiBuilderCalculationService.getActivityMongoRepository().findAllByUnitIdAndTimeTypeIds(unitId, lowerLevelTimeTypeIds);
@@ -224,19 +227,19 @@ public class KPICalculationRelatedInfo {
         Set<WTATemplateType> wtaTemplateTypes = new HashSet<>();
         for (YAxisConfig yAxisConfig : ObjectUtils.isNull(yAxis) ? yAxisConfigs : Arrays.asList(yAxis)) {
             switch (yAxisConfig) {
-                case YAxisConfig.CHILD_CARE_DAYS:
+                case CHILD_CARE_DAYS:
                     wtaTemplateTypes.add(WTATemplateType.CHILD_CARE_DAYS_CHECK);
                     break;
-                case YAxisConfig.SENIORDAYS:
+                case SENIORDAYS:
                     wtaTemplateTypes.add(WTATemplateType.SENIOR_DAYS_PER_YEAR);
                     break;
-                case YAxisConfig.PROTECTED_DAYS_OFF:
+                case PROTECTED_DAYS_OFF:
                     wtaTemplateTypes.add(WTATemplateType.PROTECTED_DAYS_OFF);
                     break;
-                case YAxisConfig.CARE_DAYS:
+                case CARE_DAYS:
                     wtaTemplateTypes.add(WTATemplateType.WTA_FOR_CARE_DAYS);
                     break;
-                case YAxisConfig.TOTAL_ABSENCE_DAYS:
+                case TOTAL_ABSENCE_DAYS:
                     wtaTemplateTypes.addAll(ObjectUtils.newHashSet(WTATemplateType.CHILD_CARE_DAYS_CHECK, WTATemplateType.SENIOR_DAYS_PER_YEAR, WTATemplateType.PROTECTED_DAYS_OFF, WTATemplateType.WTA_FOR_CARE_DAYS));
                     break;
                 default:
@@ -249,15 +252,15 @@ public class KPICalculationRelatedInfo {
     private void updateActivityAndTimeTypeAndPlannedTimeMap() {
         for (YAxisConfig yAxisConfig : yAxisConfigs) {
             switch (yAxisConfig) {
-                case YAxisConfig.ACTIVITY:
-                case YAxisConfig.PLANNING_QUALITY_LEVEL:
+                case ACTIVITY:
+                case PLANNING_QUALITY_LEVEL:
                     List<Activity> activities = kpiBuilderCalculationService.getActivityMongoRepository().findAllActivitiesByIds(filterBasedCriteria.containsKey(FilterType.ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.ACTIVITY_IDS)) : new HashSet<>());
                     activityMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));
                     break;
-                case YAxisConfig.TIME_TYPE:
+                case TIME_TYPE:
                     timeTypeMap = kpiBuilderCalculationService.getTimeTypeService().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), filterBasedCriteria.containsKey(FilterType.TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)) : new ArrayList<>());
                     break;
-                case YAxisConfig.PLANNED_TIME:
+                case PLANNED_TIME:
                     Collection<PlannedTimeType> plannedTimeTypes = kpiBuilderCalculationService.getPlannedTimeTypeService().getAllPlannedTimeByIds(filterBasedCriteria.containsKey(FilterType.PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PLANNED_TIME_TYPE)) : new ArrayList<>());
                     plannedTimeMap = plannedTimeTypes.stream().collect(Collectors.toMap(PlannedTimeType::getId, v -> v));
                     break;
@@ -344,7 +347,7 @@ public class KPICalculationRelatedInfo {
     }
 
     public void getTodoDetails() {
-        if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(YAxisConfig.PLANNING_QUALITY_LEVEL, CalculationType.ABSENCE_REQUEST,YAxisConfig.ACTIVITY))) {
+        if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(PLANNING_QUALITY_LEVEL, CalculationType.ABSENCE_REQUEST, ACTIVITY))) {
             getUpdateTodoStatus();
             getUpdateTodoDTOSByDayOfWeek(todoDTOS);
             activityIds = filterBasedCriteria.containsKey(FilterType.ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.ACTIVITY_IDS)) : new HashSet<>();
@@ -394,7 +397,7 @@ public class KPICalculationRelatedInfo {
     }
 
     public List<TodoDTO> getTodosByInterval(DateTimeInterval dateTimeInterval, List<TodoDTO> todoDTOS) {
-        if(YAxisConfig.PLANNING_QUALITY_LEVEL.equals(yAxisConfigs.get(0))) {
+        if(PLANNING_QUALITY_LEVEL.equals(yAxisConfigs.get(0))) {
             return todoDTOS.stream().filter(todoDTO -> dateTimeInterval.containsAndEqualsEndDate(todoDTO.getRequestedOn())).collect(Collectors.toList());
         }else {
             return todoDTOS.stream().filter(todoDTO -> dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(todoDTO.getShiftDate()))).collect(Collectors.toList());

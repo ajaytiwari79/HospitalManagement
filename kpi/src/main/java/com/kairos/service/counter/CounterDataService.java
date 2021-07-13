@@ -61,6 +61,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static com.kairos.enums.FilterType.*;
 import static java.util.stream.Collectors.toList;
 
 
@@ -150,7 +151,7 @@ public class CounterDataService {
         if (ObjectUtils.isNotNull(staffApplicableKPI.getApplicableFilter())) {
             staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
             if(KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation()) && !filters.isCountryAdmin()){
-                staffFilterBasedCriteria.put(FilterType.STAFF_IDS, Arrays.asList(ObjectUtils.isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
+                staffFilterBasedCriteria.put(STAFF_IDS, Arrays.asList(ObjectUtils.isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
             }
             if(ObjectUtils.isNotNull(filters.getFrequencyType())){
                 staffApplicableKPI.setInterval(filters.getInterval());
@@ -158,7 +159,7 @@ public class CounterDataService {
                 staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
             }
             if(ObjectUtils.isNotNull(filters.getStartDate()) && ObjectUtils.isNotNull( filters.getEndDate())) {
-                staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
+                staffFilterBasedCriteria.put(TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
                 staffApplicableKPI.setFrequencyType(DurationType.MONTHS);
             }
             updateFibonacciConfig(staffApplicableKPI, startDate, staffFilterBasedCriteria);
@@ -168,10 +169,10 @@ public class CounterDataService {
 
     private void updateFibonacciConfig(ApplicableKPI staffApplicableKPI, LocalDate startDate, Map<FilterType, List> staffFilterBasedCriteria) {
         if(ObjectUtils.isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
-            staffFilterBasedCriteria.put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
-            if(!staffFilterBasedCriteria.containsKey(FilterType.TIME_INTERVAL) && ObjectUtils.isNotNull(startDate)){
+            staffFilterBasedCriteria.put(FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
+            if(!staffFilterBasedCriteria.containsKey(TIME_INTERVAL) && ObjectUtils.isNotNull(startDate)){
                 List<DateTimeInterval> dateTimeIntervals = KPIUtils.getDateTimeIntervals(staffApplicableKPI.getInterval(),  staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
-                staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL, ObjectUtils.newArrayList(dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
+                staffFilterBasedCriteria.put(TIME_INTERVAL, ObjectUtils.newArrayList(dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
             }
         }
     }
@@ -234,73 +235,73 @@ public class CounterDataService {
         List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(defaultKpiDataDTO.getOrganizationCommonDTOS()) ? defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(OrganizationCommonDTO::getId).collect(toList()) : ObjectUtils.newArrayList(UserContext.getUserDetails().getLastSelectedOrganizationId());
         for (FilterType filterType : kpi.getFilterTypes()) {
             switch (filterType){
-                case FilterType.EMPLOYMENT_TYPE:
+                case EMPLOYMENT_TYPE:
                     getEmploymentTypeDefaultData(criteriaList, defaultKpiDataDTO);
                     break;
-                case FilterType.TIME_SLOT:
+                case TIME_SLOT:
                     getTimeSlotDefaultData(criteriaList, defaultKpiDataDTO);
                     break;
-                case FilterType.DAY_TYPE:
+                case DAY_TYPE:
                     getDayTypeDefaultData(criteriaList, defaultKpiDataDTO);
                     break;
-                case FilterType.UNIT_IDS:
+                case UNIT_IDS:
                     getUnitIdsDefaultData(criteriaList, defaultKpiDataDTO, level);
                     break;
-                case FilterType.STAFF_IDS:
+                case STAFF_IDS:
                     getStaffDefaultData(criteriaList, defaultKpiDataDTO, level);
                     break;
-                case FilterType.ACTIVITY_STATUS:
+                case ACTIVITY_STATUS:
                     if (CounterType.ABSENCES_PER_INTERVAL.equals(kpi.getType())) {
                         getTodoStatusDefaultData(criteriaList);
                     } else {
                         getActivityStatusDefaultData(criteriaList);
                     }
                     break;
-                case FilterType.DAYS_OF_WEEK:
+                case DAYS_OF_WEEK:
                     getDayOfWeekDefaultData(criteriaList);
                     break;
-                case FilterType.PLANNED_TIME_TYPE:
+                case PLANNED_TIME_TYPE:
                     getPlannedTimeDefaultData(criteriaList);
                     break;
-                case FilterType.TIME_TYPE:
+                case TIME_TYPE:
                     getTimeTypesDefaultData(criteriaList, defaultKpiDataDTO);
                     break;
-                case FilterType.PHASE:
+                case PHASE:
                     getPhaseDefaultData(criteriaList);
                     break;
-                case FilterType.TIME_INTERVAL:
-                    criteriaList.add(new FilterCriteria(FilterType.TIME_INTERVAL.getValue(), FilterType.TIME_INTERVAL, new ArrayList<>()));
+                case TIME_INTERVAL:
+                    criteriaList.add(new FilterCriteria(TIME_INTERVAL.getValue(), TIME_INTERVAL, new ArrayList<>()));
                     break;
-                case FilterType.ACTIVITY_IDS:
+                case ACTIVITY_IDS:
                     getActivityDefaultData(criteriaList, unitIds);
                     break;
-                case FilterType.CALCULATION_TYPE:
+                case CALCULATION_TYPE:
                     getCalculationTypeData(criteriaList);
                     break;
-                case FilterType.CALCULATION_BASED_ON:
+                case CALCULATION_BASED_ON:
                     getCalculationBasedOnData(criteriaList);
                     break;
-                case FilterType.CALCULATION_UNIT:
+                case CALCULATION_UNIT:
                     getCalculationUnitData(criteriaList);
                     break;
-                case FilterType.REASON_CODE:
+                case REASON_CODE:
                     getReasonCodeData(criteriaList, defaultKpiDataDTO);
                     break;
-                case FilterType.PLANNED_BY:
+                case PLANNED_BY:
                     getPlannedByUnitData(criteriaList);
                     break;
-                case FilterType.TEAM:
+                case TEAM:
                     if (ObjectUtils.isCollectionNotEmpty(unitIds)) {
                         getTeamUnitData(criteriaList, unitIds.get(0));
                     }
                     break;
-                case FilterType.EMPLOYMENT_SUB_TYPE:
+                case EMPLOYMENT_SUB_TYPE:
                     getEmploymentSubTypeData(criteriaList);
                     break;
-                case FilterType.TEAM_TYPE:
+                case TEAM_TYPE:
                     getTeamTypeData(criteriaList);
                     break;
-                case FilterType.TAGS:getTagsData(defaultKpiDataDTO,criteriaList);
+                case TAGS:getTagsData(defaultKpiDataDTO,criteriaList);
                 break;
                 default:break;
             }
@@ -311,7 +312,7 @@ public class CounterDataService {
     private void getTagsData(DefaultKpiDataDTO defaultKpiDataDTO,List<FilterCriteria> criteriaList) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getTags().forEach(tagDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(tagDTO.getId(), tagDTO.getName())));
-        criteriaList.add(new FilterCriteria(FilterType.TAGS.getValue(), FilterType.TAGS, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(TAGS.getValue(), TAGS, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getPlannedByUnitData(List<FilterCriteria> criteriaList) {
@@ -319,63 +320,63 @@ public class CounterDataService {
         for (AccessGroupRole accessGroupRole : AccessGroupRole.values()) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(accessGroupRole.name(), accessGroupRole.name().toLowerCase()));
         }
-        criteriaList.add(new FilterCriteria(FilterType.PLANNED_BY.getValue(), FilterType.PLANNED_BY, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(PLANNED_BY.getValue(), PLANNED_BY, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {
         List<ActivityDTO> activityDTOS = activityService.findAllActivityByDeletedFalseAndUnitId(unitIds);
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         activityDTOS.forEach(activityDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(activityDTO.getId().longValue(), activityDTO.getName(), activityDTO.getUnitId())));
-        criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_IDS.getValue(), FilterType.ACTIVITY_IDS, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(ACTIVITY_IDS.getValue(), ACTIVITY_IDS, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getPhaseDefaultData(List<FilterCriteria> criteriaList) {
         List<PhaseDefaultName> phases = Arrays.asList(PhaseDefaultName.values());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         phases.forEach(phase -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(phase.toString(), phase.toString())));
-        criteriaList.add(new FilterCriteria(FilterType.PHASE.getValue(), FilterType.PHASE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(PHASE.getValue(), PHASE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getTimeTypesDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<TimeType> timeTypes = timeTypeService.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeType.getId().longValue(), timeType.getLabel())));
-        criteriaList.add(new FilterCriteria(FilterType.TIME_TYPE.getValue(), FilterType.TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(TIME_TYPE.getValue(), TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getDayOfWeekDefaultData(List<FilterCriteria> criteriaList) {
         List<DayOfWeek> dayOfWeeks = Arrays.asList(DayOfWeek.values());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         dayOfWeeks.forEach(dayOfWeek -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayOfWeek.toString(), dayOfWeek.toString())));
-        criteriaList.add(new FilterCriteria(FilterType.DAYS_OF_WEEK.getValue(), FilterType.DAYS_OF_WEEK, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(DAYS_OF_WEEK.getValue(), DAYS_OF_WEEK, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getPlannedTimeDefaultData(List<FilterCriteria> criteriaList) {
         List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         plannedTimes.forEach(presenceTypeDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(presenceTypeDTO.getId().toString(), presenceTypeDTO.getName())));
-        criteriaList.add(new FilterCriteria(FilterType.PLANNED_TIME_TYPE.getValue(), FilterType.PLANNED_TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(PLANNED_TIME_TYPE.getValue(), PLANNED_TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getActivityStatusDefaultData(List<FilterCriteria> criteriaList) {
         List<ShiftStatus> activityStatus = Arrays.asList(ShiftStatus.values());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         activityStatus.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
-        criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.getValue(), FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(ACTIVITY_STATUS.getValue(), ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getTodoStatusDefaultData(List<FilterCriteria> criteriaList) {
         List<TodoStatus> todoStatuses = TodoStatus.getAllStatusExceptViewed();
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         todoStatuses.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
-        criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.getValue(), FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(ACTIVITY_STATUS.getValue(), ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getStaffDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO,ConfLevel level) {
         if(ConfLevel.UNIT.equals(level)) {
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
             defaultKpiDataDTO.getStaffKpiFilterDTOs().forEach(staffKpiFilterDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(staffKpiFilterDTO.getId(), staffKpiFilterDTO.getFullName(), staffKpiFilterDTO.getUnitIds())));
-            criteriaList.add(new FilterCriteria(FilterType.STAFF_IDS.getValue(), FilterType.STAFF_IDS, (List) kpiFilterDefaultDataDTOS));
+            criteriaList.add(new FilterCriteria(STAFF_IDS.getValue(), STAFF_IDS, (List) kpiFilterDefaultDataDTOS));
         }
     }
 
@@ -384,7 +385,7 @@ public class CounterDataService {
         for (CalculationType calculationType : CalculationType.values()) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
         }
-        criteriaList.add(new FilterCriteria(FilterType.CALCULATION_TYPE.getValue(), FilterType.CALCULATION_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(CALCULATION_TYPE.getValue(), CALCULATION_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getTeamUnitData(List<FilterCriteria> criteriaList, Long unitId) {
@@ -393,7 +394,7 @@ public class CounterDataService {
         for (TeamDTO teamDTO : teamDTOS) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(teamDTO.getId(), teamDTO.getName()));
         }
-        criteriaList.add(new FilterCriteria(FilterType.TEAM.getValue(), FilterType.TEAM, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(TEAM.getValue(), TEAM, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getCalculationUnitData(List<FilterCriteria> criteriaList) {
@@ -401,14 +402,14 @@ public class CounterDataService {
         for (XAxisConfig XAxisConfig : XAxisConfig.values()) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(XAxisConfig.toString(), XAxisConfig.getDisplayValue()));
         }
-        criteriaList.add(new FilterCriteria(FilterType.CALCULATION_UNIT.getValue(), FilterType.CALCULATION_UNIT, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(CALCULATION_UNIT.getValue(), CALCULATION_UNIT, (List) kpiFilterDefaultDataDTOS));
     }
     private void getEmploymentSubTypeData(List<FilterCriteria> criteriaList){
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         for (EmploymentSubType employmentSubType : EmploymentSubType.values()) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(employmentSubType.toString(), employmentSubType.value));
         }
-        criteriaList.add(new FilterCriteria(FilterType.EMPLOYMENT_SUB_TYPE.getValue(), FilterType.EMPLOYMENT_SUB_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(EMPLOYMENT_SUB_TYPE.getValue(), EMPLOYMENT_SUB_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getTeamTypeData(List<FilterCriteria> criteriaList){
@@ -416,14 +417,14 @@ public class CounterDataService {
         for (TeamType teamType : TeamType.values()) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(teamType.toString(), teamType.value));
         }
-        criteriaList.add(new FilterCriteria(FilterType.TEAM_TYPE.getValue(), FilterType.TEAM_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(TEAM_TYPE.getValue(), TEAM_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
 
     private void getReasonCodeData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getReasonCodeDTOS().forEach(reasonCodeDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(reasonCodeDTO.getId(), reasonCodeDTO.getName())));
-        criteriaList.add(new FilterCriteria(FilterType.REASON_CODE.getValue(), FilterType.REASON_CODE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(REASON_CODE.getValue(), REASON_CODE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getCalculationBasedOnData(List<FilterCriteria> criteriaList) {
@@ -431,33 +432,33 @@ public class CounterDataService {
         for (YAxisConfig calculationType : YAxisConfig.values()) {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
         }
-        criteriaList.add(new FilterCriteria(FilterType.CALCULATION_BASED_ON.getValue(), FilterType.CALCULATION_BASED_ON, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(CALCULATION_BASED_ON.getValue(), CALCULATION_BASED_ON, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getUnitIdsDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO,ConfLevel confLevel) {
         if(ConfLevel.UNIT.equals(confLevel)) {
             List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
             defaultKpiDataDTO.getOrganizationCommonDTOS().forEach(organizationCommonDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(organizationCommonDTO.getId(), organizationCommonDTO.getName())));
-            criteriaList.add(new FilterCriteria(FilterType.UNIT_IDS.getValue(), FilterType.UNIT_IDS, (List) kpiFilterDefaultDataDTOS));
+            criteriaList.add(new FilterCriteria(UNIT_IDS.getValue(), UNIT_IDS, (List) kpiFilterDefaultDataDTOS));
         }
     }
 
     private void getDayTypeDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getDayTypeDTOS().forEach(dayTypeDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayTypeDTO.getId(), dayTypeDTO.getName())));
-        criteriaList.add(new FilterCriteria(FilterType.DAY_TYPE.getValue(), FilterType.DAY_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(DAY_TYPE.getValue(), DAY_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getTimeSlotDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getTimeSlotDTOS().forEach(timeSlotDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeSlotDTO.getId(), timeSlotDTO.getName())));
-        criteriaList.add(new FilterCriteria(FilterType.TIME_SLOT.getValue(), FilterType.TIME_SLOT, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(TIME_SLOT.getValue(), TIME_SLOT, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getEmploymentTypeDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getEmploymentTypeKpiDTOS().forEach(employmentTypeKpiDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(employmentTypeKpiDTO.getId(), employmentTypeKpiDTO.getName())));
-        criteriaList.add(new FilterCriteria(FilterType.EMPLOYMENT_TYPE.getValue(), FilterType.EMPLOYMENT_TYPE, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(EMPLOYMENT_TYPE.getValue(), EMPLOYMENT_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     public TabKPIDTO saveKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
