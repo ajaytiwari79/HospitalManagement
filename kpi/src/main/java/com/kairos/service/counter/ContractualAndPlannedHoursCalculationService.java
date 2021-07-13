@@ -21,7 +21,10 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
+import com.kairos.persistence.model.Shift;
 import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.ShiftMongoRepository;
+import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.counter.FibonacciCalculationUtil;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -49,10 +52,9 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
-    private TimeBankCalculationService timeBankCalculationService;
+    private TimeBankService timeBankService;
     @Inject
     private PlannedHoursCalculationService plannedHoursCalculationService;
-    @Inject private PlanningPeriodService planningPeriodService;
     @Inject
     private CounterHelperService counterHelperService;
 
@@ -93,12 +95,12 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     private Long getaContratualMinutes(Interval interval, StaffKpiFilterDTO staffKpiFilterDTO, Long contractualMinutes) {
-        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
+        DateTimeInterval planningPeriodInterval = planningPeriodMongoRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             if (interval != null) {
                 DateTime startDate = interval.getStart();
                 while (startDate.isBefore(interval.getEnd())) {
-                    contractualMinutes += timeBankCalculationService.getContractualMinutesByDate(planningPeriodInterval, DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getEmploymentLines());
+                    contractualMinutes += timeBankService.getContractualMinutesByDate(planningPeriodInterval, DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getEmploymentLines());
                     startDate = startDate.plusDays(1);
                 }
             }

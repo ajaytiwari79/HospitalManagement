@@ -6,7 +6,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelGraphConfigurationDTO
 import com.kairos.dto.activity.staffing_level.StaffingLevelPublishDTO;
 import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
-import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.ImportStaffingLevelService;
@@ -51,9 +51,9 @@ public class StaffingLevelController {
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for presence")
-    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid StaffingLevelDTO staffingLevelDTO, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                staffingLevelService.createStaffingLevel(presenceStaffingLevelDto,unitId));
+                staffingLevelService.createStaffingLevel(staffingLevelDTO,unitId));
     }
 
 
@@ -97,10 +97,10 @@ public class StaffingLevelController {
 
     @RequestMapping(value = "/presence/{staffingLevelId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
-    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
+    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid StaffingLevelDTO staffingLevelDTO,
         @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {
       return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.updatePresenceStaffingLevel(staffingLevelId,unitId, presenceStaffingLevelDto));
+                staffingLevelService.updatePresenceStaffingLevel(staffingLevelId,unitId, staffingLevelDTO));
     }
 
 

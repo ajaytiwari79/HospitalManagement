@@ -4,7 +4,7 @@ import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
@@ -152,8 +152,8 @@ public class ImportStaffingLevelService {
     }
 
     private void createStaffingLevelObject(List<Map<String, String>> processedData, long unitId) {
-        List<PresenceStaffingLevelDto> staffingDtoList = new ArrayList<>();
-        PresenceStaffingLevelDto staffingDTO;
+        List<StaffingLevelDTO> staffingDtoList = new ArrayList<>();
+        StaffingLevelDTO staffingDTO;
         List<StaffingLevelInterval> staffingLevelTimeSlList = new ArrayList<>();
         StaffingLevelInterval staffingLevelTimeSlot;
         Duration duration;
@@ -175,7 +175,7 @@ public class ImportStaffingLevelService {
         LocalDate dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = dateInLocal.get(weekOfYear);
-        staffingDTO = new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
+        staffingDTO = new StaffingLevelDTO(null, date, currentWeekCount, staffingLevelSetting);
         for (Map<String, String> singleData : processedData) {
             if (singleData.containsKey(FOR_DAY) && i != 0) {
                 staffingDTO = createStaffingLevelDTO(staffingDTO,staffingLevelTimeSlList,staffingDtoList,sourceFormat,singleData);
@@ -194,7 +194,7 @@ public class ImportStaffingLevelService {
         createStaffingLevels(unitId, staffingDtoList);
     }
 
-    private PresenceStaffingLevelDto createStaffingLevelDTO(PresenceStaffingLevelDto staffingDTO, List<StaffingLevelInterval> staffingLevelTimeSlList, List<PresenceStaffingLevelDto> staffingDtoList, DateFormat sourceFormat, Map<String, String> singleData){
+    private StaffingLevelDTO createStaffingLevelDTO(StaffingLevelDTO staffingDTO, List<StaffingLevelInterval> staffingLevelTimeSlList, List<StaffingLevelDTO> staffingDtoList, DateFormat sourceFormat, Map<String, String> singleData){
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
         staffingDtoList.add(staffingDTO);
         Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
@@ -208,7 +208,7 @@ public class ImportStaffingLevelService {
         LocalDate dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = dateInLocal.get(weekOfYear);
-        return new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
+        return new StaffingLevelDTO(null, date, currentWeekCount, staffingLevelSetting);
     }
 
     private Duration getDuration(Map<String, String> singleData) {
@@ -223,7 +223,7 @@ public class ImportStaffingLevelService {
         return duration;
     }
 
-    private void createStaffingLevels(long unitId, List<PresenceStaffingLevelDto> staffingDtoList) {
+    private void createStaffingLevels(long unitId, List<StaffingLevelDTO> staffingDtoList) {
         staffingDtoList.forEach(staffingLevelDto -> {
             staffingLevelService.createStaffingLevel(staffingLevelDto, unitId);
         });

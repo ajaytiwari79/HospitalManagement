@@ -21,7 +21,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PresenceStaffingLevelDto {
+public class StaffingLevelDTO {
     private BigInteger id;
     private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -31,6 +31,7 @@ public class PresenceStaffingLevelDto {
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> absenceStaffingLevelInterval = new ArrayList<>();
     private Set<StaffingLevelActivityDetails> staffingLevelActivityDetails =new LinkedHashSet<>();
     private Date updatedAt;
     private boolean draft;
@@ -42,8 +43,8 @@ public class PresenceStaffingLevelDto {
     private StaffingLevelChange staffingLevelChange;
     private StaffingLevelAction staffingLevelAction;
 
-    public PresenceStaffingLevelDto(BigInteger phaseId, Date currentDate, Integer weekCount,
-                                    StaffingLevelSetting staffingLevelSetting) {
+    public StaffingLevelDTO(BigInteger phaseId, Date currentDate, Integer weekCount,
+                            StaffingLevelSetting staffingLevelSetting) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;

@@ -8,6 +8,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.counter.CounterServiceMapping;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
@@ -27,14 +28,13 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.TodoStatus;
-import com.kairos.persistence.model.ApplicableKPI;
-import com.kairos.persistence.model.ExceptionService;
-import com.kairos.persistence.model.FibonacciKPICalculation;
-import com.kairos.persistence.model.KPI;
+import com.kairos.persistence.model.*;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
+import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.ShiftMongoRepository;
+import com.kairos.persistence.repository.counter.TimeBankRepository;
 import com.kairos.utils.counter.FibonacciCalculationUtil;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
@@ -73,30 +73,17 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject
     private CounterHelperService counterHelperService;
     @Inject
-    private PlannedTimeTypeService plannedTimeTypeService;
-    @Inject
-    private ShiftFilterService shiftFilterService;
-    @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private CostCalculationKPIService costCalculationKPIService;
     @Inject
-    private PhaseService phaseService;
-    @Inject
-    private TimeTypeService timeTypeService;
-    @Inject
     private TimeBankRepository timeBankRepository;
     @Inject
-    private PlanningPeriodService planningPeriodService;
+    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
-    private TimeBankCalculationService timeBankCalculationService;
-    @Inject
-    private ActivityMongoRepository activityMongoRepository;
-    @Autowired
-    @Lazy
-    private TodoService todoService;
+    private TimeBankService timeBankService;
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
     @Inject
@@ -110,6 +97,7 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject private TimeBankOffKPIService timeBankOffKPIService;
     @Inject
     private CounterServiceMapping counterServiceMapping;
+    @Inject private CounterHelperRepository counterHelperRepository;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -406,7 +394,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(calculationType.value, value));
                 } else {
-                    for (Map.Entry<BigInteger, Activity> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
+                    for (Map.Entry<BigInteger, ActivityDTO> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
                         kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setActivityIds(ObjectUtils.newHashSet(activityEntry.getKey()));
                         Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityEntry.getValue().getName(), activityEntry.getValue().getActivityGeneralSettings().getBackgroundColor(), value));
@@ -426,7 +414,7 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         for (BigInteger activityId : kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().keySet()) {
             if (kpiCalculationRelatedInfo.getActivityMap().containsKey(activityId)) {
-                Activity activity = kpiCalculationRelatedInfo.getActivityMap().get(activityId);
+                ActivityDTO activity = kpiCalculationRelatedInfo.getActivityMap().get(activityId);
                 List<TodoDTO> todoDTOS = new CopyOnWriteArrayList(kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().get(activityId)));
                 ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getActivityGeneralSettings().getBackgroundColor(), todoDTOS.size());
                 subClusteredBarValue.addAll(getPQlOfTodo(activity, todoDTOS, kpiCalculationRelatedInfo));
@@ -439,7 +427,7 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
 
-    private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity, List<TodoDTO> todoDTOS, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(ActivityDTO activity, List<TodoDTO> todoDTOS, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         PQLSettings pqlSettings = activity.getActivityRulesSettings().getPqlSettings();
         List<ApprovalCriteria> approvalCriterias = ObjectUtils.newArrayList(pqlSettings.getAppreciable(), pqlSettings.getAcceptable(), pqlSettings.getCritical());
@@ -618,7 +606,7 @@ public class KPIBuilderCalculationService implements CounterService {
             for (ShiftWithActivityDTO shift : shifts) {
                 List<ShiftActivityDTO> shiftActivitys = shift.getActivities();
                 if (excludeBreak) {
-                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService,new HashMap<>(),null).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
+                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankService,new HashMap<>(),null).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
                 }
                 shiftActivityDTOS.addAll(shiftActivitys.stream().filter(shiftActivityDTO -> isShiftActivityValid(shiftActivityDTO)).collect(Collectors.toList()));
             }

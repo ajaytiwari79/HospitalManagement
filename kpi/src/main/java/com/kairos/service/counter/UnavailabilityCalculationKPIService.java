@@ -6,6 +6,8 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.enums.FilterType;
+import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +23,6 @@ import java.util.stream.Collectors;
 @Service
 public class UnavailabilityCalculationKPIService implements KPIService{
 
-    @Inject
-    private TimeTypeService timeTypeService;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
 
 

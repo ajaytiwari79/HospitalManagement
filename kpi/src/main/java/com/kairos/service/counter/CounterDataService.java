@@ -26,6 +26,7 @@ import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
@@ -39,12 +40,16 @@ import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.*;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 
+import com.kairos.persistence.repository.counter.TimeBankRepository;
+import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.counter.KPIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,17 +76,9 @@ public class CounterDataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterDataService.class);
 
     @Inject
-    private ShiftService shiftService;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject
-    private DayTypeService dayTypeService;
-    @Inject
-    private ReasonCodeService reasonCodeService;
-    @Inject
-    private TimeSlotMongoRepository timeSlotMongoRepository;
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -91,13 +88,13 @@ public class CounterDataService {
     @Inject
     private TimeBankRepository timeBankRepository;
     @Inject
-    private ActivityService activityService;
-    @Inject
-    private TimeTypeService timeTypeService;
+    private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private CounterDistService counterDistService;
     @Inject
-    private PlannedTimeTypeService plannedTimeTypeService;
+    private CounterHelperRepository counterHelperRepository;
+    @Inject
+    private CounterHelperService counterHelperService;
 
 
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
@@ -206,9 +203,9 @@ public class CounterDataService {
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
-        defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
-        defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, ReasonCodeType.FORCEPLAN));
-        TimeSlotSetDTO timeSlotSetDTO = timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING);
+        defaultKpiDataDTO.setDayTypeDTOS(counterHelperRepository.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        defaultKpiDataDTO.setReasonCodeDTOS(counterHelperService.getReasonCodesByUnitId(refId, ReasonCodeType.FORCEPLAN));
+        TimeSlotSetDTO timeSlotSetDTO = counterHelperRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING);
         if(ObjectUtils.isNull(timeSlotSetDTO)){
             exceptionService.dataNotFoundException(KPIMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT);
         }
@@ -324,7 +321,7 @@ public class CounterDataService {
     }
 
     private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {
-        List<ActivityDTO> activityDTOS = activityService.findAllActivityByDeletedFalseAndUnitId(unitIds);
+        List<ActivityDTO> activityDTOS = counterHelperRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         activityDTOS.forEach(activityDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(activityDTO.getId().longValue(), activityDTO.getName(), activityDTO.getUnitId())));
         criteriaList.add(new FilterCriteria(ACTIVITY_IDS.getValue(), ACTIVITY_IDS, (List) kpiFilterDefaultDataDTOS));
@@ -338,7 +335,7 @@ public class CounterDataService {
     }
 
     private void getTimeTypesDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
-        List<TimeType> timeTypes = timeTypeService.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
+        List<TimeTypeDTO> timeTypes = timeTypeMongoRepository.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeType.getId().longValue(), timeType.getLabel())));
         criteriaList.add(new FilterCriteria(TIME_TYPE.getValue(), TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
@@ -352,7 +349,7 @@ public class CounterDataService {
     }
 
     private void getPlannedTimeDefaultData(List<FilterCriteria> criteriaList) {
-        List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<PresenceTypeDTO> plannedTimes=counterHelperRepository.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         plannedTimes.forEach(presenceTypeDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(presenceTypeDTO.getId().toString(), presenceTypeDTO.getName())));
         criteriaList.add(new FilterCriteria(PLANNED_TIME_TYPE.getValue(), PLANNED_TIME_TYPE, (List) kpiFilterDefaultDataDTOS));

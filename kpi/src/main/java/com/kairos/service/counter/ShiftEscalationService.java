@@ -17,7 +17,6 @@ public class ShiftEscalationService implements KPIService{
 
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
-    @Inject private ShiftValidatorService shiftValidatorService;
 
     public double getEscalatedShiftsOrResolvedShifts(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, true);

@@ -27,6 +27,7 @@ import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.*;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -52,15 +53,11 @@ public class CounterDistService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private TimeTypeService timeTypeService;
-    @Inject
-    private ActivityService activityService;
+    private CounterHelperRepository counterHelperRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
     private FibonacciKPIService fibonacciKPIService;
-    @Inject
-    private ShortcutService shortcutService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -254,7 +251,7 @@ public class CounterDistService {
     private List<TabKPIDTO> getTabKPIDToByShortcutId(List<BigInteger> kpiIds,BigInteger shortcutId,String moduleId){
         List<TabKPIDTO> tabKPIDTOS=new ArrayList<>();
         if(ObjectUtils.isNotNull(shortcutId)){
-            ShortcutDTO shortcutDTO = shortcutService.getShortcutById(shortcutId);
+            ShortcutDTO shortcutDTO = counterHelperRepository.getShortcutById(shortcutId);
             com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO= shortcutDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
             if(ObjectUtils.isNotNull(tabKPIDTO) && ObjectUtils.isCollectionNotEmpty(kpiIds)){
                 for (BigInteger kpiId : kpiIds) {

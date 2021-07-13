@@ -7,11 +7,11 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
 import com.kairos.dto.user.team.TeamDTO;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationType;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.service.staffing_level.StaffingLevelAvailableCountService;
-import com.kairos.service.staffing_level.StaffingLevelService;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -23,23 +23,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.enums.FilterType.TEAM_TYPE;
-import static com.kairos.enums.kpi.CalculationType.*;
-import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
-
 /**
  * Created By G.P.Ranjan on 24/12/19
  **/
 @Service
 public class StaffingLevelCalculationKPIService implements KPIService{
     @Inject
-    private StaffingLevelService staffingLevelService;
+    private CounterHelperRepository counterHelperRepository;
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
-    @Inject private
-    StaffingLevelAvailableCountService staffingLevelAvailableCountService;
 
     public double getStaffingLevelCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
@@ -61,16 +53,16 @@ public class StaffingLevelCalculationKPIService implements KPIService{
         }else {
             activityIds = shiftActivityCriteria.getTeamActivityIds();
         }
-        List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(), DateUtils.asDate(DateUtils.asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
+        List<StaffingLevelDTO> staffingLevels = counterHelperRepository.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(), DateUtils.asDate(DateUtils.asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
         long staffingLevelData = 0;
         boolean isPresenceStaffingLevelData = CalculationType.PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) || CalculationType.PRESENCE_OVER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType());
-        for (StaffingLevel staffingLevel : staffingLevels) {
+        for (StaffingLevelDTO staffingLevel : staffingLevels) {
             staffingLevelData += getStaffingLevelData(kpiCalculationRelatedInfo, activityIds, filterShiftActivity, isPresenceStaffingLevelData, staffingLevel);
         }
         return isPresenceStaffingLevelData ? KPIUtils.getValueWithDecimalFormat(DateUtils.getHoursByMinutes(staffingLevelData)) : staffingLevelData;
     }
 
-    private long getStaffingLevelData(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, boolean isPresenceStaffingLevelData, StaffingLevel staffingLevel) {
+    private long getStaffingLevelData(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, boolean isPresenceStaffingLevelData, StaffingLevelDTO staffingLevel) {
         long staffingLevelData;
         if (isPresenceStaffingLevelData) {
             staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getPresenceStaffingLevelInterval(), CalculationType.PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
@@ -123,21 +115,21 @@ public class StaffingLevelCalculationKPIService implements KPIService{
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         Set<BigInteger> activityIds = shiftActivityCriteria.getTeamActivityIds();
-        List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(), DateUtils.asDate(DateUtils.asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
+        List<StaffingLevelDTO> staffingLevels = counterHelperRepository.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(), DateUtils.asDate(DateUtils.asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
         Map<Integer,Long> staffingLevelDataMap = new HashMap<>();
-        for (StaffingLevel staffingLevel : staffingLevels) {
+        for (StaffingLevelDTO staffingLevel : staffingLevels) {
             setStaffingLevelDataPerHour(kpiCalculationRelatedInfo, activityIds, filterShiftActivity, staffingLevel, staffingLevelDataMap);
         }
         return staffingLevelDataMap;
     }
 
-    private void setStaffingLevelDataPerHour(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, StaffingLevel staffingLevel, Map<Integer,Long> staffingLevelDataMap) {
+    private void setStaffingLevelDataPerHour(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, StaffingLevelDTO staffingLevel, Map<Integer,Long> staffingLevelDataMap) {
         if (ObjectUtils.isCollectionNotEmpty(staffingLevel.getPresenceStaffingLevelInterval())) {
             updateCountForPresenceStaffingLevel(kpiCalculationRelatedInfo, activityIds, staffingLevel, staffingLevelDataMap);
         }
     }
 
-    private void updateCountForPresenceStaffingLevel(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, StaffingLevel staffingLevel, Map<Integer, Long> staffingLevelDataMap) {
+    private void updateCountForPresenceStaffingLevel(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, StaffingLevelDTO staffingLevel, Map<Integer, Long> staffingLevelDataMap) {
         for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
             long staffingLevelData = CalculationType.PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) ? getUnderStaffingLevelData(staffingLevelInterval, activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes()) : getOverStaffingLevelData(staffingLevelInterval, activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
             Integer hourNumber = staffingLevelInterval.getSequence() / 4;

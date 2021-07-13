@@ -23,7 +23,7 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.counter.ShiftMongoRepository;
 import com.kairos.utils.counter.FibonacciCalculationUtil;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -37,7 +37,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
+import static com.kairos.enums.kpi.KPIRepresentation.*;
 
 @Service
 public class ShiftAndActivityDurationKpiService implements CounterService {
@@ -82,7 +82,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getDurationOfShiftAndActivity(organizationId, filterBasedCriteria, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
@@ -105,10 +105,10 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         Integer shiftDurationMinutes = 0;
         Map<String, String> activityNameAndColorCodeMap = new HashMap<>();
         switch (applicableKPI.getKpiRepresentation()) {
-            case KPIRepresentation.REPRESENT_PER_STAFF:
+            case REPRESENT_PER_STAFF:
                 staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentPerStaff(staffIds, shifts, activityNameAndColorCodeMap);
                 break;
-            case KPIRepresentation.REPRESENT_TOTAL_DATA:
+            case REPRESENT_TOTAL_DATA:
                 staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentTotalData(dateTimeIntervals, shifts, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes, activityNameAndColorCodeMap);
                 break;
             default:

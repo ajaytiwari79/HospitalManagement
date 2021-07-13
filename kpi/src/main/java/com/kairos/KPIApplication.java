@@ -37,6 +37,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.kairos.commons.utils.ObjectMapperUtils.LOCALDATE_FORMATTER;
 import static com.kairos.commons.utils.ObjectMapperUtils.LOCALTIME_FORMATTER;
@@ -69,8 +71,11 @@ public class KPIApplication implements WebMvcConfigurer {
         messageBundle.setBasename("classpath:messages/messages");
         messageBundle.setDefaultEncoding("UTF-8");
         return messageBundle;
+    }
 
-
+    @Bean(name ="executorService",destroyMethod ="shutdown")
+    public ExecutorService executorService(){
+        return  Executors.newWorkStealingPool();
     }
 
     @Bean("objectMapperJackson")

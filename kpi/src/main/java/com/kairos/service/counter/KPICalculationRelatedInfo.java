@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -29,9 +30,7 @@ import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.ApplicableKPI;
-import com.kairos.persistence.model.DailyTimeBankEntry;
-import com.kairos.persistence.model.KPI;
+import com.kairos.persistence.model.*;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +44,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.enums.kpi.YAxisConfig.*;
-import static com.kairos.enums.kpi.YAxisConfig.CHILD_CARE_DAYS;
 
 @Getter
 @Setter
@@ -74,7 +72,7 @@ public class KPICalculationRelatedInfo {
     private Map<Long, Collection<DailyTimeBankEntry>> staffIdAndDailyTimebankEntryMap = new HashMap<>();
     private Collection<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
     private List<Long> employmentTypeIds = new ArrayList<>();
-    private Map<BigInteger, Activity> activityMap = new HashMap<>();
+    private Map<BigInteger, ActivityDTO> activityMap = new HashMap<>();
     private Map<BigInteger, TimeTypeDTO> timeTypeMap = new HashMap<>();
     private Map<BigInteger, PlannedTimeType> plannedTimeMap = new HashMap<>();
     private KPIBuilderCalculationService.ShiftActivityCriteria currentShiftActivityCriteria;
@@ -122,13 +120,13 @@ public class KPICalculationRelatedInfo {
         getActivityIdMap();
         getTimeTypeTodoList();
         updateActivityAndTimeTypeAndPlannedTimeMap();
-        planningPeriodInterval = kpiBuilderCalculationService.getPlanningPeriodService().getPlanningPeriodIntervalByUnitId(unitId);
+        planningPeriodInterval = kpiBuilderCalculationService.getPlanningPeriodMongoRepository().getPlanningPeriodIntervalByUnitId(unitId);
         getDailyTimeBankEntryByEmploymentId();
     }
 
     public void getActivityTodoList() {
         if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(PLANNING_QUALITY_LEVEL, CalculationType.ABSENCE_REQUEST))) {
-            todoDTOS = kpiBuilderCalculationService.getTodoService().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS = kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
         }
     }
@@ -202,9 +200,9 @@ public class KPICalculationRelatedInfo {
     private void getActivityIdMap(){
         if(CalculationType.TODO_STATUS.equals(calculationTypes.get(0)) && CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(TIME_TYPE))) {
             Set<BigInteger> timeTypeIds = ObjectUtils.isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE)) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.TIME_TYPE)) : new HashSet<>();
-            Set<BigInteger> lowerLevelTimeTypeIds = kpiBuilderCalculationService.getTimeTypeService().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
-            List<Activity> activities = kpiBuilderCalculationService.getActivityMongoRepository().findAllByUnitIdAndTimeTypeIds(unitId, lowerLevelTimeTypeIds);
-            activityMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));
+            Set<BigInteger> lowerLevelTimeTypeIds = kpiBuilderCalculationService.getCounterHelperRepository().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
+            List<ActivityDTO> activities = kpiBuilderCalculationService.getCounterHelperRepository().findAllByUnitIdAndTimeTypeIds(unitId, lowerLevelTimeTypeIds);
+            activityMap = activities.stream().collect(Collectors.toMap(ActivityDTO::getId, v -> v));
         }
     }
 
@@ -254,14 +252,14 @@ public class KPICalculationRelatedInfo {
             switch (yAxisConfig) {
                 case ACTIVITY:
                 case PLANNING_QUALITY_LEVEL:
-                    List<Activity> activities = kpiBuilderCalculationService.getActivityMongoRepository().findAllActivitiesByIds(filterBasedCriteria.containsKey(FilterType.ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.ACTIVITY_IDS)) : new HashSet<>());
-                    activityMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));
+                    List<ActivityDTO> activities = kpiBuilderCalculationService.getCounterHelperRepository().findAllActivitiesByIds(filterBasedCriteria.containsKey(FilterType.ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.ACTIVITY_IDS)) : new HashSet<>());
+                    activityMap = activities.stream().collect(Collectors.toMap(ActivityDTO::getId, v -> v));
                     break;
                 case TIME_TYPE:
-                    timeTypeMap = kpiBuilderCalculationService.getTimeTypeService().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), filterBasedCriteria.containsKey(FilterType.TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)) : new ArrayList<>());
+                    timeTypeMap = kpiBuilderCalculationService.getCounterHelperRepository().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), filterBasedCriteria.containsKey(FilterType.TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)) : new ArrayList<>());
                     break;
                 case PLANNED_TIME:
-                    Collection<PlannedTimeType> plannedTimeTypes = kpiBuilderCalculationService.getPlannedTimeTypeService().getAllPlannedTimeByIds(filterBasedCriteria.containsKey(FilterType.PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PLANNED_TIME_TYPE)) : new ArrayList<>());
+                    Collection<PlannedTimeType> plannedTimeTypes = kpiBuilderCalculationService.getCounterHelperRepository().getAllPlannedTimeByIds(filterBasedCriteria.containsKey(FilterType.PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PLANNED_TIME_TYPE)) : new ArrayList<>());
                     plannedTimeMap = plannedTimeTypes.stream().collect(Collectors.toMap(PlannedTimeType::getId, v -> v));
                     break;
                 default:
@@ -339,7 +337,7 @@ public class KPICalculationRelatedInfo {
             } else {
                 shifts = kpiBuilderCalculationService.getShiftMongoRepository().findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), false);
                 StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
-                shifts = kpiBuilderCalculationService.getShiftFilterService().getShiftsByFilters(shifts, staffFilterDTO, staffKpiFilterDTOS);
+                shifts = kpiBuilderCalculationService.getCounterHelperService().getShiftsByFilters(shifts, staffFilterDTO, staffKpiFilterDTOS);
             }
         } else {
             shifts = new ArrayList<>();
@@ -364,15 +362,15 @@ public class KPICalculationRelatedInfo {
 
     private void getUpdateTodoStatus() {
         if(filterBasedCriteria.containsKey(FilterType.ACTIVITY_STATUS)&& !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))) {
-            todoDTOS = kpiBuilderCalculationService.getTodoService().getAllTodoByDateTimeIntervalAndTodoStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),filterBasedCriteria.get(FilterType.ACTIVITY_STATUS));
+            todoDTOS = kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByDateTimeIntervalAndTodoStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),filterBasedCriteria.get(FilterType.ACTIVITY_STATUS));
         }else if(!filterBasedCriteria.containsKey(FilterType.ACTIVITY_STATUS)&& !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))){
-            todoDTOS =kpiBuilderCalculationService.getTodoService().getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS =kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         }
         else if(XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))&& CalculationType.TODO_STATUS.equals(calculationTypes.get(0))){
-            todoDTOS =kpiBuilderCalculationService.getTodoService().getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS =kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         }
         else{
-            todoDTOS=kpiBuilderCalculationService.getTodoService().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS=kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         }
 
     }
@@ -434,7 +432,7 @@ public class KPICalculationRelatedInfo {
             }
         });
         if (filterBasedCriteria.containsKey(FilterType.PHASE)) {
-            List<PhaseDTO> phases = kpiBuilderCalculationService.getPhaseService().getPhasesByUnit(organizationId);
+            List<PhaseDTO> phases = kpiBuilderCalculationService.getCounterHelperRepository().getPhasesByUnit(organizationId);
             Set<PhaseDefaultName> phaseDefaultNames = (Set<PhaseDefaultName>) filterBasedCriteria.get(FilterType.PHASE).stream().map(value -> PhaseDefaultName.valueOf(value.toString())).collect(Collectors.toSet());
             Set<String> phaseIds = phases.stream().filter(phaseDTO -> phaseDefaultNames.contains(phaseDTO.getPhaseEnum())).map(phaseDTO -> phaseDTO.getId().toString()).collect(Collectors.toSet());
             filterData.add(new FilterSelectionDTO(FilterType.PHASE, phaseIds));
@@ -470,7 +468,7 @@ public class KPICalculationRelatedInfo {
         }
         if (includeFilter) {
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, this.timeSlotDTOS, this.unitId);
-            shifts = kpiBuilderCalculationService.getShiftFilterService().getShiftsByFilters(shifts, staffFilterDTO, staffKpiFilterDTOS);
+            shifts = kpiBuilderCalculationService.getCounterHelperService().getShiftsByFilters(shifts, staffFilterDTO, staffKpiFilterDTOS);
         }
         return shiftWithActivityDTOS;
     }

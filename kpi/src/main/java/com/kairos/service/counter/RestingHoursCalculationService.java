@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
@@ -17,6 +18,9 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
+import com.kairos.persistence.model.Shift;
+import com.kairos.persistence.repository.counter.ShiftMongoRepository;
+import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.counter.FibonacciCalculationUtil;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -32,11 +36,9 @@ import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 @Service
 public class RestingHoursCalculationService implements CounterService {
     @Inject
-    private TimeTypeService timeTypeService;
+    private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
-    @Inject
-    private ActivityService activityService;
     @Inject
     private CounterHelperService counterHelperService;
 

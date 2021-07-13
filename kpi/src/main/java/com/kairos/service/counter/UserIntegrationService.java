@@ -6,8 +6,11 @@ import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
+import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.team.TeamDTO;
+import com.kairos.persistence.model.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ public class UserIntegrationService {
         return null;
     }
     public List<TeamDTO> getTeamByUnitId(Long unitId) {
+        return null;
     }
     public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long lastSelectedOrganizationId) {
         return null;
@@ -57,6 +61,12 @@ public class UserIntegrationService {
         return false;
     }
     public Long getStaffIdByUserId(Long refId) {
+        return null;
+    }
+    public ShiftFilterDefaultData getShiftFilterDefaultData(SelfRosteringFilterDTO selfRosteringFilterDTO) {
+        return null;
+    }
+    public List<AccessGroupPermissionCounterDTO> getStaffAndAccessGroups(AccessGroupKPIEntry accessGroupKPIEntry) {
         return null;
     }
 }

@@ -9,6 +9,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
+import com.kairos.persistence.model.Shift;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
