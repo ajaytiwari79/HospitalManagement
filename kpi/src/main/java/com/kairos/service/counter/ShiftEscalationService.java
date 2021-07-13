@@ -1,18 +1,16 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.service.shift.ShiftValidatorService;
+import com.kairos.enums.kpi.CalculationType;
+import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.List;
-
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
-import static com.kairos.enums.kpi.CalculationType.ESCALATED_SHIFTS;
-import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
 public class ShiftEscalationService implements KPIService{

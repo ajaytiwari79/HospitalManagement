@@ -5,9 +5,9 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.FibonacciKPICalculation;
+import com.kairos.persistence.model.KPI;
 
 import java.util.List;
 import java.util.Map;

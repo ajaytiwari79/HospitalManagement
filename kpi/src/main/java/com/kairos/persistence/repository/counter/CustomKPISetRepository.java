@@ -4,7 +4,7 @@ package com.kairos.persistence.repository.counter;
  *
  */
 
-import com.kairos.persistence.model.counter.KPISet;
+import com.kairos.persistence.model.KPISet;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter;
+package com.kairos.persistence.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

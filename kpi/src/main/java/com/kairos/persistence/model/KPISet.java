@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter;
+package com.kairos.persistence.model;
 /*
  *Created By Pavan on 29/4/19
  *

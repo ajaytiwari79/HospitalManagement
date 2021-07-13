@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter;
+package com.kairos.persistence.model;
 
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.enums.ConfLevel;

@@ -9,7 +9,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.wta.IntervalUnit;
-import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.ApplicableKPI;
 import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;

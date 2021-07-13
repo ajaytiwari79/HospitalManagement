@@ -23,8 +23,12 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
+import com.kairos.enums.shift.TodoStatus;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.FibonacciKPICalculation;
+import com.kairos.persistence.model.KPI;
+import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.TodoRepository;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -47,8 +51,6 @@ public class AbsencePlanningKPIService implements CounterService {
     private CounterHelperService counterHelperService;
     @Inject
     private TodoRepository todoRepository;
-    @Inject
-    private UserIntegrationService userIntegrationService;
 
 
     private List<CommonKpiDataUnit> getAbsencePlanningKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, ApplicableKPI applicableKPI) {

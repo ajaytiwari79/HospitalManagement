@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.persistence.model.counter.MongoBaseEntity;
+import com.kairos.persistence.model.MongoBaseEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.NoRepositoryBean;

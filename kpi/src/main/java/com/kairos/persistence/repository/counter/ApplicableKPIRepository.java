@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.ApplicableKPI;
 
 import java.math.BigInteger;
 

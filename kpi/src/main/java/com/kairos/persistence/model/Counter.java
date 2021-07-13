@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter;
+package com.kairos.persistence.model;
 
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;

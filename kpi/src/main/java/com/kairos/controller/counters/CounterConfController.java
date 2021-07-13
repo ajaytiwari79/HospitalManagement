@@ -7,7 +7,7 @@ import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.Counter;
 import com.kairos.service.counter.CounterConfService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.constants.ApiConstants.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

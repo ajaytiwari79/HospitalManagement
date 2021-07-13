@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.BarLineChartKPiDateUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
@@ -17,17 +18,11 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.period.PlanningPeriodService;
-import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.DailyTimeBankEntry;
+import com.kairos.persistence.model.FibonacciKPICalculation;
+import com.kairos.persistence.model.KPI;
+import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -40,13 +35,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 
 @Service
 public class PlannedHoursVsTimeBankService implements CounterService {

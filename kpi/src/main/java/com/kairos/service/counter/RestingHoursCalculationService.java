@@ -14,13 +14,16 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.FibonacciKPICalculation;
+import com.kairos.persistence.model.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.utils.counter.FibonacciCalculationUtil;
+import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
@@ -29,12 +32,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
-import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.*;
 
 @Service
 public class RestingHoursCalculationService implements CounterService {

@@ -1,7 +1,9 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -27,12 +29,9 @@ import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.PlannedTimeType;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.DailyTimeBankEntry;
+import com.kairos.persistence.model.KPI;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,17 +43,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
-import static com.kairos.enums.FilterType.*;
-import static com.kairos.enums.kpi.CalculationType.*;
-import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
-import static com.kairos.enums.wta.WTATemplateType.*;
-import static com.kairos.utils.counter.KPIUtils.getBigIntegerSet;
-import static com.kairos.utils.counter.KPIUtils.*;
 
 @Getter
 @Setter

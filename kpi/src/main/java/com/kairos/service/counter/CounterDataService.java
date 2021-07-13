@@ -7,7 +7,9 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -19,10 +21,7 @@ import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.LocationType;
-import com.kairos.dto.activity.counter.enums.XAxisConfig;
+import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
@@ -43,20 +42,10 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.team.TeamType;
-import com.kairos.persistence.model.activity.TimeType;
-
-import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankRepository;
-import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.day_type.DayTypeService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.reason_code.ReasonCodeService;
-import com.kairos.service.shift.ShiftService;
+
+import com.kairos.utils.counter.KPIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -72,12 +61,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.dto.activity.counter.enums.CounterType.ABSENCES_PER_INTERVAL;
-import static com.kairos.enums.FilterType.*;
-import static com.kairos.enums.reason_code.ReasonCodeType.FORCEPLAN;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
 import static java.util.stream.Collectors.toList;
 
 
@@ -117,7 +100,7 @@ public class CounterDataService {
 
 
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
-        Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
+        Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(MongoBaseEntity::getId, kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
@@ -208,7 +191,7 @@ public class CounterDataService {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         List<ApplicableKPI> applicableKPIS;
         if (!accessGroupPermissionCounterDTO.isManagement()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_KPI_PERMISSION);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_KPI_PERMISSION);
         }
         if (ObjectUtils.isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin() && !accessGroupPermissionCounterDTO.isManagement()) {
             level = ConfLevel.STAFF;
@@ -217,7 +200,7 @@ public class CounterDataService {
             applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         }
         if (applicableKPIS.isEmpty()) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
@@ -226,7 +209,7 @@ public class CounterDataService {
         defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, ReasonCodeType.FORCEPLAN));
         TimeSlotSetDTO timeSlotSetDTO = timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING);
         if(ObjectUtils.isNull(timeSlotSetDTO)){
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT);
+            exceptionService.dataNotFoundException(KPIMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT);
         }
         defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetDTO.getTimeSlots());
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
@@ -480,7 +463,7 @@ public class CounterDataService {
     public TabKPIDTO saveKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         if (!accessGroupPermissionCounterDTO.isManagement()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_KPI_PERMISSION);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_KPI_PERMISSION);
         }
         if (ObjectUtils.isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
             level = ConfLevel.STAFF;
@@ -488,7 +471,7 @@ public class CounterDataService {
         }
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         if (applicableKPIS.isEmpty()) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         KPI kpi = validateAndGetKpi(refId, kpiId, counterDTO, level, accessGroupPermissionCounterDTO, applicableKPIS);
         kpi.setMultiDimensional(counterDTO.isMultiDimensional());
@@ -508,10 +491,10 @@ public class CounterDataService {
     private KPI validateAndGetKpi(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, List<ApplicableKPI> applicableKPIS) {
         KPI kpi = counterRepository.getKPIByid(kpiId);
         if (ObjectUtils.isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_KPI_PERMISSION);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_KPI_PERMISSION);
         }
         if (!applicableKPIS.get(0).getTitle().equals(counterDTO.getTitle()) && Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
-            exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
+            exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
         }
         return kpi;
     }
@@ -537,7 +520,7 @@ public class CounterDataService {
         boolean copy = ObjectUtils.isNotNull(tabId);
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         if (!accessGroupPermissionCounterDTO.isManagement()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_KPI_PERMISSION);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_KPI_PERMISSION);
         }
         List<ApplicableKPI> applicableKPIS = validateAndApplicableKPIS(level,refId, tabId,accessGroupPermissionCounterDTO,kpiId);
         TabKPIConf tabKPIConf = null;
@@ -583,7 +566,7 @@ public class CounterDataService {
             applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
         }
         if (applicableKPIS.isEmpty()) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         return applicableKPIS;
     }
@@ -591,10 +574,10 @@ public class CounterDataService {
     private KPI validateAndGetKpiForCopy(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
         KPI kpi = counterRepository.getKPIByid(kpiId);
         if ((ObjectUtils.isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_KPI_PERMISSION);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_KPI_PERMISSION);
         }
         if (Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
-            exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
+            exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
         }
         return kpi;
     }

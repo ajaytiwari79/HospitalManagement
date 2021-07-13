@@ -3,14 +3,14 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
-import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +18,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.constants.ActivityMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE;
-import static com.kairos.constants.ActivityMessagesConstants.ERROR_KPI_INVALIDDATA;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -69,7 +65,7 @@ public class CounterConfService {
                 duplicateEntries.add(category);
             }
         });
-        if (ObjectUtils.isCollectionEmpty(duplicateEntries)) exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE);
+        if (ObjectUtils.isCollectionEmpty(duplicateEntries)) exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE);
     }
 
     private List<String> getTrimmedNames(List<KPICategoryDTO> categories) {
@@ -103,7 +99,7 @@ public class CounterConfService {
         categoryIds = delete ? categories.stream().filter(kpiCategoryDTO -> !AppConstants.UNCATEGORIZED.equals(kpiCategoryDTO.getName())).map(KPICategoryDTO::getId).collect(Collectors.toList()) : categories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         List<KPICategoryDTO> categoryDTOs = counterRepository.getKPICategory(categoryIds, level, refId);
         if (categories.size() != categoryDTOs.size()) {
-            exceptionService.invalidOperationException(ActivityMessagesConstants.ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_INVALIDDATA);
         }
         return categoryDTOs;
     }

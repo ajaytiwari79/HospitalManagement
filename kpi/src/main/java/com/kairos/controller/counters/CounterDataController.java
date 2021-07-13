@@ -6,7 +6,7 @@ import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.KPI;
 import com.kairos.service.counter.CounterDataService;
 
 import org.springframework.http.HttpStatus;
@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Map;
-
-import static com.kairos.constants.ApiConstants.COUNTER_DATA_URL;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

@@ -2,12 +2,16 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.constants.AppConstants;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
@@ -17,12 +21,10 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.ApplicableKPIRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +33,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.UNCATEGORIZED;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.*;
-import static com.kairos.dto.activity.counter.enums.CounterType.ACTIVITY_KPI;
 
 @Service
 public class FibonacciKPIService implements CounterService{
@@ -52,13 +48,13 @@ public class FibonacciKPIService implements CounterService{
     public FibonacciKPIDTO createFibonacciKPI(Long referenceId, FibonacciKPIDTO fibonacciKPIDTO, ConfLevel confLevel) {
         boolean existByName = fibonacciKPIRepository.existByName(null,fibonacciKPIDTO.getTitle(),confLevel,referenceId);
         if(existByName){
-            exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
+            exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
         }
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTRY_ID);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTRY_ID);
         }
         if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_ID);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_ORGANIZATION_ID);
         }
         fibonacciKPIDTO.setReferenceId(referenceId);
         fibonacciKPIDTO.setConfLevel(confLevel);
@@ -76,17 +72,17 @@ public class FibonacciKPIService implements CounterService{
     public FibonacciKPIDTO updateFibonacciKPI(Long referenceId,FibonacciKPIDTO fibonacciKPIDTO,ConfLevel confLevel){
         boolean existByName = fibonacciKPIRepository.existByName(fibonacciKPIDTO.getId(),fibonacciKPIDTO.getTitle(),confLevel,referenceId);
         if(existByName){
-            exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
+            exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_KPI_NAME_DUPLICATE);
         }
         if(confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTRY_ID);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTRY_ID);
         }
         if(confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)){
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_ID);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_ORGANIZATION_ID);
         }
         ApplicableKPI applicableKPI = counterRepository.getKPIByKPIId(fibonacciKPIDTO.getId(),referenceId,confLevel);
         if(ObjectUtils.isNull(applicableKPI)){
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIDTO.getId());
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIDTO.getId());
         }
         applicableKPI.setFibonacciKPIConfigs(ObjectMapperUtils.copyCollectionPropertiesByMapper(fibonacciKPIDTO.getFibonacciKPIConfigs(),FibonacciKPIConfig.class));
         applicableKPI.setTitle(fibonacciKPIDTO.getTitle());
@@ -111,7 +107,7 @@ public class FibonacciKPIService implements CounterService{
     public boolean deleteFibonacciKPI(BigInteger fibonacciKPIId){
         FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findFibonacciKPIById(fibonacciKPIId);
         if(ObjectUtils.isNull(fibonacciKPI)){
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIId);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIId);
             return false;
         }
         fibonacciKPI.setDeleted(true);

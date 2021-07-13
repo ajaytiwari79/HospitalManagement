@@ -6,6 +6,8 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
@@ -20,15 +22,11 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.wta.IntervalUnit;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.KPISet;
-import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.ExceptionService;
+import com.kairos.persistence.model.KPISet;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.KPISetRepository;
-import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.phase.PhaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,8 +40,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class KPISetService {
@@ -79,7 +75,7 @@ public class KPISetService {
     public KPISetDTO updateKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         KPISet kpiSet = kpiSetRepository.findOne(kpiSetDTO.getId());
         if (ObjectUtils.isNull(kpiSet)) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_DATANOTFOUND, "KPISet", kpiSetDTO.getId());
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_DATANOTFOUND, "KPISet", kpiSetDTO.getId());
         }
         verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
@@ -92,7 +88,7 @@ public class KPISetService {
     public boolean deleteKPISet(BigInteger kpiSetId) {
         KPISet kpiSet = kpiSetRepository.findOne(kpiSetId);
         if (ObjectUtils.isNull(kpiSet)) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_DATANOTFOUND, "KPISet", kpiSetId);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_DATANOTFOUND, "KPISet", kpiSetId);
             return false;
         }
         kpiSet.setDeleted(true);
@@ -133,9 +129,9 @@ public class KPISetService {
 
     private void validateConfLevel(Long referenceId, ConfLevel confLevel) {
         if (confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTRY_ID);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTRY_ID);
         } else if (confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_ID);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_ORGANIZATION_ID);
         }
     }
 

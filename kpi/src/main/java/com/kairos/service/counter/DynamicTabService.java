@@ -2,15 +2,15 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.persistence.model.counter.KPIDashboard;
+import com.kairos.persistence.model.ExceptionService;
+import com.kairos.persistence.model.KPIDashboard;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +18,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class DynamicTabService {
@@ -143,7 +140,7 @@ public class DynamicTabService {
             }
         });
         if (ObjectUtils.isCollectionNotEmpty(duplicateEntries)) {
-            exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE);
+            exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE);
         }
     }
 
@@ -155,7 +152,7 @@ public class DynamicTabService {
                 dashboardTabsName.add(kpiDashboardDTO.getName());
             });
         } catch (NullPointerException e) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_DASHBOARDTAB_NOTFOUND);
+            exceptionService.dataNotFoundException(KPIMessagesConstants.MESSAGE_DASHBOARDTAB_NOTFOUND);
         }
         return dashboardTabsName;
     }
@@ -167,7 +164,7 @@ public class DynamicTabService {
         }
         Set<String> dashboardTabNames = dashboardTabs.getUpdateDashboardTab().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if (dashboardTabNames.size() != dashboardTabs.getUpdateDashboardTab().size())
-            exceptionService.duplicateDataException(ActivityMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE);
+            exceptionService.duplicateDataException(KPIMessagesConstants.ERROR_DASHBOARD_NAME_DUPLICATE);
         List<KPIDashboardDTO> deletableDashboardTab = getExistingDashboardTab(dashboardTabs.getDeleteDashboardTab(), level, refId);
         List<KPIDashboardDTO> existingDashboardTab = getExistingDashboardTab(dashboardTabs.getUpdateDashboardTab(), level, refId);
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
@@ -183,7 +180,7 @@ public class DynamicTabService {
         List<String> dashboardIds = dashboardTabs.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<KPIDashboardDTO> dashboardDTOs = counterRepository.getKPIDashboard(dashboardIds, level, refId);
         if (dashboardTabs.size() != dashboardDTOs.size()) {
-            exceptionService.invalidOperationException(ActivityMessagesConstants.ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_INVALIDDATA);
         }
         return dashboardDTOs;
     }

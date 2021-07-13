@@ -10,7 +10,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
-import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.repository.day_type.CountryCalenderRepo;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -25,9 +25,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.utils.counter.KPIUtils.*;
 
 /**
  * pradeep

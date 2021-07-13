@@ -1,6 +1,9 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.constants.AppConstants;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.dto.activity.ShortCuts.ShortcutDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
@@ -23,6 +26,7 @@ import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.persistence.model.*;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -41,9 +45,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.UNCATEGORIZED;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -104,7 +105,7 @@ public class CounterDistService {
         List<KPIDTO> kpidtos = counterRepository.getCounterListForReferenceId(refId, level, false);
         if (kpidtos.isEmpty()) {
             LOGGER.info("KPI not found for {} id {}", refId, level);
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         return kpidtos;
     }
@@ -132,7 +133,7 @@ public class CounterDistService {
             kpidtos = counterRepository.getCounterListForReferenceId(refId, ConfLevel.UNIT, false);
         } else {
             if (ObjectUtils.isCollectionEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds())) {
-                exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_STAFF_INVALID_UNIT);
+                exceptionService.dataNotFoundException(KPIMessagesConstants.MESSAGE_STAFF_INVALID_UNIT);
             }
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, refId, accessGroupPermissionCounterDTO.getStaffId());
             List<KPIDTO> copyKpidtos = counterRepository.getCopyKpiOfUnit(ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId(), true);
@@ -158,7 +159,7 @@ public class CounterDistService {
         Long unitId = ConfLevel.UNIT.equals(level) ? refId : null;
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(categoryKPIsDetails.getKpiIds(), level, refId);
         if (applicableKPIS.isEmpty()) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, level, refId);
         List<BigInteger> categoryIds = kpiCategoryDTOS.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
@@ -168,7 +169,7 @@ public class CounterDistService {
         List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryKPIsDetails.getKpiIds(), categoryIds);
         List<BigInteger> availableCategoryIds = categoryKPIConfs.stream().map(CategoryKPIConf::getCategoryId).collect(toList());
         if (availableCategoryIds.contains(categoryKPIsDetails.getCategoryId())) {
-            exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+            exceptionService.invalidRequestException("error.dist.category_kpi.invalid_operation");
         }
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
         applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), categoryKPIsDetails.getCategoryId(), countryId, unitId, level)));
@@ -192,7 +193,7 @@ public class CounterDistService {
     public TabKPIDTO updateInitialTabKPIDataConf(TabKPIDTO tabKPIDTO, Long unitId, ConfLevel level) {
         TabKPIConf tabKPIConf = counterRepository.findTabKPIConfigurationByTabId(tabKPIDTO.getTabId(), Arrays.asList(tabKPIDTO.getKpiId()), unitId, level);
         if (!Optional.ofNullable(tabKPIConf).isPresent()) {
-            exceptionService.invalidRequestException(ActivityMessagesConstants.ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_INVALIDDATA);
         }
         if (tabKPIConf.getTabId().equals(tabKPIDTO.getTabId()) && tabKPIConf.getKpiId().equals(tabKPIDTO.getKpiId())) {
             tabKPIConf.setLocationType(tabKPIDTO.getLocationType());
@@ -211,7 +212,7 @@ public class CounterDistService {
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters, Long staffId,BigInteger shortcutId) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         if (!accessGroupPermissionCounterDTO.isCountryAdmin() && CollectionUtils.isEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds())) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_STAFF_INVALID_UNIT);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_STAFF_INVALID_UNIT);
         }
         Long countryId = accessGroupPermissionCounterDTO.getCountryId();
         List<BigInteger> kpiIds = new ArrayList<>();
@@ -321,7 +322,7 @@ public class CounterDistService {
             }
         });
         if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException(ActivityMessagesConstants.ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_INVALIDDATA);
         }
         counterRepository.saveEntities(entriesToSave);
         List<ApplicableKPI> applicableKPIS;
@@ -342,7 +343,7 @@ public class CounterDistService {
             }
         }));
         if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException(ActivityMessagesConstants.ERROR_KPI_ALREADY_EXISTS_IN_TAB);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_ALREADY_EXISTS_IN_TAB);
         }
         counterRepository.saveEntities(entriesToSave);
     }
@@ -356,7 +357,7 @@ public class CounterDistService {
         if (!isCountryAdmin) {
             List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIIds(kpiIds, refId, level);
             if (kpiIds.size() != applicableKPIS.size()) {
-                exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+                exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
             }
         }
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
@@ -370,7 +371,7 @@ public class CounterDistService {
         List<BigInteger> kpiIds = tabKPIMappingDTOS.stream().map(TabKPIMappingDTO::getKpiId).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabId), kpiIds, accessGroupPermissionCounterDTO.getStaffId(), level);
         if (!Optional.ofNullable(tabKPIConfs).isPresent()) {
-            exceptionService.invalidRequestException(ActivityMessagesConstants.ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_INVALIDDATA);
         }
         Map<BigInteger, TabKPIMappingDTO> tabKPIMappingDTOMap = new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(), tabKPIMappingDTO));
@@ -406,7 +407,7 @@ public class CounterDistService {
         List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIIds(accessGroupKPIConf.getKpiIds(), refId, level);
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, v -> v));
         if (accessGroupKPIConf.getKpiIds().size() != applicableKPIS.size()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupKPIConf.getAccessGroupIds(), accessGroupKPIConf.getKpiIds(), level, refId);
         Map<Long, Map<BigInteger, BigInteger>> accessGroupKPIMap = new HashMap<>();
@@ -418,7 +419,7 @@ public class CounterDistService {
             }
         }));
         if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException(ActivityMessagesConstants.ERROR_KPI_ALREADY_EXISTS_IN_TAB);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_ALREADY_EXISTS_IN_TAB);
         }
         counterRepository.saveEntities(entriesToSave);
         if (ConfLevel.UNIT.equals(level)) {
@@ -453,7 +454,7 @@ public class CounterDistService {
         if (ConfLevel.UNIT.equals(level)) {
             AccessGroupKPIEntry accessGroupKPIEntry = counterRepository.getAccessGroupKPIEntry(accessGroupMappingDTO, refId, level);
             if (!Optional.ofNullable(accessGroupKPIEntry).isPresent()) {
-                exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_ACCESSGROUP_KPI_NOTFOUND);
+                exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_ACCESSGROUP_KPI_NOTFOUND);
             }
             List<AccessGroupPermissionCounterDTO> staffAndAccessGroups = userIntegrationService.getStaffAndAccessGroups(accessGroupKPIEntry);
             Set<Long> accessGroupsIds = staffAndAccessGroups.stream().flatMap(accessGroupDTO -> accessGroupDTO.getAccessGroupIds().stream().filter(accessGroup -> !(accessGroup.equals(accessGroupMappingDTO.getAccessGroupId())))).collect(toSet());
@@ -546,7 +547,7 @@ public class CounterDistService {
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
         List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIIds(orgTypeKPIConf.getKpiIds(), countryId, ConfLevel.COUNTRY);
         if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
-            exceptionService.actionNotPermittedException(ActivityMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
+            exceptionService.actionNotPermittedException(KPIMessagesConstants.MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, v -> v));
         List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
@@ -560,7 +561,7 @@ public class CounterDistService {
             }
         }));
         if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException(ActivityMessagesConstants.ERROR_KPI_INVALIDDATA);
+            exceptionService.invalidRequestException(KPIMessagesConstants.ERROR_KPI_INVALIDDATA);
         }
         counterRepository.saveEntities(entriesToSave);
         createApplicableKpiAndCategoryKPIConfiguraionOfUnits(orgTypeKPIConf, kpiIdAndApplicableKpi, orgTypeMappingDTOS);
@@ -606,7 +607,7 @@ public class CounterDistService {
     public void removeOrgTypeKPIEntries(OrgTypeMappingDTO orgTypeMappingDTO, Long countryId) {
         OrgTypeKPIEntry orgTypeKPIEntry = counterRepository.getOrgTypeKPIEntry(orgTypeMappingDTO, countryId);
         if (!Optional.ofNullable(orgTypeKPIEntry).isPresent()) {
-            exceptionService.dataNotFoundByIdException(ActivityMessagesConstants.MESSAGE_ORGTYPE_KPI_NOTFOUND);
+            exceptionService.dataNotFoundByIdException(KPIMessagesConstants.MESSAGE_ORGTYPE_KPI_NOTFOUND);
         }
         List<OrgTypeDTO> orgTypeDTOS = userIntegrationService.getOrganizationIdsBySubOrgId(Arrays.asList(orgTypeKPIEntry.getOrgTypeId()));
         Set<Long> subOrgTypeIds = orgTypeDTOS.stream().flatMap(orgTypeDTO -> orgTypeDTO.getOrgTypeIds().stream().filter(orgTypeId -> !orgTypeId.equals(orgTypeMappingDTO.getOrgTypeId()))).collect(toSet());

@@ -2,9 +2,14 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.service.audit_logging.AuditLoggingService;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.constants.KPIMessagesConstants;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
+import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
@@ -22,29 +27,15 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
+import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.PlannedTimeType;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankRepository;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.period.PlanningPeriodService;
-import com.kairos.service.phase.PhaseService;
-import com.kairos.service.shift.ShiftBreakService;
-import com.kairos.service.shift.ShiftFilterService;
-import com.kairos.service.time_bank.CalculatePlannedHoursAndScheduledHours;
-import com.kairos.service.time_bank.TimeBankCalculationService;
-import com.kairos.service.todo.TodoService;
+import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.ExceptionService;
+import com.kairos.persistence.model.FibonacciKPICalculation;
+import com.kairos.persistence.model.KPI;
+import com.kairos.utils.counter.FibonacciCalculationUtil;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,18 +56,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.CALCULATION_TYPE_NOT_VALID;
-import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST;
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.*;
-import static com.kairos.enums.FilterType.*;
-import static com.kairos.enums.kpi.CalculationType.*;
-import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
-import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
-import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.*;
 import static java.util.Map.Entry.comparingByKey;
 
 @Getter
@@ -129,7 +108,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
         if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_BASED_ON))) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST);
+            exceptionService.dataNotFoundException(KPIMessagesConstants.EXCEPTION_INVALIDREQUEST);
         }
         double total = 0;
         if (YAxisConfig.PLANNED_TIME.equals(yAxisConfig)) {
@@ -155,11 +134,11 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private double getTotalByPlannedTime(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_TYPE))) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST);
+            exceptionService.dataNotFoundException(KPIMessagesConstants.EXCEPTION_INVALIDREQUEST);
         }
         CalculationType calculationType = ((List<CalculationType>) ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_TYPE), CalculationType.class)).get(0);
         if (!calculationType.equals(CalculationType.TOTAL_MINUTES)) {
-            exceptionService.illegalArgumentException(ActivityMessagesConstants.CALCULATION_TYPE_NOT_VALID);
+            exceptionService.illegalArgumentException(KPIMessagesConstants.CALCULATION_TYPE_NOT_VALID);
         }
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, true);
         ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);
@@ -194,7 +173,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private double getActivityAndTimeTypeTotalByCalulationType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_TYPE))) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST);
+            exceptionService.dataNotFoundException(KPIMessagesConstants.EXCEPTION_INVALIDREQUEST);
         }
         Function<ShiftActivityDTO, Integer> methodParam = null;
         switch (kpiCalculationRelatedInfo.getCalculationType()) {
@@ -233,7 +212,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private double getTotalValueByByType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, Function<ShiftActivityDTO, Integer> methodParam) {
         if (ObjectUtils.isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_UNIT))) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST);
+            exceptionService.dataNotFoundException(KPIMessagesConstants.EXCEPTION_INVALIDREQUEST);
         }
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, true);
         ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);

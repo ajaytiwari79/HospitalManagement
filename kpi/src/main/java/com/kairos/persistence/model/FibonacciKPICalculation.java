@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter;
+package com.kairos.persistence.model;
 
 import com.kairos.enums.kpi.Direction;
 import lombok.Getter;

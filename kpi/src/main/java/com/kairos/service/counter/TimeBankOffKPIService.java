@@ -2,12 +2,14 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.todo.TodoDTO;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
-import com.kairos.persistence.model.shift.Shift;
+import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -16,12 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
-import static com.kairos.enums.FilterType.*;
-import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
 public class TimeBankOffKPIService implements KPIService{

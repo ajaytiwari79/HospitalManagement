@@ -1,7 +1,7 @@
-package com.kairos.utils.Fibonacci;
+package com.kairos.utils.counter;
 
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
+import com.kairos.persistence.model.FibonacciKPICalculation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

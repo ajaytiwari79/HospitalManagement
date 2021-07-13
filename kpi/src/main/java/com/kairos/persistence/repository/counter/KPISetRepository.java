@@ -7,7 +7,7 @@ package com.kairos.persistence.repository.counter;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.persistence.model.counter.KPISet;
+import com.kairos.persistence.model.KPISet;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
