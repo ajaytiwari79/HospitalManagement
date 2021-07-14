@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,4 +30,7 @@ public class CountryHolidayCalender extends MongoBaseEntity {
     private String googleCalId;
     private Long countryId;
     private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
+    private DayOfWeek dayOfWeek;
+    private byte weekNumber;
+    private String shortName;
 }
