@@ -27,6 +27,8 @@ public class ShiftSearchDTO {
     private List<StaffFilterSelectionDTO> staffFilters;
     private List<FilterSelectionDTO> filtersData;
     private Set<Long> staffIds;
+    private Long staffFavouriteFiltersId;
+    private Long staffId;
 
     public Set<Long> getStaffIds() {
         this.staffIds= ObjectUtils.isNullOrElse(this.staffIds,new HashSet<>());

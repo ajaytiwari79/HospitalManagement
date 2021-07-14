@@ -29,6 +29,7 @@ public class StaffFavouriteFilter extends UserBaseEntity {
     private List<FilterSelection> filtersData;
 
     private String name;
+    private int usedCount;
 
     public StaffFavouriteFilter(){
         // default constructor
