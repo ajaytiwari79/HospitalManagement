@@ -36,7 +36,7 @@ public class CountryHolidayCalenderDTO implements Serializable {
     private DayTypeDTO dayTypeDTO;
     private Long countryId;
     private DayOfWeek dayOfWeek;
-    private byte weekNumber;
+    //private byte weekNumber;
     private String shortName;
     private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
 }
