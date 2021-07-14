@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -13,6 +14,8 @@ public class SectorWiseDayTypeInfo {
     private String sectorName;
     private BigInteger dayTypeId;
     private String holidayType;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private Type type=Type.FLOATING;
 
     public enum Type {
