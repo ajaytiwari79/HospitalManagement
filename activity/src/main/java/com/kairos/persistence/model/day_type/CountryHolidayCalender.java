@@ -31,6 +31,6 @@ public class CountryHolidayCalender extends MongoBaseEntity {
     private Long countryId;
     private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
     private DayOfWeek dayOfWeek;
-    private byte weekNumber;
+    //private byte weekNumber;
     private String shortName;
 }
