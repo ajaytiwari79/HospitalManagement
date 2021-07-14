@@ -53,7 +53,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) " +
             "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) " +
             " WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
-            "RETURN accessGroup.translations as translations," +
+            "RETURN DISTINCT accessGroup.translations as translations," +
             "id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, accessGroup.dayTypeIds AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes,pag as parentAccessGroup ORDER BY accessGroup.name")
     List<AccessGroupQueryResult> getAccessGroupsForUnit(Long refId);
 
