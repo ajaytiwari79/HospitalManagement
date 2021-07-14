@@ -58,6 +58,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     private CalculationFor calculationFor;
     private Long countryId;
     private ConditionalCompensation conditionalCompensation;
+    private boolean notApplicableForSunday; // this is for getting  compensation on sunday
 
     public void setActivityIds(Set<BigInteger> activityIds) {
         this.activityIds = isNotNull(activityIds) ? activityIds : new HashSet<>();
