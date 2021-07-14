@@ -50,8 +50,6 @@ public class CountryHolidayCalenderService {
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryHolidayCalender.setCountryId(countryId);
         countryCalenderRepo.save(countryHolidayCalender);
-        DayType dayType=dayTypeRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
-        countryHolidayCalenderDTO.setHolidayType(dayType.isHolidayType());
         countryHolidayCalenderDTO.setId(countryHolidayCalender.getId());
         protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO),null,countryId);
         return countryHolidayCalenderDTO;
