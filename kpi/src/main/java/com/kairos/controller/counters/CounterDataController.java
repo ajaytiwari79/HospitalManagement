@@ -7,7 +7,7 @@ import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.persistence.model.KPI;
-import com.kairos.service.counter.CounterDataService;
+import com.kairos.service.CounterDataService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

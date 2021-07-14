@@ -5,7 +5,7 @@ import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.service.counter.DynamicTabService;
+import com.kairos.service.DynamicTabService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.constants.ApiConstants.*;
 
 @RestController
 @RequestMapping(ApiConstants.API_V1)

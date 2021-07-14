@@ -5,7 +5,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.service.counter.TimeBankService;
+import com.kairos.service.TimeBankService;
 
 import java.math.BigInteger;
 import java.util.HashMap;

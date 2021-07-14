@@ -6,7 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.service.counter.FibonacciKPIService;
+import com.kairos.service.FibonacciKPIService;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
-
-import static com.kairos.constants.ApiConstants.*;
-
 
 /**
  * pradeep

@@ -15,10 +15,10 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.service.counter.CounterDataService;
-import com.kairos.service.counter.CounterDistService;
-import com.kairos.service.counter.DynamicTabService;
-import com.kairos.service.counter.RestingHoursCalculationService;
+import com.kairos.service.CounterDataService;
+import com.kairos.service.CounterDistService;
+import com.kairos.service.DynamicTabService;
+import com.kairos.service.RestingHoursCalculationService;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +29,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.constants.ApiConstants.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

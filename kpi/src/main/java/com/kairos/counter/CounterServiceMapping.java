@@ -2,6 +2,7 @@ package com.kairos.counter;
 
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.kpi.CalculationType;
+import com.kairos.service.*;
 import com.kairos.service.counter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +11,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.kairos.enums.kpi.CalculationType.*;
 
 
 /*

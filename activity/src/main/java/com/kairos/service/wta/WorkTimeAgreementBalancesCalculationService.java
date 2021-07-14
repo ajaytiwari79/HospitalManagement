@@ -36,8 +36,6 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.counter.KPICalculationRelatedInfo;
-import com.kairos.service.counter.KPIService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
@@ -71,7 +69,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
 @Service
-public class WorkTimeAgreementBalancesCalculationService implements KPIService {
+public class WorkTimeAgreementBalancesCalculationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkTimeAgreementBalancesCalculationService.class);
     @Inject
@@ -806,20 +804,6 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return valid;
     }
 
-    public int getLeaveCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
-        int count = 0;
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
-        if (isCollectionNotEmpty(staffKpiFilterDTOS)) {
-            for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-                for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                    WorkTimeAgreementBalance workTimeAgreementBalance = getWorkTimeAgreementBalance(kpiCalculationRelatedInfo.getUnitId(),employmentWithCtaDetailsDTO.getId(), dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate(),kpiCalculationRelatedInfo.getWtaTemplateTypes(yAxisConfig),null);
-                    count += workTimeAgreementBalance.getWorkTimeAgreementRuleTemplateBalances().stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).mapToInt(intervalBalance -> (int) intervalBalance.getAvailable()).sum();
-                }
-            }
-        }
-        return count;
-    }
-
     public IntervalBalance getProtectedDaysOffCount(Long unitId, LocalDate localDate, Long staffId, BigInteger activityId) {
         localDate = isNotNull(localDate) ? localDate : DateUtils.getCurrentLocalDate();
         WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = null;
@@ -837,8 +821,4 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return isNotNull(workTimeAgreementRuleTemplateBalancesDTO) ? workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().get(0) : new IntervalBalance();
     }
 
-    @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
-        return getLeaveCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo, (YAxisConfig) t);
-    }
 }

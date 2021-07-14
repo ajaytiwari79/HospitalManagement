@@ -8,7 +8,7 @@ import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdation
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.persistence.model.Counter;
-import com.kairos.service.counter.CounterConfService;
+import com.kairos.service.CounterConfService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

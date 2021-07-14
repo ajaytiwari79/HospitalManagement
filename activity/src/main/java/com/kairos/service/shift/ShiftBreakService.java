@@ -22,9 +22,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.service.counter.KPIBuilderCalculationService;
-import com.kairos.service.counter.KPICalculationRelatedInfo;
-import com.kairos.service.counter.KPIService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -44,15 +41,13 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
-import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 /**
  * @author pradeep
  * @date - 18/9/18
  */
 @Service
-public class ShiftBreakService implements KPIService {
+public class ShiftBreakService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiftBreakService.class);
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
@@ -68,7 +63,6 @@ public class ShiftBreakService implements KPIService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private PhaseService phaseService;
-    @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
     @Inject private TimeBankService timeBankService;
 
 
@@ -300,19 +294,6 @@ public class ShiftBreakService implements KPIService {
         }
     }
 
-    public double getNumberOfBreakInterrupt(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval,true);
-        KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
-        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
-        long interruptShift = filterShiftActivity.getShifts().stream().filter(k -> k.getBreakActivities().stream().anyMatch(ShiftActivityDTO::isBreakInterrupt)).count();
-        if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
-            return isCollectionNotEmpty(filterShiftActivity.getShifts()) ? getValueWithDecimalFormat((interruptShift * 100.0d) / filterShiftActivity.getShifts().size()) : 0;
-        } else
-            return interruptShift;
-    }
-
-
-
     public void updateBreak(Shift shift, Shift shift1, ShiftActivity shiftActivity) {
         ShiftActivity breakActivity = shift.getBreakActivities().stream().filter(k -> k.getStartDate().before(shiftActivity.getEndDate())).findFirst().orElse(null);
         shift.getBreakActivities().remove(breakActivity);
@@ -321,9 +302,4 @@ public class ShiftBreakService implements KPIService {
         }
     }
 
-
-    @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
-        return getNumberOfBreakInterrupt(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-    }
 }

@@ -10,7 +10,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.service.counter.KPISetService;
+import com.kairos.service.KPISetService;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -22,10 +22,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
-
-import static com.kairos.constants.ApiConstants.*;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
 
 @RestController
 @RequestMapping(ApiConstants.API_V1)
