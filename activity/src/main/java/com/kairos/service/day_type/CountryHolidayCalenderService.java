@@ -68,6 +68,7 @@ public class CountryHolidayCalenderService {
         CountryHolidayCalender calender = countryCalenderRepo.findOne(id);
         if (calender != null) {
             calender.setEnabled(false);
+            calender.setDeleted(true);
             countryCalenderRepo.save(calender);
             return true;
         }
