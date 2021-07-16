@@ -376,13 +376,15 @@ public class CoverShiftService {
         return shiftList;
     }
 
-    public void notInterestInCoverShift(BigInteger id, Long staffId, LocalDate selectedDate) {
+    public void notInterestInCoverShift(BigInteger id, Long staffId, LocalDate selectedDate, boolean doNotAddDeclined) {
         List<CoverShift> coverShifts=selectedDate!=null?coverShiftMongoRepository.findAllByDateAndDeletedFalse(selectedDate):coverShiftMongoRepository.findAllByIdInAndDeletedFalse(Arrays.asList(id));
         if (isCollectionEmpty(coverShifts)) {
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
         for(CoverShift coverShift:coverShifts){
-            coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
+            if(!doNotAddDeclined) {
+                coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
+            }
             coverShift.getInterestedStaffs().remove(staffId);
             coverShift.getRequestedStaffs().remove(staffId);
         }
