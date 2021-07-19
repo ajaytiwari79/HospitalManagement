@@ -17,7 +17,7 @@ public class ActivityCardInformationService {
 
     public ActivityCardInformation updateActivityCardInformation(ActivityCardInformation activityCardInformation) {
         ActivityCardInformation existingActivityCardInformation  = activityCardInformationRepository.findByUnitIdAndStaffId(activityCardInformation.getUnitId(),activityCardInformation.getStaffId(),activityCardInformation.getViewType());
-        if(isNotNull(activityCardInformation)){
+        if(isNotNull(existingActivityCardInformation)){
             activityCardInformation.setId(existingActivityCardInformation.getId());
         }
         return activityCardInformationRepository.save(activityCardInformation);
