@@ -18,7 +18,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.*;
-import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.ShiftMongoRepository;
 import com.kairos.persistence.repository.counter.TimeBankRepository;
 import com.kairos.utils.KPIUtils;
@@ -43,7 +43,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     @Inject
     private PlannedHoursCalculationService plannedHoursCalculationService;
     @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    private CounterHelperRepository counterHelperRepository;
     @Inject
     private CounterHelperService  counterHelperService;
     @Inject
@@ -191,7 +191,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
 
 
     private Long getTotalTimeBank(Map<Long, List<DailyTimeBankEntry>> longListMap, DateTimeInterval dateTimeInterval, Long totalDeltaTimeBankOfUnit, StaffKpiFilterDTO staffKpiFilterDTO) {
-        DateTimeInterval planningPeriodInterval = planningPeriodMongoRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
+        DateTimeInterval planningPeriodInterval = counterHelperRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
             int timeBankOfInterval = (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, new HashSet<>(), dailyTimeBankEntries, false)[0];

@@ -17,6 +17,7 @@ import com.kairos.dto.activity.counter.enums.KPISetType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
@@ -25,9 +26,9 @@ import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.ExceptionService;
 import com.kairos.persistence.model.KPISet;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.KPISetRepository;
-import com.kairos.persistence.repository.counter.PhaseMongoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
@@ -54,9 +56,11 @@ public class KPISetService {
     @Inject
     private CounterRepository counterRepository;
     @Inject
-    private PhaseMongoRepository phaseMongoRepository;
-    @Inject
     private CounterDataService counterDataService;
+    @Inject
+    private CounterHelperService counterHelperService;
+    @Inject
+    private CounterHelperRepository counterHelperRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KPISetService.class);
 
@@ -144,10 +148,10 @@ public class KPISetService {
         }
     }
 
-   /* public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
+    public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
         List<KPISet> kpiSets = kpiSetRepository.findAllByCountryIdAndDeletedFalse(orgSubTypeIds, countryId);
-        List<Phase> unitPhaseList = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<BigInteger, Phase> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Function.identity()));
+        List<PhaseDTO> unitPhaseList = counterHelperRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        Map<BigInteger, PhaseDTO> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(PhaseDTO::getParentCountryPhaseId, Function.identity()));
         List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
             if(ObjectUtils.isCollectionNotEmpty(kpiSet.getKpiIds())) {
@@ -157,13 +161,13 @@ public class KPISetService {
         if (ObjectUtils.isCollectionNotEmpty(unitKPISets)) {
             kpiSetRepository.saveEntities(unitKPISets);
         }
-    }*/
+    }
 
 
     public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
-        BigInteger phaseId = phaseMongoRepository.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(startDate), DateUtils.asDate(startDate.atTime(LocalTime.MAX)));
+        BigInteger phaseId = counterHelperService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(startDate), DateUtils.asDate(startDate.atTime(LocalTime.MAX)));
         if (ObjectUtils.isNotNull(phaseId)) {
             List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseIdAndReferenceIdAndConfLevel(phaseId,unitId, ConfLevel.UNIT);
             if (ObjectUtils.isCollectionNotEmpty(kpiSetDTOList)) {

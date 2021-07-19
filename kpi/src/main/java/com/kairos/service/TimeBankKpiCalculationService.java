@@ -21,10 +21,7 @@ import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.DailyTimeBankEntry;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
-import com.kairos.persistence.repository.counter.TimeBankRepository;
-import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
+import com.kairos.persistence.repository.counter.*;
 import com.kairos.utils.FibonacciCalculationUtil;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -49,7 +46,7 @@ public class TimeBankKpiCalculationService implements CounterService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    private CounterHelperRepository counterHelperRepository;
     @Inject
     private TimeBankService timeBankService;
     @Inject
@@ -196,7 +193,7 @@ public class TimeBankKpiCalculationService implements CounterService {
     }
 
     private Long getTotalTimeBank(Map<Long, List<DailyTimeBankEntry>> longListMap, DateTimeInterval dateTimeInterval, Long totalTimeBankOfUnit, StaffKpiFilterDTO staffKpiFilterDTO) {
-        DateTimeInterval planningPeriodInterval = planningPeriodMongoRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
+        DateTimeInterval planningPeriodInterval = counterHelperRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
             int timeBankOfInterval = (int) timeBankService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, new HashSet<>(), dailyTimeBankEntries, false)[0];

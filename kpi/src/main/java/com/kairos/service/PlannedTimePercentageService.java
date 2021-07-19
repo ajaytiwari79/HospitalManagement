@@ -26,7 +26,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.ShiftMongoRepository;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -49,7 +49,7 @@ public class PlannedTimePercentageService implements CounterService {
     @Inject
     private CounterHelperService counterHelperService;
     @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    private CounterHelperRepository counterHelperRepository;
 
     private Map<BigInteger,String> plannedTimeIdAndNameMap=new HashMap<>();
     private List<CommonKpiDataUnit> getPlannedTimePercentageOfShift(Long organizationId, Map<FilterType, List> filterBasedCriteria, ApplicableKPI applicableKPI) {
@@ -65,7 +65,7 @@ public class PlannedTimePercentageService implements CounterService {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new ArrayList<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),null);
-        List<PresenceTypeDTO> plannedTimes= planningPeriodMongoRepository.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<PresenceTypeDTO> plannedTimes= counterHelperRepository.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         if(ObjectUtils.isCollectionNotEmpty(plannedTimeIds)){
          plannedTimeIdAndNameMap=plannedTimes.stream().filter(presenceTypeDTO -> plannedTimeIds.contains(presenceTypeDTO.getId())).collect(Collectors.toMap(PresenceTypeDTO::getId, PresenceTypeDTO::getName));
         }else {

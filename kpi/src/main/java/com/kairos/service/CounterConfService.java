@@ -31,6 +31,10 @@ public class CounterConfService {
     private ExceptionService exceptionService;
     @Inject
     private CounterRepository counterRepository;
+    @Inject
+    private KPISetService kpiSetService;
+    @Inject
+    private CounterDistService counterDistService;
 
     public void updateCounterCriteria(BigInteger counterId, List<FilterCriteria> criteriaList) {
         Counter counter = (Counter) counterRepository.getEntityById(counterId, Counter.class);
@@ -156,5 +160,11 @@ public class CounterConfService {
         List<KPI> savedKPIs = counterRepository.saveEntities(kpis);
         List<ApplicableKPI> applicableKPIS = savedKPIs.parallelStream().map(kpi -> new ApplicableKPI(kpi.getId(), kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
         counterRepository.saveEntities(applicableKPIS);
+    }
+
+    public boolean createDefaultData(Map<String,Object> data,Long unitId){
+        kpiSetService.copyKPISets(unitId,(List<Long>)data.get("subTypeIds"),(Long)data.get("countryId"));
+        counterDistService.createDefaultCategory(unitId);
+        return true;
     }
 }

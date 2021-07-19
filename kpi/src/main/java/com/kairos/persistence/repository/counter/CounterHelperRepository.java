@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.counter;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.ShortCuts.ShortcutDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
@@ -82,6 +84,26 @@ public class CounterHelperRepository {
         return null;
     }
     public List<StaffingLevelDTO> findByUnitIdAndDates(Long unitId, Date startDate, Date asDate) {
+        return null;
+    }
+
+    public List<PhaseDTO> findByOrganizationIdAndDeletedFalse(Long unitId) {
+        return null;
+    }
+    public PhaseDTO findByUnitIdAndPhaseEnum(Long unitId, String toString) {
+        return null;
+    }
+
+    public DateTimeInterval getPlanningPeriodIntervalByUnitId(Long unitId) {
+        return null;
+    }
+    public PhaseDTO getCurrentPhaseByDateUsingPlanningPeriod(Long unitId, LocalDate asLocalDate) {
+        return null;
+    }
+    public List<PhaseDTO> findByOrganizationIdAndPhaseTypeAndDeletedFalse(Long unitId, String toString) {
+        return null;
+    }
+    public List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date asDate, Date endDate) {
         return null;
     }
 }

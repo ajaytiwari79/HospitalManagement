@@ -25,7 +25,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.TodoRepository;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,7 +45,7 @@ import static com.kairos.enums.kpi.KPIRepresentation.*;
 @Service
 public class AbsencePlanningKPIService implements CounterService {
     @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    private CounterHelperRepository counterHelperRepository;
     @Inject
     private CounterHelperService counterHelperService;
     @Inject

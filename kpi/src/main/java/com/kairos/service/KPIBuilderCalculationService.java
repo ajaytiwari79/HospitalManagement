@@ -32,7 +32,6 @@ import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
-import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.counter.ShiftMongoRepository;
 import com.kairos.persistence.repository.counter.TimeBankRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
@@ -78,8 +77,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private CostCalculationKPIService costCalculationKPIService;
     @Inject
     private TimeBankRepository timeBankRepository;
-    @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
     private TimeBankService timeBankService;
     @Inject

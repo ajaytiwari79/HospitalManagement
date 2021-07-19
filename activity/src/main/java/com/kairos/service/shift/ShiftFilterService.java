@@ -24,7 +24,6 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.time_bank.AsyncTimeBankCalculationService;
 import com.kairos.service.time_slot.TimeSlotSetService;
-import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -144,7 +143,7 @@ public class ShiftFilterService {
             selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
         }
         if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
-            Set<String> teamIds = KPIUtils.getStringByList(filterTypeMap.get(TEAM));
+            Set<String> teamIds = getStringByList(filterTypeMap.get(TEAM));
             ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(unitId,teamIds));
             selectedActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
         }

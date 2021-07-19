@@ -8,6 +8,7 @@ import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -18,6 +19,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.ApplicableKPI;
+import com.kairos.persistence.model.ExceptionService;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.KPIUtils;
 import org.springframework.stereotype.Service;
@@ -29,11 +31,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.KPIMessagesConstants.MESSAGE_ORGANIZATION_PHASES_ON_DATE;
+import static com.kairos.constants.KPIMessagesConstants.MESSAGE_PHASESETTINGS_ABSENT;
+import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
 /**
  * pradeep
@@ -46,6 +52,7 @@ public class CounterHelperService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private CounterHelperRepository counterHelperRepository;
+    @Inject private ExceptionService exceptionService;
 
     public Object[] getKPIdata(Map<FilterType, List> filterBasedCriteria,ApplicableKPI applicableKPI, List<LocalDate> filterDates, List<Long> staffIds, List<Long> employmentTypeIds, List<Long> unitIds, Long organizationId){
         List<DateTimeInterval> dateTimeIntervals = KPIUtils.getDateTimeIntervals(applicableKPI.getInterval(), ObjectUtils.isNull(applicableKPI) ? 0 : applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,applicableKPI.getDateForKPISetCalculation());
@@ -124,17 +131,17 @@ public class CounterHelperService {
     }
     public Map[] getPhasesByDates(Long unitId, LocalDate startDate,LocalDate endDate,ZoneId timeZone,Long employementTypeId) {
         timeZone = isNull(timeZone) ? ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId)) : timeZone;
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        List<PlanningPeriodDTO> planningPeriods = planningPeriodMongoRepository.findAllPlanningPeriodBetweenDatesAndUnitId(unitId,asDate(startDate),asDate(endDate));
-        Map<Date,Phase> localDatePhaseStatusMap=new HashMap<>();
+        List<PhaseDTO> phases = counterHelperRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        List<PlanningPeriodDTO> planningPeriods = counterHelperRepository.findAllPlanningPeriodBetweenDatesAndUnitId(unitId,asDate(startDate),asDate(endDate));
+        Map<Date,PhaseDTO> localDatePhaseStatusMap=new HashMap<>();
         Map[] phaseDetailsMap=getPhaseMap(phases);
         Map<LocalDate,Boolean> publishEmployementType = new HashMap<>();
-        Map<BigInteger,Phase> phaseAndIdMap=(Map<BigInteger,Phase>)phaseDetailsMap[0];
-        Map<String,Phase> phaseMap = (Map<String,Phase>)phaseDetailsMap[1];
+        Map<BigInteger,PhaseDTO> phaseAndIdMap=(Map<BigInteger,PhaseDTO>)phaseDetailsMap[0];
+        Map<String,PhaseDTO> phaseMap = (Map<String,PhaseDTO>)phaseDetailsMap[1];
         DayOfWeek tentativeDayOfWeek = phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay() == null ? DayOfWeek.MONDAY : phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay();
         LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativeDayOfWeek).atStartOfDay().minusSeconds(1);
         while (!startDate.isAfter(endDate)){
-            Phase phase = null;
+            PhaseDTO phase = null;
             LocalDateTime requestedDate = asLocalDateTime(startDate);
             PlanningPeriodDTO planningPeriodOptional = findElementPlanningPeriodByDate(planningPeriods,requestedDate.toLocalDate());//planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
             if (requestedDate.isAfter(untilTentative)) {
@@ -152,5 +159,73 @@ public class CounterHelperService {
             startDate = startDate.plusDays(1);
         }
         return new Map[]{localDatePhaseStatusMap,publishEmployementType};
+    }
+
+    private PlanningPeriodDTO findElementPlanningPeriodByDate(List<PlanningPeriodDTO> planningPeriodDTOS,LocalDate localDate){
+        int left = 0, right = planningPeriodDTOS.size() - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            // Check if x is present at mid
+            if (planningPeriodDTOS.get(mid).contains(localDate)) {
+                return planningPeriodDTOS.get(mid);
+            }
+            // If x greater, ignore left half
+            if (planningPeriodDTOS.get(mid).getEndDate().isBefore(localDate)) {
+                left = mid + 1;
+            }
+            // If x is smaller, ignore right half
+            else {
+                right = mid - 1;
+            }
+        }
+        exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE, UserContext.getUserDetails().getLastSelectedOrganizationId(), localDate);
+        return null;
+    }
+
+    private Map[] getPhaseMap(List<PhaseDTO> phases){
+        Map<BigInteger,PhaseDTO> phaseMap = new HashMap<>();
+        Map<String,PhaseDTO> phaseEnumMap = new HashMap<>();
+        for (PhaseDTO phase : phases) {
+            phaseMap.put(phase.getId(),phase);
+            phaseEnumMap.put(phase.getPhaseEnum().toString(),phase);
+        }
+        return new Map[]{phaseMap,phaseEnumMap};
+    }
+
+    public BigInteger getCurrentPhaseByUnitIdAndDate(Long unitId, Date startDate, Date endDate) {
+        ZoneId timeZone= ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId));
+        PhaseDTO tentativePhase = counterHelperRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TENTATIVE.toString());
+        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativePhase.getUntilNextDay()==null? DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
+        LocalDateTime endDateTime = Optional.ofNullable(endDate).isPresent()? DateUtils.asLocalDateTime(endDate):null;
+        PhaseDTO phase;
+        if(startDateTime.isAfter(untilTentativeDate)){
+            phase = counterHelperRepository.getCurrentPhaseByDateUsingPlanningPeriod(unitId,DateUtils.asLocalDate(startDate));
+        }
+        else {
+            List<PhaseDTO> actualPhases = counterHelperRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
+            Map<String, PhaseDTO> phaseMap = actualPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), Function.identity()));
+            phase = getActualPhaseApplicableForDate(startDateTime,phaseMap,untilTentativeDate,timeZone);
+        }
+        if (isNull(phase)) {
+            exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
+        }
+        return phase.getId();
+    }
+
+    private PhaseDTO getActualPhaseApplicableForDate(LocalDateTime startDateTime, Map<String,PhaseDTO> phaseMap, LocalDateTime untilTentativeDate,ZoneId timeZone){
+        PhaseDTO phase=null;
+        int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
+        LocalDateTime realTimeStartDate=DateUtils.getLocalDateTimeFromZoneId(timeZone).minusMinutes(minutesToCalculate+1);
+        if (startDateTime.isBefore(realTimeStartDate)) {
+            return phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString());
+        }
+        LocalDateTime realTimeEndDate=DateUtils.getLocalDateTimeFromZoneId(timeZone).plusMinutes(minutesToCalculate+1);
+        if(new DateTimeInterval(asDate(realTimeStartDate),asDate(realTimeEndDate)).contains(asDate(startDateTime))){
+            return phaseMap.get(PhaseDefaultName.REALTIME.toString());
+        }else if ((startDateTime).isBefore(untilTentativeDate) && startDateTime.isAfter(realTimeEndDate)) {
+            return phaseMap.get(PhaseDefaultName.TENTATIVE.toString());
+        }
+        return phase;
     }
 }

@@ -12,9 +12,9 @@ import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
-import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.rest_client.KPIIntegrationService;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
@@ -49,7 +49,7 @@ public class PriorityGroupService {
     private static final Logger logger = LoggerFactory.getLogger(PriorityGroupService.class);
 
     @Inject private UserIntegrationService userIntegrationService;
-    @Inject private CounterRepository counterRepository;
+    @Inject private KPIIntegrationService kpiIntegrationService;
     @Inject
     private OpenShiftNotificationMongoRepository openShiftNotificationRepository;
 
@@ -67,7 +67,7 @@ public class PriorityGroupService {
     public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByCountryIdAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
         PriorityGroupDefaultData priorityGroupDefaultData= userIntegrationService.getExpertiseAndEmployment(countryId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters=kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters)
                                         ,priorityGroupDTOS);
     }
@@ -121,7 +121,7 @@ public class PriorityGroupService {
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData= userIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters=kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters),priorityGroupDTOS);
 
     }
@@ -196,7 +196,7 @@ public class PriorityGroupService {
     public PriorityGroupWrapper getPriorityGroupsByRuleTemplateForUnit(Long unitId,BigInteger ruleTemplateId){
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndOrderIdIsNullAndDeletedFalse(unitId,ruleTemplateId);
         PriorityGroupDefaultData priorityGroupDefaultData1= userIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters=kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises(),counters);
         return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
     }
@@ -243,7 +243,7 @@ public class PriorityGroupService {
     public PriorityGroupWrapper getPriorityGroupsByOrderIdForUnit(Long unitId,BigInteger orderId){
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
         PriorityGroupDefaultData priorityGroupDefaultData1= userIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters=kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises(),counters);
         return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
 

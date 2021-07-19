@@ -9,6 +9,7 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.persistence.model.Counter;
 import com.kairos.service.CounterConfService;
+import com.kairos.service.CounterDistService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,8 @@ public class CounterConfController {
 
     @Inject
     private CounterConfService counterConfService;
+    @Inject
+    private CounterDistService counterDistService;
 
     @PostMapping(value = ApiConstants.COUNTRY_URL+ ApiConstants.COUNTER_CONF_URL+"/counter")
     public ResponseEntity<ResponseDTO<Object>> addCounterEntries(@PathVariable Long countryId){
@@ -77,5 +80,15 @@ public class CounterConfController {
     @PutMapping(value = ApiConstants.UNIT_URL+ ApiConstants.COUNTER_CONF_URL+"/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId));
+    }
+
+    @PostMapping(value = ApiConstants.UNIT_URL+ "/create_default_data")
+    public ResponseEntity<Map<String, Object>> createDefaultData(@RequestBody Map<String,Object> data, @PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.createDefaultData(data,unitId));
+    }
+
+    @PostMapping(value = ApiConstants.UNIT_URL+ "/tab_kpi")
+    public ResponseEntity<Map<String, Object>> getKPIAndTabByIds(@PathVariable Long unitId,@RequestBody Map<String,Object> data){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDistService.getTabKPIByTabIdsAndKpiIds((List<String>) data.get("tabIds"),(List<BigInteger>) data.get("kpiIds"),(Long) data.get("staffId")));
     }
 }

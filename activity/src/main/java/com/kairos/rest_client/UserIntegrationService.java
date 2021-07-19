@@ -5,9 +5,12 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.RestClientUrlUtil;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.EmploymentDTO;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
@@ -601,6 +604,7 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_DETAILS_FOR_BALANCES_BY_EMPLOYMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, employmentId);
     }
+
 }
 
 

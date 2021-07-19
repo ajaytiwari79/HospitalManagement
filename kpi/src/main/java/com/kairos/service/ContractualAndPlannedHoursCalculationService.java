@@ -21,7 +21,7 @@ import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
 import com.kairos.persistence.model.Shift;
-import com.kairos.persistence.repository.counter.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.ShiftMongoRepository;
 import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
@@ -48,7 +48,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    private CounterHelperRepository counterHelperRepository;
     @Inject
     private TimeBankService timeBankService;
     @Inject
@@ -93,7 +93,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     private Long getaContratualMinutes(Interval interval, StaffKpiFilterDTO staffKpiFilterDTO, Long contractualMinutes) {
-        DateTimeInterval planningPeriodInterval = planningPeriodMongoRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
+        DateTimeInterval planningPeriodInterval = counterHelperRepository.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             if (interval != null) {
                 DateTime startDate = interval.getStart();
