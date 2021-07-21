@@ -78,7 +78,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long employmentId,Date startDate,Date endDate);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds);
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
 
@@ -91,5 +91,6 @@ public interface CustomShiftMongoRepository {
     Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting, List<Long> staffIds);
 
     List<ShiftActivityDTO> findAllShiftActivityiesBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds);
 
 }

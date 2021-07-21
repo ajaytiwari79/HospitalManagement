@@ -113,18 +113,24 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift) {
-        return findAllShiftsBetweenDurationByEmploymentIds(shiftId,newArrayList(employmentId),startDate,endDate,draftShift);
+        return findAllShiftsBetweenDurationByEmploymentIds(shiftId,newArrayList(employmentId),startDate,endDate,draftShift,newHashSet());
     }
 
     @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds) {
+        return findAllShiftsBetweenDurationByEmploymentIds(shiftId,newArrayList(employmentId),startDate,endDate,draftShift,shiftIds);
+    }
+
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds) {
         Criteria criteria;
+        shiftIds.add(shiftId);
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
-                    .and(START_DATE).gte(startDate).lt(endDate).and("_id").ne(shiftId);
+                    .and(START_DATE).gte(startDate).lt(endDate).and("_id").nin(shiftIds);
         } else {
             criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
-                    .and(START_DATE).gte(startDate).and("_id").ne(shiftId);
+                    .and(START_DATE).gte(startDate).and("_id").nin(shiftIds);
         }
         if(isNotNull(draftShift)){
             criteria.and(DRAFT).is(draftShift);

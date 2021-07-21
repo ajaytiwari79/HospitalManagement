@@ -119,4 +119,11 @@ public class CoverShiftController {
     public ResponseEntity<Map<String, Object>> findAllShiftsByIds(@RequestBody List<BigInteger> shiftIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.findAllShiftsByIds(shiftIds));
     }
+
+    @ApiOperation("get wta details for cover shift")
+    @GetMapping(value = "/cover_shift/wta_details")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWTADetails(@RequestParam BigInteger shiftId,@RequestParam Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getWTADetails(shiftId,employmentId));
+    }
 }
