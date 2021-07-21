@@ -5,10 +5,13 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.enums.kpi.YAxisConfig;
+import com.kairos.enums.wta.WTATemplateType;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -32,5 +35,8 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService{
             }
         }
         return count;
+    }
+    private WorkTimeAgreementBalance getWorkTimeAgreementBalance(Long unitId, Long id, LocalDate startLocalDate, LocalDate endLocalDate, Set<WTATemplateType> wtaTemplateTypes, Object o) {
+        return null;
     }
 }

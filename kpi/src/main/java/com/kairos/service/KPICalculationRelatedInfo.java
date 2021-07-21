@@ -120,7 +120,7 @@ public class KPICalculationRelatedInfo {
         getActivityIdMap();
         getTimeTypeTodoList();
         updateActivityAndTimeTypeAndPlannedTimeMap();
-        planningPeriodInterval = kpiBuilderCalculationService.getPlanningPeriodMongoRepository().getPlanningPeriodIntervalByUnitId(unitId);
+        planningPeriodInterval = kpiBuilderCalculationService.getCounterHelperRepository().getPlanningPeriodIntervalByUnitId(unitId);
         getDailyTimeBankEntryByEmploymentId();
     }
 
