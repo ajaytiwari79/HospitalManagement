@@ -386,11 +386,13 @@ public class CoverShiftService {
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
         for(CoverShift coverShift:coverShifts){
+            coverShift.getRequestedStaffs().remove(staffId);
             if(!doNotAddDeclined) {
                 coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
+            }else if(doNotAddDeclined){
+                coverShift.getRequestedStaffs().put(staffId,asDate(coverShift.getDate()));
             }
             coverShift.getInterestedStaffs().remove(staffId);
-            coverShift.getRequestedStaffs().remove(staffId);
         }
         coverShiftMongoRepository.saveEntities(coverShifts);
     }
