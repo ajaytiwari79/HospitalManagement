@@ -18,6 +18,7 @@ import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.shift.CoverShiftMongoRepository;
@@ -35,6 +36,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelValidatorService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.wta.WorkTimeAgreementService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +106,7 @@ public class CoverShiftService {
     private TimeSlotMongoRepository timeSlotMongoRepository;
     @Inject
     private StaffingLevelValidatorService staffingLevelValidatorService;
+    @Inject private WorkTimeAgreementService workTimeAgreementService;
 
     //@CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
     public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId, CoverShiftSettingDTO coverShiftSettingDTO) {
@@ -407,6 +410,34 @@ public class CoverShiftService {
             coverShiftDTO.setPayOutPerShiftCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(payOutPerShift.getPayOutPerShiftCTADistributions(), PayOutCTADistributionDTO.class));
 
         }
+    }
+
+    public Map<String,ViolatedRulesDTO> getWTADetails(BigInteger shiftId,Long employmentId) {
+        Shift shift = shiftService.findOneByShiftId(shiftId);
+        shift.setEmploymentId(employmentId);
+        List<Shift> exitsingShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(employmentId,shift.getStartDate(),shift.getEndDate());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = shiftService.getStaffAdditionalInfoDTO(shift.getUnitId(), DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), shift.getEmploymentId());
+        if (staffAdditionalInfoDTO.getUserAccessRoleDTO().isStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
+        }
+        Map<String,ViolatedRulesDTO> violatedRulesDTOMap = new HashMap<>();
+        Set<BigInteger> shiftIds = new HashSet<>();
+        if(isCollectionNotEmpty(exitsingShifts)){
+            List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
+            for (Shift exitsingShift : exitsingShifts) {
+                shiftIds.add(exitsingShift.getId());
+                ViolatedRulesDTO violatedRulesDTO = shiftValidatorService.validateRule(exitsingShift, staffAdditionalInfoDTO,false);
+                workTimeAgreements.addAll(violatedRulesDTO.getWorkTimeAgreements());
+            }
+            violatedRulesDTOMap.put("violatedRulesForExistingShift",new ViolatedRulesDTO(workTimeAgreements));
+        }
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(0).getEndDate());
+        WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = organizationActivityService.getActivityWrapperMap(newArrayList(shift), null);
+        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null, activityWrapperMap, shift);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, false,shiftIds);
+        violatedRulesDTOMap.put("violatedRulesForPlannedShift",shiftWithViolatedInfoDTO.getViolatedRules());
+        return violatedRulesDTOMap;
     }
 
 }
