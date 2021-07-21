@@ -26,7 +26,6 @@ import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
-import com.kairos.persistence.repository.counter.TodoRepository;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -48,8 +47,6 @@ public class AbsencePlanningKPIService implements CounterService {
     private CounterHelperRepository counterHelperRepository;
     @Inject
     private CounterHelperService counterHelperService;
-    @Inject
-    private TodoRepository todoRepository;
 
 
     private List<CommonKpiDataUnit> getAbsencePlanningKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, ApplicableKPI applicableKPI) {
@@ -68,7 +65,7 @@ public class AbsencePlanningKPIService implements CounterService {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),new ArrayList<>(),filterBasedCriteria,true);
         DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getDefaultDataForKPI(staffEmploymentTypeDTO);
         staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
-        List<TodoDTO> todoDTOS = todoRepository.findAllByKpiFilter(unitIds.get(0), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), staffIds, todoStatus);
+        List<TodoDTO> todoDTOS = counterHelperRepository.findAllByKpiFilter(unitIds.get(0), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), staffIds, todoStatus);
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectDoubleMap = calculateDataByKpiRepresentation(staffIds, dateTimeIntervals, applicableKPI, todoDTOS, defaultKpiDataDTO.getTimeSlotDTOS());
 
         if(ObjectUtils.newHashSet(REPRESENT_PER_STAFF, REPRESENT_PER_INTERVAL, REPRESENT_TOTAL_DATA).contains(applicableKPI.getKpiRepresentation())){

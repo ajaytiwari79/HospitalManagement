@@ -150,7 +150,7 @@ public class KPISetService {
 
     public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
         List<KPISet> kpiSets = kpiSetRepository.findAllByCountryIdAndDeletedFalse(orgSubTypeIds, countryId);
-        List<PhaseDTO> unitPhaseList = counterHelperRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        List<PhaseDTO> unitPhaseList = counterHelperRepository.getPhasesByUnit(unitId);
         Map<BigInteger, PhaseDTO> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(PhaseDTO::getParentCountryPhaseId, Function.identity()));
         List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {

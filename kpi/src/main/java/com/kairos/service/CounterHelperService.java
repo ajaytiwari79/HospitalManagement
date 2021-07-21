@@ -131,7 +131,7 @@ public class CounterHelperService {
     }
     public Map[] getPhasesByDates(Long unitId, LocalDate startDate,LocalDate endDate,ZoneId timeZone,Long employementTypeId) {
         timeZone = isNull(timeZone) ? ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId)) : timeZone;
-        List<PhaseDTO> phases = counterHelperRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        List<PhaseDTO> phases = counterHelperRepository.getPhasesByUnit(unitId);
         List<PlanningPeriodDTO> planningPeriods = counterHelperRepository.findAllPlanningPeriodBetweenDatesAndUnitId(unitId,asDate(startDate),asDate(endDate));
         Map<Date,PhaseDTO> localDatePhaseStatusMap=new HashMap<>();
         Map[] phaseDetailsMap=getPhaseMap(phases);

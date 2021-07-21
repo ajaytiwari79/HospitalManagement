@@ -15,7 +15,7 @@ import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.CalculatePlannedHoursAndScheduledHours;
-import com.kairos.persistence.repository.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +34,8 @@ public class CostCalculationKPIService {
 
     @Inject
     private TimeBankService timeBankService;
-    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
+    @Inject private CounterHelperRepository counterHelperRepository;
 
   public double calculateTotalCostOfStaff(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo){
       StaffKpiFilterDTO staffKpiFilterDTO = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
@@ -50,7 +50,7 @@ public class CostCalculationKPIService {
       List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
       for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
           EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO=employmentWithCtaDetailsDTOMap.get(shiftActivityDTO.getEmploymentId());
-          CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(shiftActivityDTO.getEmploymentId(), DateUtils.asDate(shiftActivityDTO.getStartLocalDate()));
+          CTAResponseDTO ctaResponseDTO = counterHelperRepository.getCTAByEmploymentIdAndDate(shiftActivityDTO.getEmploymentId(), DateUtils.asDate(shiftActivityDTO.getStartLocalDate()));
           for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
               if (CalculationFor.BONUS_HOURS.equals(ruleTemplate.getCalculationFor())) {
                   TimeBankService.updateDayTypeDetailInCTARuletemplate(daytypesMap, ruleTemplate);

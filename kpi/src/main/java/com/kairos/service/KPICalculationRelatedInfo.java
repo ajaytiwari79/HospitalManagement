@@ -126,7 +126,7 @@ public class KPICalculationRelatedInfo {
 
     public void getActivityTodoList() {
         if (CollectionUtils.containsAny(yAxisConfigs, ObjectUtils.newHashSet(PLANNING_QUALITY_LEVEL, CalculationType.ABSENCE_REQUEST))) {
-            todoDTOS = kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS = kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByEntityIds(this.unitId,dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
         }
     }
@@ -259,7 +259,7 @@ public class KPICalculationRelatedInfo {
                     timeTypeMap = kpiBuilderCalculationService.getCounterHelperRepository().getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), filterBasedCriteria.containsKey(FilterType.TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)) : new ArrayList<>());
                     break;
                 case PLANNED_TIME:
-                    Collection<PlannedTimeType> plannedTimeTypes = kpiBuilderCalculationService.getCounterHelperRepository().getAllPlannedTimeByIds(filterBasedCriteria.containsKey(FilterType.PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PLANNED_TIME_TYPE)) : new ArrayList<>());
+                    List<PlannedTimeType> plannedTimeTypes = kpiBuilderCalculationService.getCounterHelperRepository().getAllPlannedTimeByIds(filterBasedCriteria.containsKey(FilterType.PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PLANNED_TIME_TYPE)) : new ArrayList<>());
                     plannedTimeMap = plannedTimeTypes.stream().collect(Collectors.toMap(PlannedTimeType::getId, v -> v));
                     break;
                 default:
@@ -362,15 +362,15 @@ public class KPICalculationRelatedInfo {
 
     private void getUpdateTodoStatus() {
         if(filterBasedCriteria.containsKey(FilterType.ACTIVITY_STATUS)&& !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))) {
-            todoDTOS = kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByDateTimeIntervalAndTodoStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),filterBasedCriteria.get(FilterType.ACTIVITY_STATUS));
+            todoDTOS = kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByDateTimeIntervalAndTodoStatus(this.unitId,dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),filterBasedCriteria.get(FilterType.ACTIVITY_STATUS));
         }else if(!filterBasedCriteria.containsKey(FilterType.ACTIVITY_STATUS)&& !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))){
-            todoDTOS =kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS =kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByShiftDate(this.unitId,dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         }
         else if(XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))&& CalculationType.TODO_STATUS.equals(calculationTypes.get(0))){
-            todoDTOS =kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS =kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByShiftDate(this.unitId,dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         }
         else{
-            todoDTOS=kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            todoDTOS=kpiBuilderCalculationService.getCounterHelperRepository().getAllTodoByEntityIds(this.unitId,dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         }
 
     }
