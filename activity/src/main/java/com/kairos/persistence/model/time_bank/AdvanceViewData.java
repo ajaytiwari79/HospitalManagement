@@ -19,8 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.CAMEL_CASE_MONTHLY;
 import static com.kairos.constants.AppConstants.WEEK;
 import static java.util.stream.Collectors.toList;
@@ -79,7 +78,7 @@ public class AdvanceViewData {
         }
         employmentIds = employmentDetails.stream().map(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId()).collect(toList());
         payOutPerShifts = timeBankService.getPayOutRepository().findAllByEmploymentsAndDate(employmentIds, asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())), endDate);
-        shiftQueryResultWithActivities = timeBankService.getShiftMongoRepository().findAllShiftsBetweenDurationByEmploymentIds(null,employmentIds, asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())), endDate,null);
+        shiftQueryResultWithActivities = timeBankService.getShiftMongoRepository().findAllShiftsBetweenDurationByEmploymentIds(null,employmentIds, asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())), endDate,null,newHashSet());
     }
 
     private void updateDataForTimebankView() {

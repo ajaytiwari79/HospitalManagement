@@ -31,6 +31,10 @@ public class ViolatedRulesDTO implements Serializable {
     private BigInteger overlapWithShiftId;
     private String overlapMessage;
 
+    public ViolatedRulesDTO(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {
+        this.workTimeAgreements = workTimeAgreements;
+    }
+
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
         workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());
         workTimeAgreements.sort(Comparator.comparing(WorkTimeAgreementRuleViolation::isCanBeIgnore));
