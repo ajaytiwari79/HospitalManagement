@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.kairos.enums.PublicHolidayCategory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,4 +40,5 @@ public class CountryHolidayCalenderDTO implements Serializable {
     private byte weekNumber;
     private String shortName;
     private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
+    private PublicHolidayCategory publicHolidayCategory = PublicHolidayCategory.FIXED;
 }
