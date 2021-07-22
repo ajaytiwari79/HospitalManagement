@@ -308,30 +308,36 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     private CustomAggregationOperation getCustomAggregationOperationForPlanningPeriods(Long unitId) {
         return new CustomAggregationOperation("{\n" +
-                "    \"$lookup\": {\n" +
-                "      \"from\": \"planningPeriod\",\n" +
-                "      \"let\": {\n" +
-                "        \"unitId\":" +unitId+
-                "      },\n" +
-                "      \"pipeline\": [\n" +
-                "        {\n" +
-                "          \"$match\": {\n" +
-                "            \"$expr\": {\n" +
-                "              \"$and\": [\n" +
-                "                {\n" +
-                "                  \"$eq\": [\n" +
-                "                    \"$unitId\",\n" +
-                "                    \"$$unitId\"\n" +
-                "                  ]\n" +
-                "                }\n" +
-                "              ]\n" +
+                "      \"$lookup\": {\n" +
+                "        \"from\": \"planningPeriod\",\n" +
+                "        \"let\": {\n" +
+                "          \"unitId\": "+unitId+
+                "        },\n" +
+                "        \"pipeline\": [\n" +
+                "          {\n" +
+                "            \"$match\": {\n" +
+                "              \"$expr\": {\n" +
+                "                \"$and\": [\n" +
+                "                  {\n" +
+                "                    \"$eq\": [\n" +
+                "                      \"$unitId\",\n" +
+                "                      \"$$unitId\"\n" +
+                "                    ]\n" +
+                "                  },\n" +
+                "                  {\n" +
+                "                    \"$eq\": [\n" +
+                "                      \"$deleted\",\n" +
+                "                      false\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                ]\n" +
+                "              }\n" +
                 "            }\n" +
                 "          }\n" +
-                "        }" +
-                "      ],\n" +
-                "      \"as\": \"planningPeriods\"\n" +
-                "    }\n" +
-                "  }");
+                "        ],\n" +
+                "        \"as\": \"planningPeriods\"\n" +
+                "      }\n" +
+                "    }");
     }
 
     private AggregationOperation getCustomAggregationForBreakActivities(Long unitId,Collection<Long> expertiseIds) {
