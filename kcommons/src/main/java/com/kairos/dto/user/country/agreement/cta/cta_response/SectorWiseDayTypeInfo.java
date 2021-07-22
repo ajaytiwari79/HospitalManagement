@@ -16,9 +16,4 @@ public class SectorWiseDayTypeInfo implements Serializable {
     private String holidayType;
     private LocalTime startTime;
     private LocalTime endTime;
-    private Type type=Type.FLOATING;
-
-    public enum Type {
-        FIXED,FLOATING
-    }
 }
