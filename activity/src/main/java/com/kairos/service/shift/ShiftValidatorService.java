@@ -873,6 +873,7 @@ public class ShiftValidatorService {
         }
         shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, staffAdditionalInfoDTO, shiftDataHelper, CREATE);
+        staffAdditionalInfoDTO.setDayTypes(shiftDataHelper.getDayTypes());
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO);
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
         Map<BigInteger, DayTypeDTO> dayTypeDTOMap = shiftDataHelper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
