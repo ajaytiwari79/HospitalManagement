@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.day_type;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.SectorWiseDayTypeInfo;
+import com.kairos.enums.PublicHolidayCategory;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,4 +34,5 @@ public class CountryHolidayCalender extends MongoBaseEntity {
     private DayOfWeek dayOfWeek;
     private byte weekNumber;
     private String shortName;
+    private PublicHolidayCategory publicHolidayCategory = PublicHolidayCategory.FIXED;
 }

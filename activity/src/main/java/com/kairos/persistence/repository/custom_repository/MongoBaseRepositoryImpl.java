@@ -182,7 +182,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	@Override
 	public Collection<T> findAllById(Collection<ID>  id){
 		Assert.notNull("The given sort must not be null!");
-		Query query = new Query(Criteria.where(DELETED).is(false).and("id").in(id));
+		Query query = new Query(Criteria.where(DELETED).is(false).and("_id").in(id));
 		return mongoOperations.find(query,entityInformation.getJavaType(),entityInformation.getCollectionName());
 	}
 

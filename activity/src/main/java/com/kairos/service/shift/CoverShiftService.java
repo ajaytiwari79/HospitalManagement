@@ -302,6 +302,7 @@ public class CoverShiftService {
 
         }
         coverShift.getInterestedStaffs().put(staffId, new StaffInterest(DateUtils.getDate(),staffInterest.getAccountType()));
+        coverShift.getRequestedStaffs().remove(staffId);
         coverShift.getDeclinedStaffIds().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
     }
@@ -385,11 +386,13 @@ public class CoverShiftService {
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
         for(CoverShift coverShift:coverShifts){
+            coverShift.getRequestedStaffs().remove(staffId);
             if(!doNotAddDeclined) {
                 coverShift.getDeclinedStaffIds().put(staffId, DateUtils.getDate());
+            }else if(doNotAddDeclined){
+                coverShift.getRequestedStaffs().put(staffId,asDate(coverShift.getDate()));
             }
             coverShift.getInterestedStaffs().remove(staffId);
-            coverShift.getRequestedStaffs().remove(staffId);
         }
         coverShiftMongoRepository.saveEntities(coverShifts);
     }
@@ -399,6 +402,9 @@ public class CoverShiftService {
         Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(MongoBaseEntity::getId,Function.identity()));
         for (CoverShiftDTO coverShiftDTO : coverShiftDTOS) {
             Shift shift = shiftMap.get(coverShiftDTO.getShiftId());
+            if(isNull(shift)){
+                exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, coverShiftDTO.getShiftId());
+            }
             shift.setStaffId(staffAdditionalInfoDTO.getId());
             shift.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
             DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.renewDailyTimeBank(staffAdditionalInfoDTO,shift , false);
