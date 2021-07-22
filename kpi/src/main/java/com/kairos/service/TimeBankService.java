@@ -16,12 +16,14 @@ import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.DailyTimeBankEntry;
 import com.kairos.persistence.model.ShiftDataHelper;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -41,6 +43,8 @@ import static com.kairos.enums.phase.PhaseDefaultName.*;
 
 @Service
 public class TimeBankService implements KPIService{
+
+    @Inject public CounterHelperRepository counterHelperRepository;
 
 
     public double getTotalTimeBankOrContractual(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean calculateContractual) {

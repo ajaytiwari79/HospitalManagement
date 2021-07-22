@@ -19,8 +19,6 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
-import com.kairos.persistence.repository.counter.TimeBankRepository;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -47,14 +45,10 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     @Inject
     private CounterHelperService  counterHelperService;
     @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject
-    private TimeBankRepository timeBankRepository;
 
     private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> staffIds, LocalDate startDate, LocalDate endDate, Set<DayOfWeek> daysOfWeeks) {
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, startDate,endDate);
+        List<DailyTimeBankEntry> dailyTimeBankEntries = counterHelperRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, startDate,endDate);
         List<LocalDate> localDates = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(daysOfWeeks)) {
             for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {
@@ -89,7 +83,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
          dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         staffIds=(List<Long>)kpiData[2];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+        List<Shift> shifts = counterHelperRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = plannedHoursCalculationService.calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
         Map<Object, Double> staffPlannedHoursAndTimeBankHours =calculateDataByKpiRepresentation(staffIds,dateTimeIntervals,applicableKPI,unitIds,staffKpiFilterDTOS,daysOfWeek);
        kpiDataUnits= getKpiDataUnits(staffPlannedHours,staffPlannedHoursAndTimeBankHours,applicableKPI,staffKpiFilterDTOS);
@@ -125,7 +119,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
 
     private Map<Object, Double> getstaffPlannedAndTimeBankHoursPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         Map<Object, Double> staffIdAndDeltaTimeBankMap = new HashedMap();
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(0).getEndLocalDate().minusDays(1));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = counterHelperRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(0).getEndLocalDate().minusDays(1));
         Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));

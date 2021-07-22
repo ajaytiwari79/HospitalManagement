@@ -48,8 +48,6 @@ import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 
-import com.kairos.persistence.repository.counter.TimeBankRepository;
-import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.KPIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,10 +83,6 @@ public class CounterDataService {
     private CounterServiceMapping counterServiceMapping;
     @Inject
     private ExecutorService executorService;
-    @Inject
-    private TimeBankRepository timeBankRepository;
-    @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private CounterDistService counterDistService;
     @Inject
@@ -204,7 +198,7 @@ public class CounterDataService {
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
         defaultKpiDataDTO.setDayTypeDTOS(counterHelperRepository.findAllByCountryIdAndDeletedFalse(UserContext.getUserDetails().getCountryId()));
-        defaultKpiDataDTO.setReasonCodeDTOS(counterHelperService.getReasonCodesByUnitId(refId, ReasonCodeType.FORCEPLAN));
+        defaultKpiDataDTO.setReasonCodeDTOS(counterHelperRepository.getReasonCodesByUnitId(refId, ReasonCodeType.FORCEPLAN));
         TimeSlotSetDTO timeSlotSetDTO = counterHelperRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING);
         if(ObjectUtils.isNull(timeSlotSetDTO)){
             exceptionService.dataNotFoundException(KPIMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT);
@@ -335,7 +329,7 @@ public class CounterDataService {
     }
 
     private void getTimeTypesDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
-        List<TimeTypeDTO> timeTypes = timeTypeMongoRepository.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
+        List<TimeTypeDTO> timeTypes = counterHelperRepository.getAllTimeTypesByCountryId(defaultKpiDataDTO.getCountryId());
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(timeType.getId().longValue(), timeType.getLabel())));
         criteriaList.add(new FilterCriteria(TIME_TYPE.getValue(), TIME_TYPE, (List) kpiFilterDefaultDataDTOS));

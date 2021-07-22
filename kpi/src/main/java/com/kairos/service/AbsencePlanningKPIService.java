@@ -203,11 +203,13 @@ public class AbsencePlanningKPIService implements CounterService {
 
     @Override
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
+        //it is not the part of fibonacci
         return null;
     }
 
     @Override
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, KPI kpi, ApplicableKPI applicableKPI) {
+        //it is not the part of fibonacci
         return new TreeSet<>();
     }
 }

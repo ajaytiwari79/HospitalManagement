@@ -57,7 +57,7 @@ public class CostCalculationKPIService {
                   boolean valid = timeBankService.validateCTARuleTemplate(ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), ObjectUtils.newHashSet(shiftActivityDTO.getActivityId()), ObjectUtils.newHashSet(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId()), shiftActivityDTO.getPlannedTimes());
                   boolean dayTypeValid = timeBankService.isDayTypeValid(shiftActivityDTO.getStartDate(), ruleTemplate, dayTypeDTOMap);
                   if (valid && dayTypeValid) {
-                      totalCtaBonus += new CalculatePlannedHoursAndScheduledHours(timeBankService,new HashMap<>(),null).getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
+                      totalCtaBonus += new CalculatePlannedHoursAndScheduledHours(timeBankService).getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
                   }
               }
           }

@@ -42,20 +42,14 @@ public class TimeBankKpiCalculationService implements CounterService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
     private CounterHelperRepository counterHelperRepository;
     @Inject
     private TimeBankService timeBankService;
     @Inject
-    public TimeBankRepository timeBankRepository;
-    @Inject
     public CounterHelperService counterHelperService;
 
     private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> employmentIds, LocalDate startDate, LocalDate endDate, Set<DayOfWeek> daysOfWeeks) {
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByIdsAndBetweenDates(employmentIds, DateUtils.asDate(startDate), DateUtils.asDate(endDate));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = counterHelperRepository.findAllDailyTimeBankByIdsAndBetweenDates(employmentIds, DateUtils.asDate(startDate), DateUtils.asDate(endDate));
         List<LocalDate> localDates = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(daysOfWeeks)) {
             for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {

@@ -22,8 +22,6 @@ import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
 import com.kairos.persistence.model.Shift;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
-import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,10 +41,6 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
 
     @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private CounterHelperRepository counterHelperRepository;
     @Inject
@@ -69,7 +63,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters((List<Long>) kpiData[2], ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+        List<Shift> shifts = counterHelperRepository.findShiftsByKpiFilters((List<Long>) kpiData[2], ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = plannedHoursCalculationService.calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
         Map<Object, Double> staffContractualAndPlannedHours = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI ,staffKpiFilterDTOS);
         kpiDataUnits = getKpiDataUnits(staffPlannedHours,staffContractualAndPlannedHours,applicableKPI,staffKpiFilterDTOS);

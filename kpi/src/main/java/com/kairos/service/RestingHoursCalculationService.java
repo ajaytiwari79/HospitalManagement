@@ -19,8 +19,7 @@ import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
 import com.kairos.persistence.model.Shift;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
-import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -36,11 +35,8 @@ import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 @Service
 public class RestingHoursCalculationService implements CounterService {
     @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
     private CounterHelperService counterHelperService;
+    @Inject private CounterHelperRepository counterHelperRepository;
 
     public double getTotalRestingHours(List<Shift> shifts, LocalDate startDate, LocalDate endDate) {
         //all shifts should be sorted on startDate
@@ -58,7 +54,7 @@ public class RestingHoursCalculationService implements CounterService {
 
     public Map<Object, Double> calculateRestingHours(List<Long> staffIds, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals) {
         Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap = new HashMap<>();
-        List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
+        List<Shift> shifts = counterHelperRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
@@ -116,7 +112,7 @@ public class RestingHoursCalculationService implements CounterService {
         Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds, ObjectUtils.newArrayList(), ObjectUtils.newArrayList(organizationId),organizationId);
         staffIds = (List<Long>)kpiData[2];
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
-        List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
+        List<Shift> shifts = counterHelperRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(staffIds, null, dateTimeIntervals, applicableKPI, shifts);
         return restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
     }

@@ -18,8 +18,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.*;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
-import com.kairos.persistence.repository.counter.TimeTypeMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
 import com.kairos.utils.KPIUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -37,10 +36,7 @@ import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 public class PlannedHoursCalculationService implements CounterService {
     @Inject
     private CounterHelperService counterHelperService;
-    @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
+    @Inject private CounterHelperRepository counterHelperRepository;
 
 
     public double getPlannedHoursOfStaff(List<Shift> shifts) {
@@ -74,9 +70,9 @@ public class PlannedHoursCalculationService implements CounterService {
         List<String> shiftActivityStatus = (filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) != null) ? filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) : new ArrayList<>();
         if (filterBasedCriteria.containsKey(FilterType.TIME_TYPE) && ObjectUtils.isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE))) {
             if (filterBasedCriteria.get(FilterType.TIME_TYPE).get(0) instanceof String) {
-                timeTypeIds = timeTypeMongoRepository.findTimeTypeIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
+                timeTypeIds = counterHelperRepository.findTimeTypeIdssByTimeTypeEnum(filterBasedCriteria.get(FilterType.TIME_TYPE));
             } else {
-                timeTypeIds = timeTypeMongoRepository.findAllTimeTypeIdsByTimeTypeIds(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
+                timeTypeIds = counterHelperRepository.findAllTimeTypeIdsByTimeTypeIds(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
                 timeTypeIds.addAll(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
             }
         }
@@ -84,7 +80,7 @@ public class PlannedHoursCalculationService implements CounterService {
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+        List<Shift> shifts = counterHelperRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
         getKpiDataUnits(multiplicationFactor, staffPlannedHours, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
         KPIUtils.sortKpiDataByDateTimeInterval(kpiDataUnits);
@@ -179,7 +175,7 @@ public class PlannedHoursCalculationService implements CounterService {
         Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI, filterDates, staffIds, ObjectUtils.newArrayList(), ObjectUtils.newArrayList(organizationId), organizationId);
         staffIds = (List<Long>) kpiData[2];
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.newArrayList(organizationId), ObjectUtils.newArrayList(), ObjectUtils.newHashSet(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+        List<Shift> shifts = counterHelperRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.newArrayList(organizationId), ObjectUtils.newArrayList(), ObjectUtils.newHashSet(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         return getStaffPlannedHoursByRepresentPerStaff(staffIds, shifts);
     }
 

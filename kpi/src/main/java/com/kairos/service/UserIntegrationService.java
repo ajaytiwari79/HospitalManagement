@@ -1,6 +1,7 @@
 package com.kairos.service;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
@@ -22,8 +23,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.KPIMessagesConstants.MESSAGE_STAFF_NOT_FOUND_BY_USER;
@@ -126,6 +129,16 @@ public class UserIntegrationService {
     }
     public String getTimeZoneByUnitId(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, UNIT_TIMEZONE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        });
+    }
+
+    public Set<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
+        Set<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Object>>>() {});
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(data,LocalDate.class);
+    }
+
+    public List<StaffDTO> getStaffByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_STAFF_BY_UNITID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 }

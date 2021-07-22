@@ -127,37 +127,4 @@ public class GenericRestClient {
             }
         return path;
     }
-
-
-    public static <T> String getURI(T t, String uri, Map<String, Object> queryParams) {
-        URIBuilder builder = new URIBuilder();
-
-        if (Optional.ofNullable(queryParams).isPresent()) {
-            queryParams.entrySet().forEach(e -> {
-                builder.addParameter(e.getKey(), e.getValue().toString());
-            });
-        }
-        try {
-            uri = uri + builder.build().toString();
-        } catch (URISyntaxException e) {
-            logger.error(e.getMessage());
-        }
-        return uri;
-    }
-
-    //TODO Remove
-    public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
-        switch (integrationOperation) {
-            case CREATE:
-                return HttpMethod.POST;
-            case DELETE:
-                return HttpMethod.DELETE;
-            case UPDATE:
-                return HttpMethod.PUT;
-            case GET:
-                return HttpMethod.GET;
-            default:
-                return null;
-        }
-    }
 }

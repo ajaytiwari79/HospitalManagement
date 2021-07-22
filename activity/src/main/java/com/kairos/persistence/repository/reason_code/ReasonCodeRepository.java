@@ -21,15 +21,8 @@ public interface ReasonCodeRepository extends MongoBaseRepository<ReasonCode,Big
 
     List<ReasonCodeDTO> findByUnitIdAndReasonCodeTypeAndDeletedFalse(long unitId, ReasonCodeType reasonCodeType);
 
-    List<ReasonCodeDTO> findByUnitIdInAndReasonCodeType(List<Long> unitId, ReasonCodeType reasonCodeType);
-
-    //List<ReasonCodeDTO> findAllByUnitIdAndDeletedFalseOrderByCreatedAt(long orgId);
     @Query(value = "{'unitId':?0,deleted:false,_id:{$ne:?4},reasonCodeType:?2,$or:[{name:?1},{code:?3}]}",exists = true)
     boolean existsByUnitIdAndNameOrReasonCodeTypeOrCodeAndIdNotIn(Long unitId,  String name, ReasonCodeType reasonCodeType,String code,BigInteger reasonCodeId);
-
-    //ReasonCode findByUnitIdAndReasonCodeAndDeletedFalse(long unitId, long reasonCodeId);
-
-    //List<ReasonCode> findByIdInAndDeletedFalse(Set<Long> reasonCodeIds);
 
     boolean existsByTimeTypeIdAndDeletedFalse(BigInteger timeTypeId);
 

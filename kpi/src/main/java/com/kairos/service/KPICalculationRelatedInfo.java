@@ -9,10 +9,7 @@ import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.shift.AuditShiftDTO;
-import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
-import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
@@ -94,10 +91,10 @@ public class KPICalculationRelatedInfo {
     private Set<Long> tagIds = new HashSet<>();
     private Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndActivityTodoListMap = new HashMap<>();
     private Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndTimeTypeTodoListMap = new HashMap<>();
-    private Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityIdAndShiftMap = new HashMap<>();
-    private Map<Long,Map<BigInteger,List<Shift>>> staffIdAndTimeTypeIdAndShiftMap = new HashMap<>();
-    private Map<BigInteger,List<Shift>> activityIdAndShiftListMap =new HashMap<>();
-    private Map<BigInteger,List<Shift>> timeTypeIdAndShiftListMap =new HashMap();
+    private Map<Long,Map<BigInteger,List<ShiftDTO>>> staffIdAndActivityIdAndShiftMap = new HashMap<>();
+    private Map<Long,Map<BigInteger,List<ShiftDTO>>> staffIdAndTimeTypeIdAndShiftMap = new HashMap<>();
+    private Map<BigInteger,List<ShiftDTO>> activityIdAndShiftListMap =new HashMap<>();
+    private Map<BigInteger,List<ShiftDTO>> timeTypeIdAndShiftListMap =new HashMap();
 
     public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi,KPIBuilderCalculationService kpiBuilderCalculationService) {
         this.kpiBuilderCalculationService = kpiBuilderCalculationService;
@@ -148,11 +145,11 @@ public class KPICalculationRelatedInfo {
 
     }
 
-    public void updateActivityIdShiftListMap(Map<BigInteger,List<TodoDTO>> activityIdTodoListMap, Map<BigInteger,List<Shift>> ActivityIdShiftListMap ){
+    public void updateActivityIdShiftListMap(Map<BigInteger,List<TodoDTO>> activityIdTodoListMap, Map<BigInteger,List<ShiftDTO>> ActivityIdShiftListMap ){
         if(CalculationType.TODO_STATUS.equals(calculationTypes.get(0))) {
             for (Map.Entry<BigInteger, List<TodoDTO>> entry : activityIdTodoListMap.entrySet()) {
                 List<BigInteger> shiftIds = entry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
-                List<Shift> shiftList = kpiBuilderCalculationService.getShiftMongoRepository().findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+                List<ShiftDTO> shiftList = kpiBuilderCalculationService.getCounterHelperRepository().findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
                 ActivityIdShiftListMap.put(entry.getKey(), shiftList);
 
             }
@@ -173,13 +170,13 @@ public class KPICalculationRelatedInfo {
         return staffIdAndBigIntegerTodoListMap;
     }
 
-    private Map<Long, Map<BigInteger, List<Shift>>> getStaffIdAndActivityIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdActivityIdTodoListMap) {
-        Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityAndShiftMap = new HashMap<>();
-        Map<BigInteger,List<Shift>> activityIdShiftListMap = new HashMap<>();
+    private Map<Long, Map<BigInteger, List<ShiftDTO>>> getStaffIdAndActivityIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdActivityIdTodoListMap) {
+        Map<Long,Map<BigInteger,List<ShiftDTO>>> staffIdAndActivityAndShiftMap = new HashMap<>();
+        Map<BigInteger,List<ShiftDTO>> activityIdShiftListMap = new HashMap<>();
         for(Map.Entry<Long,Map<BigInteger,List<TodoDTO>>> entry :staffIdActivityIdTodoListMap.entrySet()){
             for(Map.Entry<BigInteger,List<TodoDTO>> bigIntegerListEntry :entry.getValue().entrySet()){
                 List<BigInteger> shiftIds =bigIntegerListEntry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
-                List<Shift> shiftList =kpiBuilderCalculationService.getShiftMongoRepository().findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+                List<ShiftDTO> shiftList =kpiBuilderCalculationService.getCounterHelperRepository().findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
                 activityIdShiftListMap.put(bigIntegerListEntry.getKey(),shiftList);
             }
             staffIdAndActivityAndShiftMap.put(entry.getKey(),activityIdShiftListMap);
@@ -332,10 +329,10 @@ public class KPICalculationRelatedInfo {
         if (!CollectionUtils.containsAny(ObjectUtils.newHashSet(CalculationType.DELTA_TIMEBANK, CalculationType.ACTUAL_TIMEBANK, CalculationType.STAFF_AGE, CalculationType.STAFFING_LEVEL_CAPACITY), calculationTypes)) {
             List<String> validKPIS = ObjectUtils.newArrayList(CalculationType.PRESENCE_UNDER_STAFFING.toString(), CalculationType.PRESENCE_OVER_STAFFING.toString(), CalculationType.ABSENCE_UNDER_STAFFING.toString(), CalculationType.ABSENCE_OVER_STAFFING.toString());
             if (filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(validKPIS, filterBasedCriteria.get(FilterType.CALCULATION_TYPE))) {
-                List<Shift> shiftData = kpiBuilderCalculationService.getShiftMongoRepository().findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : ObjectUtils.newArrayList(organizationId));
+                List<Shift> shiftData = kpiBuilderCalculationService.getCounterHelperRepository().findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : ObjectUtils.newArrayList(organizationId));
                 shifts = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftData, ShiftWithActivityDTO.class);
             } else {
-                shifts = kpiBuilderCalculationService.getShiftMongoRepository().findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), false);
+                shifts = kpiBuilderCalculationService.getCounterHelperRepository().findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), false);
                 StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
                 shifts = kpiBuilderCalculationService.getCounterHelperService().getShiftsByFilters(shifts, staffFilterDTO, staffKpiFilterDTOS);
             }
@@ -483,7 +480,7 @@ public class KPICalculationRelatedInfo {
 
     private void getDailyTimeBankEntryByDate() {
         if(CollectionUtils.containsAny(ObjectUtils.newHashSet(CalculationType.DELTA_TIMEBANK, CalculationType.ACTUAL_TIMEBANK, CalculationType.STAFFING_LEVEL_CAPACITY), calculationTypes)) {
-            dailyTimeBankEntries = kpiBuilderCalculationService.getTimeBankRepository().findAllDailyTimeBankByIdsAndBetweenDates(employmentIds, startDate, endDate);
+            dailyTimeBankEntries = kpiBuilderCalculationService.getCounterHelperRepository().findAllDailyTimeBankByIdsAndBetweenDates(employmentIds, startDate, endDate);
         }
         if (ObjectUtils.isCollectionNotEmpty(daysOfWeeks)) {
             dailyTimeBankEntries = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> daysOfWeeks.contains(dailyTimeBankEntry.getDate().getDayOfWeek())).collect(Collectors.toList());
@@ -503,7 +500,7 @@ public class KPICalculationRelatedInfo {
     }
 
     private void getDailyTimeBankEntryByEmploymentId() {
-        dailyTimeBankEntries = kpiBuilderCalculationService.getTimeBankRepository().findAllByEmploymentIdsAndBeforDate(new ArrayList<>(employmentIds), planningPeriodInterval.getEndDate());
+        dailyTimeBankEntries = kpiBuilderCalculationService.getCounterHelperRepository().findAllByEmploymentIdsAndBeforDate(new ArrayList<>(employmentIds), planningPeriodInterval.getEndDate());
         employmentIdAndDailyTimebankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toCollection(ArrayList::new)));
     }
 

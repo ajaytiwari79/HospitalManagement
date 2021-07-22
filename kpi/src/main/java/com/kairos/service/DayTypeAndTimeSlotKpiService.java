@@ -27,7 +27,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
+import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -47,9 +47,8 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
     private CounterHelperService counterHelperService;
+    @Inject private CounterHelperRepository counterHelperRepository;
 
     // use for calculate hours of given days of daytype
     private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Day> days) {
@@ -133,7 +132,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         Set<DayOfWeek> daysOfWeek = counterHelperService.getDayOfWeek(dayTypeIds,daysTypeIdAndDayTypeMap);
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),null);
+        List<ShiftWithActivityDTO> shifts = counterHelperRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),null);
         Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));

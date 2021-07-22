@@ -32,8 +32,6 @@ import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.*;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
-import com.kairos.persistence.repository.counter.ShiftMongoRepository;
-import com.kairos.persistence.repository.counter.TimeBankRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
 import com.kairos.utils.KPIUtils;
 import lombok.Builder;
@@ -66,8 +64,6 @@ import static java.util.Map.Entry.comparingByKey;
 public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
     private CounterHelperService counterHelperService;
     @Inject
     private UserIntegrationService userIntegrationService;
@@ -75,8 +71,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private ExceptionService exceptionService;
     @Inject
     private CostCalculationKPIService costCalculationKPIService;
-    @Inject
-    private TimeBankRepository timeBankRepository;
     @Inject
     private TimeBankService timeBankService;
     @Inject
@@ -601,7 +595,7 @@ public class KPIBuilderCalculationService implements CounterService {
             for (ShiftWithActivityDTO shift : shifts) {
                 List<ShiftActivityDTO> shiftActivitys = shift.getActivities();
                 if (excludeBreak) {
-                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankService,new HashMap<>(),null).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
+                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankService).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
                 }
                 shiftActivityDTOS.addAll(shiftActivitys.stream().filter(shiftActivityDTO -> isShiftActivityValid(shiftActivityDTO)).collect(Collectors.toList()));
             }

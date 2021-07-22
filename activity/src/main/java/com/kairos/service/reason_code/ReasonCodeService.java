@@ -62,10 +62,6 @@ public class ReasonCodeService {
          return reasonCodeRepository.findByUnitIdAndReasonCodeTypeAndDeletedFalse(unitId, reasonCodeType);
     }
 
-    public List<ReasonCodeDTO> getReasonCodesByUnitIds(List<Long> unitIds, ReasonCodeType reasonCodeType) {
-        return reasonCodeRepository.findByUnitIdInAndReasonCodeType(unitIds, reasonCodeType);
-    }
-
     public ReasonCodeDTO updateReasonCodeForCountry(long countryId, ReasonCodeDTO reasonCodeDTO) {
         boolean isNameAlreadyExists = reasonCodeRepository.existsByCountryIdAndIdNotInAndNameOrReasonCodeTypeOrCode(countryId, reasonCodeDTO.getId(), "(?i)" + reasonCodeDTO.getName(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode());
         if (isNameAlreadyExists) {

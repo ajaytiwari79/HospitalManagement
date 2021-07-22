@@ -26,43 +26,6 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
 
     }
 
-    //
-    public boolean hasPermission() {
-        OAuth2Authentication oAuth2Authentication= (OAuth2Authentication)this.authentication;
-        Set<String> authorities= AuthorityUtils.authorityListToSet(oAuth2Authentication.getUserAuthentication().getAuthorities());
-        CurrentUserDetails currentUserDetails= UserContext.getUserDetails();
-        Long organizationId = extractIdOrgIdFromUrl();
-        Assert.notNull(currentUserDetails,"User can not be null");
-        Assert.notNull(UserContext.getTabId(),"Tab id can not be null");
-        Assert.notNull(organizationId,"Organization id can not be null");
-        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest req = sra.getRequest();
-        String permissionString;
-
-        if("GET".equals(req.getMethod())){
-            permissionString = organizationId + "_" + UserContext.getTabId() + "_" + "r";
-        } else {
-            permissionString = organizationId + "_" + UserContext.getTabId() + "_" + "rw";
-        }
-        Optional<String> permission = authorities.stream().filter(s -> s.startsWith(permissionString)).findFirst();
-
-        return permission.isPresent();
-    }
-
-    private Long extractIdOrgIdFromUrl(){
-
-
-        if(Optional.ofNullable(UserContext.getUnitId()).isPresent()){
-            return UserContext.getUnitId();
-        } else if(Optional.ofNullable(UserContext.getOrgId()).isPresent()){
-            return UserContext.getOrgId();
-        }else {
-            return null;
-        }
-    }
-
-    //
-
     @Override
     public Object getFilterObject() {
         return this.filterObject;
