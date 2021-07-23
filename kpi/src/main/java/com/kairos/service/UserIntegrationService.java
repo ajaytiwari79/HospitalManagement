@@ -1,6 +1,7 @@
 package com.kairos.service;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
@@ -14,16 +15,20 @@ import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.team.TeamDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.AccessGroupKPIEntry;
 import com.kairos.persistence.model.ExceptionService;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -140,5 +145,11 @@ public class UserIntegrationService {
     public List<StaffDTO> getStaffByUnitId(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_STAFF_BY_UNITID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
+    }
+    public StaffAdditionalInfoDTO getStaffDetailsForBalances(Long unitId, LocalDate localDate,Long employmentId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("startDate", localDate != null ? localDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_DETAILS_FOR_BALANCES_BY_EMPLOYMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        }, employmentId);
     }
 }

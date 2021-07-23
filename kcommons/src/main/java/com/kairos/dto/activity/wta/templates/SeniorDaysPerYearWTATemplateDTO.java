@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,7 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
     @NotNullOrEmpty(message = "message.mismatched-ids")
     private List<BigInteger> activityIds;
     private CutOffIntervalUnit cutOffIntervalUnit;
+    private List<ActivityCutOffCount> activityCutOffCounts = new ArrayList<>();
     public float getRecommendedValue() {
         return recommendedValue;
     }
