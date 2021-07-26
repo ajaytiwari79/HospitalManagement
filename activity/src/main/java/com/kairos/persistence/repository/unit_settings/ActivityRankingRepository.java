@@ -25,15 +25,7 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
 
     List<ActivityRanking> getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
 
-    List<ActivityRankingDTO> getActivityRankingByExpertiseIdAndDeletedFalse(Long expertiseId);
-
-    List<ActivityRankingDTO> getActivityRankingByExpertiseIdAndPublishedAndDeletedFalse(Long expertiseId, Boolean published);
-
-    List<ActivityRankingDTO> getActivityRankingByDeletedFalse();
-
     ActivityRanking findByDraftIdAndDeletedFalse(BigInteger draftId);
-
-    ActivityRanking findTopByExpertiseIdAndDeletedFalseAndPublishedTrueOrderByStartDateDesc(Long expertiseId);
 
     List<ActivityRanking> getActivityRankingSettingsByUnitIdAndDeletedFalse(Long unitId);
 
@@ -47,6 +39,7 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
     @Query("{'deleted':false, 'published':false,'_id':{'$in':?0}}")
     List<ActivityRanking> getAllDraftByIds(List<BigInteger> deleteDraftCopy);
 
-    //List<ActivityRanking> findAllByExpertiseIdInAndDeletedFalseAndEndDateGreaterThanEquals(List<Long> expertiseIds, LocalDate startDate);
+    @Query("{countryId:?0, deleted:false, published:true,expertiseId:{$exists:true}}")
+    List<ActivityRanking> getCurrentlyActiveActivityRankingSettings(Long countryId);
 
 }
