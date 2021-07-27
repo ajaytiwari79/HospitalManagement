@@ -5,6 +5,7 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
@@ -554,5 +555,10 @@ public class ActivityRankingService {
             }
         }
         return true;
+    }
+
+    public Map<Long, List<ActivityRanking>> getAllAbsenceActivitiesRanking(Long countryId) {
+        List<ActivityRanking> activityRankingList = activityRankingRepository.getCurrentlyActiveActivityRankingSettings(countryId);
+        return activityRankingList.stream().collect(Collectors.groupingBy(ActivityRanking::getExpertiseId));
     }
 }
