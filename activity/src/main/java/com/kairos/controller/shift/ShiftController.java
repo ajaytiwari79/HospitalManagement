@@ -292,8 +292,8 @@ public class ShiftController {
     @ApiOperation("update a break interrupt")
     @PutMapping(value = "/shift/break_interrupt/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId, @RequestParam("breakAction") BreakAction breakAction) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId, breakAction));
+    public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId, @RequestParam("breakAction") BreakAction breakAction, @RequestParam(value = "breakId", required = false) BigInteger breakId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId, breakAction, breakId));
     }
 
     @ApiOperation("update status of absence request")
