@@ -93,8 +93,8 @@ public class CoverShiftController {
     @ApiOperation("update cover shift setting by unit")
     @PutMapping(value = "/remove_interest/{id}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> removeInterestInCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId,@RequestParam(value = "selectedDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedDate) {
-        coverShiftService.notInterestInCoverShift(id,staffId,selectedDate);
+    public ResponseEntity<Map<String, Object>> removeInterestInCoverShiftByShiftId(@PathVariable BigInteger id,@RequestParam("staffId") Long staffId,@RequestParam(value = "selectedDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedDate,@RequestParam(value = "doNotAddDeclined",required = false) boolean doNotAddDeclined) {
+        coverShiftService.notInterestInCoverShift(id,staffId,selectedDate,doNotAddDeclined);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
@@ -118,5 +118,12 @@ public class CoverShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> findAllShiftsByIds(@RequestBody List<BigInteger> shiftIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.findAllShiftsByIds(shiftIds));
+    }
+
+    @ApiOperation("get wta details for cover shift")
+    @GetMapping(value = "/cover_shift/wta_details")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWTADetails(@RequestParam BigInteger shiftId,@RequestParam Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getWTADetails(shiftId,employmentId));
     }
 }

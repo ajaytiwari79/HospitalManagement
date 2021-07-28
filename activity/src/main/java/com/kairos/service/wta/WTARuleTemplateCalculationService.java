@@ -181,7 +181,7 @@ public class WTARuleTemplateCalculationService {
         for (WTAQueryResultDTO workingTimeAgreement : workingTimeAgreements) {
             if(isCollectionNotEmpty(workingTimeAgreement.getRuleTemplates())){
                 DateTimeInterval dateTimeInterval = new DateTimeInterval(workingTimeAgreement.getStartDate(), isNotNull(workingTimeAgreement.getEndDate()) ? workingTimeAgreement.getEndDate() : endDate);
-                dateTimeIntervalListMap.put(dateTimeInterval, workingTimeAgreement.getRuleTemplates().stream().map(wtaBaseRuleTemplate -> (DurationBetweenShiftsWTATemplate) wtaBaseRuleTemplate).collect(Collectors.toList()));
+                dateTimeIntervalListMap.put(dateTimeInterval, workingTimeAgreement.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> wtaBaseRuleTemplate instanceof DurationBetweenShiftsWTATemplate).map(wtaBaseRuleTemplate -> (DurationBetweenShiftsWTATemplate) wtaBaseRuleTemplate).collect(Collectors.toList()));
             }
         }
         return dateTimeIntervalListMap;

@@ -1,10 +1,12 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.kairos.enums.PublicHolidayCategory;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -34,5 +36,9 @@ public class CountryHolidayCalenderDTO implements Serializable {
     private boolean allowTimeSettings;
     private DayTypeDTO dayTypeDTO;
     private Long countryId;
+    private DayOfWeek dayOfWeek;
+    private byte weekNumber;
+    private String shortName;
     private List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfo;
+    private PublicHolidayCategory publicHolidayCategory = PublicHolidayCategory.FIXED;
 }

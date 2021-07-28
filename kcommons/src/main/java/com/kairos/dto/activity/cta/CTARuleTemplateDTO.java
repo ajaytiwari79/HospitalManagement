@@ -79,6 +79,7 @@ public class CTARuleTemplateDTO {
     private Long countryId;
     private Long unitId;
     private Map<String, TranslationInfo> translations;
+    private boolean notApplicableForSunday; // this is for getting  compensation on sunday
 
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {

@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_V1)
@@ -83,6 +84,12 @@ public class ActivityRankingController {
     @PostMapping(value =  "/country/{countryId}/create_activity_ranking")
     public ResponseEntity<Map<String, Object>> createAbsenceRanking(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.createAbsenceRanking(countryId));
+    }
+
+    @ApiOperation(value = "get  all absence ranking")
+    @GetMapping(value = COUNTRY_URL + "/absence_activity_ranking")
+    public ResponseEntity<Map<String, Object>> getAllAbsenceActivitiesRanking(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityRankingService.getAllAbsenceActivitiesRanking(countryId));
     }
 
 }

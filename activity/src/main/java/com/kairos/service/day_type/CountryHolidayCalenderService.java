@@ -50,8 +50,6 @@ public class CountryHolidayCalenderService {
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryHolidayCalender.setCountryId(countryId);
         countryCalenderRepo.save(countryHolidayCalender);
-        DayType dayType=dayTypeRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
-        countryHolidayCalenderDTO.setHolidayType(dayType.isHolidayType());
         countryHolidayCalenderDTO.setId(countryHolidayCalender.getId());
         protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO),null,countryId);
         return countryHolidayCalenderDTO;
@@ -60,14 +58,8 @@ public class CountryHolidayCalenderService {
     @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public CountryHolidayCalenderDTO updateCountryCalender(CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         LOGGER.info("Data Received: " + countryHolidayCalenderDTO);
-        CountryHolidayCalender calender = countryCalenderRepo.findOne(countryHolidayCalenderDTO.getId());
-        calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
-        calender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());
-        calender.setDescription(countryHolidayCalenderDTO.getDescription());
-        calender.setDayTypeId(countryHolidayCalenderDTO.getDayTypeId());
-        calender.setStartTime(countryHolidayCalenderDTO.getStartTime());
-        calender.setEndTime(countryHolidayCalenderDTO.getEndTime());
-        countryCalenderRepo.save(calender);
+        CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
+        countryCalenderRepo.save(countryHolidayCalender);
         return countryHolidayCalenderDTO;
     }
 
@@ -76,6 +68,7 @@ public class CountryHolidayCalenderService {
         CountryHolidayCalender calender = countryCalenderRepo.findOne(id);
         if (calender != null) {
             calender.setEnabled(false);
+            calender.setDeleted(true);
             countryCalenderRepo.save(calender);
             return true;
         }

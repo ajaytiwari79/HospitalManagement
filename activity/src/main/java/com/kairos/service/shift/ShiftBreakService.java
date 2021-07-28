@@ -268,7 +268,7 @@ public class ShiftBreakService implements KPIService {
         return breakAvailabilitySettings;
     }
 
-    public boolean interruptBreak(BigInteger shiftId, BreakAction breakAction) {
+    public boolean interruptBreak(BigInteger shiftId, BreakAction breakAction, BigInteger breakId) {
         Shift shift = shiftMongoRepository.findById(shiftId).orElseThrow(() -> new DataNotFoundByIdException(convertMessage(MESSAGE_SHIFT_ID, shiftId)));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         if (TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) {
@@ -277,7 +277,15 @@ public class ShiftBreakService implements KPIService {
                     shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(true));
                     break;
                 case NOT_HELD:
-                    shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakNotHeld(true));
+                    if(isNotNull(breakId)){
+                        shift.getBreakActivities().forEach(shiftActivity -> {
+                            if(shiftActivity.getId().equals(breakId)) {
+                                shiftActivity.setBreakNotHeld(true);
+                            }
+                        });
+                    } else {
+                        shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakNotHeld(true));
+                    }
                     break;
                 case UNINTERRUPT:
                     shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(false));
