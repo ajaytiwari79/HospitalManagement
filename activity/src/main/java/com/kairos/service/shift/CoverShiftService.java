@@ -306,6 +306,7 @@ public class CoverShiftService {
     public List<ShiftWithViolatedInfoDTO> assignCoverShiftToStaff(BigInteger id, Long staffId, Long employmentId) {
         ShiftDTO shift = shiftMongoRepository.findByIdAndDeletedFalse(id);
         CoverShift coverShift = coverShiftMongoRepository.findByShiftIdAndStaffIdAndDeletedFalse(id, shift.getStaffId());
+
         if (isNull(coverShift)) {
             exceptionService.actionNotPermittedException(MESSAGE_DATA_NOTFOUND, COVER_SHIFT);
         }
