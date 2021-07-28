@@ -34,7 +34,7 @@ public class CoverShiftController {
     @ApiOperation("get eligible staffs")
     @PostMapping(value = "/get_eligible_staffs")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getEligibleStaffs(@PathVariable Long unitId, @RequestParam BigInteger shiftId, @RequestBody CoverShiftSetting coverShiftSetting) {
+    public ResponseEntity<Map<String, Object>> getEligibleStaffs(@RequestParam BigInteger shiftId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId));
     }
 
