@@ -54,7 +54,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         WorkTimeAgreementBalancesCalculationService workTimeAgreementService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
-        if (isCollectionNotEmpty(activityIds) && !isDisabled() && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) {
+        if (isCollectionNotEmpty(activityIds) && infoWrapper.getActivityWrapperMap().containsKey(activityIds.get(0)) && !isDisabled() && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) {
             CareDaysDTO careDays = getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
