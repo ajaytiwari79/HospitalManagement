@@ -26,6 +26,10 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    private boolean staffCanIgnoreForWeeklyEmployment;
+    private boolean managementCanIgnoreForWeeklyEmployment;
+    private Integer factorOfWeeklyEmploymentForStaff;
+    private Integer factorOfWeeklyEmploymentForManagement;
 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
