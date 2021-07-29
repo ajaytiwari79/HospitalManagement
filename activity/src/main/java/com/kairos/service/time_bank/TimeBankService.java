@@ -245,6 +245,16 @@ public class TimeBankService implements KPIService {
         return dailyTimeBankEntry;
     }
 
+    public DailyTimeBankEntry calculateTimeBankForCoverShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift){
+        DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
+        DateTime endDate = startDate.plusDays(1);
+        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null, organizationActivityService.getActivityWrapperMap(newArrayList(shift), null), shift);
+        DateTimeInterval interval = new DateTimeInterval(startDate.getMillis(), endDate.getMillis());
+        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(shift.getUnitId());
+        DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getStaffId(), asLocalDate(shift.getStartDate()));
+        return timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, newArrayList(shiftWithActivityDTO), dailyTimeBankEntry, planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), false);
+    }
+
     private void resetCTARelatedData(ShiftActivityDTO shiftActivityDTO) {
         shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
         shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());

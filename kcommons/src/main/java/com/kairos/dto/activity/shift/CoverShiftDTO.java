@@ -2,6 +2,7 @@ package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
+import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +29,7 @@ public class CoverShiftDTO {
     private int deltaTimeBankMinutes;
     private long totalPayOutMinutes;
     private List<PayOutPerShiftCTADistributionDTO> payOutPerShiftCTADistributions = new ArrayList<>();
-    private List<TimeBankCTADistributionDTO> timeBankCTADistributionList=new ArrayList<>();
+    private List<TimeBankDistributionDTO> timeBankCTADistributionList=new ArrayList<>();
 
     private enum ApprovalBy{
         SELF,AUTO_PICK,PLANNER

@@ -117,6 +117,16 @@ public class PayOutService {
         //shiftMongoRepository.save(shift);
     }
 
+    public PayOutPerShift updatePayOutForCoverShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        updateActivityWrapper(shift,activityWrapperMap);
+        ZonedDateTime startDate = DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDate = startDate.plusDays(1);
+        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+        ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift,activityWrapperMap);
+        PayOutPerShift payOutPerShift = new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId());
+        return payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shiftWithActivityDTO, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
+    }
+
     private void updatePayoutDetailInShift(ShiftWithActivityDTO shiftWithActivityDTO,Shift shift){
         int totalPlannerMinutesOfPayout = updatePayDetailsInShiftActivity(shiftWithActivityDTO.getActivities(), shift.getActivities());
         shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+totalPlannerMinutesOfPayout);
