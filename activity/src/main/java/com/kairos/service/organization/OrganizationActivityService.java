@@ -48,18 +48,16 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
+import com.kairos.rest_client.KPIIntegrationService;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.*;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
-import com.kairos.service.counter.CounterDistService;
-import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.service.day_type.DayTypeService;
@@ -164,8 +162,6 @@ public class OrganizationActivityService {
     @Inject
     private PriorityGroupService priorityGroupService;
     @Inject
-    private CounterRepository counterRepository;
-    @Inject
     private WorkTimeAgreementService workTimeAgreementService;
     @Inject
     private CostTimeAgreementService costTimeAgreementService;
@@ -174,13 +170,9 @@ public class OrganizationActivityService {
     @Inject
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
     @Inject
-    private KPISetService kpiSetService;
-    @Inject
     private ProtectedDaysOffService protectedDaysOffService;
     @Inject
     private ShiftService shiftService;
-    @Inject
-    private CounterDistService counterDistService;
     @Inject
     private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject
@@ -203,6 +195,7 @@ public class OrganizationActivityService {
     @Inject private AutoFillGapSettingsService autoFillGapSettingsService;
     @Inject private ExecutorService executorService;
     @Inject private ActivityHelperService activityHelperService;
+    @Inject private KPIIntegrationService kpiIntegrationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -556,7 +549,7 @@ public class OrganizationActivityService {
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
         UnitSettingDTO unitSettingDTO = unitSettingRepository.getMinOpenShiftHours(unitId);
         orderAndActivityDTO.setMinOpenShiftHours(unitSettingDTO != null ? unitSettingDTO.getOpenShiftPhaseSetting().getMinOpenShiftHours() : null);
-        orderAndActivityDTO.setCounters(counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT));
+        orderAndActivityDTO.setCounters(kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT));
         orderAndActivityDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(unitId, ORDER));
         orderAndActivityDTO.setPlannedTypes(plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId()));
         return orderAndActivityDTO;
@@ -567,7 +560,7 @@ public class OrganizationActivityService {
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
-        List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters = kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
 
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
                 minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(), counters);
@@ -587,10 +580,9 @@ public class OrganizationActivityService {
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
-        kpiSetService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
+        kpiIntegrationService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         reasonCodeService.createReasonCodeForUnit(unitId,orgTypeAndSubTypeDTO.getCountryId());
-        counterDistService.createDefaultCategory(unitId);
         autoFillGapSettingsService.createDefaultAutoFillGapSettings(unitId, orgTypeAndSubTypeDTO, phases);
         return true;
     }

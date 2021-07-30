@@ -7,7 +7,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
@@ -52,7 +52,7 @@ public class ShiftPlanningProblemSubmitDTO {
     private List<ShiftDTO> shifts;
     private List<ActivityDTO> activities;
     private PlanningPeriodDTO planningPeriod;
-    private List<PresenceStaffingLevelDto> staffingLevels;
+    private List<StaffingLevelDTO> staffingLevels;
     private ActivityConfigurationDTO activityConfiguration;
     private Set<BigInteger> lockedShiftIds;
     private Map<BigInteger,Integer> activityOrderMap;

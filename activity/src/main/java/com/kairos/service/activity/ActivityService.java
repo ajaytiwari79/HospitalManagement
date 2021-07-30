@@ -37,12 +37,12 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
+import com.kairos.rest_client.KPIIntegrationService;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -107,7 +107,6 @@ public class ActivityService {
     @Inject private ExceptionService exceptionService;
     @Inject private OpenShiftIntervalRepository openShiftIntervalRepository;
     @Inject private UserIntegrationService userIntegrationService;
-    @Inject private CounterRepository counterRepository;
     @Inject private GlideTimeSettingsService glideTimeSettingsService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
 
@@ -121,6 +120,7 @@ public class ActivityService {
     @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject private ActivityPermissionService activityPermissionService;
     @Inject @Lazy private ActivityHelperService activityHelperService;
+    @Inject private KPIIntegrationService kpiIntegrationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
@@ -940,7 +940,7 @@ public class ActivityService {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
-        List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters = kpiIntegrationService.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
     }
 

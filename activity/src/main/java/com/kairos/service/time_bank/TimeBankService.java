@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -41,8 +40,6 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.counter.KPICalculationRelatedInfo;
-import com.kairos.service.counter.KPIService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -99,7 +96,7 @@ import static java.util.stream.Collectors.toList;
 @Transactional
 @Service
 @Getter
-public class TimeBankService implements KPIService {
+public class TimeBankService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeBankService.class);
 
@@ -765,40 +762,6 @@ public class TimeBankService implements KPIService {
 
     public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, LocalDate startDate, LocalDate endDate){
         return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
-    }
-    public double getTotalTimeBankOrContractual(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean calculateContractual) {
-        double totalTimeBankOrContractual = 0;
-        for (StaffKpiFilterDTO staffKpiFilterDTO : kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId)) {
-            for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                Collection<DailyTimeBankEntry> dailyTimeBankEntries = kpiCalculationRelatedInfo.getDailyTimeBankEntrysByEmploymentIdAndInterval(employmentWithCtaDetailsDTO.getId(), dateTimeInterval);
-                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), new Interval(dateTimeInterval.getStartDate().getTime(), dateTimeInterval.getEndDate().getTime()), employmentWithCtaDetailsDTO, new HashSet<>(), (List) dailyTimeBankEntries, calculateContractual)[0];
-                totalTimeBankOrContractual += timeBankOfInterval;
-            }
-        }
-        return getHoursByMinutes(totalTimeBankOrContractual);
-    }
-
-    @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
-        return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getCalculationType().equals(CalculationType.STAFFING_LEVEL_CAPACITY));
-    }
-
-    public void updateScheduledAndDurationHours(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        int scheduledMinutes = 0;
-        int durationMinutes = 0;
-        for (ShiftActivity shiftActivity : shift.getActivities()) {
-            int[] scheduledAndDurationMinutes = updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
-            scheduledMinutes += scheduledAndDurationMinutes[0];
-            durationMinutes += scheduledAndDurationMinutes[1];
-            for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
-                updateScheduledHoursAndActivityDetailsInShiftActivity(childActivity, activityWrapperMap, staffAdditionalInfoDTO);
-            }
-        }
-        if (isCollectionNotEmpty(shift.getBreakActivities()) && activityWrapperMap.containsKey(shift.getBreakActivities().get(0).getActivityId()) && UNPAID_BREAK.equals(activityWrapperMap.get(shift.getBreakActivities().get(0).getActivityId()).getTimeType())) {
-            scheduledMinutes -= shift.getBreakActivities().get(0).getInterval().getMinutes();
-        }
-        shift.setScheduledMinutes(scheduledMinutes);
-        shift.setDurationMinutes(durationMinutes);
     }
 
     public int[] updateScheduledHoursAndActivityDetailsInShiftActivity(ShiftActivity shiftActivity, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

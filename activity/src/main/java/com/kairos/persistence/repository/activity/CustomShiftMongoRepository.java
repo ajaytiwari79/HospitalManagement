@@ -49,11 +49,6 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllDraftShiftsByIds(List<BigInteger> shiftIds , boolean draftShift);
 
-    List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
-
-
-    List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate,Boolean isDraft);
-
     void updateRemarkInShiftActivity(BigInteger shiftActivityId, String remark);
 
     List<Shift> findAllShiftByIntervalAndEmploymentId(Long employmentId, Date startDate, Date endDate);

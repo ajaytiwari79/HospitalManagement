@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.staffing_level;
 
-import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
@@ -36,7 +36,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     }
 
     @Override
-    public List<PresenceStaffingLevelDto> findByUnitIdAndDatesAndActivityId(Long unitId, Date startDate, Date endDate, BigInteger activityId){
+    public List<StaffingLevelDTO> findByUnitIdAndDatesAndActivityId(Long unitId, Date startDate, Date endDate, BigInteger activityId){
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(CURRENT_DATE).gte(startDate).lte(endDate)),
                 Aggregation.unwind(PRESENCE_STAFFING_LEVEL_INTERVAL),
@@ -59,7 +59,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
                 Aggregation.group(CURRENT_DATE,"staffingLevelSetting").push(PRESENCE_STAFFING_LEVEL_INTERVAL).as(PRESENCE_STAFFING_LEVEL_INTERVAL),
                 Aggregation.project(PRESENCE_STAFFING_LEVEL_INTERVAL).andExclude("_id").and("_id.currentDate").as(CURRENT_DATE).and("_id.staffingLevelSetting").as("staffingLevelSetting")
         );
-        return mongoTemplate.aggregate(aggregation,StaffingLevel.class, PresenceStaffingLevelDto.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregation,StaffingLevel.class, StaffingLevelDTO.class).getMappedResults();
     }
 
     @Override
