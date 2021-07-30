@@ -34,8 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
-import static com.kairos.commons.utils.DateUtils.getCurrentLocalTime;
+import static com.kairos.commons.utils.DateUtils.*;
 
 @Service
 public class DayTypeService {
@@ -131,6 +130,7 @@ public class DayTypeService {
         if(CollectionUtils.isNotEmpty(dayTypeList)){
             dayTypes.addAll(dayTypeList.stream().map(DayTypeDTO::getId).collect(Collectors.toSet()));
         }
+        LOGGER.info("daytypes {}",dayTypes);
         return dayTypes;
     }
 
