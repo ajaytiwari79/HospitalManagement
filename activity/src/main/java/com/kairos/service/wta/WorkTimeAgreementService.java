@@ -62,6 +62,7 @@ import com.kairos.service.tag.TagService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.time_slot.TimeSlotSetService;
+import com.kairos.service.unit_settings.UnitGeneralSettingService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -156,6 +157,7 @@ public class WorkTimeAgreementService{
     private TimeSlotSetService timeSlotSetService;
     @Inject private ActivityPermissionService activityPermissionService;
     @Inject  private ShiftHelperService shiftHelperService;
+    @Inject private UnitGeneralSettingService unitGeneralSettingService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -479,6 +481,7 @@ public class WorkTimeAgreementService{
         wtaDefaultDataInfoDTO.setActivityList(activities);
         wtaDefaultDataInfoDTO.setTimeSlots(timeSlotDTOS);
         wtaDefaultDataInfoDTO.setPresenceTypes(presenceTypeDTOS);
+        wtaDefaultDataInfoDTO.setUnitGeneralSettingDTO(unitGeneralSettingService.getGeneralSetting(unitId));
         return wtaDefaultDataInfoDTO;
     }
 
