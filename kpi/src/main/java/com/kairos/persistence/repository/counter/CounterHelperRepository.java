@@ -9,11 +9,13 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -23,16 +25,15 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
-import com.kairos.persistence.model.DailyTimeBankEntry;
-import com.kairos.persistence.model.PlannedTimeType;
-import com.kairos.persistence.model.Shift;
+import com.kairos.persistence.model.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -51,10 +52,11 @@ import static com.kairos.constants.AppConstants.DESCRIPTION;
 import static com.kairos.constants.AppConstants.TIME_SLOT_SET;
 import static com.kairos.constants.CommonConstants.DELETED;
 import static com.kairos.constants.CommonConstants.DISABLED;
-import static com.kairos.constants.KPIMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT;
+import static com.kairos.constants.KPIMessagesConstants.*;
 import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.shift.TodoStatus.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Repository
 public class CounterHelperRepository {
@@ -91,8 +93,13 @@ public class CounterHelperRepository {
     public static final String EMPLOYMENT_ID = "employmentId";
     public static final String STAFF_ID = "staffId";
     public static final String SHIFTS = "shifts";
+    public static final String WTA_BASE_RULE_TEMPLATE = "wtaBaseRuleTemplate";
+    public static final String PROTECTED_DAYS_OFF_SETTING = "protectedDaysOffSetting";
+    public static final String ACTIVITIES_ACTIVITY_ID = "activities.activityId";
+    public static final String DRAFT ="draft";
 
     @Inject private MongoTemplate mongoTemplate;
+    @Inject private ExceptionService exceptionService;
 
     public List<DayTypeDTO> findAllByCountryIdAndDeletedFalse(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -273,7 +280,7 @@ public class CounterHelperRepository {
                 group(UNIT_ID).first(START_DATE).as(START_DATE).last(END_DATE).as(END_DATE),
                 project().and(START_DATE).as(START_DATE).and(END_DATE).as(END_DATE)
         );
-        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriodDTO.class, PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PLANNING_PERIOD, PlanningPeriodDTO.class);
         PlanningPeriodDTO planningPeriodDTO = results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
         return new DateTimeInterval(planningPeriodDTO.getStartDate(),planningPeriodDTO.getEndDate());
     }
@@ -360,13 +367,12 @@ public class CounterHelperRepository {
 
     public Set<BigInteger> findAllTimeTypeIdsByTimeTypeIds(List<BigInteger> timeTypeIds) {
         Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(Criteria.where(ID2).in(timeTypeIds)),
+                Aggregation.match(Criteria.where(ID1).in(timeTypeIds)),
                 Aggregation.graphLookup(TIME_TYPE).startWith(ID2).connectFrom(ID1).connectTo(UPPER_LEVEL_TIME_TYPE_ID).as("children"),
                 Aggregation.project("children._id"),
-                Aggregation.unwind(ID1))
-                ;
-        AggregationResults<TimeTypeDTO> results = mongoTemplate.aggregate(aggregation, TIME_TYPE,TimeTypeDTO.class);
-        return results.getMappedResults().stream().map(s-> s.getId()).collect(Collectors.toSet());
+                Aggregation.unwind(ID1));
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, TimeType.class,Map.class);
+        return results.getMappedResults().stream().map(a->new BigInteger(a.get("_id").toString())).collect(Collectors.toSet());
     }
 
     public List<TimeTypeDTO> getAllTimeTypesByCountryId(Long countryId) {
@@ -377,36 +383,265 @@ public class CounterHelperRepository {
         return mongoTemplate.find(new Query(Criteria.where(UNIT_ID).is(refId).and(DELETED).is(false).and("reasonCodeType").is(forceplan)),ReasonCodeDTO.class,"reasonCode");
     }
     public List<ShiftDTO> findAllByIdInAndDeletedFalseOrderByStartDateAsc(List<BigInteger> shiftIds) {
-        return mongoTemplate.find(new Query(Criteria.where(ID1).is(shiftIds).and(DELETED).is(false)),ShiftDTO.class,"shifts");
+        return mongoTemplate.find(new Query(Criteria.where(ID1).is(shiftIds).and(DELETED).is(false)),ShiftDTO.class,SHIFTS);
     }
     public List<ShiftDTO> findAllByShiftIdsByAccessgroupRole(Set<BigInteger> shiftIds, Set<String> accessRole) {
         return mongoTemplate.find(new Query(Criteria.where("shiftId").is(shiftIds).and(DELETED).is(false).and("accessGroupRole").in(accessRole)),ShiftDTO.class,"shiftState");
     }
 
-    public List<Shift> findShiftsByKpiFilters(List<Long> kpiDatum, List<Long> longs, List<String> objects, Set<BigInteger> objects1, Date startDate, Date endDate) {
-        return null;
+    public List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate){
+        Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
+                .and(START_DATE).gte(startDate).lt(endDate);
+        List<AggregationOperation> aggregationOperation = new ArrayList<>();
+        aggregationOperation.add(new MatchOperation(criteria));
+        aggregationOperation.add(unwind(ACTIVITIES));
+        if (CollectionUtils.isNotEmpty(shiftActivityStatus)) {
+            aggregationOperation.add(match(where("activities.status").in(shiftActivityStatus)));
+        }
+        if (CollectionUtils.isNotEmpty(timeTypeIds)) {
+            aggregationOperation.add(lookup(ACTIVITIES, ACTIVITIES_ACTIVITY_ID, "_id", ACTIVITY));
+            aggregationOperation.add(unwind(ACTIVITY));
+            aggregationOperation.add(match(where("activity.activityBalanceSettings.timeTypeId").in(timeTypeIds)));
+        }
+        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
+        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
+        return result.getMappedResults();
     }
 
-    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> longs, List<BigInteger> objects, List<Integer> dayOfWeeksNo, Date startDate, Date endDate, Boolean b) {
-        return null;
+    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate, Boolean isDraft) {
+        Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
+                .and(START_DATE).gte(startDate).lte(endDate).and(DRAFT).is(false);
+        List<AggregationOperation> aggregationOperation = new ArrayList<>();
+        aggregationOperation.add(new MatchOperation(criteria));
+        aggregationOperation.add(unwind(ACTIVITIES));
+        if (CollectionUtils.isNotEmpty(activitiesIds)) {
+            aggregationOperation.add(match(where(ACTIVITIES_ACTIVITY_ID).in(activitiesIds)));
+        }
+        aggregationOperation.add(lookup(ACTIVITIES, ACTIVITIES_ACTIVITY_ID, ID1, ACTIVITY));
+        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityKpiProjection()));
+        if (CollectionUtils.isNotEmpty(dayOfWeeks)) {
+            aggregationOperation.add(match(where("dayOfWeek").in(dayOfWeeks)));
+        }
+        aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByShiftAndActivity())));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
+        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
+        updateActivityInShift(result.getMappedResults());
+        return result.getMappedResults();
     }
-    public List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, List<Long> longs) {
-        return null;
+
+    private <T extends ShiftDTO> void updateActivityInShift(List<T> shiftWithActivityDTOS) {
+        Set<BigInteger> activityIds = new HashSet<>();
+        for (T shift : shiftWithActivityDTOS) {
+            activityIds.addAll(getActivityIdsByShift(shift));
+            if(isNotNull(shift.getDraftShift())){
+                activityIds.addAll(getActivityIdsByShift(shift.getDraftShift()));
+            }
+        }
+        Map<BigInteger, ActivityDTO> activityDTOMap = getActivityDTOMap(activityIds);
+        shiftWithActivityDTOS.forEach(shift -> {
+            updateActivityInShiftActivities(activityDTOMap, shift.getActivities(),shift.getEmploymentId(),shift.getPhaseId(),shift.getShiftType());
+            updateActivityInShiftActivities(activityDTOMap, shift.getBreakActivities(),shift.getEmploymentId(),shift.getPhaseId(),shift.getShiftType());
+            if(isNotNull(shift.getDraftShift())){
+                updateActivityInShiftActivities(activityDTOMap, shift.getDraftShift().getActivities(),shift.getEmploymentId(),shift.getPhaseId(),shift.getShiftType());
+                updateActivityInShiftActivities(activityDTOMap, shift.getDraftShift().getBreakActivities(),shift.getEmploymentId(),shift.getPhaseId(),shift.getShiftType());
+            }
+        });
     }
-    public List<Shift> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, LocalDateTime localDateTimeFromLocalDate, LocalDateTime localDateTimeFromLocalDate1) {
-        return null;
+
+    private <T extends ShiftActivityDTO> void updateActivityInShiftActivities(Map<BigInteger, ActivityDTO> activityDTOMap, List<T> shiftActivities, Long employmentId, BigInteger phaseId, ShiftType shiftType) {
+        if(isCollectionNotEmpty(shiftActivities)) {
+            shiftActivities.forEach(shiftActivityDTO -> {
+                shiftActivityDTO.setEmploymentId(employmentId);
+                shiftActivityDTO.setPhaseId(phaseId);
+                shiftActivityDTO.setShiftType(shiftType);
+                shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
+                shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
+            });
+        }
     }
-    public Collection<DailyTimeBankEntry> findAllByEmploymentIdsAndBeforDate(ArrayList<Long> longs, Date endDate) {
-        return null;
+
+    private <T extends ShiftDTO> Set<BigInteger> getActivityIdsByShift( T shift) {
+        Set<BigInteger> activityIds = new HashSet<>();
+        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        if(isCollectionNotEmpty(shift.getBreakActivities())) {
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        }
+        return activityIds;
     }
+
+    private Map<BigInteger, ActivityDTO> getActivityDTOMap(Set<BigInteger> activityIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(ID1).in(activityIds).and(DISABLED).is(false)),
+                lookup(TIME_TYPE, "activityBalanceSettings.timeTypeId", ID1, TIME_TYPE)
+                ,project(NAME,DESCRIPTION,COUNTRY_ID,UNIT_ID,"parentId","isParentActivity","activityGeneralSettings","activityBalanceSettings","activityRulesSettings","activityTimeCalculationSettings","activitySkillSettings")
+                        .and(TIME_TYPE).arrayElementAt(0).as(TIME_TYPE));
+        List<ActivityDTO> activityDTOS = mongoTemplate.aggregate(aggregation, ActivityDTO.class, ActivityDTO.class).getMappedResults();
+        return activityDTOS.stream().collect(Collectors.toMap(ActivityDTO::getId, v->v));
+    }
+
+
+    public List<ShiftDTO> findShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, List<Long> unitIds) {
+        return mongoTemplate.find(new Query(Criteria.where(DELETED).is(false).and(UNIT_ID).in(unitIds).and(DISABLED).is(false).and(START_DATE).lte(endDate).and(END_DATE).gte(startDate)),ShiftDTO.class,SHIFTS);
+    }
+
+    public List<ShiftDTO> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate) {
+        return mongoTemplate.find(new Query(Criteria.where(DELETED).is(false).and(STAFF_ID).in(staffIds).and(DISABLED).is(false).and(START_DATE).lte(endDate).and(END_DATE).gte(startDate)),ShiftDTO.class,SHIFTS);
+    }
+
+    public Collection<DailyTimeBankEntry> findAllByEmploymentIdsAndBeforDate(ArrayList<Long> employmentIds, Date endDate) {
+        return mongoTemplate.find(new Query(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and("date").lte(endDate)),DailyTimeBankEntry.class,"dailyTimeBankEntries");
+    }
+
     public List<WTAResponseDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(endDate).and(END_DATE).gte(startDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
-                project("name", DESCRIPTION, DISABLED, START_DATE, END_DATE, RULE_TEMPLATES, EMPLOYMENT_ID)
+                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, ID1, RULE_TEMPLATES),
+                project(NAME, DESCRIPTION, DISABLED, START_DATE, END_DATE, RULE_TEMPLATES, EMPLOYMENT_ID)
         );
         AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, "workingTimeAgreement", WTAResponseDTO.class);
         return result.getMappedResults();
+    }
+
+    public List<ShiftActivityDTO> findAllShiftActivityiesBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds) {
+        Criteria criteria;
+        if (Optional.ofNullable(endDate).isPresent()) {
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
+                    .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
+        } else {
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
+                    .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
+        }
+        Aggregation aggregation = Aggregation.newAggregation(match(criteria.and(DRAFT).is(false)),
+                unwind(ACTIVITIES),
+                match(Criteria.where(ACTIVITIES_ACTIVITY_ID).in(activityIds)),
+                new CustomAggregationOperation("{\n" +
+                        "    \"$project\": {\n" +
+                        "      \"status\": 1,\n" +
+                        "      \"activityId\": 1,\n" +
+                        "      \"startDate\": 1,\n" +
+                        "      \"endDate\": 1,\n" +
+                        "    }\n" +
+                        "  }")
+        );
+        return mongoTemplate.aggregate(aggregation,Shift.class ,ShiftActivityDTO.class).getMappedResults();
+    }
+
+    public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){
+        ProtectedDaysOffSettingDTO protectedDaysOffSetting = mongoTemplate.findOne(new Query(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),ProtectedDaysOffSettingDTO.class, PROTECTED_DAYS_OFF_SETTING);
+        if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
+            exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF,unitId);
+        }
+        return new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings());
+    }
+    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffByExpertiseId(Long expertiseId) {
+        return mongoTemplate.find(new Query(Criteria.where("expertiseId").is(expertiseId).and(DELETED).is(false)),ProtectedDaysOffSettingDTO.class, PROTECTED_DAYS_OFF_SETTING);
+    }
+
+    private String groupByShiftAndActivity() {
+        return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
+                "'staffId':{'$first':'$staffId'},'shiftType':{'$first':'$shiftType'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'breakActivities':{'$first':'$breakActivities'},'activities':{'$addToSet':'$activities'}}}";
+    }
+
+    public static Document shiftWithActivityGroup() {
+        String group = "{ '$group': {\n" +
+                "    '_id': {\n" +
+                "    '_id' : '$_id',\n" +
+                "    'name' : '$name',\n" +
+                "    'draft' : '$draft',\n" +
+                "    'draftShift' : '$draftShift',\n" +
+                "    'startDate' : '$startDate',\n" +
+                "    'endDate' : '$endDate',\n" +
+                "    'disabled' : '$disabled',\n" +
+                "    'bid' :'$bid',\n" +
+                "    'pId' :'$pId',\n" +
+                "    'bonusTimeBank' : '$bonusTimeBank',\n" +
+                "    'amount' : '$amount',\n" +
+                "    'probability' : '$probability',\n" +
+                "    'accumulatedTimeBankInMinutes' : '$accumulatedTimeBankInMinutes',\n" +
+                "    'remarks' : '$remarks',\n" +
+                "    'staffId' : '$staffId',\n" +
+                "    'unitId' : '$unitId',\n" +
+                "    'phaseId' : '$phaseId',\n" +
+                "    'scheduledMinutes' : '$scheduledMinutes',\n" +
+                "    'durationMinutes' :'$durationMinutes',\n" +
+                "    'employmentId'  : '$employmentId' },\n" +
+                "     'activities': { '$addToSet':'$activities'}\n" +
+                "    }}";
+        return Document.parse(group);
+    }
+
+    public static Document shiftWithActivityKpiProjection() {
+        String project = "{  \n" +
+                "      '$project':{  \n" +
+                "         '_id' : 1,\n" +
+                "         'breakActivities' : 1,\n" +
+                "    'name' : 1,\n" +
+                "    'durationMinutes' : 1,\n" +
+                "        'scheduledMinutes':1,\n" +
+                "        'timeBankCtaBonusMinutes':1,\n" +
+                "        'scheduledMinutesOfTimebank':1,\n" +
+                "        'scheduledMinutesOfPayout':1,\n" +
+                "        'plannedMinutesOfPayout':1,\n" +
+                "        'plannedMinutesOfTimebank':1,\n" +
+                "        'payoutCtaBonusMinutes':1,\n" +
+                "        'createdBy':1,\n" +
+                "    'staffId' : 1,\n" +
+                "    'shiftType' : 1,\n" +
+                "    'startDate' : 1,\n" +
+                "    'endDate' : 1,\n" +
+                "    'employmentId' : 1,\n" +
+                "    'phaseId' : 1,\n" +
+                " 'dayOfWeek': { '$dayOfWeek': '$startDate' }\n" +
+                getActivitiesProjection()+"   }}";
+
+        return Document.parse(project);
+    }
+
+    private static String getActivitiesProjection() {
+        return "\t'activities.id' : 1,\n" +
+                "        'activities.activityId' : 1,\n" +
+                "        'activities.durationMinutes' : 1,\n" +
+                "        'activities._id' : 1,\n" +
+                "        'activities.breakShift' : 1,\n" +
+                "        'activities.allowedBreakDurationInMinute' : 1,\n" +
+                "        'activities.scheduledMinutes':1,\n" +
+                "        'activities.activityName':1,\n" +
+                "        'activities.status':1,\n" +
+                "        'activities.timeBankCtaBonusMinutes':1,\n" +
+                "        'activities.scheduledMinutesOfTimebank':1,\n" +
+                "        'activities.scheduledMinutesOfPayout':1,\n" +
+                "        'activities.plannedMinutesOfPayout':1,\n" +
+                "        'activities.plannedMinutesOfTimebank':1,\n" +
+                "        'activities.absenceReasonCodeId' : 1,\n" +
+                "        'activities.reasonCodeId' : 1,\n" +
+                "        'activities.remarks' : 1,\n" +
+                "        'activities.payoutCtaBonusMinutes':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
+                "        'activities.startDate' : 1,\n" +
+                "        'activities.endDate' : 1,\n" +
+                "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
+                "        'activities.backgroundColor':{'$arrayElemAt':[ '$activity.activityGeneralSettings.backgroundColor',0]}\n";
+
+    }
+
+    public class CustomAggregationOperation implements AggregationOperation {
+
+        private Document operation;
+
+        public CustomAggregationOperation(Document operation) {
+            this.operation = operation;
+        }
+
+        public CustomAggregationOperation(String operation) {
+            this.operation = Document.parse(operation);
+        }
+
+        @Override
+        public Document toDocument(AggregationOperationContext context) {
+            return context.getMappedObject(operation);
+        }
     }
 }

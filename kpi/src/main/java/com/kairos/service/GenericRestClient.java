@@ -34,7 +34,7 @@ public class GenericRestClient {
     private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
     @Inject
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
     @Inject
     private ExceptionService exceptionService;
     @Autowired

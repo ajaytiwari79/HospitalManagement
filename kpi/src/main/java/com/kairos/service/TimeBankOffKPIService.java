@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -83,10 +84,10 @@ public class TimeBankOffKPIService implements KPIService{
         return isActivityExist?activityTodoList:timeTypeTodoList;
     }
 
-    private List<Shift> getShiftListIfStaffIsNotExist(KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<Shift>> entry) {
+    private List<ShiftDTO> getShiftListIfStaffIsNotExist(KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<ShiftDTO>> entry) {
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(FilterType.ACTIVITY_IDS)&&YAxisConfig.ACTIVITY.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().getOrDefault(FilterType.CALCULATION_BASED_ON,new ArrayList()).get(0));
-        List<Shift> activityShiftList =kpiCalculationRelatedInfo.getShiftsByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndShiftListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
-        List<Shift> timeTypeShiftList =kpiCalculationRelatedInfo.getShiftsByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
+        List<ShiftDTO> activityShiftList =kpiCalculationRelatedInfo.getShiftsByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndShiftListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
+        List<ShiftDTO> timeTypeShiftList =kpiCalculationRelatedInfo.getShiftsByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
         return isActivityExist?activityShiftList:timeTypeShiftList;
     }
 
@@ -102,15 +103,15 @@ public class TimeBankOffKPIService implements KPIService{
 
     public double getHoursOfTheTodos(Long staffId,KPICalculationRelatedInfo kpiCalculationRelatedInfo,DateTimeInterval dateTimeInterval){
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(FilterType.ACTIVITY_IDS)&& YAxisConfig.ACTIVITY.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.CALCULATION_BASED_ON).get(0));
-        Map<BigInteger,List<Shift>> bigIntegerAndShiftMap =isActivityExist?kpiCalculationRelatedInfo.getStaffIdAndActivityIdAndShiftMap().get(staffId):kpiCalculationRelatedInfo.getStaffIdAndTimeTypeIdAndShiftMap().get(staffId);
-        Map<BigInteger,List<Shift>> bigIntegerAndShiftListMap =isActivityExist?kpiCalculationRelatedInfo.getActivityIdAndShiftListMap():kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap();
-        Map<BigInteger,List<Shift>> filterIdAndShiftListMap = ObjectUtils.isNotNull(staffId)?bigIntegerAndShiftMap:bigIntegerAndShiftListMap;
+        Map<BigInteger,List<ShiftDTO>> bigIntegerAndShiftMap =isActivityExist?kpiCalculationRelatedInfo.getStaffIdAndActivityIdAndShiftMap().get(staffId):kpiCalculationRelatedInfo.getStaffIdAndTimeTypeIdAndShiftMap().get(staffId);
+        Map<BigInteger,List<ShiftDTO>> bigIntegerAndShiftListMap =isActivityExist?kpiCalculationRelatedInfo.getActivityIdAndShiftListMap():kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap();
+        Map<BigInteger,List<ShiftDTO>> filterIdAndShiftListMap = ObjectUtils.isNotNull(staffId)?bigIntegerAndShiftMap:bigIntegerAndShiftListMap;
         double shiftHours =0.0d;
         if(ObjectUtils.isNotNull(filterIdAndShiftListMap)) {
-            for (Map.Entry<BigInteger, List<Shift>> entry : filterIdAndShiftListMap.entrySet()) {
+            for (Map.Entry<BigInteger, List<ShiftDTO>> entry : filterIdAndShiftListMap.entrySet()) {
 
-                List<Shift> shiftList = ObjectUtils.isNotNull(staffId) ? entry.getValue() : getShiftListIfStaffIsNotExist(kpiCalculationRelatedInfo, dateTimeInterval, entry);
-                for (Shift shift : shiftList) {
+                List<ShiftDTO> shiftList = ObjectUtils.isNotNull(staffId) ? entry.getValue() : getShiftListIfStaffIsNotExist(kpiCalculationRelatedInfo, dateTimeInterval, entry);
+                for (ShiftDTO shift : shiftList) {
                     shiftHours += DateUtils.getMinutesBetweenDate(shift.getStartDate(), shift.getEndDate());
                 }
             }

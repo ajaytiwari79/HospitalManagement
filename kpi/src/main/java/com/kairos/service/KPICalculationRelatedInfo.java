@@ -329,7 +329,7 @@ public class KPICalculationRelatedInfo {
         if (!CollectionUtils.containsAny(ObjectUtils.newHashSet(CalculationType.DELTA_TIMEBANK, CalculationType.ACTUAL_TIMEBANK, CalculationType.STAFF_AGE, CalculationType.STAFFING_LEVEL_CAPACITY), calculationTypes)) {
             List<String> validKPIS = ObjectUtils.newArrayList(CalculationType.PRESENCE_UNDER_STAFFING.toString(), CalculationType.PRESENCE_OVER_STAFFING.toString(), CalculationType.ABSENCE_UNDER_STAFFING.toString(), CalculationType.ABSENCE_OVER_STAFFING.toString());
             if (filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(validKPIS, filterBasedCriteria.get(FilterType.CALCULATION_TYPE))) {
-                List<Shift> shiftData = kpiBuilderCalculationService.getCounterHelperRepository().findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : ObjectUtils.newArrayList(organizationId));
+                List<ShiftDTO> shiftData = kpiBuilderCalculationService.getCounterHelperRepository().findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : ObjectUtils.newArrayList(organizationId));
                 shifts = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftData, ShiftWithActivityDTO.class);
             } else {
                 shifts = kpiBuilderCalculationService.getCounterHelperRepository().findShiftsByShiftAndActvityKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), false);
@@ -399,8 +399,8 @@ public class KPICalculationRelatedInfo {
         }
     }
 
-    public List<Shift> getShiftsByInterval(DateTimeInterval dateTimeInterval,List<Shift> shifts){
-        List<Shift> shiftList = new ArrayList<>();
+    public List<ShiftDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval,List<ShiftDTO> shifts){
+        List<ShiftDTO> shiftList = new ArrayList<>();
         if(ObjectUtils.isCollectionNotEmpty(shifts)) {
             shiftList = shifts.stream().filter(shift -> dateTimeInterval.containsAndEqualsEndDate(shift.getStartDate())).collect(Collectors.toList());
         }

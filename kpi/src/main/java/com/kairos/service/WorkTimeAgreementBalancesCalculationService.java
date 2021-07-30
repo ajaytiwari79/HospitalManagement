@@ -100,7 +100,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService{
                         break;
                     case PROTECTED_DAYS_OFF:
                         ProtectedDaysOffWTATemplateDTO protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplateDTO) ruleTemplate;
-                        ProtectedDaysOffSettingDTO protectedDaysOffSetting = protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
+                        ProtectedDaysOffSettingDTO protectedDaysOffSetting = counterHelperRepository.getProtectedDaysOffByUnitId(unitId);
                         interval = interval.addInterval(getIntervalByProtectedDaysOffRuleTemplate(startDate, protectedDaysOffWTATemplate, activityMap, protectedDaysOffSetting, planningPeriodEndDate));
                         break;
                     default:
@@ -228,13 +228,13 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService{
     }
 
     public WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(Long unitId, ProtectedDaysOffWTATemplateDTO protectedDaysOffWTATemplate, List<ShiftActivityDTO> shiftActivityDTOS, Map<BigInteger, ActivityDTO> activityMap,  StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, LocalDate planningPeriodEndDate) {
-        ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit = protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
+        ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit = counterHelperRepository.getProtectedDaysOffByUnitId(unitId);
         List<IntervalBalance> intervalBalances = new ArrayList<>();
         WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = null;
         if (!ProtectedDaysOffUnitSettings.UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR.equals(protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings())) {
             ActivityDTO activity = activityMap.get(protectedDaysOffWTATemplate.getActivityId());
             CutOffIntervalUnit cutOffIntervalUnit = activity.getActivityRulesSettings().getCutOffIntervalUnit();
-            List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings = protectedDaysOffService.getProtectedDaysOffByExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
+            List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings = counterHelperRepository.getProtectedDaysOffByExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
             protectedDaysOffSettings = protectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> isEqualOrAfter(protectedDaysOffSetting.getPublicHolidayDate(),staffAdditionalInfoDTO.getEmployment().getStartDate()) && (isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) || !protectedDaysOffSetting.getPublicHolidayDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate()))).collect(Collectors.toList());
             String activityName = activity.getName();
             String timetypeColor = activity.getActivityGeneralSettings().getBackgroundColor();

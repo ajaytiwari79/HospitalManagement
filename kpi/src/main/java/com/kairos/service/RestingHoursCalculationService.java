@@ -12,6 +12,7 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
@@ -38,11 +39,11 @@ public class RestingHoursCalculationService implements CounterService {
     private CounterHelperService counterHelperService;
     @Inject private CounterHelperRepository counterHelperRepository;
 
-    public double getTotalRestingHours(List<Shift> shifts, LocalDate startDate, LocalDate endDate) {
+    public double getTotalRestingHours(List<ShiftDTO> shifts, LocalDate startDate, LocalDate endDate) {
         //all shifts should be sorted on startDate
         DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
         long totalrestingMinutes = dateTimeInterval.getMilliSeconds()/3600000;
-        for (Shift shift : shifts) {
+        for (ShiftDTO shift : shifts) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             if (dateTimeInterval.overlaps(shiftInterval)) {
                 totalrestingMinutes -= (int)(dateTimeInterval.overlap(shiftInterval).getMinutes()/60);
@@ -53,8 +54,8 @@ public class RestingHoursCalculationService implements CounterService {
     }
 
     public Map<Object, Double> calculateRestingHours(List<Long> staffIds, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals) {
-        Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap = new HashMap<>();
-        List<Shift> shifts = counterHelperRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
+        Map<DateTimeInterval, List<ShiftDTO>> dateTimeIntervalListMap = new HashMap<>();
+        List<ShiftDTO> shifts = counterHelperRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
         }
@@ -112,7 +113,7 @@ public class RestingHoursCalculationService implements CounterService {
         Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds, ObjectUtils.newArrayList(), ObjectUtils.newArrayList(organizationId),organizationId);
         staffIds = (List<Long>)kpiData[2];
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
-        List<Shift> shifts = counterHelperRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
+        List<ShiftDTO> shifts = counterHelperRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(staffIds, null, dateTimeIntervals, applicableKPI, shifts);
         return restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
     }
@@ -124,7 +125,7 @@ public class RestingHoursCalculationService implements CounterService {
         return FibonacciCalculationUtil.getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
     }
 
-    private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Shift> shifts) {
+    private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<ShiftDTO> shifts) {
         Map<Object, Double> staffRestingHours ;
         Double restingHours = 0d;
         switch (applicableKPI.getKpiRepresentation()) {
@@ -141,10 +142,10 @@ public class RestingHoursCalculationService implements CounterService {
         return KPIUtils.verifyKPIResponseData(staffRestingHours) ? staffRestingHours : new HashMap<>();
     }
 
-    private Map<Object, Double> getStaffRestingHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Double restingHours) {
-        Map<Long, List<Shift>> staffShiftMapping;
+    private Map<Object, Double> getStaffRestingHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<ShiftDTO> shifts, Double restingHours) {
+        Map<Long, List<ShiftDTO>> staffShiftMapping;
         Map<Object, Double> staffRestingHours = new HashMap<>();
-        staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
+        staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             for (Long staffId : staffIds) {
                 restingHours += getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), dateTimeInterval.getEndLocalDate());
@@ -154,10 +155,10 @@ public class RestingHoursCalculationService implements CounterService {
         return staffRestingHours;
     }
 
-    private Map<Object, Double> getStaffRestingHoursByRepresentPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts) {
+    private Map<Object, Double> getStaffRestingHoursByRepresentPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<ShiftDTO> shifts) {
         Double restingHours;
         Map<Object, Double> staffRestingHours=new HashMap<>();
-        Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
+        Map<Long, List<ShiftDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()));
         for (Long staffId : staffIds) {
             restingHours = getTotalRestingHours(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate()), DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()));
             staffRestingHours.put(staffId, restingHours);
@@ -165,12 +166,12 @@ public class RestingHoursCalculationService implements CounterService {
         return staffRestingHours;
     }
 
-    private Map<Object, Double> getStaffRestingHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals , DurationType frequencyType) {
+    private Map<Object, Double> getStaffRestingHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<ShiftDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals , DurationType frequencyType) {
         Double restingHours;
         Map<Object, Double> staffRestingHours = new HashMap<>();
-        Map<Long, List<Shift>> staffShiftMapping;
-        Map<DateTimeInterval, Map<Long, List<Shift>>> dateTimeIntervalListMap1 = new HashedMap();
-        dateTimeIntervalListMap.keySet().stream().forEach(dateTimeInterval -> dateTimeIntervalListMap1.put(dateTimeInterval, dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()))));
+        Map<Long, List<ShiftDTO>> staffShiftMapping;
+        Map<DateTimeInterval, Map<Long, List<ShiftDTO>>> dateTimeIntervalListMap1 = new HashedMap();
+        dateTimeIntervalListMap.keySet().stream().forEach(dateTimeInterval -> dateTimeIntervalListMap1.put(dateTimeInterval, dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()))));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             restingHours = 0d;
             staffShiftMapping = dateTimeIntervalListMap1.get(dateTimeInterval);
