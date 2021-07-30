@@ -22,15 +22,15 @@ public class UnitGeneralSettingController {
     @Inject
     UnitGeneralSettingService unitGeneralSettingService;
 
-    @ApiOperation(value = "get  all absence ranking")
+    @ApiOperation(value = "update general settings")
     @PutMapping(value = UNIT_URL + "/general_settings")
-    public ResponseEntity<Map<String, Object>> updateGeneralSetting(@PathVariable Long unotId, @RequestBody UnitGeneralSettingDTO unitGeneralSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitGeneralSettingService.updateGeneralSetting(unotId, unitGeneralSettingDTO));
+    public ResponseEntity<Map<String, Object>> updateGeneralSetting(@PathVariable Long unitId, @RequestBody UnitGeneralSettingDTO unitGeneralSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitGeneralSettingService.updateGeneralSetting(unitId, unitGeneralSettingDTO));
     }
 
-    @ApiOperation(value = "get  all absence ranking")
+    @ApiOperation(value = "get  general settings")
     @GetMapping(value = UNIT_URL + "/general_settings")
-    public ResponseEntity<Map<String, Object>> getGeneralSetting(@PathVariable Long unotId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitGeneralSettingService.getGeneralSetting(unotId));
+    public ResponseEntity<Map<String, Object>> getGeneralSetting(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitGeneralSettingService.getGeneralSetting(unitId));
     }
 }
