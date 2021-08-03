@@ -335,6 +335,7 @@ public class CoverShiftService {
         shiftDTO.setId(shift.getId());
         shiftDTO.setStartDate(shift.getStartDate());
         shift.setEndDate(shift.getEndDate());
+        shiftDTO.setCreatedByCoverShift(true);
         return shiftService.updateShift(shiftDTO, false, false, ShiftActionType.SAVE);
     }
 
