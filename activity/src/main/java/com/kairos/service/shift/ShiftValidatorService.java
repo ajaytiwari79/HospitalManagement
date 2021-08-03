@@ -371,9 +371,9 @@ public class ShiftValidatorService {
         }
     }
 
-    public void validateShiftViolatedRules(Shift shift, boolean shiftOverlappedWithNonWorkingType, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, ShiftActionType actionType) {
+    public void validateShiftViolatedRules(Shift shift, boolean shiftOverlappedWithNonWorkingType, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, ShiftActionType actionType, Phase phase) {
         ShiftViolatedRules shiftViolatedRules = isNull(shift.getDraftShift()) ? shift.getShiftViolatedRules() : shift.getDraftShift().getShiftViolatedRules();
-        if (!(ShiftActionType.SAVE.equals(actionType) || ShiftActionType.CANCEL.equals(actionType))) {
+        if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || !(ShiftActionType.SAVE.equals(actionType) || ShiftActionType.CANCEL.equals(actionType))) {
             if (isNull(shiftViolatedRules)) {
                 shiftViolatedRules = new ShiftViolatedRules(shift.getId());
                 shiftViolatedRules.setDraft(isNotNull(shift.getDraftShift()));
@@ -384,6 +384,10 @@ public class ShiftValidatorService {
             }
             if (shift.getBreakActivities().stream().anyMatch(ShiftActivity::isBreakNotHeld)) {
                 shiftViolatedRules.getEscalationReasons().add(ShiftEscalationReason.BREAK_NOT_HELD);
+                shiftViolatedRules.setEscalationResolved(false);
+            }
+            if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())){
+                shiftViolatedRules.getEscalationReasons().add(ShiftEscalationReason.WORK_TIME_AGREEMENT);
                 shiftViolatedRules.setEscalationResolved(false);
             }
             shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
