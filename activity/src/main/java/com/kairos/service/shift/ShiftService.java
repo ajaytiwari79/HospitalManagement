@@ -699,7 +699,7 @@ public class ShiftService {
             if (byTAndAView) {
                 shiftDTO.setId(shiftDTO.getShiftId());
             }
-            shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate, shift);
+            shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate, shift,shiftWithViolatedInfoDTOS.get(0));
         }
         shiftDetailsService.updateTimingChanges(oldShift,shiftDTO,shiftWithViolatedInfoDTOS.get(0));
         return shiftWithViolatedInfoDTOS;

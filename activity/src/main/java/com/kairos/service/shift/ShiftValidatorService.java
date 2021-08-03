@@ -767,30 +767,30 @@ public class ShiftValidatorService {
         }
     }
 
-    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, Date oldShiftStartDate, Date oldShiftEndDate, Shift shift) {
+    public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, Date oldShiftStartDate, Date oldShiftEndDate, Shift shift, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO) {
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
         List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
         overLappedShifts.forEach(overLappedShift -> {
             if (!shiftOverLappedWithOther(overLappedShift) && isNotNull(overLappedShift.getShiftViolatedRules()) && isCollectionEmpty(overLappedShift.getShiftViolatedRules().getWorkTimeAgreements())) {
-                if (getEsclationResolved(shift, overLappedShift)) {
+                if (getEsclationResolved(shift, overLappedShift,shiftWithViolatedInfoDTO)) {
                     shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
                     overLappedShift.getShiftViolatedRules().setEscalationResolved(true);
                 }
             }
-            getEsclationResolved(shift, overLappedShift);
+            getEsclationResolved(shift, overLappedShift,shiftWithViolatedInfoDTO);
         });
         shiftMongoRepository.saveAll(overLappedShifts);
         return shiftDTO;
     }
 
-    private boolean getEsclationResolved(Shift shift, Shift overLappedShift) {
-        boolean isResolved = true;
+    private boolean getEsclationResolved(Shift shift, Shift overLappedShift,ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO) {
+        boolean isResolved = false;
         if (shift.getId().equals(overLappedShift.getId()) && isNotNull(overLappedShift.getShiftViolatedRules())) {
             if (shift.getBreakActivities().stream().anyMatch(ShiftActivity::isBreakNotHeld)) {
                 overLappedShift.getShiftViolatedRules().setEscalationResolved(false);
                 isResolved = false;
-            } else {
+            } else if(shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()){
                 overLappedShift.getShiftViolatedRules().setEscalationResolved(true);
                 isResolved = true;
             }
