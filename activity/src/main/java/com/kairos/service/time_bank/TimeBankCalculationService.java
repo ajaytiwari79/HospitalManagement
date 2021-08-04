@@ -81,6 +81,7 @@ import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static com.kairos.enums.phase.PhaseDefaultName.PAYROLL;
 import static com.kairos.enums.phase.PhaseDefaultName.REALTIME;
 import static com.kairos.enums.phase.PhaseDefaultName.*;
+import static java.time.DayOfWeek.SUNDAY;
 import static java.util.stream.Collectors.*;
 
 /*
@@ -348,17 +349,18 @@ public class TimeBankCalculationService {
     public boolean isDayTypeValid(Date shiftDate, CTARuleTemplateDTO ruleTemplateDTO, Map<BigInteger, DayTypeDTO> dayTypeDTOMap) {
         List<DayTypeDTO> dayTypeDTOS = ruleTemplateDTO.getDayTypeIds().stream().map(dayTypeDTOMap::get).collect(Collectors.toList());
         boolean valid = false;
+        DayOfWeek dayOfWeek = asLocalDate(shiftDate).getDayOfWeek();
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
             if (dayTypeDTO.isHolidayType()) {
                 valid = isPublicHolidayValid(shiftDate, valid, dayTypeDTO);
             } else {
-                valid = ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(asLocalDate(shiftDate).getDayOfWeek());
+                valid = ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(dayOfWeek);
             }
             if (valid) {
                 break;
             }
         }
-        return valid;
+        return valid && dayOfWeek.equals(SUNDAY) && !ruleTemplateDTO.isNotApplicableForSunday();
     }
 
     public static boolean isPublicHolidayValid(Date shiftDate, boolean valid, DayTypeDTO dayTypeDTO) {
