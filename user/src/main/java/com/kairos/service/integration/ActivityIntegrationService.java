@@ -285,5 +285,12 @@ public class ActivityIntegrationService {
     public void setAbsenceRankingForExpertise(ActivityRankingDTO absenceRankingForExpertise) {
         genericRestClient.publishRequest(absenceRankingForExpertise, null, false, IntegrationOperation.CREATE, "/expertise/{expertiseId}/absence_ranking", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){},absenceRankingForExpertise.getExpertiseId());
     }
+
+    public void createNewWTALine(Long unitId, Long employmentId, Date publiceDate) {
+        Map<String, Object> queryParams = new HashMap<String, Object>();
+        queryParams.put("date", publiceDate);
+        queryParams.put("employmentId", employmentId);
+        restClientForSchedulerMessages.publish(null, unitId, true, IntegrationOperation.CREATE, "/create_wta_line_on_update_weekly_hours", queryParams);
+    }
 }
 
