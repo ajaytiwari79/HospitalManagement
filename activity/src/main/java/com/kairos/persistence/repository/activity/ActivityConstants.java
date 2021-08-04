@@ -32,9 +32,11 @@ public class ActivityConstants {
             "          \"$project\":{\n" +
             "              \"id\":1,\n" +
             "              \"name\":1,\n" +
+            "              \"activityGeneralSettings\":1,\n" +
             "              \"activityRulesSettings\":1,\n" +
             "              \"parentActivityId\":1,\n" +
             "              \"activityPriorityName\":1,\n" +
+            "              \"activityPhaseSettings\":1,\n" +
             "              \"expertises\":1,\n" +
             "              }    \n" +
             "              }\n" +
