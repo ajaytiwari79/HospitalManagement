@@ -12,6 +12,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.UnitGeneralSettingDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.basic_details.*;
@@ -29,6 +30,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.StaffWorkingType;
+import com.kairos.enums.TimeBankLimitsType;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
@@ -69,8 +71,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -78,8 +82,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -993,5 +996,41 @@ public class WorkTimeAgreementService{
         wtaBaseRuleTemplate.setTranslations(translations);
         wtaBaseRuleTemplateRepository.save(wtaBaseRuleTemplate);
         return wtaBaseRuleTemplate.getTranslations();
+    }
+
+    public boolean createWtaLineOnUpdateEmploymentWeeklyHours(Long unitId, Long employmentId, LocalDate date) {
+        UnitGeneralSettingDTO unitGeneralSetting = unitGeneralSettingService.getGeneralSetting(unitId);
+        if(TimeBankLimitsType.FACTOR_OF_WEEKLY_HOURS.equals(unitGeneralSetting.getTimeBankLimitsType())) {
+            createNewWtaLine(newArrayList(employmentId), asDate(date));
+        }
+        return true;
+    }
+
+    @Async
+    public void createWtaLineOnUpdateUnitSetting(Long unitId) {
+        List<EmploymentWithCtaDetailsDTO> employmentDTOS = userIntegrationService.getAllEmploymentByUnitId(unitId);
+        List<Long> employmentIds = employmentDTOS.stream().map(EmploymentWithCtaDetailsDTO::getId).collect(Collectors.toList());
+        createNewWtaLine(employmentIds, DateUtils.getDate());
+    }
+
+    private void createNewWtaLine(List<Long> employmentIds, Date date) {
+        List<WorkingTimeAgreement> workingTimeAgreements = workingTimeAgreementMongoRepository.findWTAOfEmployments(employmentIds);
+        Map<BigInteger, WorkingTimeAgreement> wtaMap = workingTimeAgreements.stream().collect(Collectors.toMap(WorkingTimeAgreement::getId, v->v));
+        List<WTAQueryResultDTO> currentWtas = wtaRepository.getWTAByEmploymentIds(employmentIds, date);
+        List<WorkingTimeAgreement> updatedResults = new ArrayList<>();
+        for (WTAQueryResultDTO currentWta : currentWtas) {
+            if(currentWta.getWTATemplateTypes().contains(WTATemplateType.TIME_BANK)){
+                WorkingTimeAgreement workingTimeAgreement = wtaMap.get(currentWta.getId());
+                if(!workingTimeAgreement.getStartDate().isEqual(asLocalDate(date))){
+                    WorkingTimeAgreement newWorkingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WorkingTimeAgreement.class);
+                    newWorkingTimeAgreement.setId(null);
+                    newWorkingTimeAgreement.setStartDate(asLocalDate(date));
+                    workingTimeAgreement.setEndDate(asLocalDate(date).minusDays(1));
+                    updatedResults.add(newWorkingTimeAgreement);
+                    updatedResults.add(workingTimeAgreement);
+                }
+            }
+        }
+        wtaRepository.saveEntities(updatedResults);
     }
 }
