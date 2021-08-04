@@ -327,7 +327,7 @@ public class WTAController {
     @ApiOperation(value = "update create_wta_line_on_update_weekly_hours")
     @PostMapping(value = UNIT_URL+"/create_wta_line_on_update_weekly_hours")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createWtaLineOnUpdateEmploymentWeeklyHours(@PathVariable Long unitId, @RequestParam Long employmentId, @RequestParam Date date) {
+    public ResponseEntity<Map<String, Object>> createWtaLineOnUpdateEmploymentWeeklyHours(@PathVariable Long unitId, @RequestParam Long employmentId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.createWtaLineOnUpdateEmploymentWeeklyHours(unitId, employmentId, date));
     }
 

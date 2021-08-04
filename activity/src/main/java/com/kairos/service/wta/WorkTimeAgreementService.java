@@ -998,10 +998,10 @@ public class WorkTimeAgreementService{
         return wtaBaseRuleTemplate.getTranslations();
     }
 
-    public boolean createWtaLineOnUpdateEmploymentWeeklyHours(Long unitId, Long employmentId, Date date) {
+    public boolean createWtaLineOnUpdateEmploymentWeeklyHours(Long unitId, Long employmentId, LocalDate date) {
         UnitGeneralSettingDTO unitGeneralSetting = unitGeneralSettingService.getGeneralSetting(unitId);
         if(TimeBankLimitsType.FACTOR_OF_WEEKLY_HOURS.equals(unitGeneralSetting.getTimeBankLimitsType())) {
-            createNewWtaLine(newArrayList(employmentId), date);
+            createNewWtaLine(newArrayList(employmentId), asDate(date));
         }
         return true;
     }

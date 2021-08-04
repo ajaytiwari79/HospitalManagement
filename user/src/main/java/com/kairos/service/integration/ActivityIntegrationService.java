@@ -286,9 +286,9 @@ public class ActivityIntegrationService {
         genericRestClient.publishRequest(absenceRankingForExpertise, null, false, IntegrationOperation.CREATE, "/expertise/{expertiseId}/absence_ranking", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){},absenceRankingForExpertise.getExpertiseId());
     }
 
-    public void createNewWTALine(Long unitId, Long employmentId, Date publiceDate) {
+    public void createNewWTALine(Long unitId, Long employmentId, LocalDate publishDate) {
         Map<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put("date", publiceDate);
+        queryParams.put("date", publishDate);
         queryParams.put("employmentId", employmentId);
         restClientForSchedulerMessages.publish(null, unitId, true, IntegrationOperation.CREATE, "/create_wta_line_on_update_weekly_hours", queryParams);
     }
