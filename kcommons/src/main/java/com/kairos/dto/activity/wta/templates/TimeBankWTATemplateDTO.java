@@ -23,8 +23,8 @@ public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private MinMaxSetting minMaxSetting;
     private boolean staffCanIgnoreForWeeklyEmployment;
     private boolean managementCanIgnoreForWeeklyEmployment;
-    private Integer factorOfWeeklyEmploymentForStaff;
-    private Integer factorOfWeeklyEmploymentForManagement;
+    private int factorOfWeeklyEmploymentForStaff;
+    private int factorOfWeeklyEmploymentForManagement;
 
     public TimeBankWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.TIME_BANK;

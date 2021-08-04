@@ -5,6 +5,9 @@ import com.kairos.dto.activity.unit_settings.UnitGeneralSettingDTO;
 import com.kairos.enums.TimeBankLimitsType;
 import com.kairos.persistence.model.unit_settings.UnitGeneralSetting;
 import com.kairos.persistence.repository.unit_settings.UnitGeneralSettingRepository;
+import com.kairos.service.wta.WorkTimeAgreementService;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -15,7 +18,10 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 public class UnitGeneralSettingService {
 
     @Inject
-    UnitGeneralSettingRepository unitGeneralSettingRepository;
+    private UnitGeneralSettingRepository unitGeneralSettingRepository;
+
+    @Inject @Lazy
+    private WorkTimeAgreementService workTimeAgreementService;
 
     public UnitGeneralSettingDTO createGeneralSetting(UnitGeneralSettingDTO unitGeneralSettingDTO){
         UnitGeneralSetting unitGeneralSetting = ObjectMapperUtils.copyPropertiesByMapper(unitGeneralSettingDTO, UnitGeneralSetting.class);
@@ -31,6 +37,7 @@ public class UnitGeneralSettingService {
         }
         unitGeneralSetting.setTimeBankLimitsType(unitGeneralSettingDTO.getTimeBankLimitsType());
         unitGeneralSettingRepository.save(unitGeneralSetting);
+        workTimeAgreementService.createWtaLineOnUpdateUnitSetting(unitId);
         return unitGeneralSettingDTO;
     }
 

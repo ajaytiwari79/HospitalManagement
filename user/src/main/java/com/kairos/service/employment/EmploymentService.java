@@ -76,8 +76,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getDateFromEpoch;
-import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
@@ -268,10 +267,10 @@ public class EmploymentService {
     }
 
 
-    private EmploymentLineChangeResultDTO calculativeValueChanged(EmploymentDTO employmentDTO, EmploymentLineEmploymentTypeRelationShip oldEmploymentLineEmploymentTypeRelationShip, EmploymentLine employmentLine, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams,Boolean saveAsDraft) {
+    private EmploymentLineChangeResultDTO calculativeValueChanged(EmploymentDTO employmentDTO, EmploymentLineEmploymentTypeRelationShip oldEmploymentLineEmploymentTypeRelationShip, EmploymentLine employmentLine, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams, Boolean saveAsDraft, long employmentId) {
         EmploymentLineChangeResultDTO changeResultDTO = new EmploymentLineChangeResultDTO(false);
         setCTAAndWTADetails(employmentDTO, ctawtaAndAccumulatedTimebankWrapper, changedParams, changeResultDTO,saveAsDraft);
-        checkWorkingHoursIfChnaged(employmentDTO, employmentLine, changeResultDTO);
+        checkWorkingHoursIfChanged(employmentDTO, employmentLine, changeResultDTO, saveAsDraft, employmentId);
         checkEmploymentTypeIfChanged(employmentDTO, oldEmploymentLineEmploymentTypeRelationShip, changeResultDTO);
         List<FunctionWithAmountQueryResult> newAppliedFunctions = employmentDetailsValidatorService.findAndValidateFunction(employmentDTO);
         List<FunctionWithAmountQueryResult> olderAppliesFunctions = employmentGraphRepository.findAllAppliedFunctionOnEmploymentLines(employmentDTO.getEmploymentLineId());
@@ -299,9 +298,12 @@ public class EmploymentService {
         return changeResultDTO;
     }
 
-    private void checkWorkingHoursIfChnaged(EmploymentDTO employmentDTO, EmploymentLine employmentLine, EmploymentLineChangeResultDTO changeResultDTO) {
+    private void checkWorkingHoursIfChanged(EmploymentDTO employmentDTO, EmploymentLine employmentLine, EmploymentLineChangeResultDTO changeResultDTO, boolean saveAsDraft, long employmentId) {
         if (employmentLine.getAvgDailyWorkingHours() != employmentDTO.getAvgDailyWorkingHours() || employmentLine.getTotalWeeklyMinutes() != (employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))) {
             changeResultDTO.setCalculativeChanged(true);
+            if(!saveAsDraft) {
+                activityIntegrationService.createNewWTALine(employmentDTO.getUnitId(), employmentId, employmentDTO.getStartDate());
+            }
         }
     }
 
@@ -353,11 +355,10 @@ public class EmploymentService {
         EmploymentQueryResult employmentQueryResult;
         List<NameValuePair> changedParams = new ArrayList<>();
         setDataInExistingEmployment(employmentDTO, saveAsDraft, oldEmployment);
-        EmploymentLineChangeResultDTO changeResultDTO = calculativeValueChanged(employmentDTO, employmentLineEmploymentTypeRelationShip, currentEmploymentLine, existingCtaWtaAndAccumulatedTimebankWrapper, changedParams,saveAsDraft);
+        EmploymentLineChangeResultDTO changeResultDTO = calculativeValueChanged(employmentDTO, employmentLineEmploymentTypeRelationShip, currentEmploymentLine, existingCtaWtaAndAccumulatedTimebankWrapper, changedParams, saveAsDraft, employmentId);
         if (changeResultDTO.isCalculativeChanged()) {
             employmentQueryResult = getEmploymentQueryResult(employmentId, employmentDTO, unitId, unit, oldEmployment, currentEmploymentLine, existingCtaWtaAndAccumulatedTimebankWrapper, employmentType, employmentLineEmploymentTypeRelationShip, changedParams, changeResultDTO);
-        }
-        else {
+        } else {
             currentEmploymentLine.setEndDate(employmentDTO.getEndDate());
             if (saveAsDraft) {
                 currentEmploymentLine.setStartDate(employmentDTO.getStartDate());
