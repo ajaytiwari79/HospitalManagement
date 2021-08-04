@@ -943,7 +943,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 StaffActivitySetting.class)){
             staffId = 0l;
         }
-        aggregations[i++] = match(Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false));
+        aggregations[i++] = match(Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false).and(UNIT_ID).is(unitId));
         aggregations[i++] = group(STAFF_ID).addToSet(ACTIVITYID).as(ACTIVITY_IDS);
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType,unitId);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
