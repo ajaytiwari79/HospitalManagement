@@ -475,7 +475,7 @@ public class EmploymentService {
         }
         if(!employmentDTO.getEndDate().equals(employment.getEndDate())){
             employment.setEndDate(employmentDTO.getEndDate());
-            setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
+            //setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
         }
     }
 

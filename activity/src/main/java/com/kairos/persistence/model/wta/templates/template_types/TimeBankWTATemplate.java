@@ -3,6 +3,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.TimeBankLimitsType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -30,6 +31,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private boolean managementCanIgnoreForWeeklyEmployment;
     private int factorOfWeeklyEmploymentForStaff;
     private int factorOfWeeklyEmploymentForManagement;
+    private TimeBankLimitsType timeBankLimitsType;
 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
