@@ -34,11 +34,13 @@ import com.kairos.enums.TimeBankLimitsType;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.DurationBetweenShiftsWTATemplate;
+import com.kairos.persistence.model.wta.templates.template_types.TimeBankWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -1001,36 +1003,52 @@ public class WorkTimeAgreementService{
     public boolean createWtaLineOnUpdateEmploymentWeeklyHours(Long unitId, Long employmentId, LocalDate date) {
         UnitGeneralSettingDTO unitGeneralSetting = unitGeneralSettingService.getGeneralSetting(unitId);
         if(TimeBankLimitsType.FACTOR_OF_WEEKLY_HOURS.equals(unitGeneralSetting.getTimeBankLimitsType())) {
-            createNewWtaLine(newArrayList(employmentId), asDate(date));
+            createNewWtaLine(newArrayList(employmentId), date, unitGeneralSetting.getTimeBankLimitsType());
         }
         return true;
     }
 
     @Async
-    public void createWtaLineOnUpdateUnitSetting(Long unitId) {
+    public void createWtaLineOnUpdateUnitSetting(Long unitId, TimeBankLimitsType timeBankLimitsType) {
         List<EmploymentWithCtaDetailsDTO> employmentDTOS = userIntegrationService.getAllEmploymentByUnitId(unitId);
         List<Long> employmentIds = employmentDTOS.stream().map(EmploymentWithCtaDetailsDTO::getId).collect(Collectors.toList());
-        createNewWtaLine(employmentIds, DateUtils.getDate());
+        createNewWtaLine(employmentIds, DateUtils.getLocalDate(), timeBankLimitsType);
     }
 
-    private void createNewWtaLine(List<Long> employmentIds, Date date) {
+    private void createNewWtaLine(List<Long> employmentIds, LocalDate date, TimeBankLimitsType timeBankLimitsType) {
         List<WorkingTimeAgreement> workingTimeAgreements = workingTimeAgreementMongoRepository.findWTAOfEmployments(employmentIds);
         Map<BigInteger, WorkingTimeAgreement> wtaMap = workingTimeAgreements.stream().collect(Collectors.toMap(WorkingTimeAgreement::getId, v->v));
-        List<WTAQueryResultDTO> currentWtas = wtaRepository.getWTAByEmploymentIds(employmentIds, date);
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllParentWTAByIds(employmentIds);
+        Map<Long, List<WTAQueryResultDTO>> wtaDTOMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         List<WorkingTimeAgreement> updatedResults = new ArrayList<>();
-        for (WTAQueryResultDTO currentWta : currentWtas) {
-            if(currentWta.getWTATemplateTypes().contains(WTATemplateType.TIME_BANK)){
-                WorkingTimeAgreement workingTimeAgreement = wtaMap.get(currentWta.getId());
-                if(!workingTimeAgreement.getStartDate().isEqual(asLocalDate(date))){
-                    WorkingTimeAgreement newWorkingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WorkingTimeAgreement.class);
-                    newWorkingTimeAgreement.setId(null);
-                    newWorkingTimeAgreement.setStartDate(asLocalDate(date));
-                    workingTimeAgreement.setEndDate(asLocalDate(date).minusDays(1));
-                    updatedResults.add(newWorkingTimeAgreement);
-                    updatedResults.add(workingTimeAgreement);
-                }
+        for (List<WTAQueryResultDTO> wtaList : wtaDTOMap.values()) {
+            for(WTAQueryResultDTO wta : wtaList) {
+                updateTimeBankLimitsInRuleTemplates(date, timeBankLimitsType, wtaMap, updatedResults, wta);
             }
         }
         wtaRepository.saveEntities(updatedResults);
+    }
+
+    private void updateTimeBankLimitsInRuleTemplates(LocalDate date, TimeBankLimitsType timeBankLimitsType, Map<BigInteger, WorkingTimeAgreement> wtaMap, List<WorkingTimeAgreement> updatedResults, WTAQueryResultDTO wta) {
+        if((isNull(wta.getEndDate()) || !wta.getEndDate().isBefore(date)) && wta.getWTATemplateTypes().contains(WTATemplateType.TIME_BANK)) {
+            WorkingTimeAgreement workingTimeAgreement = wtaMap.get(wta.getId());
+            if (workingTimeAgreement.getStartDate().isBefore(date)) {
+                WorkingTimeAgreement oldWorkingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WorkingTimeAgreement.class);
+                oldWorkingTimeAgreement.setEndDate(date.minusDays(1));
+                updatedResults.add(oldWorkingTimeAgreement);
+                workingTimeAgreement.setId(null);
+                workingTimeAgreement.setStartDate(date);
+                List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(ObjectMapperUtils.copyCollectionPropertiesByMapper(wta.getRuleTemplates(), WTABaseRuleTemplateDTO.class), true);
+                wtaBaseRuleTemplateRepository.saveEntities(ruleTemplates);
+                List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
+                workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
+            }
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndWtaTemplateType(workingTimeAgreement.getRuleTemplateIds(), WTATemplateType.TIME_BANK);
+            for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
+                ((TimeBankWTATemplate)wtaBaseRuleTemplate).setTimeBankLimitsType(timeBankLimitsType);
+            }
+            wtaBaseRuleTemplateRepository.saveEntities(wtaBaseRuleTemplates);
+            updatedResults.add(workingTimeAgreement);
+        }
     }
 }

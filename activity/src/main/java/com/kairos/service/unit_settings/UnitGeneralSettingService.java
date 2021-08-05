@@ -37,7 +37,7 @@ public class UnitGeneralSettingService {
         }
         unitGeneralSetting.setTimeBankLimitsType(unitGeneralSettingDTO.getTimeBankLimitsType());
         unitGeneralSettingRepository.save(unitGeneralSetting);
-        workTimeAgreementService.createWtaLineOnUpdateUnitSetting(unitId);
+        workTimeAgreementService.createWtaLineOnUpdateUnitSetting(unitId, unitGeneralSetting.getTimeBankLimitsType());
         return unitGeneralSettingDTO;
     }
 
