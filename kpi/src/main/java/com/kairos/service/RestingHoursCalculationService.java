@@ -19,7 +19,6 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.persistence.model.ApplicableKPI;
 import com.kairos.persistence.model.FibonacciKPICalculation;
 import com.kairos.persistence.model.KPI;
-import com.kairos.persistence.model.Shift;
 import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.utils.FibonacciCalculationUtil;
 import com.kairos.utils.KPIUtils;

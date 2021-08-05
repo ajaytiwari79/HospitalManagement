@@ -1,10 +1,12 @@
 package com.kairos.persistence.repository.counter;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.ShortCuts.ShortcutDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
@@ -22,23 +24,30 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.enums.TimeSlotType;
-import com.kairos.enums.TimeTypes;
+import com.kairos.enums.*;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +62,7 @@ import static com.kairos.constants.AppConstants.TIME_SLOT_SET;
 import static com.kairos.constants.CommonConstants.DELETED;
 import static com.kairos.constants.CommonConstants.DISABLED;
 import static com.kairos.constants.KPIMessagesConstants.*;
+import static com.kairos.enums.PriorityFor.NONE;
 import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.shift.TodoStatus.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -106,7 +116,7 @@ public class CounterHelperRepository {
                 Aggregation.match(Criteria.where(COUNTRY_ID).in(countryId).and(DELETED).is(false)),
                 Aggregation.lookup(COUNTRY_HOLIDAY_CALENDER,ID1,"dayTypeId","countryHolidayCalenderData")
         );
-        return mongoTemplate.aggregate(aggregation, "dayType",DayTypeDTO.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregation, DayType.class,DayTypeDTO.class).getMappedResults();
     }
 
     public List<CountryHolidayCalenderDTO> getAllByCountryIdAndHolidayDateBetween(Long countryId, LocalDate startDate, LocalDate endDate) {
@@ -280,7 +290,7 @@ public class CounterHelperRepository {
                 group(UNIT_ID).first(START_DATE).as(START_DATE).last(END_DATE).as(END_DATE),
                 project().and(START_DATE).as(START_DATE).and(END_DATE).as(END_DATE)
         );
-        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PLANNING_PERIOD, PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         PlanningPeriodDTO planningPeriodDTO = results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
         return new DateTimeInterval(planningPeriodDTO.getStartDate(),planningPeriodDTO.getEndDate());
     }
@@ -293,7 +303,7 @@ public class CounterHelperRepository {
                 project().and(PHASE).arrayElementAt(0).as(PHASE),
                 project("phase._id", "phase.name","phase.phaseEnum","phase.accessGroupIds","phase.organizationId")
         );
-        AggregationResults<PhaseDTO> results = mongoTemplate.aggregate(aggregation, PLANNING_PERIOD, PhaseDTO.class);
+        AggregationResults<PhaseDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PhaseDTO.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
     }
 
@@ -315,7 +325,7 @@ public class CounterHelperRepository {
                 sort(Sort.Direction.ASC, START_DATE),
                 projectionOperation
         );
-        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PLANNING_PERIOD, PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return results.getMappedResults();
     }
 
@@ -361,7 +371,7 @@ public class CounterHelperRepository {
                 Aggregation.match(Criteria.where("timeTypes").in(timeTypeEnums)),
                 Aggregation.project(ID2),
                 Aggregation.unwind(ID2));
-        AggregationResults<TimeTypeDTO> results = mongoTemplate.aggregate(aggregation, TIME_TYPE,TimeTypeDTO.class);
+        AggregationResults<TimeTypeDTO> results = mongoTemplate.aggregate(aggregation, TimeType.class,TimeTypeDTO.class);
         return results.getMappedResults().stream().map(s-> s.getId()).collect(Collectors.toSet());
     }
 
@@ -389,7 +399,7 @@ public class CounterHelperRepository {
         return mongoTemplate.find(new Query(Criteria.where("shiftId").is(shiftIds).and(DELETED).is(false).and("accessGroupRole").in(accessRole)),ShiftDTO.class,"shiftState");
     }
 
-    public List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate){
+    public List<ShiftDTO> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate){
         Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
                 .and(START_DATE).gte(startDate).lt(endDate);
         List<AggregationOperation> aggregationOperation = new ArrayList<>();
@@ -405,7 +415,7 @@ public class CounterHelperRepository {
         }
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
+        AggregationResults<ShiftDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class);
         return result.getMappedResults();
     }
 
@@ -477,7 +487,7 @@ public class CounterHelperRepository {
                 lookup(TIME_TYPE, "activityBalanceSettings.timeTypeId", ID1, TIME_TYPE)
                 ,project(NAME,DESCRIPTION,COUNTRY_ID,UNIT_ID,"parentId","isParentActivity","activityGeneralSettings","activityBalanceSettings","activityRulesSettings","activityTimeCalculationSettings","activitySkillSettings")
                         .and(TIME_TYPE).arrayElementAt(0).as(TIME_TYPE));
-        List<ActivityDTO> activityDTOS = mongoTemplate.aggregate(aggregation, ActivityDTO.class, ActivityDTO.class).getMappedResults();
+        List<ActivityDTO> activityDTOS = mongoTemplate.aggregate(aggregation, ACTIVITIES, ActivityDTO.class).getMappedResults();
         return activityDTOS.stream().collect(Collectors.toMap(ActivityDTO::getId, v->v));
     }
 
@@ -643,5 +653,98 @@ public class CounterHelperRepository {
         public Document toDocument(AggregationOperationContext context) {
             return context.getMappedObject(operation);
         }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public class PlanningPeriod extends MongoBaseEntity {
+
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private String name;
+        private String dateRange;
+        @Indexed
+        private Long unitId = -1L;
+        private BigInteger currentPhaseId;
+        private BigInteger nextPhaseId;
+        private int duration;
+        private DurationType durationType;
+        private boolean active = true;
+        private Set<Long> publishEmploymentIds = new HashSet<>();
+    }
+
+    @Getter
+    @Setter
+    public class Shift {
+        protected Date startDate;
+        protected Date endDate;
+        protected Integer shiftStartTime;//In Second
+        protected Integer shiftEndTime;//In Second
+        protected boolean disabled = false;
+        @NotNull(message = "error.ShiftDTO.staffId.notnull")
+        protected Long staffId;
+        protected BigInteger phaseId;
+        protected BigInteger planningPeriodId;
+        @Indexed
+        protected Long unitId;
+        protected int scheduledMinutes;
+        protected int durationMinutes;
+        @NotEmpty(message = "message.shift.activity.empty")
+        protected List<ShiftActivity> activities;
+    }
+
+    @org.springframework.data.mongodb.core.mapping.Document(collection = "time_Type")
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public class TimeType extends MongoBaseEntity implements Serializable {
+
+        private static final long serialVersionUID = 3265660403399363722L;
+        private Long countryId;
+        private TimeTypes timeTypes;
+        private BigInteger upperLevelTimeTypeId;
+        private String label;
+        private boolean leafNode;
+        private String description;
+        private List<BigInteger> childTimeTypeIds = new ArrayList<>();
+        private String backgroundColor;
+        private TimeTypeEnum secondLevelType;
+        private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
+        private boolean partOfTeam;
+        private boolean allowChildActivities;
+        private boolean allowedConflicts;
+        private ActivityPhaseSettings activityPhaseSettings;
+        private List<Long> expertises;
+        private List<Long> organizationTypes;
+        private List<Long> organizationSubTypes;
+        private List<Long> regions;
+        private List<Long> levels;
+        private List<Long> employmentTypes;
+        private boolean breakNotHeldValid;
+        private PriorityFor priorityFor = NONE;
+        private boolean sicknessSettingValid;
+        private Map<String, BigInteger> upperLevelTimeTypeDetails;
+        //this setting for unity graph
+        private UnityActivitySetting unityActivitySetting;
+    }
+
+    @org.springframework.data.mongodb.core.mapping.Document
+    @Getter
+    @Setter
+    public class DayType extends MongoBaseEntity {
+        private static final long serialVersionUID = 5594442948746712580L;
+        @NotBlank(message = "error.DayType.name.notEmpty")
+        private String name;
+        @NotNull
+        int code;
+        private String description;
+        private String colorCode;
+        private Long countryId;
+        private List<Day> validDays = new ArrayList<>();
+        private boolean holidayType;
+        private boolean isEnabled = true;
+        private boolean allowTimeSettings;
     }
 }

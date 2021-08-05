@@ -12,6 +12,7 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.*;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.DurationType;
@@ -83,7 +84,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
          dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         staffIds=(List<Long>)kpiData[2];
-        List<Shift> shifts = counterHelperRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+        List<ShiftDTO> shifts = counterHelperRepository.findShiftsByKpiFilters(staffIds, ObjectUtils.isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = plannedHoursCalculationService.calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
         Map<Object, Double> staffPlannedHoursAndTimeBankHours =calculateDataByKpiRepresentation(staffIds,dateTimeIntervals,applicableKPI,unitIds,staffKpiFilterDTOS,daysOfWeek);
        kpiDataUnits= getKpiDataUnits(staffPlannedHours,staffPlannedHoursAndTimeBankHours,applicableKPI,staffKpiFilterDTOS);
