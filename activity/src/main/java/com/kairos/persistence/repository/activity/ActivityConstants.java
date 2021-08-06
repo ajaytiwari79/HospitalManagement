@@ -37,6 +37,7 @@ public class ActivityConstants {
             "              \"parentActivityId\":1,\n" +
             "              \"activityPriorityName\":1,\n" +
             "              \"activityPhaseSettings\":1,\n" +
+            "              \"activitySkillSettings\":1,\n" +
             "              \"expertises\":1,\n" +
             "              }    \n" +
             "              }\n" +
