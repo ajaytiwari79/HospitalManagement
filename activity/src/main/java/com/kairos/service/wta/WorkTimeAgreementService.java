@@ -527,7 +527,7 @@ public class WorkTimeAgreementService{
 
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
             if (isCollectionNotEmpty(versionsOfWTAs)) {
-                List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
+                List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.getOrDefault(currentWTA.getEmploymentId(),new ArrayList<>()), WTAResponseDTO.class);
                 if(isNotNull(finalOrgWTA)) {
                     versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
                 }
