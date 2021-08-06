@@ -244,9 +244,11 @@ public class ActivityConfigurationService {
         ActivityConfiguration nonWorkingActivityConfiguration = null;
         if(timeTypes.contains(TimeTypeEnum.ABSENCE)){
             absenceActivityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        }else if(timeTypes.contains(TimeTypeEnum.PRESENCE)){
+        }
+        if(timeTypes.contains(TimeTypeEnum.PRESENCE)){
             presenceActivityConfiguration = findPresenceConfigurationByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        }else if(!CollectionUtils.removeAll(timeTypes,newHashSet(TimeTypeEnum.ABSENCE,TimeTypeEnum.PRESENCE)).isEmpty()){
+        }
+        if(!CollectionUtils.removeAll(timeTypes,newHashSet(TimeTypeEnum.ABSENCE,TimeTypeEnum.PRESENCE)).isEmpty()){
             nonWorkingActivityConfiguration = activityConfigurationRepository.findAllNonWorkingConfigurationByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
         }
         for (ShiftActivity shiftActivity : shift.getActivities()) {
