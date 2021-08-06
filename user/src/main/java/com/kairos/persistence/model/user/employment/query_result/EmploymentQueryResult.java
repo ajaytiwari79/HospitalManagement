@@ -16,10 +16,9 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 /**
  * Created by vipul on 10/8/17.
@@ -60,10 +59,13 @@ public class EmploymentQueryResult {
     private List<CareDays> childCareDays;
     private List<StaffChildDetail> staffChildDetails;
 
-
-
-
-
+    public void setEmploymentLines(List<EmploymentLinesQueryResult> employmentLines) {
+        if (isCollectionNotEmpty(employmentLines)){
+            employmentLines.sort(Comparator.comparing(EmploymentLinesQueryResult::getStartDate));
+            this.endDate = employmentLines.get(employmentLines.size()-1).getEndDate();
+        }
+        this.employmentLines = employmentLines;
+    }
     /**
      *  Please do not use in backend its just only for FE compactibility
      */

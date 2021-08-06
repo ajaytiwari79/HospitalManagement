@@ -97,6 +97,8 @@ public class ShiftHelperService {
         shiftActivity.setTimeType(shiftActivityDTO.getTimeType());
         shiftActivity.setMethodForCalculatingTime(shiftActivityDTO.getMethodForCalculatingTime());
         shiftActivity.setId(shiftActivityDTO.getId());
+        shiftActivity.setDurationMinutes(shiftActivityDTO.getDurationMinutes());
+        shiftActivity.setScheduledMinutes(shiftActivityDTO.getScheduledMinutes());
     }
 
     public void updateShiftResponse(ShiftDTO shiftDTO, String timeZone, Phase phase){

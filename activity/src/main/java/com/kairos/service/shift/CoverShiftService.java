@@ -406,6 +406,7 @@ public class CoverShiftService {
     private void updateTimeBankInCoverShifts(List<CoverShiftDTO> coverShiftDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts) {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = isCollectionEmpty(shifts) ? new HashMap<>() : organizationActivityService.getActivityWrapperMap(shifts, null);
         Map<BigInteger, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(MongoBaseEntity::getId,Function.identity()));
+        coverShiftDTOS = coverShiftDTOS.stream().filter(coverShiftDTO -> shiftMap.containsKey(coverShiftDTO.getShiftId())).collect(Collectors.toList());
         for (CoverShiftDTO coverShiftDTO : coverShiftDTOS) {
             Shift shift = shiftMap.get(coverShiftDTO.getShiftId());
             if(isNull(shift)){
