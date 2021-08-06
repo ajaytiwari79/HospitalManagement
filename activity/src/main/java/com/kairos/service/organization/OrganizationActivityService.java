@@ -868,11 +868,12 @@ public class OrganizationActivityService {
         }
         if (isNotNull(shiftDTO)) {
             unitId=shiftDTO.getUnitId();
-            activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
-            activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
-            activityIds.addAll(shiftDTO.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+            getActivityIdsByShift(activityIds, ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class));
         }
         List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        if(activities.size() < activityIds.size()){
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOTFOUND,ACTIVITY);
+        }
         ActivityRanking activityRanking= activityRankingService.getCurrentlyActiveActivityRankingSettings(unitId,shiftDTO==null?DateUtils.getLocalDate():DateUtils.asLocalDate(shiftDTO.getStartDate()));
         ActivityUtil.updateRanking(activityRanking,activities);
         return activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
