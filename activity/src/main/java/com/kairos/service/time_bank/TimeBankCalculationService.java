@@ -360,7 +360,10 @@ public class TimeBankCalculationService {
                 break;
             }
         }
-        return valid && dayOfWeek.equals(SUNDAY) && !ruleTemplateDTO.isNotApplicableForSunday();
+        if(valid && dayOfWeek.equals(SUNDAY)){
+            valid = !ruleTemplateDTO.isNotApplicableForSunday();
+        }
+        return valid;
     }
 
     public static boolean isPublicHolidayValid(Date shiftDate, boolean valid, DayTypeDTO dayTypeDTO) {
