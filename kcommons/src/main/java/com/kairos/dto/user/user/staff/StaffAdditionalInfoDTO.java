@@ -80,6 +80,7 @@ public class StaffAdditionalInfoDTO {
     private ShiftActivityDTO replacedActivity;
     private List<TeamRankingInfoDTO> staffTeamRankingInfoData;
     private Boolean canRankTeam;
+    private Boolean wtaViolationOccurIfPlanned;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;

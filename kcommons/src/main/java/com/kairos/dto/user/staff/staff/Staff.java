@@ -24,6 +24,7 @@ public class Staff {
     private List<Long> skills;
     private StaffStatusEnum currentStatus;
     private Set<Long> employmentIds = new HashSet<>();
+    private Boolean wtaViolationOccurIfPlanned;
 
     public Staff(Long id, String firstName, String lastName, List<Long> skills, StaffStatusEnum currentStatus) {
 
