@@ -928,22 +928,19 @@ public class StaffRetrievalService {
 
     public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(Long unitId, NotEligibleStaffDataDTO notEligibleStaffDataDTO) {
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = staffGraphRepository.getEligibleStaffsForCoverShift(unitId,notEligibleStaffDataDTO);
-        if(notEligibleStaffDataDTO.isContainsWTARuleViolationCriteria()){
-            Set<Long> employmentIds = staffAdditionalInfoDTOS.stream().flatMap(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmploymentIds().stream()).collect(Collectors.toSet());
-            List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds,false);
-            Map<Long,StaffEmploymentDetails> staffEmploymentDetailsMap = employmentDetails.stream().collect(Collectors.toMap(staffEmploymentDetails -> staffEmploymentDetails.getId(),v->v));
-            ListIterator<StaffAdditionalInfoDTO> iterator = staffAdditionalInfoDTOS.listIterator();
-            while (iterator.hasNext()){
-                StaffAdditionalInfoDTO staffAdditionalInfoDTO = iterator.next();
-                List<StaffEmploymentDetails> staffEmploymentDetails = staffAdditionalInfoDTO.getEmploymentIds().stream().filter(employmentId->staffEmploymentDetailsMap.containsKey(employmentId)).map(employmentId->staffEmploymentDetailsMap.get(employmentId)).collect(Collectors.toList());
-                if(isCollectionNotEmpty(staffEmploymentDetails)){
-                    staffAdditionalInfoDTO.setEmployment(staffEmploymentDetails.get(0));
-                }
-                else {
-                    iterator.remove();
-                }
+        Set<Long> employmentIds = staffAdditionalInfoDTOS.stream().flatMap(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmploymentIds().stream()).collect(Collectors.toSet());
+        List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds,false);
+        Map<Long,StaffEmploymentDetails> staffEmploymentDetailsMap = employmentDetails.stream().collect(Collectors.toMap(staffEmploymentDetails -> staffEmploymentDetails.getId(),v->v));
+        ListIterator<StaffAdditionalInfoDTO> iterator = staffAdditionalInfoDTOS.listIterator();
+        while (iterator.hasNext()){
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = iterator.next();
+            List<StaffEmploymentDetails> staffEmploymentDetails = staffAdditionalInfoDTO.getEmploymentIds().stream().filter(employmentId->staffEmploymentDetailsMap.containsKey(employmentId)).map(employmentId->staffEmploymentDetailsMap.get(employmentId)).collect(Collectors.toList());
+            if(isCollectionNotEmpty(staffEmploymentDetails)){
+                staffAdditionalInfoDTO.setEmployment(staffEmploymentDetails.get(0));
             }
-            return staffAdditionalInfoDTOS;
+            else {
+                iterator.remove();
+            }
         }
         return staffAdditionalInfoDTOS;
     }
