@@ -169,27 +169,30 @@ public class CoverShiftService {
     }
 
     private void removeStaffWhichHaveWTAViolation(CoverShiftSetting coverShiftSetting, Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Set<BigInteger> activityIds, Long countryId, boolean userAccessRole) {
-        if (coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION)) {
-            ShiftDataHelper shiftDataHelper = getShiftDataHelperForCoverShift(coverShiftSetting, shift, staffAdditionalInfoDTOS, activityIds, countryId, userAccessRole);
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getActivities().get(0).getStartDate(), shiftDataHelper);
-            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null, shiftDataHelper.getActivityMap(), shift);
-            List<Future<ShiftWithViolatedInfoDTO>> shiftWithViolatedInfoDTOS = new ArrayList<>();
-            validateShifts(shift, staffAdditionalInfoDTOS, shiftDataHelper, phase, shiftWithActivityDTO, shiftWithViolatedInfoDTOS);
-            List<ShiftWithViolatedInfoDTO> withViolatedInfoDTOS = new ArrayList<>();
-            for (Future<ShiftWithViolatedInfoDTO> data : shiftWithViolatedInfoDTOS) {
-                try {
-                    if (isNotNull(data)) {
-                        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = data.get();
-                        if (isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())) {
+        ShiftDataHelper shiftDataHelper = getShiftDataHelperForCoverShift(coverShiftSetting, shift, staffAdditionalInfoDTOS, activityIds, countryId, userAccessRole);
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getActivities().get(0).getStartDate(), shiftDataHelper);
+        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null, shiftDataHelper.getActivityMap(), shift);
+        List<Future<ShiftWithViolatedInfoDTO>> shiftWithViolatedInfoDTOS = new ArrayList<>();
+        validateShifts(shift, staffAdditionalInfoDTOS, shiftDataHelper, phase, shiftWithActivityDTO, shiftWithViolatedInfoDTOS);
+        for (Future<ShiftWithViolatedInfoDTO> data : shiftWithViolatedInfoDTOS) {
+            try {
+                if (isNotNull(data)) {
+                    ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = data.get();
+                    if (isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())) {
+                        if(coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION)){
                             staffAdditionalInfoDTOS.removeIf(staffAdditionalInfoDTO -> shiftWithViolatedInfoDTO.getShifts().get(0).getStaffId().equals(staffAdditionalInfoDTO.getId()));
+                        }else {
+                            staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO ->{
+                                if(shiftWithViolatedInfoDTO.getShifts().get(0).getStaffId().equals(staffAdditionalInfoDTO.getId())) {
+                                    staffAdditionalInfoDTO.setWtaViolationOccurIfPlanned(true);
+                                }
+                            });
                         }
-                        withViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
                     }
-                } catch (InterruptedException | ExecutionException ex) {
-                    LOGGER.error("error while generate KPI  data", ex);
                 }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOGGER.error("error while generate KPI  data", ex);
             }
-
         }
     }
 
