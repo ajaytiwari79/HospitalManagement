@@ -19,7 +19,6 @@ public class SchedulerService {
     @Inject
     private RedisService redisService;
 
-
     @Scheduled(cron="0 0 0 * * ?")
     public void dailyJob(){
         LOGGER.info("Daily Job Execution {}",new Date());

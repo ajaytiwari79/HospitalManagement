@@ -106,7 +106,7 @@ public class ProtectedDaysOffService {
         List<ProtectedDaysOff> protectedDaysOffs = new ArrayList<>();
         for (CountryHolidayCalenderDTO countryHolidayCalendarQueryResult : countryHolidayCalendarQueryResults) {
             for (Long expertiseId : expertises) {
-                if (!countryHolidayCalendarQueryResult.isAllowTimeSettings() && countryHolidayCalendarQueryResult.isHolidayType()) {
+                if (!countryHolidayCalendarQueryResult.isAllowTimeSettings()) {
                     protectedDaysOffs.add(new ProtectedDaysOff(countryHolidayCalendarQueryResult.getId(), countryHolidayCalendarQueryResult.getHolidayDate(), true, countryHolidayCalendarQueryResult.getDayTypeId(), expertiseId));
                 }
             }
