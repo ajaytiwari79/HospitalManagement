@@ -426,6 +426,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_COVER_SHIFT_SETTING_ID_NOT_FOUND = "error.cover.shift.setting.id.not.found";
     public static final String ERROR_COVER_SHIFT_SETTING_ALREADY_EXIST_FOR_UNIT = "error.cover.shift.setting.already.exist.for.unit";
     public static final String ERROR_COVER_SHIFT_SETTING_UNIT_ID_INVALID = "error.cover.shift.setting.unit.id.invalid";
+    public static final String COVER_ALREADY_RAISED = "cover.already.raised";
 
     //Ranking Error Messages
     public static final String MESSAGE_RANKING_EMPTY="ranking.absent";

@@ -22,4 +22,7 @@ public interface CoverShiftMongoRepository extends MongoBaseRepository<CoverShif
     List<CoverShift> findAllByDateAndDeletedFalse(LocalDate selectedDate);
 
     List<CoverShift> findAllByIdInAndDeletedFalse(Collection<BigInteger> id);
+
+    @Query(value = "{deleted:false,shiftId:?1}",exists = true)
+    boolean existsByShiftIdAndDeleteFalse(BigInteger shiftId);
 }
