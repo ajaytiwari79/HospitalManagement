@@ -257,6 +257,11 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseIdsByCountryId(countryId));
     }
 
-
+    @GetMapping(value = COUNTRY_URL+"/expertise_of_country")
+    @ApiOperation("all expertise")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getAllExpertiseOfCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByCountryId(countryId));
+    }
 
 }

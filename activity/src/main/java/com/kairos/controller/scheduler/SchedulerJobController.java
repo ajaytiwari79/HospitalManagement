@@ -83,7 +83,10 @@ public class SchedulerJobController {
 
     }
 
+    @ApiOperation(value = "create job of public holiday ")
+    @PostMapping(value="/public_holiday")
+    public ResponseEntity<Map<String, Object>> createJobForPublicHoliday() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activitySchedulerJobService.createJobForPublicHoliday());
 
-
-
+    }
 }

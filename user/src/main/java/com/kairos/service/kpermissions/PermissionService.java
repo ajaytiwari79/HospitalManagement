@@ -452,7 +452,7 @@ public class PermissionService {
             unions = organizationService.getAllUnionsByOrganizationOrCountryId(DEFAULT_ID, refrenceId);
         }
         Long countryId = ConfLevel.COUNTRY.equals(confLevel) ? refrenceId : organizationDTO.getCountryId();
-        List<ExpertiseDTO> expertises = copyCollectionPropertiesByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId), ExpertiseDTO.class);
+        List<ExpertiseDTO> expertises = copyCollectionPropertiesByMapper(expertiseGraphRepository.getExpertiseOfCountry(countryId), ExpertiseDTO.class);
         List<EmploymentTypeDTO> employmentTypeDTOS = copyCollectionPropertiesByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId, false), EmploymentTypeDTO.class);
         List<UnionDTO> unionDTOS = copyCollectionPropertiesByMapper(unions, UnionDTO.class);
         List<TeamDTO> teamDTOS = copyCollectionPropertiesByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);

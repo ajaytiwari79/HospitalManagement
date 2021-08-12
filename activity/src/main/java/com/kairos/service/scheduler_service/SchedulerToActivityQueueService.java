@@ -6,6 +6,7 @@ import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
 import com.kairos.service.dashboard.SickService;
+import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ActivityReminderService;
@@ -46,6 +47,8 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private ActivityReminderService activityReminderService;
+    @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
 
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
@@ -90,6 +93,10 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case ACTIVITY_REMINDER:
                 LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences with in the cutoff period. ");
                 activityReminderService.sendActivityReminderViaEmail(job.getUnitId(), job.getEntityId());
+                break;
+            case PUBLIC_HOLIDAY:
+                LOGGER.info("Job to create fixed public holiday. ");
+                countryHolidayCalenderService.createFixedPublicHoliday();
                 break;
             default:
                 LOGGER.error("No exceution route found for jobsubtype");

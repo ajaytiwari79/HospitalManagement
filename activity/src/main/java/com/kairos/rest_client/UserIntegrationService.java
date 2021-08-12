@@ -30,6 +30,7 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.filter.FilteredStaffsAndRequiredDataFilterDTO;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
@@ -578,6 +579,10 @@ public class UserIntegrationService {
 
     public Set<Long> getAllExpertiseByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/all_expertise_by_country", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
+    }
+
+    public List<ExpertiseDTO> getAllExpertiseInfoByCountryId(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/expertise_of_country", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ExpertiseDTO>>>() {});
     }
 
     public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(NotEligibleStaffDataDTO notEligibleStaffDataDTO,Long unitId) {
