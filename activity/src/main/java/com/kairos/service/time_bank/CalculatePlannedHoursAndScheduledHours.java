@@ -97,12 +97,7 @@ public class CalculatePlannedHoursAndScheduledHours {
                 Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shift.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
                 if (shift.getStatuses().contains(ShiftStatus.PUBLISH) && CalculationFor.CONDITIONAL_BONUS.equals(ruleTemplate.getCalculationFor()) && (isTimeSlotChanged(shift) || isNull(shift.getId()) || optionalTimeBankDistributionDTO.isPresent())) {
                     int compensation = calculateConditionalBonus(ruleTemplate,staffAdditionalInfoDTO.getEmployment(),shift, TIMEBANK_ACCOUNT);
-                    if (optionalTimeBankDistributionDTO.isPresent() && compensation > 0) {
-                        optionalTimeBankDistributionDTO.get().setMinutes(compensation);
-                    } else if(compensation > 0){
-                        TimeBankDistributionDTO timeBankDistributionDTO = new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(getDate()), compensation);
-                        shift.getTimeBankCTADistributions().add(timeBankDistributionDTO);
-                    }
+                    updateTimeBankDetailsInShift(ruleTemplate, shift, optionalTimeBankDistributionDTO, compensation);
                 }else {
                     ruleTemplateValid = calculateBonusOrScheduledMinutesByShiftActivity(ruleTemplateValid, ruleTemplate, shift);
                 }
@@ -114,6 +109,14 @@ public class CalculatePlannedHoursAndScheduledHours {
             }
         }
         return this;
+    }
+    private void updateTimeBankDetailsInShift(CTARuleTemplateDTO ruleTemplate, ShiftWithActivityDTO shift, Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO, int compensation) {
+        if (optionalTimeBankDistributionDTO.isPresent() && compensation > 0) {
+            optionalTimeBankDistributionDTO.get().setMinutes(compensation);
+        } else if(compensation > 0){
+            TimeBankDistributionDTO timeBankDistributionDTO = new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(getDate()), compensation);
+            shift.getTimeBankCTADistributions().add(timeBankDistributionDTO);
+        }
     }
 
     public boolean isTimeSlotChanged(ShiftWithActivityDTO shift) {
@@ -176,6 +179,8 @@ public class CalculatePlannedHoursAndScheduledHours {
             shiftActivityDTO.setTimeBankCtaBonusMinutes(ctaBonusAndScheduledMinutes + shiftActivityDTO.getTimeBankCtaBonusMinutes());
             LOGGER.debug("rule template : {} minutes {}", ruleTemplate.getId(), ctaBonusAndScheduledMinutes);
         }
+        Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shift.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
+        updateTimeBankDetailsInShift(ruleTemplate,shift,optionalTimeBankDistributionDTO,ctaBonusAndScheduledMinutes);
         shiftActivityDTO.setPlannedMinutesOfTimebank(ctaBonusAndScheduledMinutes + shiftActivityDTO.getPlannedMinutesOfTimebank());
         totalDailyPlannedMinutes += ctaBonusAndScheduledMinutes;
         ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusAndScheduledMinutes);
