@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.expertise;
 
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
@@ -144,7 +145,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
 
     @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} RETURN e")
-    List<Expertise> getExpertiesOfCountry(Long countryId);
+    List<Expertise> getExpertiseOfCountry(Long countryId);
 
 
     @Query("MATCH (expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE  (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
