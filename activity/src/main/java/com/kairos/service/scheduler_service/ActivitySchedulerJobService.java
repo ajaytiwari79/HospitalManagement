@@ -160,6 +160,15 @@ public class ActivitySchedulerJobService {
         }
         return repeatTriggerDateTimes;
     }
+
+    public boolean createJobForPublicHoliday() {
+        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.PUBLIC_HOLIDAY, JobFrequencyType.YEARLY, getLocalDateTime(getFirstDayOfYear(getLocalDate().getYear()), 00, 05, 00), false));
+        LOGGER.info("create job for add public holiday");
+        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+        });
+        LOGGER.info("job registered of add public holiday");
+        return isCollectionNotEmpty(schedulerPanelDTOS);
+    }
 }
 
 

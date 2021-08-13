@@ -22,13 +22,11 @@ public interface CountryCalenderRepo extends MongoBaseRepository<CountryHolidayC
     @Query("{'deleted':false,'countryId':?0,'holidayDate':?1,'$or':[{'endTime':{$exists:false}},{'startTime':{$lte:?2},'endTime':{$gte:?2}}]}")
     CountryHolidayCalender findActiveByCountryId(Long countryId, LocalDate holidayDate,LocalTime time);
 
-    CountryHolidayCalender findByCountryId(Long countryId);
-
     List<CountryHolidayCalenderDTO> getAllByCountryIdAndHolidayDateBetween(Long countryId, LocalDate startDate, LocalDate endDate);
 
     CountryHolidayCalenderDTO getByCountryIdAndHolidayDateBetween(Long countryId, LocalDate startDate, LocalDate endDate);
 
-    @Query("{deleted:false,publicHolidayCategory:?0,holidayDate:{$gte:?1},holidayDate:{$lt:?2}}")
+    @Query("{deleted:false,publicHolidayCategory:?0,holidayDate:{$gte:?1,$lt:?2}}")
     List<CountryHolidayCalender> getPublicHolidayByCategoryAndHolidayDateBetween(String publicHolidayCategory, LocalDate startDate, LocalDate endDate);
 
     @Query("{'deleted':false, 'holidayDate':{'$in':?0}}")

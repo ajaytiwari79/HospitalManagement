@@ -97,9 +97,9 @@ public class ProtectedDaysOffService {
     }
 
     public void linkProtectedDaysOffSetting(List<CountryHolidayCalenderDTO> countryHolidayCalendarQueryResults, Set<Long> expertises, Long coutryId) {
-        if (ObjectUtils.isCollectionEmpty(expertises)) {
-            expertises =userIntegrationService.getAllExpertiseByCountryId(coutryId);
-        }
+//        if (ObjectUtils.isCollectionEmpty(expertises)) {
+//            expertises =userIntegrationService.getAllExpertiseByCountryId(coutryId);
+//        }
         if (ObjectUtils.isCollectionEmpty(countryHolidayCalendarQueryResults)) {
             countryHolidayCalendarQueryResults = countryHolidayCalenderService.getAllCountryAllHolidaysByCountryId(coutryId);
         }
