@@ -689,6 +689,8 @@ public class ShiftService {
                     shiftStateService.createShiftState(Arrays.asList(shift), true, shift.getUnitId());
                 }
                 shiftHelperService.updateShiftResponse(shiftDTO,staffAdditionalInfoDTO.getEmployment().getUnitTimeZone().toString(),phase);
+            }else{
+                shiftDTO.setBreakActivities(ObjectMapperUtils.copyCollectionPropertiesByMapper(breakActivities,ShiftActivityDTO.class));
             }
             shiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
             shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
