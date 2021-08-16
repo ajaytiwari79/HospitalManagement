@@ -23,6 +23,6 @@ public interface CoverShiftMongoRepository extends MongoBaseRepository<CoverShif
 
     List<CoverShift> findAllByIdInAndDeletedFalse(Collection<BigInteger> id);
 
-    @Query(value = "{deleted:false,shiftId:?1}",exists = true)
+    @Query(value = "{deleted:false,shiftId:?0}",exists = true)
     boolean existsByShiftIdAndDeleteFalse(BigInteger shiftId);
 }
