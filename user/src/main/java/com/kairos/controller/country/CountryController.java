@@ -156,8 +156,8 @@ public class CountryController {
     @ApiOperation(value = "Update Organization Types")
     @PutMapping(value = COUNTRY_URL + "/organization_type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationType(@Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(updateOrganizationTypeDTO));
+    public ResponseEntity<Map<String, Object>> updateOrganizationType(@PathVariable Long countryId,@Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(countryId, updateOrganizationTypeDTO));
     }
 
     @ApiOperation(value = "Delete Organization Types")

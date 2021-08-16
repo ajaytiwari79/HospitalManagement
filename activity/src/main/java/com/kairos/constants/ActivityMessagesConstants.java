@@ -445,4 +445,7 @@ public class ActivityMessagesConstants {
     public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.not.configuration";
     public static final String GAP_FILLING_CONFIGURATION_INCORRECTLY = "gap.filling.configuration.incorrectly";
     public static final String DO_NOT_ALLOW_TO_CAUSE_GAP = "do.not.allow.to.cause.gap";
+
+    public static final String ERROR_GRANULARITY_SETTING_DUPLICATE = "error.granularity.setting.duplicate";
+    public static final String ERROR_GRANULARITY_SETTING_NOT_CONFIGURED = "error.granularity.setting.not.configured";
 }
