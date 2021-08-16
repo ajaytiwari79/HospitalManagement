@@ -3,12 +3,15 @@ package com.kairos.service.granularity_setting;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.granularity_setting.GranularitySettingDTO;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.granularity_setting.GranularitySetting;
 import com.kairos.persistence.repository.granularity_setting.GranularitySettingMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -19,6 +22,7 @@ public class GranularitySettingService {
 
     @Inject private GranularitySettingMongoRepository granularitySettingMongoRepository;
     @Inject private ExceptionService exceptionService;
+    @Inject private UserIntegrationService userIntegrationService;
 
     public GranularitySettingDTO createGranularitySettingForCountry(GranularitySettingDTO granularitySettingDTO) {
         GranularitySetting granularitySetting = granularitySettingMongoRepository.findByCountryIdAndOrganisationTypeIdAndDeletedFalse(granularitySettingDTO.getCountryId(),granularitySettingDTO.getOrganisationTypeId());
@@ -74,5 +78,27 @@ public class GranularitySettingService {
     public GranularitySettingDTO getCurrentGranularitySettingForUnit(Long unitId){
         GranularitySetting granularitySetting = granularitySettingMongoRepository.findByUnitIdDate(unitId, DateUtils.getCurrentLocalDate());
         return ObjectMapperUtils.copyPropertiesByMapper(granularitySetting, GranularitySettingDTO.class);
+    }
+
+    public boolean createDefaultDataForCountry(Long countryId){
+        List<OrganizationTypeDTO> orgTypeDTOS = userIntegrationService.getAllOrgTypeByCountryId(countryId);
+        List<GranularitySetting> granularitySettings = new ArrayList<>();
+        for (OrganizationTypeDTO orgTypeDTO : orgTypeDTOS) {
+            GranularitySetting granularitySetting = granularitySettingMongoRepository.findByCountryIdAndOrganisationTypeIdAndDeletedFalse(countryId,orgTypeDTO.getId());
+            if(isNull(granularitySetting)){
+                granularitySettings.add(new GranularitySetting(countryId, 15, orgTypeDTO.getId()));
+            }
+        }
+        List<Long> unitIds = userIntegrationService.getUnitIds(countryId);
+        for (Long unitId : unitIds) {
+            GranularitySetting granularitySetting = granularitySettingMongoRepository.findByUnitIdAndDeletedFalse(unitId);
+            if(isNull(granularitySetting)){
+                granularitySettings.add(new GranularitySetting(unitId, 15, DateUtils.getCurrentLocalDate(), null));
+            }
+        }
+        if(isCollectionNotEmpty(granularitySettings)){
+            granularitySettingMongoRepository.saveEntities(granularitySettings);
+        }
+        return true;
     }
 }

@@ -15,6 +15,8 @@ public interface GranularitySettingMongoRepository extends MongoBaseRepository<G
 
     GranularitySetting findByCountryIdAndOrganisationTypeIdAndDeletedFalse(Long countryId, Long organisationTypeId);
 
+    GranularitySetting findByUnitIdAndDeletedFalse(Long unitId);
+
     List<GranularitySettingDTO> findAllByCountryIdAndDeletedFalse(Long countryId);
 
     @Query("{'deleted':false,'unitId':?0,'startDate':{$lte:?1},'$or':[{'endDate':{$exists:false}},{'endDate':{$gte:?1}}]}")
