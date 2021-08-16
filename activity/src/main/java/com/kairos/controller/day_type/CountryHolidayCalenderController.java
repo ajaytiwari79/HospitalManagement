@@ -72,8 +72,8 @@ public class CountryHolidayCalenderController {
     }
     @RequestMapping(value = COUNTRY_URL+"/holiday",method = RequestMethod.PUT)
     @ApiOperation("Update a new CountryHolidayCalenderController holiday by id")
-    ResponseEntity<Map<String, Object>> updateCountryCalender(@RequestBody CountryHolidayCalenderDTO countryHolidayCalender){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.updateCountryCalender(countryHolidayCalender));
+    ResponseEntity<Map<String, Object>> updateCountryCalender(@PathVariable Long countryId ,@RequestBody CountryHolidayCalenderDTO countryHolidayCalender){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.updateCountryCalender(countryId, countryHolidayCalender));
     }
     @RequestMapping(value = COUNTRY_URL+"/holiday/{holidayId}",method = RequestMethod.DELETE)
     @ApiOperation("Delete a  CountryHolidayCalenderController holiday by id")

@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class OrganizationTypeService{
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private ActivityIntegrationService activityIntegrationService;
 
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
@@ -53,7 +55,7 @@ public class OrganizationTypeService{
         List<Level> levels = countryGraphRepository.getLevelsByIdsIn(countryId, organizationTypeDTO.getLevels());
 
         OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(), country, levels);
-        return prepareResponse(organizationTypeGraphRepository.save(organizationType));
+        return prepareResponse(organizationTypeGraphRepository.save(organizationType), countryId, true);
     }
 
 
@@ -89,7 +91,7 @@ public class OrganizationTypeService{
     }
 
 
-    public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+    public OrganizationType updateOrganizationType(Long countryId,UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONTYPE_ID_NOTFOUND, updateOrganizationTypeDTO.getId());
@@ -104,15 +106,18 @@ public class OrganizationTypeService{
             orgTypeToUpdate.setLevels(levels);
         }
         orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName().trim());
-        return prepareResponse(organizationTypeGraphRepository.save(orgTypeToUpdate));
+        return prepareResponse(organizationTypeGraphRepository.save(orgTypeToUpdate), countryId, false);
     }
 
-    private OrganizationType prepareResponse(OrganizationType organizationType) {
+    private OrganizationType prepareResponse(OrganizationType organizationType, Long countryId, boolean createOrgType) {
         OrganizationType response = new OrganizationType();
         response.setId(organizationType.getId());
         response.setName(organizationType.getName());
         List<Level> activeLevels = organizationType.getLevels().parallelStream().filter(level -> !level.isDeleted()).collect(Collectors.toList());
         response.setLevels(activeLevels);
+        if(createOrgType) {
+            activityIntegrationService.createDefaultGranularitySetting(countryId, organizationType.getId());
+        }
         return response;
     }
 

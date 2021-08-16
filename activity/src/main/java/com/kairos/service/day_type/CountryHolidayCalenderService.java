@@ -2,7 +2,10 @@ package com.kairos.service.day_type;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.SectorWiseDayTypeInfo;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.PublicHolidayCategory;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
@@ -21,14 +24,13 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.PublicHolidayCategory.FIXED;
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class CountryHolidayCalenderService {
@@ -59,13 +61,31 @@ public class CountryHolidayCalenderService {
         countryHolidayCalender.setCountryId(countryId);
         countryCalenderRepo.save(countryHolidayCalender);
         countryHolidayCalenderDTO.setId(countryHolidayCalender.getId());
-        protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO),null,countryId);
+        Set<Long> expertiseSet = getExpertiseList(countryId, countryHolidayCalenderDTO);
+        if(isCollectionNotEmpty(expertiseSet)) {
+            protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO), expertiseSet, countryId);
+        }
         countryHolidayCalenderDTO.setCountryId(countryId);
-        createFixedHolidayForTenYears(countryHolidayCalenderDTO);
+        createFixedHolidayForTenYears(countryHolidayCalenderDTO, expertiseSet);
         return countryHolidayCalenderDTO;
     }
 
-    private void createFixedHolidayForTenYears(CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
+    private Set<Long> getExpertiseList(Long countryId, CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
+        List<ExpertiseDTO> expertiseDTOS = userIntegrationService.getAllExpertiseInfoByCountryId(countryId);
+        Map<Long, List<ExpertiseDTO>> map = expertiseDTOS.stream().collect(groupingBy(expertiseDTO ->expertiseDTO.getSector().getId()));
+        Set<Long> expertiseSet = new HashSet<>();
+        if(isCollectionNotEmpty(countryHolidayCalenderDTO.getSectorWiseDayTypeInfo())){
+            for (SectorWiseDayTypeInfo sectorWiseDayTypeInfo : countryHolidayCalenderDTO.getSectorWiseDayTypeInfo()) {
+                if("FPH".equals(sectorWiseDayTypeInfo.getHolidayType())){
+                    List<ExpertiseDTO> expertiseDTOList = map.getOrDefault(sectorWiseDayTypeInfo.getSectorId(),new ArrayList<>());
+                    expertiseSet.addAll(expertiseDTOList.stream().map(ExpertiseDTO::getId).collect(Collectors.toSet()));
+                }
+            }
+        }
+        return expertiseSet;
+    }
+
+    private void createFixedHolidayForTenYears(CountryHolidayCalenderDTO countryHolidayCalenderDTO, Set<Long> expertiseSet) {
         if(FIXED.equals(countryHolidayCalenderDTO.getPublicHolidayCategory())) {
             List<CountryHolidayCalender> countryHolidayCalenders = new ArrayList<>(9);
             LocalDate holidayDate = countryHolidayCalenderDTO.getHolidayDate();
@@ -76,15 +96,33 @@ public class CountryHolidayCalenderService {
                 countryHolidayCalenders.add(countryHolidayCalender);
             }
             countryCalenderRepo.saveEntities(countryHolidayCalenders);
-            protectedDaysOffService.linkProtectedDaysOffSetting(ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenders, CountryHolidayCalenderDTO.class),null,countryHolidayCalenderDTO.getCountryId());
+            if(isCollectionNotEmpty(expertiseSet)) {
+                protectedDaysOffService.linkProtectedDaysOffSetting(ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenders, CountryHolidayCalenderDTO.class), expertiseSet, countryHolidayCalenderDTO.getCountryId());
+            }
         }
     }
 
     @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
-    public CountryHolidayCalenderDTO updateCountryCalender(CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
+    public CountryHolidayCalenderDTO updateCountryCalender(Long countryId ,CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         LOGGER.info("Data Received: " + countryHolidayCalenderDTO);
+        CountryHolidayCalender oldCountryHolidayCalender = countryCalenderRepo.findOne(countryHolidayCalenderDTO.getId());
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryCalenderRepo.save(countryHolidayCalender);
+        CountryHolidayCalenderDTO copyCountryHolidayCalenderDTO = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalenderDTO.class);
+        List<SectorWiseDayTypeInfo> sectorWiseDayTypeInfoList = new ArrayList<>();
+        if(isCollectionNotEmpty(oldCountryHolidayCalender.getSectorWiseDayTypeInfo()) && isCollectionNotEmpty(copyCountryHolidayCalenderDTO.getSectorWiseDayTypeInfo())) {
+            List<Long> oldSectorIds = oldCountryHolidayCalender.getSectorWiseDayTypeInfo().stream().map(SectorWiseDayTypeInfo::getSectorId).collect(Collectors.toList());
+            for (SectorWiseDayTypeInfo wiseDayTypeInfo : copyCountryHolidayCalenderDTO.getSectorWiseDayTypeInfo()) {
+                if (!oldSectorIds.contains(wiseDayTypeInfo.getSectorId())) {
+                    sectorWiseDayTypeInfoList.add(wiseDayTypeInfo);
+                }
+            }
+        }
+        copyCountryHolidayCalenderDTO.setSectorWiseDayTypeInfo(sectorWiseDayTypeInfoList);
+        Set<Long> expertiseSet = getExpertiseList(countryId, copyCountryHolidayCalenderDTO);
+        if(isCollectionNotEmpty(expertiseSet)) {
+            protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO), expertiseSet, countryId);
+        }
         return countryHolidayCalenderDTO;
     }
 
@@ -123,11 +161,8 @@ public class CountryHolidayCalenderService {
 
     }
 
-    //this method execute every year in 1st jan
-    @Scheduled(cron="0 5 0 1 1 ?")
     public void createFixedPublicHoliday() {
-        LOGGER.info("Yearly Job Execution {}",new Date());
-        LocalDate startDate = DateUtils.getCurrentLocalDate().plusYears(1);
+        LocalDate startDate = DateUtils.getCurrentLocalDate();
         LocalDate endDate = startDate.plusYears(1);
         List<CountryHolidayCalender> countryHolidayCalenders = countryCalenderRepo.getPublicHolidayByCategoryAndHolidayDateBetween(FIXED.toString(), startDate, endDate);
         List<CountryHolidayCalender> newCountryHolidayCalenders = new ArrayList<>();
@@ -136,10 +171,14 @@ public class CountryHolidayCalenderService {
             newCountryHolidayCalender.setHolidayDate(countryHolidayCalender.getHolidayDate().plusYears(9));
             newCountryHolidayCalender.setId(null);
             newCountryHolidayCalenders.add(newCountryHolidayCalender);
+            CountryHolidayCalenderDTO countryHolidayCalenderDTO = ObjectMapperUtils.copyPropertiesByMapper(newCountryHolidayCalender, CountryHolidayCalenderDTO.class);
+            Set<Long> expertiseSet = getExpertiseList(newCountryHolidayCalender.getCountryId(), countryHolidayCalenderDTO);
+            if(isCollectionNotEmpty(expertiseSet)) {
+                protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO), expertiseSet, newCountryHolidayCalender.getCountryId());
+            }
         }
         if(isCollectionNotEmpty(newCountryHolidayCalenders)) {
             countryCalenderRepo.saveEntities(newCountryHolidayCalenders);
-            protectedDaysOffService.linkProtectedDaysOffSetting(ObjectMapperUtils.copyCollectionPropertiesByMapper(newCountryHolidayCalenders, CountryHolidayCalenderDTO.class), null, newCountryHolidayCalenders.get(0).getCountryId());
         }
     }
 }
