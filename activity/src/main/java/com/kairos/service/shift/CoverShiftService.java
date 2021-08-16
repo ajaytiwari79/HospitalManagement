@@ -313,7 +313,7 @@ public class CoverShiftService {
 
         }
         coverShift.getInterestedStaffs().put(staffId, new StaffInterest(DateUtils.getDate(),staffInterest.getAccountType()));
-        coverShift.getRequestedStaffs().remove(staffId);
+        //coverShift.getRequestedStaffs().remove(staffId);
         coverShift.getDeclinedStaffIds().remove(staffId);
         coverShiftMongoRepository.save(coverShift);
     }
