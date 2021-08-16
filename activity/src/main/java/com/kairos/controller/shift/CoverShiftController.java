@@ -70,6 +70,7 @@ public class CoverShiftController {
     @PutMapping(value = "/update_cover_shift_details/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateCoverShiftByShiftId(@PathVariable BigInteger shiftId, @RequestBody CoverShiftDTO coverShiftDTO) {
+        coverShiftDTO.setShiftId(shiftId);
         coverShiftService.updateCoverShiftDetails(coverShiftDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }

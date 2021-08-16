@@ -4,6 +4,7 @@ import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class CoverShiftDTO {
     private BigInteger id;
     private String commentForPlanner;
