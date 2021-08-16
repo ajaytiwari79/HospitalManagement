@@ -62,6 +62,7 @@ import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.granularity_setting.GranularitySettingService;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
@@ -196,6 +197,7 @@ public class OrganizationActivityService {
     @Inject private ExecutorService executorService;
     @Inject private ActivityHelperService activityHelperService;
     @Inject private KPIIntegrationService kpiIntegrationService;
+    @Inject private GranularitySettingService granularitySettingService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -584,6 +586,7 @@ public class OrganizationActivityService {
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         reasonCodeService.createReasonCodeForUnit(unitId,orgTypeAndSubTypeDTO.getCountryId());
         autoFillGapSettingsService.createDefaultAutoFillGapSettings(unitId, orgTypeAndSubTypeDTO, phases);
+        granularitySettingService.createDefaultGranularitySettingForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationTypeId());
         return true;
     }
 

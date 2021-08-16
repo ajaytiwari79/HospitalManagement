@@ -292,5 +292,13 @@ public class ActivityIntegrationService {
         queryParams.put("employmentId", employmentId);
         restClientForSchedulerMessages.publish(null, unitId, true, IntegrationOperation.CREATE, "/create_wta_line_on_update_weekly_hours", queryParams);
     }
+
+    public void createDefaultGranularitySetting(Long countryId, Long orgTypeId) {
+        Map<String,Object> requestBody = new HashMap<>();
+        requestBody.put("granularityInMinute",15);
+        requestBody.put("countryId",countryId);
+        requestBody.put("organisationTypeId",orgTypeId);
+        restClientForSchedulerMessages.publish(requestBody, countryId, false, IntegrationOperation.CREATE, "/granularity_setting", null);
+    }
 }
 
