@@ -28,4 +28,10 @@ public class GranularitySetting extends MongoBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    public GranularitySetting(Long countryId, int granularityInMinute, Long organisationTypeId) {
+        this.countryId = countryId;
+        this.granularityInMinute = granularityInMinute;
+        this.organisationTypeId = organisationTypeId;
+    }
 }
