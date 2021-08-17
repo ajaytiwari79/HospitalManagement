@@ -10,6 +10,7 @@ import com.kairos.dto.response.ResponseDTO;
 import com.kairos.persistence.model.Counter;
 import com.kairos.service.CounterConfService;
 import com.kairos.service.CounterDistService;
+import com.kairos.utils.KPIUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -89,6 +90,6 @@ public class CounterConfController {
 
     @PostMapping(value = ApiConstants.UNIT_URL+ "/tab_kpi")
     public ResponseEntity<Map<String, Object>> getKPIAndTabByIds(@PathVariable Long unitId,@RequestBody Map<String,Object> data){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDistService.getTabKPIByTabIdsAndKpiIds((List<String>) data.get("tabIds"),(List<BigInteger>) data.get("kpiIds"),(Long) data.get("staffId")));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDistService.getTabKPIByTabIdsAndKpiIds((List<String>) data.get("tabIds"),KPIUtils.getBigIntegerValue((List<Object>)data.get("kpiIds")),((Integer) data.get("staffId")).longValue()));
     }
 }

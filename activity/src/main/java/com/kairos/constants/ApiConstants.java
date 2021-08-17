@@ -177,7 +177,7 @@ public final class ApiConstants {
     public static final double DEFAULT_VALUE =1;
     public static final String STAFF_DETAILS_FOR_BALANCES_BY_EMPLOYMENT_ID = STAFF_URL + "/staff_details_for_balances/{employmentId}";
     public static final String STAFF_COUNTER_MODULES = UNIT_URL + "/staff_counter_modules";
-    public static final String TAB_AND_KPI = UNIT_URL + "/tab_kpi";
-    public static final String DEFAULT_DATA = UNIT_URL + "/create_default_data";
+    public static final String TAB_AND_KPI =  "/tab_kpi";
+    public static final String DEFAULT_DATA =  "/create_default_data";
 
 }
