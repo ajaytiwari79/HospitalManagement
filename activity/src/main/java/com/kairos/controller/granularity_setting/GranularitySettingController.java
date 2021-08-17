@@ -63,4 +63,12 @@ public class GranularitySettingController {
     public ResponseEntity<Map<String, Object>> getCurrentGranularitySettingForUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, granularitySettingService.getCurrentGranularitySettingForUnit(unitId));
     }
+
+    //this api for create granularity setting for already create org type and unit
+    @ApiOperation("create all granularity setting for unit and orgType")
+    @PostMapping(COUNTRY_URL+"/granularity_setting/data")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createData(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, granularitySettingService.createDefaultDataForCountry(countryId));
+    }
 }
