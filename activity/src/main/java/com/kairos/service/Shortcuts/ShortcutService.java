@@ -36,7 +36,7 @@ public class ShortcutService {
 
     public List<TabKPIDTO> getTabKPIs(List<String> tabIds, List<BigInteger> kpiIds, Long staffId,Long unitId){
          List<TabKPIDTO> tabKPIDTOS=new ArrayList<>();
-        List<TabKPIMappingDTO> tabKPIMappingDTOS = kpiIntegrationService.getTabKPIByTabIdsAndKpiIds(tabIds, kpiIds, staffId);
+        List<TabKPIMappingDTO> tabKPIMappingDTOS = kpiIntegrationService.getTabKPIByTabIdsAndKpiIds(tabIds, kpiIds, staffId,unitId);
         Map<String,List<TabKPIMappingDTO>> tabIdAndTabKPIDtoMap=tabKPIMappingDTOS.stream().collect(Collectors.groupingBy(k -> k.getTabId(),Collectors.toList()));
         for (String tabId : tabIds) {
             tabKPIDTOS.add(new TabKPIDTO(unitId,tabId,tabIdAndTabKPIDtoMap.containsKey(tabId) ? tabIdAndTabKPIDtoMap.get(tabId).stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList()): new ArrayList<>()));

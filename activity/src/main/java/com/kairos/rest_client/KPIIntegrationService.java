@@ -25,12 +25,12 @@ public class KPIIntegrationService {
     private GenericRestClient genericRestClient;
 
 
-    public List<TabKPIMappingDTO> getTabKPIByTabIdsAndKpiIds(List<String> tabIds, List<BigInteger> kpiIds, Long staffId) {
+    public List<TabKPIMappingDTO> getTabKPIByTabIdsAndKpiIds(List<String> tabIds, List<BigInteger> kpiIds, Long staffId,Long unitId) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("tabIds",tabIds);
         requestBody.put("kpiIds",kpiIds);
         requestBody.put("staffId",staffId);
-        return genericRestClient.publishRequestToKPIService(requestBody, UserContext.getUserDetails().getLastSelectedOrganizationId(), RestClientUrlType.UNIT, HttpMethod.POST, TAB_AND_KPI, new ArrayList<>(), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TabKPIMappingDTO>>>() {
+        return genericRestClient.publishRequestToKPIService(requestBody, unitId, RestClientUrlType.UNIT, HttpMethod.POST, TAB_AND_KPI, new ArrayList<>(), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TabKPIMappingDTO>>>() {
         });
     }
     public List<CounterDTO> getAllCounterBySupportedModule(ModuleType openShift) {
