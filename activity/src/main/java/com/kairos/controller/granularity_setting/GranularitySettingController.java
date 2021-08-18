@@ -57,11 +57,18 @@ public class GranularitySettingController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, granularitySettingService.updateGranularitySettingsForUnit(unitId, granularitySettingDTO));
     }
 
-    @ApiOperation("Get all granularity setting for unit")
+    @ApiOperation("Get granularity setting for unit")
     @GetMapping(UNIT_URL+"/granularity_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCurrentGranularitySettingForUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, granularitySettingService.getCurrentGranularitySettingForUnit(unitId));
+    }
+
+    @ApiOperation("Get all granularity setting for unit")
+    @GetMapping(UNIT_URL+"/granularity_setting/all")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllGranularitySettingForUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, granularitySettingService.getAllGranularitySettingForUnit(unitId));
     }
 
     //this api for create granularity setting for already create org type and unit
