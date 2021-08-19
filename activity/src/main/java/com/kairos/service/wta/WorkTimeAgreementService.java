@@ -1026,7 +1026,7 @@ public class WorkTimeAgreementService{
     private void createNewWtaLine(List<Long> employmentIds, LocalDate date, TimeBankLimitsType timeBankLimitsType) {
         List<WorkingTimeAgreement> workingTimeAgreements = workingTimeAgreementMongoRepository.findWTAOfEmployments(employmentIds);
         Map<BigInteger, WorkingTimeAgreement> wtaMap = workingTimeAgreements.stream().collect(Collectors.toMap(WorkingTimeAgreement::getId, v->v));
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllParentWTAByIds(employmentIds);
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(employmentIds);
         Map<Long, List<WTAQueryResultDTO>> wtaDTOMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         List<WorkingTimeAgreement> updatedResults = new ArrayList<>();
         for (List<WTAQueryResultDTO> wtaList : wtaDTOMap.values()) {

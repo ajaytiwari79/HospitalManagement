@@ -80,6 +80,10 @@ public class GranularitySettingService {
         return ObjectMapperUtils.copyPropertiesByMapper(granularitySetting, GranularitySettingDTO.class);
     }
 
+    public List<GranularitySettingDTO> getAllGranularitySettingForUnit(Long unitId){
+        return granularitySettingMongoRepository.findAllByUnitIdAndDeletedFalse(unitId);
+    }
+
     public boolean createDefaultDataForCountry(Long countryId){
         List<OrganizationTypeDTO> orgTypeDTOS = userIntegrationService.getAllOrgTypeByCountryId(countryId);
         List<GranularitySetting> granularitySettings = new ArrayList<>();
