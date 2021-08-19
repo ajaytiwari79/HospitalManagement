@@ -82,6 +82,7 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -198,6 +199,8 @@ public class OrganizationActivityService {
     @Inject private ActivityHelperService activityHelperService;
     @Inject private KPIIntegrationService kpiIntegrationService;
     @Inject private GranularitySettingService granularitySettingService;
+    @Inject
+    private RaygunClient raygunClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -569,24 +572,28 @@ public class OrganizationActivityService {
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        LOGGER.info("I am going to create default data or organization {}" , unitId);
-        //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
-        List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
-        phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
-        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
-        activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
-        timeSlotSetService.createDefaultTimeSlots(unitId);
-        //createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
-        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
-        timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-        periodSettingsService.createDefaultPeriodSettings(unitId);
-        priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
-        openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
-        kpiIntegrationService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
-        protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
-        reasonCodeService.createReasonCodeForUnit(unitId,orgTypeAndSubTypeDTO.getCountryId());
-        autoFillGapSettingsService.createDefaultAutoFillGapSettings(unitId, orgTypeAndSubTypeDTO, phases);
-        granularitySettingService.createDefaultGranularitySettingForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationTypeId());
+        try {
+            LOGGER.info("I am going to create default data or organization {}" , unitId);
+            //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
+            List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
+            phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
+            unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
+            activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
+            timeSlotSetService.createDefaultTimeSlots(unitId);
+            //createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
+            TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
+            timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
+            periodSettingsService.createDefaultPeriodSettings(unitId);
+            priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+            openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
+            kpiIntegrationService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
+            protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
+            reasonCodeService.createReasonCodeForUnit(unitId,orgTypeAndSubTypeDTO.getCountryId());
+            autoFillGapSettingsService.createDefaultAutoFillGapSettings(unitId, orgTypeAndSubTypeDTO, phases);
+            granularitySettingService.createDefaultGranularitySettingForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationTypeId());
+        }catch (Exception e){
+            raygunClient.send(e);
+        }
         return true;
     }
 

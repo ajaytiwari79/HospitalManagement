@@ -14,6 +14,7 @@ import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.GdprIntegrationService;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,42 +42,52 @@ public class CompanyDefaultDataService {
     private GdprIntegrationService gdprIntegrationService;
     @Inject private EmploymentTypeService employmentTypeService;
     @Inject private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private RaygunClient raygunClient;
 
 
   @Async  
     public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId) {
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
-        List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
-        List<Long> employmentTypeIds = employmentTypes.stream().map(UserBaseEntity::getId).collect(Collectors.toList());
-        units.forEach(unit -> {
-            orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
-            orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
-            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
-            orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
-            orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
-            orgTypeAndSubTypeDTO.setParentOrganization(false);
-            orgTypeAndSubTypeDTO.setEmploymentTypeIds(employmentTypeIds);
-            activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), orgTypeAndSubTypeDTO);
-            activityIntegrationService.createDefaultKPISetting(
-                    new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()),
-                            null, parentId, null), unit.getId());
-            vrpClientService.createDefaultPreferredTimeWindow(unit);
-            activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
-            gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
+       try {
+           OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
+           List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
+           List<Long> employmentTypeIds = employmentTypes.stream().map(UserBaseEntity::getId).collect(Collectors.toList());
+           units.forEach(unit -> {
+               orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
+               orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
+               orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
+               orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
+               orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
+               orgTypeAndSubTypeDTO.setParentOrganization(false);
+               orgTypeAndSubTypeDTO.setEmploymentTypeIds(employmentTypeIds);
+               activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), orgTypeAndSubTypeDTO);
+               activityIntegrationService.createDefaultKPISetting(
+                       new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()),
+                               null, parentId, null), unit.getId());
+               vrpClientService.createDefaultPreferredTimeWindow(unit);
+               activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
+               gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
-        });
+           });
+       }catch (Exception e){
+           raygunClient.send(e);
+       }
     }
 
 
   @Async  
   public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
-            orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
-            orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
-            activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), orgTypeAndSubTypeDTO);
-            unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-            activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
-            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
+      try {
+          orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
+          orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
+          activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), orgTypeAndSubTypeDTO);
+          unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+          activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
+          organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+          organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+          gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
+      }catch (Exception e){
+          raygunClient.send(e);
+      }
     }
 }

@@ -68,6 +68,7 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.service.unit_settings.UnitGeneralSettingService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,6 +164,8 @@ public class WorkTimeAgreementService{
     @Inject private ActivityPermissionService activityPermissionService;
     @Inject  private ShiftHelperService shiftHelperService;
     @Inject private UnitGeneralSettingService unitGeneralSettingService;
+    @Inject
+    private RaygunClient raygunClient;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -1010,9 +1013,14 @@ public class WorkTimeAgreementService{
 
     @Async
     public void createWtaLineOnUpdateUnitSetting(Long unitId, TimeBankLimitsType timeBankLimitsType) {
-        List<EmploymentWithCtaDetailsDTO> employmentDTOS = userIntegrationService.getAllEmploymentByUnitId(unitId);
-        List<Long> employmentIds = employmentDTOS.stream().map(EmploymentWithCtaDetailsDTO::getId).collect(Collectors.toList());
-        createNewWtaLine(employmentIds, DateUtils.getLocalDate(), timeBankLimitsType);
+        try {
+            List<EmploymentWithCtaDetailsDTO> employmentDTOS = userIntegrationService.getAllEmploymentByUnitId(unitId);
+            List<Long> employmentIds = employmentDTOS.stream().map(EmploymentWithCtaDetailsDTO::getId).collect(Collectors.toList());
+            createNewWtaLine(employmentIds, DateUtils.getLocalDate(), timeBankLimitsType);
+        }catch (Exception e){
+            raygunClient.send(e);
+        }
+
     }
 
     private void createNewWtaLine(List<Long> employmentIds, LocalDate date, TimeBankLimitsType timeBankLimitsType) {
