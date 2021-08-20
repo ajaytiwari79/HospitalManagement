@@ -200,13 +200,14 @@ public class FunctionalPaymentService {
                 list.add(functionalPaymentMatrix);
             });
             functionalPaymentCopy.setFunctionalPaymentMatrices(list);
-
+            functionalPaymentCopy.setPaymentUnit(functionalSeniorityLevelDTO.getPaymentUnit());
             functionalPayment.setHasDraftCopy(true);
             functionalPayment.setOneTimeUpdatedAfterPublish(true);
             functionalPaymentCopy.setParentFunctionalPayment(functionalPayment);
             functionalPaymentGraphRepository.save(functionalPaymentCopy);
             functionalSeniorityLevelDTO.setFunctionalPaymentId(functionalPaymentCopy.getId());
         } else {
+            functionalPayment.setPaymentUnit(functionalSeniorityLevelDTO.getPaymentUnit());
             updateInDraftCopy(functionalPayment, functionalPaymentMatrixDTOS, list, functions, seniorityLevels);
         }
         return functionalSeniorityLevelDTO;

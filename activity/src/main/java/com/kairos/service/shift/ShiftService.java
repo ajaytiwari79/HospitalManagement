@@ -259,8 +259,11 @@ public class ShiftService {
         }
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
         shiftFunctionService.updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
+        Phase newPhase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
+        } else if(shift.isDraft() && newHashSet(PhaseDefaultName.PUZZLE, PhaseDefaultName.REQUEST, PhaseDefaultName.REALTIME, PhaseDefaultName.TIME_ATTENDANCE).contains(newPhase.getPhaseEnum())) {
+            shift.setDraft(false);
         }
         if(isNull(shift.getDraftShift())) {
             if (!shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {

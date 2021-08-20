@@ -202,6 +202,8 @@ public class OrganizationActivityService {
     @Inject
     private RaygunClient raygunClient;
 
+
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationActivityService.class);
 
     @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
@@ -581,6 +583,8 @@ public class OrganizationActivityService {
             activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
             timeSlotSetService.createDefaultTimeSlots(unitId);
             //createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
+            costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
+            workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
             timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
             periodSettingsService.createDefaultPeriodSettings(unitId);
@@ -605,7 +609,6 @@ public class OrganizationActivityService {
         } else {
             existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
         }
-
         if (!existingActivities.isEmpty()) {
             Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getActivityPhaseSettings().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
             Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);

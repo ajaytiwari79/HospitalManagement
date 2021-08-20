@@ -730,8 +730,9 @@ public class CounterDistService {
         Map<String, BigInteger> categoriesNameMap = new HashMap<>();
         Map<BigInteger, BigInteger> categoriesOldAndNewIds = new HashMap<>();
         kpiCategoryDTOS.stream().forEach(kpiCategoryDTO -> categoriesNameMap.put(kpiCategoryDTO.getName(), kpiCategoryDTO.getId()));
-        List<KPICategory> kpiCategories = kpiCategoryDTOS.stream().map(category -> new KPICategory(category.getName(), null, unitId, ConfLevel.UNIT)).collect(Collectors.toList());
-        if (!kpiCategories.isEmpty()) {
+        List<KPICategory> kpiCategories = counterRepository.getKpiCategories(null, ConfLevel.UNIT, unitId);
+        if (!kpiCategories.isEmpty() && isCollectionNotEmpty(kpiCategoryDTOS)) {
+            kpiCategories = kpiCategoryDTOS.stream().map(category -> new KPICategory(category.getName(), null, unitId, ConfLevel.UNIT)).collect(Collectors.toList());
             counterRepository.saveEntities(kpiCategories);
         }
         kpiCategories.stream().forEach(kpiCategory -> categoriesOldAndNewIds.put(categoriesNameMap.get(kpiCategory.getName()), kpiCategory.getId()));
