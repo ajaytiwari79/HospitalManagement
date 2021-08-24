@@ -32,6 +32,10 @@ public class StaffChildDetailDTO {
         return CPRUtil.getGenderFromCPRNumber(this.getCprNumber());
     }
 
+    public int getAge(){
+        return CPRUtil.getAgeFromCPRNumber(this.getCprNumber());
+    }
+
     public LocalDate getDateOfBirth(){
         return CPRUtil.fetchDateOfBirthFromCPR(this.getCprNumber());
     }

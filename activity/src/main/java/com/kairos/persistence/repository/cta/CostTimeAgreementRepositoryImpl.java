@@ -51,7 +51,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     public List<CTAResponseDTO> findCTAByCountryId(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false).and(ORGANIZATION_ID).exists(false)),
                 lookup("tag", "tags", "_id", "tags")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
@@ -88,7 +88,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
+                match(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).exists(false).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
                 lookup("tag", "tags", "_id", "tags"),
                 lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
                 );
