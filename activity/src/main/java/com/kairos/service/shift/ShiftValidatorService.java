@@ -440,6 +440,9 @@ public class ShiftValidatorService {
                 if(shiftTimeDetails.getTotalTime()>maxFixedValue){
                     errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_EXCEEDS_LONGEST_TIME, getHoursStringByMinutes(maxFixedValue)));
                 }
+                if(!UserContext.getUserDetails().isStaff()){
+                    exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
+                }
             }
             Short shortestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getShortestTime() : staffActivitySettingMap.get(activityId).getShortestTime();
             Short longestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getLongestTime() : staffActivitySettingMap.get(activityId).getLongestTime();
