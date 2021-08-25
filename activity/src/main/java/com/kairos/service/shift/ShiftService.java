@@ -815,7 +815,7 @@ public class ShiftService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(shift.getPlanningPeriodId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
-        shift.setDeleteBy(UserContext.getUserDetails().isManagement()? MANAGEMENT:STAFF);
+        shift.setDeletedBy(UserContext.getUserDetails().isManagement()? MANAGEMENT:STAFF);
         shiftMongoRepository.save(shift);
         staffingLevelAvailableCountService.updateStaffingLevelAvailableCount(null,shift, staffAdditionalInfoDTO,phase);
         //TODO call this method only if violation in shift
