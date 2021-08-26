@@ -87,6 +87,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.MINIMUM_WTA_RULE_TEMPLATE_COUNTER;
 import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
+import static com.kairos.enums.TimeTypeEnum.STOP_BRICK;
 import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static com.kairos.enums.shift.ShiftOperationType.CREATE;
@@ -434,6 +435,15 @@ public class ShiftValidatorService {
         List<ActivityRuleViolation> activityRuleViolations = new ArrayList<>();
         shiftTimeDetailsMap.forEach((activityId, shiftTimeDetails) -> {
             List<String> errorMessages = new ArrayList<>();
+            if(STOP_BRICK.equals(activityWrapperMap.get(activityId).getTimeTypeInfo().getSecondLevelType()) && CommonConstants.FIXED_TIME.equals(activityWrapperMap.get(activityId).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
+                int maxFixedValue = activityWrapperMap.get(activityId).getActivity().getActivityTimeCalculationSettings().getFixedTimeValue().intValue();
+                if(shiftTimeDetails.getTotalTime()>maxFixedValue){
+                    errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_EXCEEDS_LONGEST_TIME, getHoursStringByMinutes(maxFixedValue)));
+                }
+                if(!UserContext.getUserDetails().isStaff()){
+                    exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
+                }
+            }
             Short shortestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getShortestTime() : staffActivitySettingMap.get(activityId).getShortestTime();
             Short longestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getLongestTime() : staffActivitySettingMap.get(activityId).getLongestTime();
             LocalTime earliestStartTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getEarliestStartTime() : staffActivitySettingMap.get(activityId).getEarliestStartTime();

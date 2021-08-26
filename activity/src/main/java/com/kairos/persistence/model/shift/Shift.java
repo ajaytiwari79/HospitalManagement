@@ -88,6 +88,7 @@ public class Shift extends MongoBaseEntity {
     private int restingMinutes;
     private Date coverShiftDate;
     private boolean createdByCoverShift;
+    protected AccessGroupRole deletedBy;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;

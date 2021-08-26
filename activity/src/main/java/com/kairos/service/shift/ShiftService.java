@@ -76,6 +76,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
 import static com.kairos.enums.TimeTypeEnum.GAP;
 import static com.kairos.enums.shift.ShiftType.SICK;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.isIgnoredAllRuletemplate;
@@ -814,6 +815,7 @@ public class ShiftService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(shift.getPlanningPeriodId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
+        shift.setDeletedBy(UserContext.getUserDetails().isManagement()? MANAGEMENT:STAFF);
         shiftMongoRepository.save(shift);
         staffingLevelAvailableCountService.updateStaffingLevelAvailableCount(null,shift, staffAdditionalInfoDTO,phase);
         //TODO call this method only if violation in shift
