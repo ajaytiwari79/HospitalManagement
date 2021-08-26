@@ -2,6 +2,7 @@ package com.kairos.service.staffing_level;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static org.mockito.ArgumentMatchers.isNotNull;
 
 @Service
 @Transactional
@@ -66,17 +68,17 @@ public class StaffingLevelTemplateService {
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
         }
-        StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
-        StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
-        staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
-        staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
-        removeLogsFromTemplate(staffingLevelTemplate);
-        staffingLevelTemplateRepository.save(staffingLevelTemplate);
-        BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
-        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()
-                .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
 
-        return staffingLevelTemplateDTO;
+        StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
+        if(ObjectUtils.isNotNull(staffingLevelTemplateDTO.getSelectedDate())){
+            StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
+            staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
+            staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
+            removeLogsFromTemplate(staffingLevelTemplate);
+        }
+        staffingLevelTemplateRepository.save(staffingLevelTemplate);
+        staffingLevelTemplate.getPresenceStaffingLevelInterval().sort(Comparator.comparing(staffingLevelInterval -> staffingLevelInterval.getSequence()));
+        return ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate,StaffingLevelTemplateDTO.class);
 
     }
 
