@@ -13,6 +13,8 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
@@ -149,6 +151,9 @@ public class ShiftStatusService {
                 shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()).getShifts());
             } else {
                 shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
+                if(APPROVE.equals(shiftPublishDTO.getStatus())) {
+                    deleteStopBrickShifts(shift);
+                }
             }
 
         }
@@ -159,6 +164,20 @@ public class ShiftStatusService {
             shiftDTOS.add(shiftAndActivtyStatusDTO.getShifts().get(0));
             shiftActivityResponseDTOS.add(shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().get(0));
         }
+    }
+
+    private List<ShiftDTO> deleteStopBrickShifts(Shift currentShift) {
+        List<Shift> shifts = shiftMongoRepository.findShiftsBetweenDurationByUnitIdAndStaffIdAndByTimeType(currentShift.getUnitId(), currentShift.getStaffId(), currentShift.getStartDate(), currentShift.getEndDate(), newHashSet(TimeTypeEnum.STOP_BRICK));
+        List<ShiftDTO> shiftDTOS = new ArrayList<>();
+        if(isCollectionNotEmpty(shifts)) {
+            shifts.forEach(shift -> {
+                shift.setDeleted(true);
+                shift.setDeletedBy(ShiftDeletedBy.SYSTEM);
+            });
+            shiftMongoRepository.saveEntities(shifts);
+            shiftDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class);
+        }
+        return shiftDTOS;
     }
 
     private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {

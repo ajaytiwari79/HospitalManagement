@@ -440,9 +440,6 @@ public class ShiftValidatorService {
                 if(shiftTimeDetails.getTotalTime()>maxFixedValue){
                     errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_EXCEEDS_LONGEST_TIME, getHoursStringByMinutes(maxFixedValue)));
                 }
-                if(!UserContext.getUserDetails().isStaff()){
-                    exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
-                }
             }
             Short shortestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getShortestTime() : staffActivitySettingMap.get(activityId).getShortestTime();
             Short longestTime = staffActivitySettingMap.get(activityId) == null ? activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getLongestTime() : staffActivitySettingMap.get(activityId).getLongestTime();
@@ -740,6 +737,18 @@ public class ShiftValidatorService {
         if (isShiftOverlapped && !CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting()) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().isManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
+        if(STOP_BRICK.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType())){
+            boolean overLapWithRequestShift = true;
+            for (ShiftDTO absenceShift : overlappedShifts) {
+                if(!(absenceShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST) || absenceShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST))){
+                    overLapWithRequestShift = false;
+                    break;
+                }
+            }
+            if(overLapWithRequestShift){
+                shiftOverlapInfo[1] = null;
+            }
+        }
         return new Object[]{shiftOverlappedWithNonWorkingType, shiftOverlapInfo[1]};
     }
 
@@ -765,7 +774,7 @@ public class ShiftValidatorService {
     }
 
     //This method is being used to check overlapping shift with full day and full week activity
-    public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
+    public void checkAbsenceTypeShift(ShiftDTO shiftDTO, ActivityWrapper activityWrapper) {
         Date startDate;
         Date endDate;
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
@@ -775,9 +784,17 @@ public class ShiftValidatorService {
             startDate = asDateStartOfDay(shiftDTO.getShiftDate());
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
-        boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-        if (absenceShiftExists) {
-            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
+        List<ShiftDTO> absenceShifts = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
+        if (isCollectionNotEmpty(absenceShifts)) {
+            if(STOP_BRICK.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType())){
+                for (ShiftDTO absenceShift : absenceShifts) {
+                    if(!(absenceShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST) || absenceShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST))){
+                        exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
+                    }
+                }
+            } else {
+                exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
+            }
         }
     }
 

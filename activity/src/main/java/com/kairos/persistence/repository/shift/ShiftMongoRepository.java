@@ -95,6 +95,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{'activities.secondLevelTimeType':{$in:?3},staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByStaffIdAndByTimeType(Long staffId, Date startDate, Date endDate, Set<TimeTypeEnum> timeTypeEnumSet);
 
+    @Query(value = "{'activities.secondLevelTimeType':{$in:?4},unitId:?0,staffId:?1,deleted:false, disabled:false,startDate: {$lt: ?3},endDate:{$gt:?2}}")
+    List<Shift> findShiftsBetweenDurationByUnitIdAndStaffIdAndByTimeType(Long unitId, Long staffId, Date startDate, Date endDate, Set<TimeTypeEnum> timeTypeEnumSet);
+
     ShiftDTO findByIdAndDeletedFalse(BigInteger id);
 
 }

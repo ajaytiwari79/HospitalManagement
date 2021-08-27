@@ -182,7 +182,7 @@ public class ShiftService {
         if (activityWrapper.getActivity().getActivityRulesSettings().isSicknessSettingValid()) {
             shiftWithViolatedInfoDTOS = shiftSickService.createSicknessShiftsOfStaff(shiftDTO, staffAdditionalInfoDTO, activityWrapper);
         } else {
-            shiftValidatorService.checkAbsenceTypeShift(shiftDTO);
+            shiftValidatorService.checkAbsenceTypeShift(shiftDTO, activityWrapper);
             shiftWithViolatedInfoDTOS = validateAndCreateShift(shiftDTO, shiftActionType, staffAdditionalInfoDTO, activityWrapper);
         }
         return shiftWithViolatedInfoDTOS;
@@ -815,7 +815,7 @@ public class ShiftService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(shift.getPlanningPeriodId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
-        shift.setDeletedBy(UserContext.getUserDetails().isManagement()? MANAGEMENT:STAFF);
+        shift.setDeletedBy(UserContext.getUserDetails().isManagement()? ShiftDeletedBy.MANAGEMENT:ShiftDeletedBy.STAFF);
         shiftMongoRepository.save(shift);
         staffingLevelAvailableCountService.updateStaffingLevelAvailableCount(null,shift, staffAdditionalInfoDTO,phase);
         //TODO call this method only if violation in shift
