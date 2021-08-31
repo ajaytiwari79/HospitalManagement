@@ -44,7 +44,7 @@ public class GeneralSettingsService {
         return generalSettings;
     }
 
-    public GeneralSettings getUnitGeneralSettings(Long unitId) {
+    public GeneralSettings getGeneralSettingsByUnit(Long unitId) {
         GeneralSettings existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndUnitId(unitId);
         if(isNull(existingGeneralSettings)){
             existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndCountryId(UserContext.getUserDetails().getCountryId());

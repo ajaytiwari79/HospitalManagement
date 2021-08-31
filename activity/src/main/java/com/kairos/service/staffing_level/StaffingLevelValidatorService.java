@@ -56,7 +56,7 @@ public class StaffingLevelValidatorService {
         Date shiftStartDate = shiftActivity.getStartDate();
         Date shiftEndDate = shiftActivity.getEndDate();
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        GeneralSettings generalSettingsForUnit = generalSettingsService.getUnitGeneralSettings(shift.getUnitId());
+        GeneralSettings generalSettingsForUnit = generalSettingsService.getGeneralSettingsByUnit(shift.getUnitId());
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }

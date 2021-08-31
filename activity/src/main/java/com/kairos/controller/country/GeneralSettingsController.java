@@ -46,6 +46,6 @@ public class GeneralSettingsController {
     @GetMapping(value = UNIT_URL+"/general_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitGeneralSettings(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingsService.getUnitGeneralSettings(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingsService.getGeneralSettingsByUnit(unitId));
     }
 }
