@@ -122,7 +122,7 @@ public class CounterDataService {
             } catch (InterruptedException | ExecutionException ex) {
                 LOGGER.error("error while generate KPI  data",ex);
                 String[] messages = ex.getMessage().split(": ");
-                throw new RuntimeException(messages[1]);
+                throw new RuntimeException(messages.length > 1 ? messages[1] : messages.length==1 ? messages[0] : "");
             }
         }
         return ObjectUtils.isNotNull(kpisData) ? kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData)) : new HashMap<>();

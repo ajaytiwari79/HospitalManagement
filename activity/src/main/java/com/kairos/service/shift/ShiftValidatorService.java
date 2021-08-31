@@ -161,7 +161,7 @@ public class ShiftValidatorService {
     }
 
     public static void throwException(String exception, Object... param) {
-        exceptionService.invalidRequestException(exception, param);
+        exceptionService.dataNotFoundByIdException(exception, param);
     }
 
     public static String convertMessage(String exception, Object... param) {

@@ -286,6 +286,11 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         LocalDate localDate = asLocalDate(startDate);
         Aggregation aggregation = newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(START_DATE).lte(localDate).and(END_DATE).gte(localDate).and(DELETED).is(false).and(ACTIVE).is(true)),
+                new CustomAggregationOperation("{\n" +
+                        "           $addFields: {\n" +
+                        "              \"date\": { \"$date\" : "+startDate.getTime()+" }\n" +
+                        "           }\n" +
+                        "        }"),
                 getCustomLookUpForLastPlanningPeriod(unitId),
                 getCustomProjectionForShift(),
                 getCustomWTAOperationForShift(employmentIds),
@@ -836,7 +841,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     private CustomAggregationOperation getCustomWTAOperationForShift(Collection<Long> employmentIds) {
-        return new CustomAggregationOperation("{\n" +
+         new CustomAggregationOperation("{\n" +
                 "  \"$lookup\": {\n" +
                 "    \"from\": \"workingTimeAgreement\",\n" +
                 "    \"let\": {\n" +
@@ -872,6 +877,67 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "         as: \"ruleTemplates\"\n" +
                 "       }\n" +
                 "  },\n" +
+                "    ],\n" +
+                "    \"as\": \"workingTimeAgreements\"\n" +
+                "  }\n" +
+                "}");
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"workingTimeAgreement\",\n" +
+                "    \"let\": {\n" +
+                "      \"employmentIds\": "+employmentIds+
+                "        \"date\":\"$planningPeriod.date\"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$deleted\",\n" +
+                "                  false\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$employmentId\",\n" +
+                "                  \"$$employmentIds\"\n" +
+                "                ]\n" +
+                "              },{\n" +
+                "                  \"$lte\":[\n" +
+                "                  \"$startDate\",\n" +
+                "                  \"$$date\"\n" +
+                "                  ]\n" +
+                "                  },\n" +
+                "              {\n" +
+                "                  \"$or\":[\n" +
+                "                  {\n" +
+                "                  \"$gte\": [\n" +
+                "                  \"$endDate\",\n" +
+                "                  \"$$date\"\n" +
+                "                ],    \n" +
+                "              },\n" +
+                "              {\n" +
+                "                  \"$eq\": [\n" +
+                "                  \"$endDate\",\n" +
+                "                  undefined\n" +
+                "                ],    \n" +
+                "              }\n" +
+                "                  ]\n" +
+                "                  }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"$lookup\": {\n" +
+                "          \"from\": \"wtaBaseRuleTemplate\",\n" +
+                "          \"localField\": \"ruleTemplateIds\",\n" +
+                "          \"foreignField\": \"_id\",\n" +
+                "          \"as\": \"ruleTemplates\"\n" +
+                "        }\n" +
+                "      }\n" +
                 "    ],\n" +
                 "    \"as\": \"workingTimeAgreements\"\n" +
                 "  }\n" +

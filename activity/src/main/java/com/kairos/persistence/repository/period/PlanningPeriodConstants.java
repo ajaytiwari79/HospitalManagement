@@ -32,6 +32,7 @@ public class PlanningPeriodConstants {
             "    \"planningPeriod.lastPlanningPeriodEndDate\":{ $arrayElemAt: [ \"$lastPlanningPeriod.endDate\", 0 ] },    \n" +
             "    \"planningPeriod.startDate\" : \"$startDate\",\n" +
             "    \"planningPeriod.endDate\" : \"$endDate\",\n" +
+            "    \"planningPeriod.date\" : \"$date\",\n" +
             "    \"planningPeriod.currentPhaseId\" : \"$currentPhaseId\",\n" +
             "    \"planningPeriod.nextPhaseId\" : \"$nextPhaseId\",\n" +
             "    \"planningPeriod.duration\" : \"$duration\",\n" +
