@@ -36,14 +36,14 @@ public class GeneralSettingsController {
     }
 
     @ApiOperation(value = "update Country General Setting")
-    @PutMapping(value = UNIT_URL+"/general_settings")
+    @PutMapping(value = UNIT_URL+"/unit_general_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateUnitGeneralSettingsForUnit(@PathVariable Long unitId,@RequestBody GeneralSettings generalSettings) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingsService.updateUnitGeneralSettingsForUnit(unitId, generalSettings));
     }
 
     @ApiOperation(value = "get Country General Setting")
-    @GetMapping(value = UNIT_URL+"/general_settings")
+    @GetMapping(value = UNIT_URL+"/unit_general_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitGeneralSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingsService.getGeneralSettingsByUnit(unitId));
