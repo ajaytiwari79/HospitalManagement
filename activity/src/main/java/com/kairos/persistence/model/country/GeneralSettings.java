@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CountryGeneralSettings extends MongoBaseEntity {
+public class GeneralSettings extends MongoBaseEntity {
     private Long unitId;
     private Long countryId;
     private boolean shiftCreationAllowForStaff;

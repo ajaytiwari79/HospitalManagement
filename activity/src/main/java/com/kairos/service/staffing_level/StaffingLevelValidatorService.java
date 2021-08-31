@@ -9,13 +9,16 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.country.GeneralSettings;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
+import com.kairos.persistence.model.unit_settings.UnitGeneralSetting;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
+import com.kairos.service.country.GeneralSettingsService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import org.apache.commons.collections.CollectionUtils;
@@ -47,12 +50,14 @@ public class StaffingLevelValidatorService {
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private StaffingLevelService staffingLevelService;
+    @Inject private GeneralSettingsService generalSettingsService;
 
 
     public boolean validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling) {
         Date shiftStartDate = shiftActivity.getStartDate();
         Date shiftEndDate = shiftActivity.getEndDate();
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        GeneralSettings generalSettingsForUnit = generalSettingsService.getUnitGeneralSettingsForUnit(shift.getUnitId());
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }
