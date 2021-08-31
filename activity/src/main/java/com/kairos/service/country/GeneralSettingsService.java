@@ -44,10 +44,13 @@ public class GeneralSettingsService {
         return generalSettings;
     }
 
-    public GeneralSettings getUnitGeneralSettingsForUnit(Long unitId) {
+    public GeneralSettings getUnitGeneralSettings(Long unitId) {
         GeneralSettings existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndUnitId(unitId);
         if(isNull(existingGeneralSettings)){
             existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndCountryId(UserContext.getUserDetails().getCountryId());
+        }
+        if(isNull(existingGeneralSettings)){
+            existingGeneralSettings = new GeneralSettings(unitId,null,false,false);
         }
         return existingGeneralSettings;
     }
