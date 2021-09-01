@@ -49,6 +49,7 @@ import com.kairos.persistence.repository.counter.CounterHelperRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 
 import com.kairos.utils.KPIUtils;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -89,6 +90,7 @@ public class CounterDataService {
     private CounterHelperRepository counterHelperRepository;
     @Inject
     private CounterHelperService counterHelperService;
+    @Inject private RaygunClient raygunClient;
 
 
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
@@ -120,6 +122,7 @@ public class CounterDataService {
             try {
                 if(ObjectUtils.isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException | ExecutionException ex) {
+                raygunClient.send(ex);
                 LOGGER.error("error while generate KPI  data",ex);
                 String[] messages = ex.getMessage().split(": ");
                 throw new RuntimeException(messages.length > 1 ? messages[1] : messages.length==1 ? messages[0] : "");

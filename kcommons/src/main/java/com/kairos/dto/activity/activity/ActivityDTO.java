@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -34,6 +35,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Builder
 @AllArgsConstructor
 @PermissionClass(name = "Activity")
+@Document(collection = "activities")
 public class ActivityDTO implements Serializable {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")

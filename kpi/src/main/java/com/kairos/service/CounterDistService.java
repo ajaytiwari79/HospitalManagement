@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -129,7 +130,7 @@ public class CounterDistService {
             }
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, refId, accessGroupPermissionCounterDTO.getStaffId());
             List<KPIDTO> copyKpidtos = counterRepository.getCopyKpiOfUnit(ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId(), true);
-            if (ObjectUtils.isCollectionNotEmpty(copyKpidtos)) {
+            if (isCollectionNotEmpty(copyKpidtos)) {
                 copyAndkpidtos.addAll(copyKpidtos);
             }
         }
@@ -212,7 +213,7 @@ public class CounterDistService {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());
         }
         List<KPIDTO> copyKpiDtos = counterRepository.getCopyKpiOfUnit(ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId(), true);
-        if (ObjectUtils.isCollectionNotEmpty(copyKpiDtos)) {
+        if (isCollectionNotEmpty(copyKpiDtos)) {
             kpiIds.addAll(copyKpiDtos.stream().map(KPIDTO::getId).collect(toList()));
         }
         List<ApplicableKPI> applicableKPIS;
@@ -228,7 +229,7 @@ public class CounterDistService {
     private List<TabKPIDTO> getTabKPIsData(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters, Long staffId, BigInteger shortcutId, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, Long countryId, List<BigInteger> kpiIds, Map<BigInteger, String> kpiIdAndTitleMap) {
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
-        if(ObjectUtils.isCollectionNotEmpty(getTabKPIDToByShortcutId(filters.getKpiIds(),shortcutId,moduleId))){
+        if(isCollectionNotEmpty(getTabKPIDToByShortcutId(filters.getKpiIds(),shortcutId,moduleId))){
             tabKPIDTOS=getTabKPIDToByShortcutId(filters.getKpiIds(),shortcutId,moduleId);
         }
         filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
@@ -253,7 +254,7 @@ public class CounterDistService {
         if(ObjectUtils.isNotNull(shortcutId)){
             ShortcutDTO shortcutDTO = counterHelperRepository.getShortcutById(shortcutId);
             com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO= shortcutDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
-            if(ObjectUtils.isNotNull(tabKPIDTO) && ObjectUtils.isCollectionNotEmpty(kpiIds)){
+            if(ObjectUtils.isNotNull(tabKPIDTO) && isCollectionNotEmpty(kpiIds)){
                 for (BigInteger kpiId : kpiIds) {
                     tabKPIDTOS.add(new TabKPIDTO(tabKPIDTO.getTabId(),new KPIDTO(kpiId, CounterSize.SIZE_8X2), CounterSize.SIZE_8X2));
                 }
@@ -372,7 +373,7 @@ public class CounterDistService {
                 tabKPIConf.setPosition(tabKPIMappingDTOMap.get(tabKPIConf.getId()).getPosition());
             }
         });
-        if(ObjectUtils.isCollectionNotEmpty(tabKPIConfs)) {
+        if(isCollectionNotEmpty(tabKPIConfs)) {
             counterRepository.saveEntities(tabKPIConfs);
         }
     }

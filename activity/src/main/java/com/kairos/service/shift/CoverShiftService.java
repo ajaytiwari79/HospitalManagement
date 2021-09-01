@@ -191,7 +191,7 @@ public class CoverShiftService {
                     }
                 }
             } catch (InterruptedException | ExecutionException ex) {
-                LOGGER.error("error while generate KPI  data", ex);
+                LOGGER.error("error while generate wta  data", ex);
             }
         }
     }

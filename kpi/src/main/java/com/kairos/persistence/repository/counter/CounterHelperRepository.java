@@ -30,6 +30,7 @@ import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.*;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -487,7 +488,7 @@ public class CounterHelperRepository {
                 lookup(TIME_TYPE, "activityBalanceSettings.timeTypeId", ID1, TIME_TYPE)
                 ,project(NAME,DESCRIPTION,COUNTRY_ID,UNIT_ID,"parentId","isParentActivity","activityGeneralSettings","activityBalanceSettings","activityRulesSettings","activityTimeCalculationSettings","activitySkillSettings")
                         .and(TIME_TYPE).arrayElementAt(0).as(TIME_TYPE));
-        List<ActivityDTO> activityDTOS = mongoTemplate.aggregate(aggregation, ACTIVITIES, ActivityDTO.class).getMappedResults();
+        List<ActivityDTO> activityDTOS = mongoTemplate.aggregate(aggregation, ActivityDTO.class, ActivityDTO.class).getMappedResults();
         return activityDTOS.stream().collect(Collectors.toMap(ActivityDTO::getId, v->v));
     }
 
@@ -504,14 +505,14 @@ public class CounterHelperRepository {
         return mongoTemplate.find(new Query(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and("date").lte(endDate)),DailyTimeBankEntry.class,"dailyTimeBankEntries");
     }
 
-    public List<WTAResponseDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate) {
+    public List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(endDate).and(END_DATE).gte(startDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, ID1, RULE_TEMPLATES),
                 project(NAME, DESCRIPTION, DISABLED, START_DATE, END_DATE, RULE_TEMPLATES, EMPLOYMENT_ID)
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, "workingTimeAgreement", WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
@@ -654,11 +655,28 @@ public class CounterHelperRepository {
             return context.getMappedObject(operation);
         }
     }
+    @org.springframework.data.mongodb.core.mapping.Document
+    public class WorkingTimeAgreement extends MongoBaseEntity{
+        private String name;
+        private String description;
+        private boolean disabled;
+        private Long employmentId;
+        private Long countryId;
+        private List<BigInteger> ruleTemplateIds;
+        private BigInteger parentId;
+        private BigInteger countryParentWTA;
+        private BigInteger organizationParentId;// wta id of parent organization and this must not be changable
+        private List<BigInteger> tags = new ArrayList<>();
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private Date expiryDate;
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     @Setter
     @NoArgsConstructor
+    @org.springframework.data.mongodb.core.mapping.Document
     public class PlanningPeriod extends MongoBaseEntity {
 
         private LocalDate startDate;
@@ -677,6 +695,7 @@ public class CounterHelperRepository {
 
     @Getter
     @Setter
+    @org.springframework.data.mongodb.core.mapping.Document(collection = "shifts")
     public class Shift {
         protected Date startDate;
         protected Date endDate;
@@ -695,10 +714,11 @@ public class CounterHelperRepository {
         protected List<ShiftActivity> activities;
     }
 
-    @org.springframework.data.mongodb.core.mapping.Document(collection = "time_Type")
+
     @Getter
     @Setter
     @NoArgsConstructor
+    @org.springframework.data.mongodb.core.mapping.Document(collection = "time_Type")
     public class TimeType extends MongoBaseEntity implements Serializable {
 
         private static final long serialVersionUID = 3265660403399363722L;

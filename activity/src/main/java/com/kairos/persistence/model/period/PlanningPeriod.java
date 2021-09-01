@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Getter
 @Setter
 @NoArgsConstructor
+@Document
 public class PlanningPeriod extends MongoBaseEntity {
 
     private LocalDate startDate;
