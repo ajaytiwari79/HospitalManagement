@@ -743,11 +743,11 @@ public class CounterHelperService {
                 for (ShiftDTO shiftDTO : shiftDTOS) {
                     List<BigInteger> timeTypeIds = new ArrayList<>();
                     shiftDTO.getActivities().forEach(shiftActivityDTO -> {
-                        timeTypeIds.add(shiftActivityDTO.getActivity().getTimeType().getId());
+                        timeTypeIds.add(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId());
                         if(isCollectionNotEmpty(shiftActivityDTO.getChildActivities())){
                             shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
                                 if(isNotNull(childActivityDTO.getActivity())) {
-                                    timeTypeIds.add(childActivityDTO.getActivity().getTimeType().getId());
+                                    timeTypeIds.add(childActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId());
                                 }
                             });
                         }});
