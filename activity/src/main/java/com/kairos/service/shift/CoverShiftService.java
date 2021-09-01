@@ -283,7 +283,7 @@ public class CoverShiftService {
 
     public void updateCoverShiftDetails(CoverShiftDTO coverShiftDTO) {
         if(coverShiftMongoRepository.existsByShiftIdAndDeleteFalse(coverShiftDTO.getShiftId())){
-            exceptionService.invalidRequestException(COVER_SHIFT);
+            exceptionService.invalidRequestException(COVER_ALREADY_RAISED);
         }
         CoverShift coverShift = ObjectMapperUtils.copyPropertiesByMapper(coverShiftDTO, CoverShift.class);
         coverShiftMongoRepository.save(coverShift);
