@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
+
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
@@ -30,7 +32,7 @@ public class GeneralSettingsService {
     public GeneralSettings getCountryGeneralSettings(Long countryId) {
         GeneralSettings existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndCountryId(countryId);
         if(isNull(existingGeneralSettings)){
-            existingGeneralSettings = new GeneralSettings(null,countryId,false,false);
+            existingGeneralSettings = new GeneralSettings(null,countryId,false,false,false, new ArrayList<>(),0);
         }
         return existingGeneralSettings;
     }
@@ -50,7 +52,7 @@ public class GeneralSettingsService {
             existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndCountryId(UserContext.getUserDetails().getCountryId());
         }
         if(isNull(existingGeneralSettings)){
-            existingGeneralSettings = new GeneralSettings(unitId,null,false,false);
+            existingGeneralSettings = new GeneralSettings(unitId,null,false,false,false, new ArrayList<>(),0);
         }
         return existingGeneralSettings;
     }
