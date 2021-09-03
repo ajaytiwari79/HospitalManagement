@@ -497,9 +497,6 @@ public class TimeBankService {
                 if(shiftWithActivityDTOMap.containsKey(shift.getId())){
                     ShiftWithActivityDTO shiftWithActivityDTO = shiftWithActivityDTOMap.get(shift.getId());
                     shift.setTimeBankCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftWithActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
-                    int ctaBonusOfShift = shift.getTimeBankCTADistributions().stream().mapToInt(timeBankCTADistribution -> timeBankCTADistribution.getMinutes()).sum();
-                    timeBankCtaBonusMinutes+=ctaBonusOfShift;
-                    plannedMinutesOfTimebank+=ctaBonusOfShift;
                 }
                 shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
                 shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
