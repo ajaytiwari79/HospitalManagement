@@ -517,7 +517,8 @@ public class ShiftValidatorService {
         if (!ShiftOperationType.DELETE.equals(shiftOperationType)) {
             shifts.add(shift);
         }
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, expectedTimebank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum(), staffChildAges, shiftOperationType);
+        int totalWeeklyMinutes = timeBankCalculationService.getTotalWeeklyMinutes(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, expectedTimebank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum(), staffChildAges, shiftOperationType,totalWeeklyMinutes);
     }
 
     public RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(Phase phase, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDataHelper shiftDataHelper, ShiftOperationType shiftOperationType) {
@@ -558,7 +559,8 @@ public class ShiftValidatorService {
             staffChildAges = getChildAges(shift.getStartDate(), staffAdditionalInfoDTO);
         }
         staffAdditionalInfoDTO.setStaffAge(getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), asLocalDate(shift.getStartDate())));
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, expectedTimebank, new HashMap<>(), staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), shiftDataHelper.getPlanningPeriod().getLastPlanningPeriodEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum(), staffChildAges, shiftOperationType);
+        int totalWeeklyMinutes = timeBankCalculationService.getTotalWeeklyMinutes(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, expectedTimebank, new HashMap<>(), staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), shiftDataHelper.getPlanningPeriod().getLastPlanningPeriodEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum(), staffChildAges, shiftOperationType,totalWeeklyMinutes);
     }
 
     public List<Integer> getChildAges(Date shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

@@ -252,6 +252,20 @@ public class TimeBankCalculationService {
         return contractualMinutes;
     }
 
+    public int getTotalWeeklyMinutes(java.time.LocalDate localDate, List<EmploymentLinesDTO> employmentLines) {
+        int contractualMinutes = 0;
+        if (CollectionUtils.isNotEmpty(employmentLines)) {
+            for (EmploymentLinesDTO employmentLine : employmentLines) {
+                DateTimeInterval positionInterval = employmentLine.getInterval();
+                if ((positionInterval == null && (employmentLine.getStartDate().equals(localDate) || employmentLine.getStartDate().isBefore(localDate))) || (positionInterval != null && (positionInterval.contains(localDate) || employmentLine.getEndDate().equals(localDate)))) {
+                    contractualMinutes = employmentLine.getTotalWeeklyMinutes();
+                    break;
+                }
+            }
+        }
+        return contractualMinutes;
+    }
+
     public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails,boolean calculateTimeBankOff) {
         if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());

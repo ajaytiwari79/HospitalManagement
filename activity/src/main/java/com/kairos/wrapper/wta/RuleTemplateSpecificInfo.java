@@ -61,7 +61,7 @@ public class RuleTemplateSpecificInfo {
     private int totalWeeklyMinutes;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String, TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays, List<CareDaysDTO> seniorCareDays, LocalDate lastPlanningPeriodEndDate, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String, TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays, List<CareDaysDTO> seniorCareDays, LocalDate lastPlanningPeriodEndDate, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType,int totalWeeklyMinutes) {
         this.shifts = isNullOrElse(shifts,new ArrayList<>());
         Collections.sort(this.shifts);
         this.shift = shift;
@@ -82,6 +82,7 @@ public class RuleTemplateSpecificInfo {
         this.phaseEnum=phaseEnum;
         this.staffChildAges=staffChildAges;
         this.shiftOperationType=shiftOperationType;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
     public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, UnitGeneralSettingDTO unitGeneralSetting,int totalWeeklyMinutes) {
