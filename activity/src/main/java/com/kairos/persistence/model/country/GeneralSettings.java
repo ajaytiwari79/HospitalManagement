@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +19,8 @@ public class GeneralSettings extends MongoBaseEntity {
     private Long countryId;
     private boolean shiftCreationAllowForStaff;
     private boolean shiftCreationAllowForManagement;
+    private boolean stopBrickSettingAllow;
+    private List<BigInteger> selectedPhaseIds = new ArrayList<>();
+    private int stopBrickOverStaffingDurationInPer;
+
 }
