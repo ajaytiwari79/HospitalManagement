@@ -11,6 +11,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -415,13 +416,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public boolean absenceShiftExistsByDate(Long unitId, Date startDate, Date endDate, Long staffId) {
+    public List<ShiftDTO> absenceShiftExistsByDate(Long unitId, Date startDate, Date endDate, Long staffId) {
         Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(STAFF_ID).is(staffId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate).and(DISABLED).is(false);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(ACTIVITIES, ACTIVITIES_ACTIVITY_ID, "_id", ACTIVITY),
                 match(new Criteria().orOperator(where("activity.activityTimeCalculationSettings.methodForCalculatingTime").is(FULL_DAY_CALCULATION), where("activity.activityTimeCalculationSettings.methodForCalculatingTime").is(FULL_WEEK))));
-        return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
+        return mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults();
     }
 
     private <T extends ShiftDTO> List<T> getShiftWithActivityByCriteria(Criteria criteria,boolean replaceDraftShift,Class classType,String... shiftProjection){

@@ -8,6 +8,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
@@ -61,7 +62,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift);
 
-    boolean absenceShiftExistsByDate(Long unitId,Date startDate,Date endDate,Long staffId);
+    List<ShiftDTO> absenceShiftExistsByDate(Long unitId,Date startDate,Date endDate,Long staffId);
 
     void deleteShiftBetweenDatesByEmploymentId(Long employmentId,Date startDate,Date endDate,Collection<BigInteger> shiftIds);
     List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(Collection<Long> staffIds, LocalDate startDate, LocalDate endDate);
