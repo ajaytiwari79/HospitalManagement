@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
 import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -88,7 +89,7 @@ public class Shift extends MongoBaseEntity {
     private int restingMinutes;
     private Date coverShiftDate;
     private boolean createdByCoverShift;
-    protected AccessGroupRole deletedBy;
+    protected ShiftDeletedBy deletedBy;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;

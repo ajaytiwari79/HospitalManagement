@@ -9,6 +9,7 @@ import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
@@ -102,6 +103,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     private Date coverShiftDate;
     private boolean fillGap;
     private boolean createdByCoverShift;
+    protected ShiftDeletedBy deletedBy;
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
