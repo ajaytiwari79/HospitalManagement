@@ -35,7 +35,8 @@ public class OtherPermissionDTO implements Serializable {
 
     public boolean isValid(OtherPermissionDTO otherPermissionDTO){
        boolean expertiseValid = isCollectionEmpty(expertiseIds) || CollectionUtils.containsAny(expertiseIds,otherPermissionDTO.expertiseIds);
-        boolean unionValid = isCollectionEmpty(unionIds) || CollectionUtils.containsAny(unionIds,otherPermissionDTO.unionIds);
+       //TODO remove after union issue fixed
+       boolean unionValid = true;//isCollectionEmpty(unionIds) || CollectionUtils.containsAny(unionIds,otherPermissionDTO.unionIds);
         boolean teamValid = isCollectionEmpty(teamIds) || CollectionUtils.containsAny(teamIds,otherPermissionDTO.teamIds);
         boolean employmentTypeValid = isCollectionEmpty(employmentTypeIds) || CollectionUtils.containsAny(employmentTypeIds,otherPermissionDTO.employmentTypeIds);
         boolean tagValid = isCollectionEmpty(tagIds) || CollectionUtils.containsAny(tagIds,otherPermissionDTO.tagIds);

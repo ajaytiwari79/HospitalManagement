@@ -354,6 +354,7 @@ public class PermissionService {
             fieldLevelPermissions.setFieldName(field.getFieldName());
             fieldLevelPermissions.setPermissions(hubMember ? newHashSet(FieldLevelPermission.READ, FieldLevelPermission.WRITE) : fieldLevelPermissions.getPermissions());
             fieldLevelPermissions.setForOtherFieldLevelPermissions(hubMember ? newHashSet(FieldLevelPermission.READ, FieldLevelPermission.WRITE) : fieldLevelPermissions.getForOtherFieldLevelPermissions());
+            fieldLevelPermissions.setUnionIds(new HashSet<>());//Todo remove when union issue fixed
             fieldPermissionQueryResults.add(fieldLevelPermissions);
         }
         return fieldPermissionQueryResults;
