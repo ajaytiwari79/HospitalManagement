@@ -33,6 +33,7 @@ public class ActivityConstants {
             "              \"id\":1,\n" +
             "              \"name\":1,\n" +
             "              \"activityGeneralSettings\":1,\n" +
+            "              \"activityTimeCalculationSettings\":1,\n" +
             "              \"activityRulesSettings\":1,\n" +
             "              \"parentActivityId\":1,\n" +
             "              \"activityPriorityName\":1,\n" +
