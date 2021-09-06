@@ -980,4 +980,7 @@ public class EmploymentService {
         }
         employmentLine.setWorkingDaysInWeek(workingDaysInWeek);
     }
+    public List<Map> getEmploymentAndExpertiseId() {
+        return employmentGraphRepository.getEmploymentAndExpertiseId();
+    }
 }

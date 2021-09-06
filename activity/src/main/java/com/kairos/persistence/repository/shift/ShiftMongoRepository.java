@@ -100,4 +100,5 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     ShiftDTO findByIdAndDeletedFalse(BigInteger id);
 
+
 }

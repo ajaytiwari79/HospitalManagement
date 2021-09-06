@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.expertise.ExpertisePublishSetting;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -22,6 +23,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertisePublishSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -68,6 +70,7 @@ public class ShiftStateService {
     @Inject private ShiftValidatorService shiftValidatorService;
     @Inject private DayTypeService dayTypeService;
     @Inject private TimeSlotMongoRepository timeSlotMongoRepository;
+    @Inject private ExpertisePublishSettingService expertisePublishSettingService;
 
 
     public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate,Long staffId){
@@ -197,8 +200,8 @@ public class ShiftStateService {
 
 
     public void deleteDraftShiftsViaTimeAndAttendanceJob(Long unitId){
-        List<Shift> draftShifts = shiftMongoRepository.findDraftShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(asDate(getLocalDate().plusDays(1))),asDate(getEndOfDayFromLocalDateTime().plusDays(1)),unitId);
-        shiftService.deleteDraftShiftAndViolatedRules(draftShifts);
+        shiftMongoRepository.removeDraftShiftByExpertiseSettings(unitId);
+        //shiftService.deleteDraftShiftAndViolatedRules(draftShifts);
     }
 
     public ShiftDTO updateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, BigInteger shiftStateId, BigInteger shiftStatePhaseId) {

@@ -55,4 +55,12 @@ public class ExpertisePublishSettingController {
                                                                                         @RequestBody ExpertisePublishSetting expertisePublishSetting) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertisePublishSettingService.updateExpertisePublishSettingsInUnit(unitId, expertiseId,expertisePublishSetting));
     }
+
+    @ApiOperation(value = "update EmploymentType And ExpertiseId")
+    @GetMapping(value = UNIT_URL+"/update_employmentType_and_expertiseId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateEmploymentTypeAndExpertiseId(@PathVariable Long unitId) {
+        expertisePublishSettingService.updateEmploymentTypeAndExpertiseId(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
 }

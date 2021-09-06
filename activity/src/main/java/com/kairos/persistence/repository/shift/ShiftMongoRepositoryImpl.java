@@ -16,12 +16,15 @@ import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.expertise.ExpertisePublishSetting;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import com.kairos.persistence.repository.expertise.ExpertisePublishSettingRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.expertise.ExpertisePublishSettingService;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
@@ -82,6 +85,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject private ShiftCriteriaBuilderService shiftCriteriaBuilderService;
+    @Inject private ExpertisePublishSettingRepository expertisePublishSettingRepository;
 
 
     @Override
@@ -642,6 +646,41 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             }
         }
         return criterias;
+    }
+
+    @Override
+    public void removeDraftShiftByExpertiseSettings(Long unitId){
+        List<ExpertisePublishSetting> expertisePublishSettings = expertisePublishSettingRepository.findByUnitId(unitId);
+        Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
+        List<Criteria> criteriaList = new ArrayList<>();
+        LocalDate localDate = LocalDate.now();
+        for (ExpertisePublishSetting expertisePublishSetting : expertisePublishSettings) {
+            for (Map.Entry<Long, Integer> longIntegerEntry : expertisePublishSetting.getEmploymentTypeSettings().entrySet()) {
+                if(isNull(longIntegerEntry.getKey()) && longIntegerEntry.getValue()>0){
+                    LocalDate date = localDate.plusDays(longIntegerEntry.getValue());
+                    criteriaList.add(Criteria.where("employmentTypeId").is(longIntegerEntry.getKey()).and(START_DATE).gte(date).lte(date.plusDays(1)).and("expertiseId").is(expertisePublishSetting.getExpertiseId()));
+                }
+            }
+        }
+        criteria.orOperator((Criteria[]) criteriaList.toArray());
+        Update update = new Update();
+        update.set("draftShift",null);
+        mongoTemplate.findAndModify(new Query(criteria),update,Shift.class);
+        criteria.and("draft").is(true);
+        update = new Update();
+        update.set("deleted",true);
+        mongoTemplate.findAndModify(new Query(criteria),update,Shift.class);
+    }
+
+    @Override
+    public void updateEmploymentTypeAndExpertiseId(List<Map> employmentExpertiseMap){
+        for (Map map : employmentExpertiseMap) {
+            Criteria criteria = Criteria.where(EMPLOYMENT_ID).is(((Integer)map.get("employmentId")).longValue()).and(DELETED).is(false);
+            Update update = new Update();
+            update.set("employmentTypeId",((Integer)map.get("employmentTypeId")).longValue());
+            update.set("expertiseId",((Integer)map.get("expertiseId")).longValue());
+            mongoTemplate.findAndModify(new Query(criteria),update,Shift.class);
+        }
     }
 
 }

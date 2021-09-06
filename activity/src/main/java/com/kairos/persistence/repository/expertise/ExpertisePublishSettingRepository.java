@@ -17,4 +17,7 @@ public interface ExpertisePublishSettingRepository extends MongoBaseRepository<E
 
     @Query(value = "{ expertiseId:?0, unitId:?1,deleted:false}")
     ExpertisePublishSetting findByExpertiseIdAndUnitId(Long expertiseId, Long unitId);
+
+    @Query(value = "{unitId:?1,deleted:false}")
+    List<ExpertisePublishSetting> findByUnitId(Long unitId);
 }

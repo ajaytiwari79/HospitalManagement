@@ -258,6 +258,8 @@ public class ShiftService {
         if(!ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
             shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriod, phase, shift, activityWrapperMap, staffAdditionalInfoDTO);
         }
+        shift.setEmploymentTypeId(staffAdditionalInfoDTO.getEmployment().getEmploymentLines().get(0).getEmploymentType().getId());
+        shift.setExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         shift.setPlanningPeriodPublished(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
         shiftFunctionService.updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
         Phase newPhase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());

@@ -88,5 +88,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftActivityDTO> findAllShiftActivityiesBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds);
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds);
+    void removeDraftShiftByExpertiseSettings(Long unitId);
+    void updateEmploymentTypeAndExpertiseId(List<Map> employmentExpertiseMap);
 
 }

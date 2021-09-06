@@ -90,6 +90,8 @@ public class Shift extends MongoBaseEntity {
     private Date coverShiftDate;
     private boolean createdByCoverShift;
     protected ShiftDeletedBy deletedBy;
+    private Long employmentTypeId;
+    private Long expertiseId;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;

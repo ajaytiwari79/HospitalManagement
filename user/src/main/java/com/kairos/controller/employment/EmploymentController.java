@@ -220,11 +220,11 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.findEmploymentByUnitId(unitId));
     }
 
-//    @ApiOperation(value = "get total sum of paylevel of all employment")
-//    @GetMapping(value = "/get_total_sum_of_paylevel")
-//    public ResponseEntity<Map<String, Object>> getTotalSumOfPayLevelOfAllEmployments(@RequestBody List<Long> employmentIds,@RequestParam LocalDate selectedDate) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getTotalSumOfAmountOfPayLevel(employmentIds,selectedDate));
-//    }
+    @ApiOperation(value = "get Employment And ExpertiseId")
+    @GetMapping(value = "/get_employment_and_expertiseId")
+    public ResponseEntity<Map<String, Object>> getEmploymentAndExpertiseId() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentAndExpertiseId());
+    }
 
 
 

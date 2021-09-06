@@ -6,12 +6,15 @@ import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.expertise.ExpertisePublishSetting;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.expertise.ExpertisePublishSettingRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_NIGHTWORKER_SETTING_NOTFOUND;
@@ -33,6 +37,9 @@ public class ExpertisePublishSettingService {
 
     @Inject
     private ExpertisePublishSettingRepository expertisePublishSettingRepository;
+    @Inject
+    private UserIntegrationService userIntegrationService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     public ExpertisePublishSetting getExpertisePublishSettings(Long countryId, Long expertiseId) {
         ExpertisePublishSetting expertisePublishSetting = expertisePublishSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
@@ -68,5 +75,10 @@ public class ExpertisePublishSettingService {
             expertisePublishSetting.setId(null);
         }
         return expertisePublishSetting;
+    }
+
+    public void updateEmploymentTypeAndExpertiseId(Long unitId){
+        List<Map> staffEmploymentDetailsMap = userIntegrationService.getEmploymentAndExpertiseId(unitId);
+        shiftMongoRepository.updateEmploymentTypeAndExpertiseId(staffEmploymentDetailsMap);
     }
 }

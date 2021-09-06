@@ -613,6 +613,11 @@ public class UserIntegrationService {
     public List<OrganizationTypeDTO> getAllOrgTypeByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/organization_type/all", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationTypeDTO>>>() {});
     }
+
+    public List<Map> getEmploymentAndExpertiseId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_employment_and_expertiseId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map>>>() {
+        });
+    }
 }
 
 

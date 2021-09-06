@@ -388,5 +388,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "return employment.startDate as startDate,employment.endDate as endDate,id(expertise) as expertiseId,user.cprNumber as cprNumber,seniorCareDays as seniorDays,childCareDays as childCareDays,id(staff) as staffId,staffChildDetails as staffChildDetails")
     EmploymentQueryResult getEmploymentDetailsById(Long employmentId,String startDate);
 
+    @Query("MATCH (et:EmploymentType)-[:HAS_EMPLOYMENT_TYPE]-(:EmploymentLine)-[:HAS_EMPLOYMENT_LINES]-(e:Employment)-[:HAS_EXPERTISE_IN]-(exp:Expertise) RETURN id(e) as employmentId,id(et) as employmentTypeId,id(exp) as expertiseId")
+    List<Map> getEmploymentAndExpertiseId();
+
 }
 
