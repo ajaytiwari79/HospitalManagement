@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
@@ -52,11 +53,10 @@ public class StaffingLevelValidatorService {
     @Inject private GeneralSettingsService generalSettingsService;
 
 
-    public boolean validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling) {
+    public boolean validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling, GeneralSettings generalSettings, boolean byUpdate) {
         Date shiftStartDate = shiftActivity.getStartDate();
         Date shiftEndDate = shiftActivity.getEndDate();
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        GeneralSettings generalSettingsForUnit = generalSettingsService.getGeneralSettingsByUnit(shift.getUnitId());
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }
@@ -65,7 +65,7 @@ public class StaffingLevelValidatorService {
             Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
             Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate);
-            validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling,generalSettingsForUnit);
+            validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling,generalSettings,byUpdate);
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
         return isStaffingLevelVerify;
@@ -157,11 +157,14 @@ public class StaffingLevelValidatorService {
     }
 
 
-    private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling, GeneralSettings generalSettingsForUnit) {
+    private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling, GeneralSettings generalSettingsForUnit, boolean byUpdate) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
         if (activityWrapper.getActivity().getActivityRulesSettings().isEligibleForStaffingLevel()) {
             if (CollectionUtils.isEmpty(staffingLevels)) {
                 if(gapFilling){
+                    return;
+                }
+                if(isShiftCreationAllowedWithOutStaffinglevel(generalSettingsForUnit,byUpdate)) {
                     return;
                 }
                 exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
@@ -174,11 +177,14 @@ public class StaffingLevelValidatorService {
                 if (!DateUtils.getLocalDateFromDate(shiftActivity.getStartDate()).equals(DateUtils.getLocalDateFromDate(shiftActivity.getEndDate()))) {
                     lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                     upperLimit = 95;
-                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
+                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling,generalSettingsForUnit,byUpdate);
                     lowerLimit = 0;
                     upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
                     if (staffingLevels.size() < 2) {
                         if(gapFilling){
+                            return;
+                        }
+                        if(isShiftCreationAllowedWithOutStaffinglevel(generalSettingsForUnit,byUpdate)) {
                             return;
                         }
                         exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
@@ -186,21 +192,24 @@ public class StaffingLevelValidatorService {
                     staffingLevel = staffingLevels.get(1);
                     applicableIntervals = staffingLevel.getPresenceStaffingLevelInterval();
 
-                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
+                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling, generalSettingsForUnit, byUpdate);
 
                 } else {
                     lowerLimit = staffingLevelService.getLowerIndex(shiftActivity.getStartDate());
                     upperLimit = staffingLevelService.getUpperIndex(shiftActivity.getEndDate());
-                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling);
+                    checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shift, checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling, generalSettingsForUnit, byUpdate);
                 }
             } else if(!gapFilling){
-                validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shift);
+                validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shift,generalSettingsForUnit,byUpdate);
             }
         }
 
     }
+    private boolean isShiftCreationAllowedWithOutStaffinglevel(GeneralSettings generalSettingsForUnit, boolean byUpdate) {
+        return isNotNull(generalSettingsForUnit) && !byUpdate && ((UserContext.getUserDetails().isStaff() && generalSettingsForUnit.isShiftCreationAllowForStaff()) || (UserContext.getUserDetails().isManagement() && generalSettingsForUnit.isShiftCreationAllowForManagement()));
+    }
 
-    private void checkStaffingLevelInterval(int lowerLimit, int upperLimit, List<StaffingLevelInterval> applicableIntervals, StaffingLevel staffingLevel, Shift shift, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling) {
+    private void checkStaffingLevelInterval(int lowerLimit, int upperLimit, List<StaffingLevelInterval> applicableIntervals, StaffingLevel staffingLevel, Shift shift, boolean checkOverStaffing, ShiftActivity shiftActivity, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, boolean gapFilling, GeneralSettings generalSettingsForUnit, boolean byUpdate) {
         for (int currentIndex = lowerLimit; currentIndex <= upperLimit && currentIndex < applicableIntervals.size(); currentIndex++) {
             int shiftsCount;
             Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
@@ -215,6 +224,9 @@ public class StaffingLevelValidatorService {
                 checkOverStaffing(checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, breakValid, totalCount);
                 checkUnderStaffing(checkOverStaffing, shiftActivity, staffingLevelActivityWithDurationMap, breakValid, totalCount);
             } else if(!gapFilling){
+                if(isShiftCreationAllowedWithOutStaffinglevel(generalSettingsForUnit,byUpdate)) {
+                    return;
+                }
                 exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
             }
         }
@@ -243,13 +255,19 @@ public class StaffingLevelValidatorService {
         }
     }
 
-    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean checkOverStaffing, Shift shift) {
+    private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity shiftActivity, boolean checkOverStaffing, Shift shift, GeneralSettings generalSettingsForUnit, boolean byUpdate) {
         if (CollectionUtils.isEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
+            if(isShiftCreationAllowedWithOutStaffinglevel(generalSettingsForUnit,byUpdate)) {
+                return;
+            }
             exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
         }
         int shiftsCount = 0;
         Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
         if (!staffingLevelActivity.isPresent()) {
+            if(isShiftCreationAllowedWithOutStaffinglevel(generalSettingsForUnit,byUpdate)) {
+                return;
+            }
             exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
         }
         shiftsCount = staffingLevelActivity.get().getAvailableNoOfStaff();

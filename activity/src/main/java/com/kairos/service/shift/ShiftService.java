@@ -21,6 +21,7 @@ import com.kairos.enums.shift.*;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.country.GeneralSettings;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
@@ -46,6 +47,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
+import com.kairos.service.country.GeneralSettingsService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
@@ -76,7 +78,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
 import static com.kairos.enums.TimeTypeEnum.GAP;
 import static com.kairos.enums.shift.ShiftType.SICK;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.isIgnoredAllRuletemplate;
@@ -164,6 +165,7 @@ public class ShiftService {
     @Inject private ShiftFetchService shiftFetchService;
     @Inject private OrganizationActivityService organizationActivityService;
     @Inject private ShiftHelperService shiftHelperService;
+    @Inject private GeneralSettingsService generalSettingsService;
 
     public List<ShiftWithViolatedInfoDTO> createShifts(Long unitId, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>(shiftDTOS.size());
@@ -350,13 +352,13 @@ public class ShiftService {
 
     public void saveShiftWithActivity(Map<Date, Phase> phaseListByDate, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = organizationActivityService.getActivityWrapperMap(shifts, null);
-
+        GeneralSettings generalSettings = generalSettingsService.getGeneralSettingsByUnit(staffAdditionalInfoDTO.getUnitId());
         for (Shift shift : shifts) {
             Map<BigInteger,StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(null);
 
             for (ShiftActivity shiftActivity : shiftActivities[1]) {
-                staffingLevelValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap,false);
+                staffingLevelValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap,false, generalSettings, false);
             }
             staffingLevelValidatorService.verifyStaffingLevel(new HashMap<>(), staffingLevelActivityWithDurationMap,  null, null, activityWrapperMap, false, null,false);
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());

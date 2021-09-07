@@ -2,11 +2,9 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
-import com.kairos.dto.activity.time_bank.TimeBankCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -206,11 +204,11 @@ public class CoverShiftService {
             for (int i = 0; i < staffAdditionalInfoDTOS.size(); i++) {
                 Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForUnderStaffing = new HashMap<>();
                 for (ShiftActivity shiftActivity : staffWiseShiftsMap.get(staffAdditionalInfoDTOS.get(i).getId()).stream().flatMap(k -> k.getActivities().stream()).collect(Collectors.toList())) {
-                    staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity, staffingLevelActivityWithDurationMapForUnderStaffing, true);
+                    staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity, staffingLevelActivityWithDurationMapForUnderStaffing, true, null, false);
                 }
                 Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForOverStaffing = new HashMap<>();
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMapForOverStaffing, true);
+                    staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMapForOverStaffing, true, null, false);
                 }
                 boolean result = staffingLevelValidatorService.verifyStaffingLevel(staffingLevelActivityWithDurationMapForUnderStaffing, staffingLevelActivityWithDurationMapForOverStaffing, null, null, activityWrapperMap, false, null, true);
                 if (!result) {

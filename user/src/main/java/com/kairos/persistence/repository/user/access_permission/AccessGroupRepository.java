@@ -49,7 +49,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "Match (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') return accessGroup")
     List<AccessGroup> getAccessGroups(Long unitId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
+        @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) " +
             "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) " +
             " WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
@@ -349,6 +349,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH(user:User)<-[:BELONGS_TO]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[: HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WHERE ID(accessGroup) IN {0}\n" +
             "return DISTINCT id(user)")
     List<Long> getUserIdsByAccessGroupId(Collection<Long> accessGroupIds);
+
+    /*
+    * MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)=18712 with ag
+OPTIONAL MATCH (ag)-[:HAS_PARENT_ACCESS_GROUP]-(m:AccessGroup)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(u:Unit) with ag,u
+OPTIONAL MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff)
+ RETURN ag.translations as translations,id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role, ag.enabled AS enabled,ag.startDate AS startDate, ag.endDate AS endDate, ag.dayTypeIds AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes,count(u) as unitCount,count(staff) as staffCount
+    * */
 
 
 }

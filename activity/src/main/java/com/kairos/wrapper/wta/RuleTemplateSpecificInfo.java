@@ -11,6 +11,7 @@ import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.country.GeneralSettings;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.unit_settings.UnitGeneralSetting;
 import lombok.*;
@@ -59,9 +60,10 @@ public class RuleTemplateSpecificInfo {
     private ShiftOperationType shiftOperationType;
     private UnitGeneralSettingDTO unitGeneralSetting;
     private int totalWeeklyMinutes;
+    private GeneralSettings generalSettings;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String, TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays, List<CareDaysDTO> seniorCareDays, LocalDate lastPlanningPeriodEndDate, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType,int totalWeeklyMinutes) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String, TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays, List<CareDaysDTO> seniorCareDays, LocalDate lastPlanningPeriodEndDate, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType,int totalWeeklyMinutes,GeneralSettings generalSettings) {
         this.shifts = isNullOrElse(shifts,new ArrayList<>());
         Collections.sort(this.shifts);
         this.shift = shift;
@@ -83,9 +85,10 @@ public class RuleTemplateSpecificInfo {
         this.staffChildAges=staffChildAges;
         this.shiftOperationType=shiftOperationType;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.generalSettings = generalSettings;
     }
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, UnitGeneralSettingDTO unitGeneralSetting,int totalWeeklyMinutes) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlot> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, UnitGeneralSettingDTO unitGeneralSetting,int totalWeeklyMinutes,GeneralSettings generalSettings) {
         this.shifts = isNullOrElse(shifts,new ArrayList<>());
         Collections.sort(this.shifts);
         this.shift = shift;
@@ -106,16 +109,7 @@ public class RuleTemplateSpecificInfo {
         this.phaseEnum=phaseEnum;
         this.unitGeneralSetting = unitGeneralSetting;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, boolean nightWorker, ExpertiseNightWorkerSetting expertiseNightWorkerSetting,BigInteger phaseId,ShiftWithActivityDTO shift,UserAccessRoleDTO user,ViolatedRulesDTO violatedRules) {
-        this.shifts = shifts;
-        this.nightWorker = nightWorker;
-        this.expertiseNightWorkerSetting = expertiseNightWorkerSetting;
-        this.phaseId = phaseId;
-        this.shift = shift;
-        this.user = user;
-        this.violatedRules = violatedRules;
+        this.generalSettings = generalSettings;
     }
 
     public boolean isWTARuletemplateBroken(BigInteger wtaRuletemplateId){
