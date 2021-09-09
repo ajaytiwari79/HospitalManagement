@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
@@ -60,18 +60,20 @@ public class StaffingLevelValidatorService {
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }
-        if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isEligibleForStaffingLevel()) {
+        Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
+        Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
+        List<StaffingLevel> staffingLevels = newArrayList();
+        if (!byUpdate && activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isEligibleForStaffingLevel()) {
             if (isNotNull(generalSettings) && (UserContext.getUserDetails().isManagement() && !generalSettings.isShiftCreationAllowForManagement()) || (UserContext.getUserDetails().isStaff() && !generalSettings.isShiftCreationAllowForStaff())) {
-                if (!staffingLevelMongoRepository.activityExistsInStaffingLevel(shift.getUnitId(),shiftActivity.getActivityId())) {
+                staffingLevels = staffingLevelMongoRepository.findByUnitIdAndActivityIdBetweenDates(shift.getUnitId(), startDate, endDate, shiftActivity.getActivityId());
+                if (startDate.equals(endDate) && isCollectionEmpty(staffingLevels) || (!startDate.equals(endDate) && staffingLevels.size()==2)) {
                     exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
                 }
             }
         }
         boolean isStaffingLevelVerify = gapFilling || isVerificationRequired(checkOverStaffing, phaseSettings);
         if (isStaffingLevelVerify) {
-            Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
-            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
-            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate);
+            staffingLevels = isCollectionEmpty(staffingLevels) ? staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate) : staffingLevels;
             validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivity, staffingLevelActivityWithDurationMap, gapFilling,generalSettings,byUpdate);
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }

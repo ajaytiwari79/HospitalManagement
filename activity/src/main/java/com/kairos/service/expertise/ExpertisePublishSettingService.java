@@ -73,6 +73,9 @@ public class ExpertisePublishSettingService {
         if (!Optional.ofNullable(expertisePublishSetting).isPresent()) {
             expertisePublishSetting = expertisePublishSettingRepository.findByExpertiseIdAndCountryId(expertiseId, UserContext.getUserDetails().getCountryId());
             expertisePublishSetting.setId(null);
+            expertisePublishSetting.setUnitId(unitId);
+            expertisePublishSetting.setCountryId(null);
+            expertisePublishSettingRepository.save(expertisePublishSetting);
         }
         return expertisePublishSetting;
     }

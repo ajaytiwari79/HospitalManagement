@@ -10,8 +10,7 @@ import javax.inject.Inject;
 
 import java.util.ArrayList;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 @Service
 @Transactional
@@ -50,7 +49,8 @@ public class GeneralSettingsService {
         GeneralSettings existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndUnitId(unitId);
         if(isNull(existingGeneralSettings)){
             existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndCountryId(UserContext.getUserDetails().getCountryId());
-            existingGeneralSettings = new GeneralSettings(unitId,null,existingGeneralSettings.isShiftCreationAllowForStaff(),existingGeneralSettings.isShiftCreationAllowForManagement(),existingGeneralSettings.isStopBrickSettingAllow(), existingGeneralSettings.getSelectedPhaseIds(),existingGeneralSettings.getStopBrickOverStaffingDurationInPer());
+            existingGeneralSettings = new GeneralSettings(unitId,null,existingGeneralSettings.isShiftCreationAllowForStaff(),existingGeneralSettings.isShiftCreationAllowForManagement(),existingGeneralSettings.isStopBrickSettingAllow(), newArrayList(),existingGeneralSettings.getStopBrickOverStaffingDurationInPer());
+            generalSettingsRepository.save(existingGeneralSettings);
         }
         if(isNull(existingGeneralSettings)){
             existingGeneralSettings = new GeneralSettings(unitId,null,false,false,false, new ArrayList<>(),0);
