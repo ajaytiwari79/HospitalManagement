@@ -50,7 +50,7 @@ public class GeneralSettingsService {
         if(isNull(existingGeneralSettings)){
             existingGeneralSettings = generalSettingsRepository.findByDeletedFalseAndCountryId(UserContext.getUserDetails().getCountryId());
             existingGeneralSettings = new GeneralSettings(unitId,null,existingGeneralSettings.isShiftCreationAllowForStaff(),existingGeneralSettings.isShiftCreationAllowForManagement(),existingGeneralSettings.isStopBrickSettingAllow(), newArrayList(),existingGeneralSettings.getStopBrickOverStaffingDurationInPer());
-            generalSettingsRepository.save(existingGeneralSettings);
+            generalSettingsRepository.save(existingGeneralSettings);                                                                                        
         }
         if(isNull(existingGeneralSettings)){
             existingGeneralSettings = new GeneralSettings(unitId,null,false,false,false, new ArrayList<>(),0);
