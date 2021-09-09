@@ -36,6 +36,8 @@ public class AccessGroupQueryResult {
     private AccessGroup parentAccessGroup;
     @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
+    private int unitCount;
+    private int staffCount;
 
     public String getName() {
         return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);

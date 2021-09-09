@@ -310,4 +310,18 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id, translations));
     }
 
+    @ApiOperation("Get Country Access Group Linking Details")
+    @GetMapping(value = COUNTRY_URL + "/get_country_access_group_details" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupLinkingDetails(@RequestParam Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupLinkingDetails(accessGroupId));
+    }
+
+    @ApiOperation("Get Unit Access Group Linking Details")
+    @GetMapping(value = UNIT_URL + "/get_unit_access_group_details" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationAccessGroupLinkingDetails(@RequestParam Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getOrganizationAccessGroupLinkingDetails(accessGroupId));
+    }
+
 }

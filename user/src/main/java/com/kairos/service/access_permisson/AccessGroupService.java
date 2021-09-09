@@ -266,7 +266,7 @@ public class AccessGroupService {
 
     public List<AccessGroupQueryResult> getAccessGroupsForUnit(Long organizationId) {
         Organization organization = organizationService.fetchParentOrganization(organizationId);
-        return accessGroupRepository.getAccessGroupsForUnit(organization.getId());
+        return accessGroupRepository.getAccessGroupsForUnitWithLinkUnitAndStaffCount(organization.getId());
     }
 
     public List<AccessGroup> getAccessGroups(Long organizationId) {
@@ -960,5 +960,21 @@ public class AccessGroupService {
 
     public Set<Long> getAccessGroupIdsOfUnit(final Long unitId){
         return organizationService.fetchParentOrganization(unitId).getAccessGroups().stream().map(k->k.getId()).collect(Collectors.toSet());
+    }
+
+    public Map<String,List<Map>> getCountryAccessGroupLinkingDetails(Long accessGroupId){
+        Map<String,List<Map>> accessGroupDetails = new HashMap<>();
+        accessGroupDetails.put("expertiseDetails",accessGroupRepository.getCountryAccessGroupLinkingDetailsByExpertise(accessGroupId));
+        accessGroupDetails.put("organizationDetails",accessGroupRepository.getCountryAccessGroupLinkingDetailsByOrganization(accessGroupId));
+        accessGroupDetails.put("employmentTypeDetails",accessGroupRepository.getCountryAccessGroupLinkingDetailsByEmploymentType(accessGroupId));
+        return accessGroupDetails;
+    }
+
+    public Map<String,List<Map>> getOrganizationAccessGroupLinkingDetails(Long accessGroupId){
+        Map<String,List<Map>> accessGroupDetails = new HashMap<>();
+        accessGroupDetails.put("expertiseDetails",accessGroupRepository.getOrganizationAccessGroupLinkingDetailsByExpertise(accessGroupId));
+        accessGroupDetails.put("organizationDetails",accessGroupRepository.getOrganizationAccessGroupLinkingDetailsByOrganization(accessGroupId));
+        accessGroupDetails.put("employmentTypeDetails",accessGroupRepository.getOrganizationAccessGroupLinkingDetailsByEmploymentType(accessGroupId));
+        return accessGroupDetails;
     }
 }

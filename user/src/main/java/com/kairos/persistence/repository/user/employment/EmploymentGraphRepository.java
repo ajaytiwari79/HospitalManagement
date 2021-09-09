@@ -391,5 +391,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH (et:EmploymentType)-[:HAS_EMPLOYMENT_TYPE]-(:EmploymentLine)-[:HAS_EMPLOYMENT_LINES]-(e:Employment)-[:HAS_EXPERTISE_IN]-(exp:Expertise) RETURN id(e) as employmentId,id(et) as employmentTypeId,id(exp) as expertiseId")
     List<Map> getEmploymentAndExpertiseId();
 
+
 }
 

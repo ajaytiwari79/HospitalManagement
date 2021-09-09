@@ -60,6 +60,13 @@ public class StaffingLevelValidatorService {
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }
+        if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isEligibleForStaffingLevel()) {
+            if (isNotNull(generalSettings) && (UserContext.getUserDetails().isManagement() && !generalSettings.isShiftCreationAllowForManagement()) || (UserContext.getUserDetails().isStaff() && !generalSettings.isShiftCreationAllowForStaff())) {
+                if (!staffingLevelMongoRepository.activityExistsInStaffingLevel(shift.getUnitId(),shiftActivity.getActivityId())) {
+                    exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
+                }
+            }
+        }
         boolean isStaffingLevelVerify = gapFilling || isVerificationRequired(checkOverStaffing, phaseSettings);
         if (isStaffingLevelVerify) {
             Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
