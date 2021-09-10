@@ -880,6 +880,7 @@ public class ActivityService {
         activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getActivityGeneralSettings().setEndDate(activityDTO.getEndDate());
+        activityCopied.setTranslations(new HashMap<>());
         activityMongoRepository.save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         activityDTO.setActivityCanBeCopied(true);
