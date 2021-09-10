@@ -875,7 +875,7 @@ public class ActivityService {
         Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase, Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
-        activityCopied.setCountryParentId(activityFromDatabase.getCountryParentId() == null ? activityFromDatabase.getId() : activityFromDatabase.getCountryParentId());
+        activityCopied.setParentId(activityFromDatabase.getParentId() == null ? activityFromDatabase.getId() : activityFromDatabase.getParentId());
         activityCopied.getActivityGeneralSettings().setName(activityDTO.getName().trim());
         activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
