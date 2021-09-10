@@ -368,33 +368,42 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} with ag\n" +
             "OPTIONAL MATCH (ag)<-[:"+HAS_PARENT_ACCESS_GROUP+"]-(cag:AccessGroup) with cag \n" +
             "OPTIONAL MATCH (cag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff) with staff\n" +
-            "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_EXPERTISE+"]-(exp:Expertise) with\n" +
-            "staff,exp RETURN exp.name as expertiseName,id(exp) as expertiseId,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff)}) as staffs")
+            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
+            "with staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes\n" +
+            "OPTIONAL MATCH (staff)-[:STAFF_HAS_EXPERTISE]-(exp:Expertise) with staff,employmentTypeName,totalWeeklyMinutes,exp RETURN exp.name as expertiseName,id(exp) as expertiseId,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
     List<Map> getCountryAccessGroupLinkingDetailsByExpertise(Long accessGroupId);
 
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} with ag\n" +
-            "OPTIONAL MATCH (ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff) with staff\n" +
-            "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_EXPERTISE+"]-(exp:Expertise) with\n" +
-            "staff,exp RETURN exp.name as expertiseName,id(exp) as expertiseId,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff)}) as staffs")
+    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} with ag \n" +
+            "OPTIONAL MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with staff \n" +
+            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
+            "with staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes\n" +
+            "OPTIONAL MATCH (staff)-[:STAFF_HAS_EXPERTISE]-(exp:Expertise) with staff,employmentTypeName,totalWeeklyMinutes,exp RETURN exp.name as expertiseName,id(exp) as expertiseId,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
     List<Map> getOrganizationAccessGroupLinkingDetailsByExpertise(Long accessGroupId);
 
-    @Query("MATCH (org:Organization)-[:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag:AccessGroup{deleted:false}) where id(ag)={0} with org\n" +
-            "MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with org,staff RETURN id(org) as organizationId,org.name as name,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff)}) as staffs")
+    @Query("MATCH (org:Organization)-[:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag:AccessGroup{deleted:false}) where id(ag)={0} with org \n" +
+            "MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with org,staff\n" +
+            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
+            "with org,staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes \n" +
+            "RETURN id(org) as organizationId,org.name as name,collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
     List<Map> getOrganizationAccessGroupLinkingDetailsByOrganization(Long accessGroupId);
 
     @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)= {0}\n" +
             "OPTIONAL MATCH(ag)<-[HAS_PARENT_ACCESS_GROUP]-(pag:AccessGroup) with pag\n" +
             "OPTIONAL MATCH (pag)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(org:Organization) with pag,org\n" +
-            "OPTIONAL MATCH (pag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with org,staff RETURN id(org) as organizationId,org.name as organizationName,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff)}) as staffs")
+            "MATCH (pag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with org,staff\n" +
+            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
+            "with org,staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes \n" +
+            "RETURN id(org) as organizationId,org.name as name,collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
     List<Map> getCountryAccessGroupLinkingDetailsByOrganization(Long accessGroupId);
 
     @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0}\n" +
-            "OPTIONAL MATCH (ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)-[relation:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) with employmentType,staff RETURN id(employmentType) as employmentTypeId,employmentType.name as employmentTypeName,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff)}) as staffs")
+            "OPTIONAL MATCH (ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)-[relation:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) with employmentLine.totalWeeklyMinutes as totalWeeklyMinutes,employmentType,staff RETURN id(employmentType) as employmentTypeId,employmentType.name as employmentTypeName, collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
     List<Map> getOrganizationAccessGroupLinkingDetailsByEmploymentType(Long accessGroupId);
 
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0}\n" +
-            "OPTIONAL MATCH(ag)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) with pag\n" +
-            "OPTIONAL MATCH (ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)-[relation:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) with employmentType,staff RETURN id(employmentType) as employmentTypeId,employmentType.name as employmentTypeName,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff)}) as staffs")
+    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} \n" +
+            "OPTIONAL MATCH(ag)-[HAS_PARENT_ACCESS_GROUP]->(pag:AccessGroup) with pag \n" +
+            "OPTIONAL MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType :EmploymentType) \n" +
+            "with employmentLine.totalWeeklyMinutes as totalWeeklyMinutes,employmentType,staff RETURN id(employmentType) as employmentTypeId,employmentType.name as employmentTypeName, collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
     List<Map> getCountryAccessGroupLinkingDetailsByEmploymentType(Long accessGroupId);
 
 
