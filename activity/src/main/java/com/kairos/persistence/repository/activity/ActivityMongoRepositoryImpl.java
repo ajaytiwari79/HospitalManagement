@@ -939,11 +939,14 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         String activityIdString = getBigIntegerString(activityIds.iterator());
         AggregationOperation[] aggregations = new AggregationOperation[10];
         int i=0;
+        Criteria criteria = Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false);
         if(!mongoTemplate.exists(new Query(Criteria.where(STAFF_ID).is(staffId).and(DELETED).is(false)),
                 StaffActivitySetting.class)){
-            staffId = 0l;
+            criteria = Criteria.where(STAFF_ID).in(newArrayList(0l)).and(DELETED).is(false);
+        }else {
+            criteria = Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false).and(UNIT_ID).is(unitId);
         }
-        aggregations[i++] = match(Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false).and(UNIT_ID).is(unitId));
+        aggregations[i++] = match(criteria);
         aggregations[i++] = group(STAFF_ID).addToSet(ACTIVITYID).as(ACTIVITY_IDS);
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType,unitId);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();

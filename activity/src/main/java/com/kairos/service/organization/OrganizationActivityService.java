@@ -36,6 +36,7 @@ import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -50,6 +51,7 @@ import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
@@ -201,7 +203,7 @@ public class OrganizationActivityService {
     @Inject private GranularitySettingService granularitySettingService;
     @Inject
     private RaygunClient raygunClient;
-
+    @Inject private PhaseMongoRepository phaseMongoRepository;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationActivityService.class);
@@ -526,6 +528,7 @@ public class OrganizationActivityService {
                 (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
             Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
             setDataInActivity(activityDTO, activityCopied);
+            updateExistingPhaseIdOfWTA(activityCopied.getActivityPhaseSettings().getPhaseTemplateValues(),unitId);
             activityMongoRepository.save(activityCopied);
             if(PriorityFor.PRESENCE.equals(timeType.getPriorityFor()) && !activityCopied.isChildActivity()) {
                 activityRankingService.addOrRemovePresenceActivityRanking(unitId, activityCopied, true);
@@ -538,6 +541,15 @@ public class OrganizationActivityService {
             exceptionService.actionNotPermittedException(ACTIVITY_NOT_ELIGIBLE_FOR_COPY);
         }
         return activityDTO;
+    }
+
+    public void updateExistingPhaseIdOfWTA(List<PhaseTemplateValue> phaseTemplateValues, Long unitId) {
+        List<Phase> unitPhases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        Map<String, BigInteger> parentPhasesAndUnitPhaseIdMap = unitPhases.stream().collect(Collectors.toMap(k->k.getName().toUpperCase().trim(), Phase::getId));
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseTemplateValue.getName().toUpperCase().trim(), phaseTemplateValue.getPhaseId());
+            phaseTemplateValue.setPhaseId(phaseId);
+        }
     }
 
     private void setDataInActivity(ActivityDTO activityDTO, Activity activityCopied) {
