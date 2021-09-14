@@ -5,13 +5,17 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 
 /**
@@ -90,6 +94,19 @@ public class RedisService extends CommonsExceptionUtil {
         }
         return true;
     }
+
+    @Async
+    public void removeKeyFromCacheAsyscronously(Set<String> removeKeys){
+        removeEntryFromCache(removeKeys);
+    }
+    private void removeEntryFromCache(Set<String> removeKeys) {
+        Set<String> patternKeys = removeKeys.stream().filter(key -> key.contains("*")).collect(Collectors.toSet());
+        if (isCollectionNotEmpty(patternKeys)) {
+            patternKeys.forEach(key -> removeKeys.addAll(valueOperations.keys(key)));
+        }
+        valueOperations.delete(removeKeys);
+    }
+
 
     private String getTokenKey(String accessToken) {
         String[] tokenSplitString = accessToken.split("\\.");
