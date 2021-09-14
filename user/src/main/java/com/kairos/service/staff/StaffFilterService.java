@@ -245,7 +245,7 @@ public class StaffFilterService {
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
             case CTA_ACCOUNT_TYPE:
                 return getCTAAccounts();
-            case SHIFT_DELETED_BY:
+            case STOPBRICK_DELETED_BY:
                 return dtoToQueryesultConverter(ShiftDeletedBy.getListOfShiftDeleteByForFilters(), objectMapper);
             default:
                 break;
