@@ -594,7 +594,7 @@ public class OrganizationActivityService {
             unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
             activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
             timeSlotSetService.createDefaultTimeSlots(unitId);
-            //createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
+            createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
