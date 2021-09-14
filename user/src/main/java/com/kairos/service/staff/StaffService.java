@@ -237,7 +237,6 @@ public class StaffService {
             Language language = languageGraphRepository.findOne(staffDTO.getLanguageId());
             staffToUpdate.setLanguage(language);
         }
-        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffDTO.getExpertiseIds());
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffDTO);
         staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffDTO.getStaffChildDetails(), StaffChildDetail.class));
@@ -258,8 +257,8 @@ public class StaffService {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
-        List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getDate().getTime(), DateUtils.getDate().getTime(), SkillLevel.ADVANCE);
+
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), staffDTO.getExpertiseIds(), DateUtils.getDate().getTime(), DateUtils.getDate().getTime(), SkillLevel.ADVANCE);
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = copyCollectionPropertiesByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         teamService.assignStaffInTeams(staff, staffDTO.getTeams(), unitId);

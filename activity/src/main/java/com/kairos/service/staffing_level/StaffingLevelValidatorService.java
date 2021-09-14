@@ -66,7 +66,7 @@ public class StaffingLevelValidatorService {
         if (!byUpdate && activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isEligibleForStaffingLevel()) {
             if (isNotNull(generalSettings) && (UserContext.getUserDetails().isManagement() && !generalSettings.isShiftCreationAllowForManagement()) || (UserContext.getUserDetails().isStaff() && !generalSettings.isShiftCreationAllowForStaff())) {
                 staffingLevels = staffingLevelMongoRepository.findByUnitIdAndActivityIdBetweenDates(shift.getUnitId(), startDate, endDate, shiftActivity.getActivityId());
-                if (startDate.equals(endDate) && isCollectionEmpty(staffingLevels) || (!startDate.equals(endDate) && staffingLevels.size()==2)) {
+                if (startDate.equals(endDate) && isCollectionEmpty(staffingLevels) || (!startDate.equals(endDate) && staffingLevels.size()!=2)) {
                     exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName());
                 }
             }
