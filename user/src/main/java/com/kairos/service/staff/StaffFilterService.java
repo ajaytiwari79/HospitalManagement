@@ -20,6 +20,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.enums.cta.AccountType;
+import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
@@ -244,6 +245,8 @@ public class StaffFilterService {
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
             case CTA_ACCOUNT_TYPE:
                 return getCTAAccounts();
+            case STOPBRICK_DELETED_BY:
+                return dtoToQueryesultConverter(ShiftDeletedBy.getListOfShiftDeleteByForFilters(), objectMapper);
             default:
                 break;
         }
