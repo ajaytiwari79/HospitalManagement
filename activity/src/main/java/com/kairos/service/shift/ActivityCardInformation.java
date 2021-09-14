@@ -25,6 +25,6 @@ public class ActivityCardInformation extends MongoBaseEntity {
 
 
     enum ActivityCardInformationSetting{
-        STATUS,PRIORITY,ESCALATION,CHILD,BREAK_TIME,RESTING_HOURS
+        STATUS,PRIORITY,ESCALATION,CHILD,BREAK_TIME,RESTING_HOURS,STOPBRICK
     }
 }
