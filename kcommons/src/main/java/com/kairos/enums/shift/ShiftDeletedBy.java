@@ -10,8 +10,8 @@ public enum ShiftDeletedBy {
 
     ShiftDeletedBy() {}
 
-    ShiftDeletedBy(String accessGroupRole) {
-        this.shiftDeletedBy = accessGroupRole;
+    ShiftDeletedBy(String shiftDeletedBy) {
+        this.shiftDeletedBy = shiftDeletedBy;
     }
 
     public static Set<ShiftDeletedBy> getAllShiftDeleteBy() {
@@ -21,8 +21,10 @@ public enum ShiftDeletedBy {
     public static List<FilterDetailDTO> getListOfShiftDeleteByForFilters(){
         List<FilterDetailDTO> shiftDeletedByFilterData = new ArrayList<>();
         for(ShiftDeletedBy shiftDeletedBy : EnumSet.allOf(ShiftDeletedBy.class)){
-            FilterDetailDTO filterDetailDTO = new FilterDetailDTO(shiftDeletedBy.name(), shiftDeletedBy.shiftDeletedBy);
-            shiftDeletedByFilterData.add(filterDetailDTO);
+            if(!shiftDeletedBy.name().equals("SYSTEM")) {
+                FilterDetailDTO filterDetailDTO = new FilterDetailDTO(shiftDeletedBy.name(), shiftDeletedBy.shiftDeletedBy);
+                shiftDeletedByFilterData.add(filterDetailDTO);
+            }
         }
         return shiftDeletedByFilterData;
     }
