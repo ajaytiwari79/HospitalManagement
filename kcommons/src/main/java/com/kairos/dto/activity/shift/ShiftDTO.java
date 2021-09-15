@@ -105,7 +105,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     private boolean createdByCoverShift;
     protected ShiftDeletedBy deletedBy;
     private Long employmentTypeId;
-    private String stopBrickGlue = "demo";
+    private String stopBrickGlue;
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
