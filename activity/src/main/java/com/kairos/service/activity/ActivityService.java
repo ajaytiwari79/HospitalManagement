@@ -249,6 +249,7 @@ public class ActivityService {
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
         generalTab.setTags(null);
+        activity.getTranslations().put(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase(),new TranslationInfo(generalTab.getName(), generalDTO.getDescription()));
         GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
         generalActivityWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
