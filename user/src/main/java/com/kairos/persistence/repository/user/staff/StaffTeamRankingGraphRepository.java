@@ -33,7 +33,7 @@ public interface StaffTeamRankingGraphRepository extends Neo4jBaseRepository<Sta
             "SET teamRankingInfo.teamType={3}")
     void updateTeamType(Long unitId, Long staffId, Long teamId, TeamType newTeamType);
 
-    @Query("MATCH (staffTeamRanking:StaffTeamRanking{deleted:false})-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.unitId = {0} AND staffTeamRanking.staffId = {1} AND date(staffTeamRanking.startDate)<=DATE({2}) AND (staffTeamRanking.endDate IS NULL OR date(staffTeamRanking.endDate)>=DATE({2})) " +
+    @Query("MATCH (staffTeamRanking:StaffTeamRanking{deleted:false,published:true})-[rel:TEAM_RANKING_INFO]->(teamRankingInfo:TeamRankingInfo) WHERE staffTeamRanking.unitId = {0} AND staffTeamRanking.staffId = {1} AND date(staffTeamRanking.startDate)<=DATE({2}) AND (staffTeamRanking.endDate IS NULL OR date(staffTeamRanking.endDate)>=DATE({2})) " +
             "RETURN staffTeamRanking,rel,teamRankingInfo")
     StaffTeamRanking getApplicableStaffTeamRanking(Long unitId, Long staffId, String date);
 
