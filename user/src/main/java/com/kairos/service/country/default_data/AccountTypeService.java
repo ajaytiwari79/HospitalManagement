@@ -93,7 +93,7 @@ public class AccountTypeService {
     }
 
     public AccountTypeDTO updateAccountTypeName(Long countryId, Long id, AccountTypeDTO accountTypeDTO) {
-        Optional<AccountType> accountType = accountTypeRepository.findById(accountTypeDTO.getId(), 0);
+        Optional<AccountType> accountType = accountTypeRepository.findById(accountTypeDTO.getId(), 1);
         if (!accountType.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNITTYPE_NOTFOUND, accountTypeDTO.getId());
         }
