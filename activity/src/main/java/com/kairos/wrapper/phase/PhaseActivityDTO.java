@@ -28,6 +28,7 @@ import java.util.Map;
 public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
+    @Builder.Default
     private List<DayType> dayTypes= new ArrayList<>();
     private UserAccessRoleDTO staffAccessRole;
     private List<ShiftTemplateDTO> shiftTemplates;
