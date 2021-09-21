@@ -249,6 +249,7 @@ public class ActivityService {
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
         generalTab.setTags(null);
+        activity.getTranslations().put(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase(),new TranslationInfo(generalTab.getName(), generalDTO.getDescription()));
         GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
         generalActivityWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
@@ -394,6 +395,7 @@ public class ActivityService {
         }
         ActivityTimeCalculationSettings activityTimeCalculationSettings = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO, ActivityTimeCalculationSettings.class);
         Activity activity = findActivityById(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
+        Activity oldActivity = ObjectMapperUtils.copyPropertiesByMapper(activity, Activity.class);
         verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
             activity.setActivityTimeCalculationSettings(activityTimeCalculationSettings);
@@ -401,6 +403,10 @@ public class ActivityService {
                 activityTimeCalculationSettings.setDayTypes(activity.getActivityRulesSettings().getDayTypes());
             }
             activityMongoRepository.save(activity);
+            TimeType timeType = timeTypeService.getTimeTypeById(activity.getActivityBalanceSettings().getTimeTypeId());
+            if((!activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(oldActivity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) && PriorityFor.ABSENCE.equals(timeType.getPriorityFor()) && isCollectionNotEmpty(activity.getExpertises()) && activity.getExpertises().size() > 0 && !activity.isChildActivity()) {
+                activityRankingService.updateTimeCalculationInActivity(activity, oldActivity);
+            }
         }
         return timeCalculationActivityDTO;
     }

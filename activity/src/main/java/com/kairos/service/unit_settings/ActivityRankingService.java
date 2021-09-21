@@ -150,6 +150,14 @@ public class ActivityRankingService {
     }
 
     @Async
+    public void updateTimeCalculationInActivity(Activity activity, Activity oldActivity){
+        if (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_WEEK.equals(oldActivity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+            this.removeAbsenceActivityId(oldActivity, oldActivity.getExpertises());
+            this.createOrUpdateAbsenceActivityRanking(activity, activity.getExpertises());
+        }
+    }
+
+    @Async
     public void createOrUpdateAbsenceActivityRanking(Activity activity, List<Long> expertiseIds){
         for (Long expertiseId : expertiseIds) {
             List<ActivityRanking> activityRankings = activityRankingRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, true);

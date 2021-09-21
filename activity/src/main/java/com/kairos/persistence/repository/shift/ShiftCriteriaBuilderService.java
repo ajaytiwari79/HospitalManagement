@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.TimeTypeEnum.STOP_BRICK;
+
 @Service
 public class ShiftCriteriaBuilderService {
 
@@ -64,13 +66,24 @@ public class ShiftCriteriaBuilderService {
         updateActivityTimeCalculationType(filterTypeMap,criteria);
         updateActivityStatusCriteria(filterTypeMap,criteria);
         updateTimeSlotCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
-        updateDataAfterPlanningPeriodPublish(filterTypeMap,criteria);
+        updateDataAfterPlanningPeriodPublishAndDeletedStopBrick(filterTypeMap,criteria);
     }
 
-    private <T> void updateDataAfterPlanningPeriodPublish(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
+    private <T> void updateDataAfterPlanningPeriodPublishAndDeletedStopBrick(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
+        boolean addFalseCriteria = false;
         if(isValidFilter(filterTypeMap,UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH)){
             criteria.and("planningPeriodPublished").in(filterTypeMap.get(UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH));
-        } else {
+            addFalseCriteria = true;
+        }
+        if(isValidFilter(filterTypeMap,STOPBRICK_DELETED_BY)){
+            if(addFalseCriteria){
+                criteria.orOperator(Criteria.where(DELETED).is(true).and(ACTIVITIES + ".secondLevelTimeType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY)), Criteria.where(DELETED).is(false));
+            } else {
+                criteria.and(DELETED).is(true).and(ACTIVITIES + ".secondLevelTimeType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY));
+            }
+            addFalseCriteria = true;
+        }
+        if(!addFalseCriteria) {
             criteria.and(DELETED).is(false);
         }
     }

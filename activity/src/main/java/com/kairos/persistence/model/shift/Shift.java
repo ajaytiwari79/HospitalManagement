@@ -92,6 +92,7 @@ public class Shift extends MongoBaseEntity {
     protected ShiftDeletedBy deletedBy;
     private Long employmentTypeId;
     private Long expertiseId;
+    private String stopBrickGlue;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
