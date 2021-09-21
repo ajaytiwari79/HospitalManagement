@@ -145,6 +145,7 @@ public class CountryCTAService extends MongoBaseService {
                 if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
                     ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
                 }
+                ctaRuleTemplate.setCountryId(null);
                 ctaRuleTemplate.setId(null);
                 if (!doUpdate && !creatingFromCountry && Optional.ofNullable(unitPhaseIdsMap).isPresent()) {
                     ctaRuleTemplate.getPhaseInfo().forEach(ctaRuleTemplatePhaseInfo -> {
