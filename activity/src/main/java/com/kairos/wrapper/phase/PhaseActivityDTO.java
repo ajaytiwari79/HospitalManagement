@@ -37,6 +37,7 @@ public class PhaseActivityDTO {
     private List<ReasonCodeDTO> reasonCodes;
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
+
     private List<Map<String, Object>> publicHolidays;
     private LocalDate firstRequestPhasePlanningPeriodEndDate;
     private List<PresenceTypeDTO> plannedTimes;
