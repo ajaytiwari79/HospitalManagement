@@ -266,7 +266,7 @@ public class ShiftService extends MongoBaseService {
         Phase newPhase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
-        } else if(shift.isDraft() && newHashSet(PhaseDefaultName.PUZZLE, PhaseDefaultName.REQUEST).contains(newPhase.getPhaseEnum())) {
+        } else if(shift.isDraft() && newHashSet(PhaseDefaultName.PUZZLE, PhaseDefaultName.REQUEST, PhaseDefaultName.REALTIME, PhaseDefaultName.TIME_ATTENDANCE).contains(newPhase.getPhaseEnum())) {
             shift.setDraft(false);
         }
         if(isNull(shift.getDraftShift())) {

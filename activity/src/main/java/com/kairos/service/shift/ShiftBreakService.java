@@ -104,18 +104,18 @@ public class ShiftBreakService implements KPIService {
             ShiftActivity breakActivity = null;
             DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             Date placeBreakAfterThisDate = shift.getStartDate();
-            if (isNotNull(breakWTATemplate)) {
-                BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
-                if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() <= 0 || breakAvailabilitySettings.getShiftPercentage() >= 100)) {
-                    exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
-                }
-                placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
-                eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings, breakSettings, activityWrapperMap);
-                placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSettings.getBreakDurationInMinute();
-                placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStartDate(), 15) : placeBreakAfterThisDate;
-            }
             if (isNotNull(breakSettings) && shift.getMinutes() >= breakSettings.getShiftDurationInMinute()) {
                 if (isCollectionEmpty(shift.getBreakActivities()) || shiftUpdated) {
+                    if (isNotNull(breakWTATemplate)) {
+                        BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
+                        if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() <= 0 || breakAvailabilitySettings.getShiftPercentage() >= 100)) {
+                            exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
+                        }
+                        placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
+                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings, breakSettings, activityWrapperMap);
+                        placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSettings.getBreakDurationInMinute();
+                        placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStartDate(), 15) : placeBreakAfterThisDate;
+                    }
                     breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSettings, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
                     if (isNull(breakActivity)) {
                         Date breakStartDate = placeBreakAfterThisDate;
@@ -129,6 +129,11 @@ public class ShiftBreakService implements KPIService {
                         }
                     }
                 } else if (isCollectionNotEmpty(shift.getBreakActivities()) && !shiftUpdated) {
+                    if (isNotNull(breakWTATemplate)) {
+                        BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
+                        eligibleBreakInterval = new DateTimeInterval(asZonedDateTime(shift.getStartDate()).plusMinutes(breakAvailabilitySettings.getStartAfterMinutes()), asZonedDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes()));
+                        placeBreakAfterThisDate = eligibleBreakInterval.getStartDate();
+                    }
                     breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate, breakSettings);
                 }
                 if (isNotNull(breakActivity)) {
@@ -195,7 +200,7 @@ public class ShiftBreakService implements KPIService {
         boolean breakAllowed = activity.getActivityRulesSettings().isBreakAllowed();
         if (breakAllowed) {
             boolean breakCanbePlace = shiftActivity.getEndDate().after(placeBreakAfterThisDate);
-            breakCanbePlace = breakCanbePlace ? new DateTimeInterval(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, shiftActivity.getEndDate()).getMinutes() > breakSetting.getBreakDurationInMinute() : breakCanbePlace;
+            breakCanbePlace = breakCanbePlace ? new DateTimeInterval(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, shiftActivity.getEndDate()).getMinutes() >= breakSetting.getBreakDurationInMinute() : breakCanbePlace;
             if (breakCanbePlace && !placeBreakAnyWhereInShift) {
                 Date startDate = roundDateByMinutes(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, 15);
                 Date endDate = asDate(asZonedDateTime(startDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
