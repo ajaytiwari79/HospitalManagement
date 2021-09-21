@@ -76,7 +76,11 @@ public class ShiftCriteriaBuilderService {
             addFalseCriteria = true;
         }
         if(isValidFilter(filterTypeMap,STOPBRICK_DELETED_BY)){
-            criteria.orOperator(Criteria.where(DELETED).is(true).and(ACTIVITIES+".secondLevelType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY)),Criteria.where(DELETED).is(false));
+            if(addFalseCriteria){
+                criteria.orOperator(Criteria.where(DELETED).is(true).and(ACTIVITIES + ".secondLevelTimeType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY)), Criteria.where(DELETED).is(false));
+            } else {
+                criteria.and(DELETED).is(true).and(ACTIVITIES + ".secondLevelTimeType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY));
+            }
             addFalseCriteria = true;
         }
         if(!addFalseCriteria) {
