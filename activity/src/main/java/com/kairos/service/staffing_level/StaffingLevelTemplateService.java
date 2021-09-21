@@ -87,12 +87,7 @@ public class StaffingLevelTemplateService {
             staffingLevelInterval.setStaffingLevelIntervalLogs(new TreeSet<>());
         }
     }
-
-    /**
-     * @param staffingLevelTemplateDTO
-     * @param staffingTemplateId
-     * @return
-     */
+                                                                                                                                                                        
     public StaffingLevelTemplateDTO updateStaffingLevelTemplte(StaffingLevelTemplateDTO staffingLevelTemplateDTO,
                                                            BigInteger staffingTemplateId) {
         LOGGER.info("updating staffing level Template ID={}", staffingTemplateId);
@@ -118,18 +113,6 @@ public class StaffingLevelTemplateService {
 
     }
 
-    /**
-     * @param unitId
-     * @param proposedDate
-     * @return
-     * @auther anil maurya
-     * <pre>
-     *  1.get day type for selected date
-     *  2.check validity for staffing level template
-     *  3.check valid day type
-     *
-     * </pre>
-     */
     public List<StaffingLevelTemplateDTO> getStaffingLevelTemplates(Long unitId, Date proposedDate) {
         if(!Optional.ofNullable(proposedDate).isPresent()){
             return staffingLevelTemplateRepository.findAllByUnitIdAndDeletedFalse(unitId);
@@ -143,7 +126,7 @@ public class StaffingLevelTemplateService {
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = Day.valueOf(day);
         if(!holidayDayType.isPresent()) {
-            return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+            return staffingLevelTemplateRepository.                                                                                                                 findByUnitIdAndDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }else {
             return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
         }
