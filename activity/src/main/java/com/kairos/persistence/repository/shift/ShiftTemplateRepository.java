@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.shift;
 
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -12,7 +13,7 @@ import java.util.List;
 public interface ShiftTemplateRepository extends MongoBaseRepository<ShiftTemplate,BigInteger> {
 
     @Query("{'createdBy._id':?1,deleted:false,unitId:?0}")
-    List<ShiftTemplate> findAllByUnitIdAndCreatedByAndDeletedFalse(Long unitId, Long createdBy);
+    List<ShiftTemplateDTO> findAllByUnitIdAndCreatedByAndDeletedFalse(Long unitId, Long createdBy);
     @Query("{deleted:false,id:?0}")
     ShiftTemplate findOneById(BigInteger id);
 

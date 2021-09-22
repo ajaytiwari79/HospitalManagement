@@ -6,7 +6,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.counter.KPIBuilderCalculationService;
+import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.SkillKPIService;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -38,7 +38,7 @@ public class SkillKPIServiceTestCase {
     private List<Long> staffIds;
     private Long unitId;
     private DateTimeInterval dateTimeInterval;
-    private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo;
+    private KPICalculationRelatedInfo kpiCalculationRelatedInfo;
     private List<StaffKpiFilterDTO> staffKpiFilterDTOS;
     private Map<Long,StaffKpiFilterDTO> staffKpiFilterDTOMap = new HashMap<>();
 
@@ -61,8 +61,8 @@ public class SkillKPIServiceTestCase {
     }
 
 
-    private KPIBuilderCalculationService.KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
-        KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPIBuilderCalculationService().new KPICalculationRelatedInfo();
+    private KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
+        KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPICalculationRelatedInfo();
         kpiCalculationRelatedInfo.setCalculationTypes(Arrays.asList(STAFF_SKILLS_COUNT));
         kpiCalculationRelatedInfo.setUnitId(unitId);
         kpiCalculationRelatedInfo.setStaffKpiFilterDTOS(staffKpiFilterDTOS);

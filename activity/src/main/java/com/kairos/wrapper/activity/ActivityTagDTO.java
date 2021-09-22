@@ -5,7 +5,6 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
@@ -16,9 +15,12 @@ import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRul
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * Created by prerna on 16/12/17.
@@ -27,7 +29,8 @@ import java.util.*;
 @Getter
 @Setter
 @PermissionClass(name = "Activity")
-public class ActivityTagDTO {
+public class ActivityTagDTO implements Serializable {
+    private static final long serialVersionUID = -8814717901742581421L;
     private BigInteger id;
     private String name;
     private String description;
@@ -49,7 +52,6 @@ public class ActivityTagDTO {
     private Long parentId;
     private ActivityStateEnum state;
     private List<CompositeShiftActivityDTO> compositeActivities;
-    private BigInteger activityPriorityId;
     private boolean allowChildActivities;
     private boolean applicableForChildActivities;
     private boolean sicknessSettingValid;
@@ -57,6 +59,9 @@ public class ActivityTagDTO {
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
     private Map<String, TranslationInfo> translations=new HashMap<>();
+    private BigInteger countryParentId;
+    //child's Parent activity Id
+    private BigInteger parentActivityId;
 
     public ActivityTagDTO() {
         //default constructor
@@ -81,5 +86,9 @@ public class ActivityTagDTO {
 
     public String getDescription() {
         return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+    }
+
+    public Map<String, TranslationInfo> getTranslations() {
+        return isNull(translations) ? new HashMap<>() : translations;
     }
 }

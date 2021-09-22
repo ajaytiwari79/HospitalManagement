@@ -30,12 +30,8 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
             "MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
-            "return " +
-            "{english :{name: CASE WHEN et.`translatedNames.english` IS NULL THEN '' ELSE et.`translatedNames.english` END, description : CASE WHEN et.`translatedDescriptions.english` IS NULL THEN '' ELSE et.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN et.`translatedNames.hindi` IS NULL THEN '' ELSE et.`translatedNames.hindi` END, description : CASE WHEN et.`translatedDescriptions.hindi` IS NULL THEN '' ELSE et.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN et.`translatedNames.danish` IS NULL THEN '' ELSE et.`translatedNames.danish` END, description : CASE WHEN et.`translatedDescriptions.danish` IS NULL THEN '' ELSE et.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN et.`translatedNames.britishenglish` IS NULL THEN '' ELSE et.`translatedNames.britishenglish` END, description : CASE WHEN et.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE et.`translatedDescriptions.britishenglish` END}} as translations,\n" +
-            "id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories, \n" +
+            "return et.translations as translations,\n" +
+            "id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories,et.canRankTeam as canRankTeam, \n" +
             "CASE WHEN r IS null THEN et.paymentFrequency ELSE r.paymentFrequency END as paymentFrequency, \n" +
             "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
             "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
@@ -45,12 +41,8 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND  NOT (ID(et) IN {3}) AND et.deleted={2}  with et\n" +
             "OPTIONAL MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
-            "return " +
-            "{english :{name: CASE WHEN et.`translatedNames.english` IS NULL THEN '' ELSE et.`translatedNames.english` END, description : CASE WHEN et.`translatedDescriptions.english` IS NULL THEN '' ELSE et.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN et.`translatedNames.hindi` IS NULL THEN '' ELSE et.`translatedNames.hindi` END, description : CASE WHEN et.`translatedDescriptions.hindi` IS NULL THEN '' ELSE et.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN et.`translatedNames.danish` IS NULL THEN '' ELSE et.`translatedNames.danish` END, description : CASE WHEN et.`translatedDescriptions.danish` IS NULL THEN '' ELSE et.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN et.`translatedNames.britishenglish` IS NULL THEN '' ELSE et.`translatedNames.britishenglish` END, description : CASE WHEN et.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE et.`translatedDescriptions.britishenglish` END}} as translations,\n" +
-            "id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
+            "return et.translations as translations,\n" +
+            "id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency,et.canRankTeam as canRankTeam, \n" +
             "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
             "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
             "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")

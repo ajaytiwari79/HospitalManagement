@@ -4,43 +4,40 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.country.experties.*;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayGrade;
-import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.response.*;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -73,8 +70,10 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getEndOfDayFromLocalDate;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.NIGHT_END_HOUR;
+import static com.kairos.constants.AppConstants.NIGHT_START_HOUR;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -156,7 +155,7 @@ public class ExpertiseService {
         Expertise expertise = new Expertise(expertiseDTO.getName(), expertiseDTO.getDescription(), expertiseDTO.getStartDate(), expertiseDTO.getEndDate(), country, expertiseDTO.isPublished(), Collections.singletonList(expertiseLine), expertiseDTO.getBreakPaymentSetting());
         expertiseGraphRepository.save(expertise);
         setBasicDetails(expertiseDTO, expertise);
-        linkProtectedDaysOffSetting(new ArrayList<>(), Arrays.asList(expertise));
+        linkProtectedDaysOffSetting(expertise.getId(), countryId);
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, 0,
                 DurationType.WEEKS, 0, 0, XAxisConfig.HOURS, countryId, expertise.getId());
@@ -438,26 +437,27 @@ public class ExpertiseService {
     }
 
 
-    public ProtectedDaysOffSettingDTO addOrUpdateProtectedDaysOffSetting(Long expertiseId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
-        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
-        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryGraphRepository.findByCalendarHolidayId(protectedDaysOffSettingDTO.getHolidayId());
-        if (isNull(countryHolidayCalendarQueryResult)) {
-            exceptionService.dataNotMatchedException(MESSAGE_DATANOTFOUND, DAY, DAY_TYPE, protectedDaysOffSettingDTO.getHolidayId());
-        }
-        protectedDaysOffSettingDTO.setDayTypeId(countryHolidayCalendarQueryResult.getDayType().getId());
-        protectedDaysOffSettingDTO.setPublicHolidayDate(countryHolidayCalendarQueryResult.getHolidayDate());
-        expertise.getProtectedDaysOffSettings().add(ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO, ProtectedDaysOffSetting.class));
-        expertiseGraphRepository.save(expertise);
-        ProtectedDaysOffSetting protectedDaysOffSettings = expertise.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getHolidayId().equals(protectedDaysOffSettingDTO.getHolidayId())).findAny().orElse(new ProtectedDaysOffSetting());
-        protectedDaysOffSettingDTO.setId(protectedDaysOffSettings.getId());
-        return protectedDaysOffSettingDTO;
-    }
+    //TODO Below 2 INTEGRATED
+//    public ProtectedDaysOffSettingDTO addOrUpdateProtectedDaysOffSetting(Long expertiseId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
+//        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
+//        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryGraphRepository.findByCalendarHolidayId(protectedDaysOffSettingDTO.getHolidayId());
+//        if (isNull(countryHolidayCalendarQueryResult)) {
+//            exceptionService.dataNotMatchedException(MESSAGE_DATANOTFOUND, DAY, DAY_TYPE, protectedDaysOffSettingDTO.getHolidayId());
+//        }
+//        protectedDaysOffSettingDTO.setDayTypeId(countryHolidayCalendarQueryResult.getDayType().getId());
+//        protectedDaysOffSettingDTO.setPublicHolidayDate(countryHolidayCalendarQueryResult.getHolidayDate());
+//        expertise.getProtectedDaysOffSettings().add(ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO, ProtectedDaysOffSetting.class));
+//        expertiseGraphRepository.save(expertise);
+//        ProtectedDaysOffSetting protectedDaysOffSettings = expertise.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getHolidayId().equals(protectedDaysOffSettingDTO.getHolidayId())).findAny().orElse(new ProtectedDaysOffSetting());
+//        protectedDaysOffSettingDTO.setId(protectedDaysOffSettings.getId());
+//        return protectedDaysOffSettingDTO;
+//    }
 
 
-    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSetting(Long expertiseId) {
-        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getProtectedDaysOffSettings(), ProtectedDaysOffSettingDTO.class);
-    }
+//    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSetting(Long expertiseId){
+//        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
+//        return ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getProtectedDaysOffSettings(),ProtectedDaysOffSettingDTO.class);
+//    }
 
 
     private void createDefaultSettings(Long targetExpertiseId, Long sourceExpertiseId) {
@@ -541,6 +541,7 @@ public class ExpertiseService {
         }
         expertise.setPublished(true);
         expertiseGraphRepository.save(expertise);
+        activityIntegrationService.setAbsenceRankingForExpertise(new ActivityRankingDTO(expertise.getId(),expertise.getStartDate(),expertise.getEndDate(),expertise.getCountry().getId(),true));
         if (isNotNull(expertise.getEndDate()) && expertise.getEndDate().isBefore(getLocalDate())) {
             schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(expertise.getEndDate()), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
@@ -567,23 +568,8 @@ public class ExpertiseService {
         expertiseLine.setSeniorityLevel(seniorityLevels);
     }
 
-    public boolean linkProtectedDaysOffSetting(List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults, List<Expertise> expertises) {
-        if (ObjectUtils.isCollectionEmpty(expertises)) {
-            expertises = expertiseGraphRepository.getAllExpertiseByCountry(UserContext.getUserDetails().getCountryId());
-        }
-        if (ObjectUtils.isCollectionEmpty(countryHolidayCalendarQueryResults)) {
-            countryHolidayCalendarQueryResults = countryGraphRepository.findAllCalendarHoliday();
-        }
-        List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
-        for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : countryHolidayCalendarQueryResults) {
-            if (!countryHolidayCalendarQueryResult.getDayType().isAllowTimeSettings() && countryHolidayCalendarQueryResult.getDayType().isHolidayType())
-                protectedDaysOffSettings.add(new ProtectedDaysOffSetting(countryHolidayCalendarQueryResult.getId(), countryHolidayCalendarQueryResult.getHolidayDate(), true, countryHolidayCalendarQueryResult.getDayType().getId()));
-        }
-        for (Expertise expertise : expertises) {
-            expertise.getProtectedDaysOffSettings().addAll(protectedDaysOffSettings);
-        }
-        expertiseGraphRepository.saveAll(expertises);
-        return true;
+    public void linkProtectedDaysOffSetting(Long expertiseId,Long countryId) {
+        activityIntegrationService.linkProtectedDaysOff(expertiseId,countryId);
     }
 
     public ExpertiseQueryResult copyExpertise(Long expertiseId, ExpertiseDTO expertiseDTO) {
@@ -685,18 +671,17 @@ public class ExpertiseService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long expertiseId, Map<String, TranslationInfo> translations) {
-        Map<String, String> translatedNames = new HashMap<>();
-        Map<String, String> translatedDescriptios = new HashMap<>();
-        for (Map.Entry<String, TranslationInfo> entry : translations.entrySet()) {
-            translatedNames.put(entry.getKey(), entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(), entry.getValue().getDescription());
-        }
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        expertise.setTranslatedNames(translatedNames);
-        expertise.setTranslatedDescriptions(translatedDescriptios);
+        expertise.setTranslations(translations);
         expertiseGraphRepository.save(expertise);
-        return expertise.getTranslatedData();
+        return expertise.getTranslations();
     }
 
+    public Set<Long> getExpertiseIdsByCountryId(Long countryId) {
+        return expertiseGraphRepository.getExpertiseIdsByCountryId(countryId);
+    }
 
+    public List<ExpertiseDTO> getExpertiseByCountryId(Long countryId) {
+        return copyCollectionPropertiesByMapper(expertiseGraphRepository.getAllExpertise(countryId, new boolean[]{true}), ExpertiseDTO.class);
+    }
 }

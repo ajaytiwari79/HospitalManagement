@@ -1,11 +1,10 @@
 package com.kairos.utils.external_plateform_shift;
 
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by oodles on 22/1/17.
  */
-@XmlRootElement(name = "transstatus")
+//@XmlRootElement(name = "transstatus")
 public class Transstatus {
     private String id;
     private String last_log_line_nr;

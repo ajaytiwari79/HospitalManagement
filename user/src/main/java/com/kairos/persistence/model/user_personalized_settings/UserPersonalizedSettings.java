@@ -23,6 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @AllArgsConstructor
 public class UserPersonalizedSettings extends UserBaseEntity {
 
+    private static final long serialVersionUID = 7390741485492240218L;
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private SelfRosteringView selfRosteringView;
 

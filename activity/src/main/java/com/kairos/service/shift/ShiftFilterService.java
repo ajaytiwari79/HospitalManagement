@@ -5,6 +5,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -16,14 +17,13 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
-import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
-import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.utils.counter.KPIUtils;
+import com.kairos.service.time_bank.AsyncTimeBankCalculationService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -53,9 +53,11 @@ public class ShiftFilterService {
     @Inject
     private ShiftValidatorService shiftValidatorService;
     @Inject
-    private TimeBankService timeBankService;
+    private AsyncTimeBankCalculationService asyncTimeBankCalculationService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -64,7 +66,7 @@ public class ShiftFilterService {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().filter(distinctByKey(filterSelectionDTO -> filterSelectionDTO.getName())).collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
@@ -93,7 +95,7 @@ public class ShiftFilterService {
         Map<Long,Double> employmentIdAndActualTimeBankData = new HashMap<>();
         if(filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE))) {
             for (Long employmentId : employmentIds) {
-                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true).toString()));
+                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(asyncTimeBankCalculationService.getAccumulatedTimebankAndDelta(employmentId, unitId, false,null,null).toString()));
                 employmentIdAndActualTimeBankData.put(employmentId,timeBank);
             }
         }
@@ -141,7 +143,7 @@ public class ShiftFilterService {
             selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
         }
         if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
-            Set<String> teamIds = KPIUtils.getStringByList(filterTypeMap.get(TEAM));
+            Set<String> teamIds = getStringByList(filterTypeMap.get(TEAM));
             ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(unitId,teamIds));
             selectedActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
         }

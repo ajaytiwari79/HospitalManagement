@@ -3,6 +3,7 @@ package com.kairos.dto.activity.wta.basic_details;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.UnitGeneralSettingDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -29,16 +30,15 @@ public class WTADefaultDataInfoDTO {
     private List<TimeSlotDTO> timeSlots = new ArrayList<>();
     private Long countryID;
     private FieldPermissionUserData fieldPermissionUserData;
+    private UnitGeneralSettingDTO unitGeneralSettingDTO;
 
 
 
-    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes, List<TimeSlotDTO> timeSlots, Long countryID,FieldPermissionUserData fieldPermissionUserData) {
-        this.dayTypes = dayTypes;
+    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes, List<TimeSlotDTO> timeSlots, Long countryID){
         this.presenceTypes = presenceTypes;
         this.timeSlots = timeSlots;
         this.countryID = countryID;
-        this.fieldPermissionUserData=fieldPermissionUserData;
+        this.dayTypes=dayTypes;
     }
-
 
 }

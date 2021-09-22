@@ -15,6 +15,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @Setter
 @NoArgsConstructor
 public class InitialTimeBankLog extends UserBaseEntity {
+    private static final long serialVersionUID = 6594160207897699084L;
     private Long employmentId;
     private Long previousInitialBalanceInMinutes;
     private Long updatedInitialBalanceInMinutes;

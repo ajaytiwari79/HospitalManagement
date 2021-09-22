@@ -1,5 +1,7 @@
 package com.kairos.enums;
 
-public enum InformationReciever {
+import java.io.Serializable;
+
+public enum InformationReciever implements Serializable {
     CREATOR,PLANNER
 }

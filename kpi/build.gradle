@@ -1,0 +1,109 @@
+
+buildscript {
+    ext {
+        springBootVersion='2.0.0.RELEASE'
+        swaggerVersion = '2.5.0'
+        jacksonVersion = '2.9.2'
+        projectVersion = "0.0.1"
+        version = "0.0.1"
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "http://repo.spring.io/release/"}
+        maven { url "https://plugins.gradle.org/m2/"}
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+
+    }
+}
+plugins {
+    id 'jacoco'
+    id 'idea'
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'application'
+
+
+
+version = "$projectVersion-SNAPSHOT"
+sourceCompatibility = 1.8
+mainClassName = 'com.kairos.KPIApplication'
+applicationDefaultJvmArgs = ["-Xdiag","-Xms1024m", "-Xmx1048m"]
+
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "http://repo.spring.io/release/" }
+    maven { url "https://plugins.gradle.org/m2/" }
+}
+task wrapper(type: Wrapper) { gradleVersion = '6.3' }
+
+
+ext {
+    springCloudVersion = 'Finchley.RELEASE'
+}
+
+dependencies {
+    compile project(':kcommons')
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-aop') //c
+    compile('org.springframework.boot:spring-boot-starter-cache') //c
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.0.0.RELEASE'
+    compile('redis.clients:jedis:2.9.0')
+    compile('org.springframework.cloud:spring-cloud-starter-oauth2')//c
+    compile('org.springframework.cloud:spring-cloud-starter-security')//c
+    compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'//c
+
+    compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'//c
+    compile "io.springfox:springfox-swagger2:${swaggerVersion}"//c
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion//c
+    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'//c
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    testCompile('org.springframework.boot:spring-boot-starter-test')//c
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+
+jacoco {
+    toolVersion = "0.8.3"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "kpi"
+        property "sonar.projectKey", "kairos:kpi"
+        property "sonar.sources", "src/main"
+        property "sonar.junit.reportPaths", "build/test-results/test"
+        property "sonar.jacoco.reportPaths" , "build/jacoco/test.exe"
+    }
+}

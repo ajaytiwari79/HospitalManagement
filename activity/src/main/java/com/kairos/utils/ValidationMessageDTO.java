@@ -1,5 +1,6 @@
 package com.kairos.utils;
 
+import java.io.Serializable;
 
 /**
  * ValidationMessage object for application requests.
@@ -8,7 +9,7 @@ public class ValidationMessageDTO {
     /**
      * Stores Message Strings
      */
-    public enum MessageType {
+    public enum MessageType implements Serializable {
         SUCCESS, INFO, WARNING, ERROR
     }
 

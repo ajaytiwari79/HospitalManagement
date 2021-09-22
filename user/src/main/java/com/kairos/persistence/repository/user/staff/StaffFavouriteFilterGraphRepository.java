@@ -20,4 +20,7 @@ public interface StaffFavouriteFilterGraphRepository extends Neo4jBaseRepository
     @Query("MATCH (ap:AccessPage)-[r:"+APPLICABLE_FOR+"]-(fg:FilterGroup{deleted:false})-[:HAS_FILTER_GROUP]-(staffFavouriteFilter:StaffFavouriteFilter{deleted:false})\n"+
             "WHERE ap.moduleId={0} AND LOWER(staffFavouriteFilter.name) = LOWER({1}) AND NOT(id(staffFavouriteFilter) = {2}) return COUNT(fg)>0")
     Boolean checkIfFavouriteFilterExistsWithNameExceptId(String moduleId, String name, Long staffFavouriteFilterId);
+
+    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter{deleted:false})-[:HAS_FAVOURITE_FILTERS]-(staff:Staff) where id(staff)={0} AND id(staffFavouriteFilter)={1} SET staffFavouriteFilter.usedCount = staffFavouriteFilter.usedCount + 1 return COUNT(staffFavouriteFilter)>0")
+    Boolean updateUsedCount(Long staffId, Long staffFavouriteFilterId);
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Getter
 @Setter
@@ -16,12 +17,13 @@ public class LevelDTO {
     private String name;
     private String description;
     private boolean isEnabled = true;
-    private Map<String,String> translatedNames;
-    private Map<String,String> translatedDescriptions;
-    private Map<String, TranslationInfo> translations ;
+    private Map<String,String> translatedNames = new HashMap<>();
+    private Map<String,String> translatedDescriptions = new HashMap<>();
+    private Map<String, TranslationInfo> translations = new HashMap<>();
 
     public Map<String, TranslationInfo> getTranslatedData() {
         Map<String, TranslationInfo> infoMap=new HashMap<>();
+        translatedNames = isNullOrElse(translatedNames,new HashMap<>());
         translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
         return infoMap;
     }

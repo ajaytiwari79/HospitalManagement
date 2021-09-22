@@ -11,6 +11,7 @@ import java.math.BigInteger;
  */
 @Document
 public class Bank extends MongoBaseEntity {
+    private static final long serialVersionUID = -3493041406288166008L;
     private String name;
     private String description;
     private String registrationNumber;

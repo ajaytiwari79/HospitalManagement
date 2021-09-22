@@ -252,14 +252,13 @@ public class TimeBankCalculationServiceTest {
                         bufferedWriter.write("    public static final String "+key.replace(".","_").replace("-","_").toUpperCase()+" = "+'"'+key+'"'+";");
                         bufferedWriter.newLine();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
-                    System.out.println(key);
                 }
             });
             bufferedWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
     }
 

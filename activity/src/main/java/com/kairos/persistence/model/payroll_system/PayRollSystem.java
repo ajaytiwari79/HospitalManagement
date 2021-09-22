@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class PayRollSystem extends MongoBaseEntity {
 
+    private static final long serialVersionUID = -4498496784979525538L;
     protected int code;
     protected PayRollType payRollType;
     protected String description;

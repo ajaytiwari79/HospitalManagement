@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGroup,BigInteger>,CustomPriorityGroupRepository {
+public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGroup,BigInteger> {
 
 
     PriorityGroup findByIdAndCountryIdAndDeletedFalse(BigInteger priorityGroupId,long countryId);

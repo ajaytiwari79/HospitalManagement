@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,8 +19,9 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityOptaPlannerSetting {
+public class ActivityOptaPlannerSetting implements Serializable {
 
+    private static final long serialVersionUID = 6131338887366288368L;
     @KPermissionField
     private int maxThisActivityPerShift;
     @KPermissionField

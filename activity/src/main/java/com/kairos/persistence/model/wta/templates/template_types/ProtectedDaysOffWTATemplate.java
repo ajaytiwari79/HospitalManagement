@@ -9,7 +9,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.service.wta.WorkTimeAgreementService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,8 +42,8 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType()) && isNotNull(this.getActivityId())){
-            WorkTimeAgreementService workTimeAgreementService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementService.class);
-            IntervalBalance intervalBalance = workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(), asLocalDate(infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getStaffId(), this.activityId);
+            WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
+            IntervalBalance intervalBalance = workTimeAgreementBalancesCalculationService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(), asLocalDate(infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getStaffId(), this.activityId);
             if (this.getActivityId().equals(infoWrapper.getShift().getActivities().get(0).getActivityId()) && intervalBalance.getAvailable() < 1) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),

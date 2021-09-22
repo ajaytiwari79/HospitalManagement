@@ -4,7 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,7 @@ import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_OVERLAP_I
 
 @Service
 @Transactional
-public class OpenShiftIntervalService extends MongoBaseService {
+public class OpenShiftIntervalService{
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
     @Inject
@@ -33,7 +32,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
         }
         OpenShiftInterval openShiftInterval = new OpenShiftInterval();
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
-        save(openShiftInterval);
+        openShiftIntervalRepository.save(openShiftInterval);
         openShiftIntervalDTO.setId(openShiftInterval.getId());
         return openShiftIntervalDTO;
     }
@@ -54,7 +53,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
             exceptionService.actionNotPermittedException(EXCEPTION_OVERLAP_INTERVAL);
         }
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
-        save(openShiftInterval);
+        openShiftIntervalRepository.save(openShiftInterval);
         return openShiftIntervalDTO;
     }
 
@@ -64,7 +63,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(EXCEPTION_NOOPENSHIFTINTERVALFOUND, "OpenShiftInterval", openShiftIntervalId);
         }
         openShiftInterval.setDeleted(true);
-        save(openShiftInterval);
+        openShiftIntervalRepository.save(openShiftInterval);
         return true;
     }
 

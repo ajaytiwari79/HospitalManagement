@@ -9,6 +9,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.LOCAT
 
 @NodeEntity
 public class Location extends UserBaseEntity {
+    private static final long serialVersionUID = 4378990779059064136L;
     private String name;
     private boolean defaultLocation;
 

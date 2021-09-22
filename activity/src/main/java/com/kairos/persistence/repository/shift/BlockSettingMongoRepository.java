@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Created By G.P.Ranjan on 3/12/19
+ * Created By Pavan on 13/06/21
  **/
 @Repository
 public interface BlockSettingMongoRepository extends MongoBaseRepository<BlockSetting, BigInteger> {

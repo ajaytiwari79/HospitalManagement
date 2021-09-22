@@ -73,13 +73,13 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){
         ZonedDateTime zonedDateTime = null;
         switch (intervalUnit){
-            case DAYS:dateTime.plusDays(intervalLength);
+            case DAYS:zonedDateTime = dateTime.plusDays(intervalLength);
                 break;
-            case WEEKS:dateTime.plusWeeks(intervalLength);
+            case WEEKS:zonedDateTime = dateTime.plusWeeks(intervalLength);
                 break;
-            case MONTHS:dateTime.plusMonths(intervalLength);
+            case MONTHS:zonedDateTime = dateTime.plusMonths(intervalLength);
                 break;
-            case YEARS:dateTime.plusYears(intervalLength);
+            case YEARS:zonedDateTime = dateTime.plusYears(intervalLength);
                 break;
             default:
                 break;

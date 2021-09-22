@@ -1,6 +1,8 @@
 package com.kairos.enums.cta;
 
-public enum  PlanningCategory {
+import java.io.Serializable;
+
+public enum  PlanningCategory implements Serializable {
     DEVIATION_FROM_PLANNED("Deviation from Planned"),PLANNABLE("Plannable"),TASK_SPECIFIC("Task Specific");
     private String category;
     PlanningCategory(String category){

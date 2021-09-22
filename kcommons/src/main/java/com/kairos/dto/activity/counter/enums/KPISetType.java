@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.counter.enums;
 
-public enum KPISetType {
-    HORIZONTAL,VERTICAL
+import java.io.Serializable;
+
+public enum KPISetType implements Serializable {
+    HORIZONTAL,VERTICAL,COVER_SHIFT
 }

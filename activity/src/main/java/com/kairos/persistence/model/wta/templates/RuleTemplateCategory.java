@@ -23,7 +23,8 @@ import java.util.Map;
 @Document
 public class RuleTemplateCategory extends MongoBaseEntity {
 
-     @NotNull(message = "error.RuleTemplateCategory.name.notnull")
+    private static final long serialVersionUID = 5533798456042891184L;
+    @NotNull(message = "error.RuleTemplateCategory.name.notnull")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;

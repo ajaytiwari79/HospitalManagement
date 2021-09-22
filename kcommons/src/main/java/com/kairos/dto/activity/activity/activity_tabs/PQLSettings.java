@@ -7,8 +7,10 @@ package com.kairos.dto.activity.activity.activity_tabs;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.open_shift.DurationField;
 
+import java.io.Serializable;
 import java.util.Optional;
-public class PQLSettings {
+
+public class PQLSettings implements Serializable {
     private DurationField approvalTimeInAdvance; // TODO need to rename
     private Float approvalPercentageWithoutMovement;
     private ApprovalCriteria approvalWithMovement;

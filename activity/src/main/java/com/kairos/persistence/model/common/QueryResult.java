@@ -2,6 +2,7 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +10,9 @@ import java.util.List;
  * Created by prabjot on 14/11/16.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class QueryResult {
+public class QueryResult implements Serializable {
 
+    private static final long serialVersionUID = 8643856511450413061L;
     private String name;
     private long id;
     private List<QueryResult> children = new ArrayList<>();

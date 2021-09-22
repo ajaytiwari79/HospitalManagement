@@ -24,6 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_S
 @AllArgsConstructor
 @Builder
 public class EmploymentLine extends UserBaseEntity {
+    private static final long serialVersionUID = -7588894651726243264L;
     @Relationship(type = HAS_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;
     @Relationship(type = HAS_FUNCTION)

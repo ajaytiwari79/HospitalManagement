@@ -1,13 +1,9 @@
 package com.kairos.shiftplanningNewVersion.listeners;
 
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
-import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.kairos.shiftplanningNewVersion.entity.ALI;
 import com.kairos.shiftplanningNewVersion.entity.Shift;
-import com.kairos.shiftplanningNewVersion.utils.BreakUtils;
-import com.kairos.shiftplanningNewVersion.utils.PlannedTimeTypeUtils;
 import com.kairos.shiftplanningNewVersion.utils.StaffingLevelPlanningUtility;
-import com.kairos.shiftplanningNewVersion.utils.UpdateTimeAndPayoutDetails;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
@@ -17,8 +13,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
 public class ShiftTimeListener implements VariableListener<Shift> {

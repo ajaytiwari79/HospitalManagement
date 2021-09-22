@@ -1,6 +1,8 @@
 package com.kairos.enums.gdpr;
 
-public enum AssetAttributeName {
+import java.io.Serializable;
+
+public enum AssetAttributeName implements Serializable {
 
 
     NAME("name"), DESCRIPTION("description"), HOSTING_LOCATION("hostingLocation"), STORAGE_FORMAT("storageFormats"),

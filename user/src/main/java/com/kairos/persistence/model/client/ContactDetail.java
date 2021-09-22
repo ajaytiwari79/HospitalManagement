@@ -17,6 +17,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDetail extends UserBaseEntity {
 
+    private static final long serialVersionUID = -4340109163854854546L;
     @KPermissionField
     private String workEmail;
     @KPermissionField

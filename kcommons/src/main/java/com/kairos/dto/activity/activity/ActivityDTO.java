@@ -3,6 +3,7 @@ package com.kairos.dto.activity.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.annotation.PermissionClass;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
@@ -13,8 +14,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -32,7 +35,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Builder
 @AllArgsConstructor
 @PermissionClass(name = "Activity")
-public class ActivityDTO  {
+@Document(collection = "activities")
+public class ActivityDTO implements Serializable {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
     private String name;
@@ -61,18 +65,20 @@ public class ActivityDTO  {
     private SkillActivityDTO activitySkillSettings;
     @Builder.Default
     private Boolean activityCanBeCopied=false;
-    private ActivityPriorityDTO activityPriority;
+    private Integer ranking;
     private List<ShiftStatus> activityStatus;
     @Builder.Default
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
-    private BigInteger activityPriorityId;
     private int activitySequence;
+    private int staffTeamSequence;
+    private boolean mainTeam;
     private BigInteger countryParentId;
     private Long teamId;
     @Builder.Default
     private Map<String, TranslationInfo> translations = new HashMap<>();
+
 
 
     public ActivityDTO() {
@@ -102,9 +108,16 @@ public class ActivityDTO  {
     }
 
     public boolean isFullDayOrFullWeekActivity() {
-        return isNotNull(this.getActivityTimeCalculationSettings()) && ((CommonConstants.FULL_WEEK).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime())); }
+        return isNotNull(this.getActivityTimeCalculationSettings()) && ((CommonConstants.FULL_WEEK).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()));
+    }
 
+    public String getName(){
+        return TranslationUtil.getName(translations,name);
+    }
 
+    public String getDescription(){
+        return TranslationUtil.getDescription(translations,description);
+    }
 
 
 }

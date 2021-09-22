@@ -3,6 +3,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
@@ -19,12 +20,12 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
-import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -47,6 +48,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private int intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
+    private transient DateTimeInterval interval;
 
     public ConsecutiveWorkWTATemplate() {
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
@@ -59,9 +61,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
             if (CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())) {
                 List<TimeInterval> timeIntervals = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), null);
                 if (isCollectionNotEmpty(timeIntervals)) {
-                    List<ShiftWithActivityDTO> shiftQueryResultWithActivities = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
-                    DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                    shiftQueryResultWithActivities = getShiftsByInterval(dateTimeInterval, shiftQueryResultWithActivities, timeIntervals);
+                    List<ShiftWithActivityDTO> shiftQueryResultWithActivities = getShiftsByInterval(infoWrapper.getShifts(), timeIntervals);
                     if(MAXIMUM.equals(minMaxSetting)){
                         shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     }
@@ -73,6 +73,21 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                 }
             }
         }
+    }
+
+    public List<ShiftWithActivityDTO> getShiftsByInterval(List<ShiftWithActivityDTO> shifts, List<TimeInterval> timeIntervals) {
+        List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
+        shifts.forEach(shift -> {
+            boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
+            if ((interval.contains(shift.getStartDate()) || interval.getEndLocalDate().equals(shift.getEndLocalDate())) && isTimeIntervalValid(timeIntervals, shift) && isValidShift) {
+                updatedShifts.add(shift);
+            }
+        });
+        return updatedShifts;
+    }
+
+    private boolean isTimeIntervalValid(List<TimeInterval> timeIntervals, ShiftWithActivityDTO s) {
+        return timeIntervals == null || timeIntervals.stream().anyMatch(timeInterval->timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)));
     }
 
     public ConsecutiveWorkWTATemplate(String name, String description) {

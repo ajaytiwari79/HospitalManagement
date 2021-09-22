@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Created by pawanmandhan on 23/8/17.
  */
@@ -13,8 +15,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityIndividualPointsSettings {
+public class ActivityIndividualPointsSettings implements Serializable {
 
+    private static final long serialVersionUID = 5441972196335411203L;
     //method for calculating individual points
     @KPermissionField
     private String individualPointsCalculationMethod;

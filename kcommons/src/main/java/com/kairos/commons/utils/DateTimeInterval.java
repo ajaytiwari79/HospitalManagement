@@ -251,6 +251,12 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
     }
 
+    public final boolean containsAndEqualsEndDate(LocalDate date) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (asDate(date).getTime() >= thisStart && asDate(date).getTime() <= thisEnd);
+    }
+
     public final boolean containsAndEqualsEndDate(ZonedDateTime zonedDateTime) {
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
@@ -322,10 +328,30 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
             if(this.start<dateTimeInterval.start && this.end>dateTimeInterval.end){
                 dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
                 dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
-            }else if(this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
+            }else if(!this.start.equals(dateTimeInterval.start) && this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
                 dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
             }else if (this.contains(dateTimeInterval.end) && dateTimeInterval.contains(this.start)){
                 dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+            }
+        }
+        return dateTimeIntervals;
+    }
+
+    public final List<DateTimeInterval> minusIntervalViceVersa(DateTimeInterval dateTimeInterval){
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
+        if(this.overlaps(dateTimeInterval)){
+            if(this.start<dateTimeInterval.start && this.end>dateTimeInterval.end){
+                dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+            }else if(!this.start.equals(dateTimeInterval.start) && this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
+                dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
+                dateTimeIntervals.add(new DateTimeInterval(this.end,dateTimeInterval.end));
+            }else if (this.contains(dateTimeInterval.end) && dateTimeInterval.contains(this.start)){
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.start,this.start));
+            }else if(dateTimeInterval.start<this.start && dateTimeInterval.end>this.end){
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.start,this.start));
+                dateTimeIntervals.add(new DateTimeInterval(this.end,dateTimeInterval.end));
             }
         }
         return dateTimeIntervals;

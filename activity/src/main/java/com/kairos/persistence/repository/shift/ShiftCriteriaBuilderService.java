@@ -1,18 +1,13 @@
 package com.kairos.persistence.repository.shift;
 
-import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
-import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
-import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.RealTimeStatus;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
-import com.kairos.utils.counter.KPIUtils;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +18,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.*;
-import static com.kairos.enums.FilterType.TIME_SLOT;
+import static com.kairos.enums.TimeTypeEnum.STOP_BRICK;
+
 @Service
 public class ShiftCriteriaBuilderService {
 
@@ -41,12 +36,14 @@ public class ShiftCriteriaBuilderService {
     private static final String PLANNED_TIME_IDS = "activities.plannedTimes.plannedTimeId";
     private static final String VALIDATED_BY_ROLES = "accessGroupRole";
     private static final String START_TIME = "shiftStartTime";
-    private Set<FilterType> FILTER_WHICH_REQUIRED_DATA = newHashSet(TIME_SLOT, TEAM,FUNCTIONS);
+    private Set<FilterType> FILTER_WHICH_REQUIRED_DATA = newHashSet(TEAM,FUNCTIONS);
 
     @Inject
     private TimeTypeService timeTypeService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
 
     public <T> void updateCriteria(Long unitId,Map<FilterType, Set<T>> filterTypeMap, Criteria criteria,RequiredDataForFilterDTO requiredDataForFilterDTO){
@@ -56,6 +53,7 @@ public class ShiftCriteriaBuilderService {
             if(requiredDataFromUserService) {
                 requiredDataForFilterDTO = userIntegrationService.getRequiredDataForFilter(unitId, filterTypeMap);
             }
+            requiredDataForFilterDTO.setTimeSlotDTOS(timeSlotSetService.getUnitTimeSlotByNames(unitId,(Set<String>) filterTypeMap.get(TIME_SLOT)));
         }
         updateTimeTypeCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
         updateFunctionCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
@@ -68,13 +66,24 @@ public class ShiftCriteriaBuilderService {
         updateActivityTimeCalculationType(filterTypeMap,criteria);
         updateActivityStatusCriteria(filterTypeMap,criteria);
         updateTimeSlotCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
-        updateDataAfterPlanningPeriodPublish(filterTypeMap,criteria);
+        updateDataAfterPlanningPeriodPublishAndDeletedStopBrick(filterTypeMap,criteria);
     }
 
-    private <T> void updateDataAfterPlanningPeriodPublish(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
+    private <T> void updateDataAfterPlanningPeriodPublishAndDeletedStopBrick(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
+        boolean addFalseCriteria = false;
         if(isValidFilter(filterTypeMap,UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH)){
             criteria.and("planningPeriodPublished").in(filterTypeMap.get(UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH));
-        } else {
+            addFalseCriteria = true;
+        }
+        if(isValidFilter(filterTypeMap,STOPBRICK_DELETED_BY)){
+            if(addFalseCriteria){
+                criteria.orOperator(Criteria.where(DELETED).is(true).and(ACTIVITIES + ".secondLevelTimeType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY)), Criteria.where(DELETED).is(false));
+            } else {
+                criteria.and(DELETED).is(true).and(ACTIVITIES + ".secondLevelTimeType").is(STOP_BRICK).and("deletedBy").in(filterTypeMap.get(STOPBRICK_DELETED_BY));
+            }
+            addFalseCriteria = true;
+        }
+        if(!addFalseCriteria) {
             criteria.and(DELETED).is(false);
         }
     }
@@ -86,7 +95,7 @@ public class ShiftCriteriaBuilderService {
     }
 
     private <T> void updateTimeTypeCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
-        Set<BigInteger> timeTypeIds = null;
+        Set<BigInteger> timeTypeIds = new HashSet<>();
         FilterType timeType = FilterType.TIME_TYPE;
         if(isValidFilter(filterTypeMap, timeType)) {
             timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(timeType)));
