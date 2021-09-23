@@ -29,7 +29,7 @@ public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
     @Builder.Default
-    private List<DayTypeDTO> dayTypes= new ArrayList<>();
+    private List<DayType> dayTypes= new ArrayList<>();
     private UserAccessRoleDTO staffAccessRole;
     private List<ShiftTemplateDTO> shiftTemplates;
     private List<PhaseDTO> applicablePhases;
