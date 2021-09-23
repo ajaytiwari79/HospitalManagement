@@ -163,7 +163,7 @@ public class StaffActivitySettingService {
         staffActivitySettings.forEach(staffActivitySetting->{
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
-            staffActivitySetting.setId(staffActivitySettingMap.get(staffActivitySetting.getActivityId()).getId());
+            staffActivitySetting.setId(staffActivitySettingMap.getOrDefault(staffActivitySetting.getActivityId(),null).getId());
         });
         List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
         staffActivitySettingRepository.saveEntities(staffActivitySettingsList);
