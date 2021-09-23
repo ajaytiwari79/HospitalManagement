@@ -356,7 +356,7 @@ public class CounterHelperRepository {
                 Aggregation.project(ID2, STATUS, STAFF_ID).and(SHIFTS).arrayElementAt(0).as("shift"),
                 Aggregation.project(ID2, STATUS, STAFF_ID).and("shift.startDate").as("shiftDateTime")
         );
-        AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, TODO, TodoDTO.class);
+        AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, TodoDTO.class, TodoDTO.class);
         return result.getMappedResults();
     }
 
