@@ -159,11 +159,11 @@ public class StaffActivitySettingService {
     @CacheEvict(value="getStaffSpecificActivitySettings", allEntries = true)
    public List<StaffActivitySettingDTO> updateBulkStaffActivitySettings(Long unitId,Long staffId,List<StaffActivitySettingDTO> staffActivitySettings){
         Set<BigInteger> activityIds = staffActivitySettings.stream().map(staffActivitySettingDTO -> staffActivitySettingDTO.getActivityId()).collect(Collectors.toSet());
-        Map<BigInteger,StaffActivitySetting> staffActivitySettingMap = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(staffId,activityIds).stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
+        Map<BigInteger,BigInteger> staffActivitySettingMap = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(staffId,activityIds).stream().collect(Collectors.toMap(k->k.getActivityId(),v->v.getId()));
         staffActivitySettings.forEach(staffActivitySetting->{
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
-            staffActivitySetting.setId(staffActivitySettingMap.getOrDefault(staffActivitySetting.getActivityId(),null).getId());
+            staffActivitySetting.setId(staffActivitySettingMap.getOrDefault(staffActivitySetting.getActivityId(),null));
         });
         List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
         staffActivitySettingRepository.saveEntities(staffActivitySettingsList);
