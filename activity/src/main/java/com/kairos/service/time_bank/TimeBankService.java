@@ -33,6 +33,7 @@ import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -147,7 +148,7 @@ public class TimeBankService {
     @Inject private AsyncTimeBankCalculationService asyncTimeBankCalculationService;
     @Inject private RedisService redisService;
     @Inject private ExecutorService executorService;
-
+    @Inject private DayTypeRepository dayTypeRepository;
 
 
 
@@ -312,20 +313,23 @@ public class TimeBankService {
         return costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
     }
 
-    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
-        AdvanceViewData advanceViewData = new AdvanceViewData(unitId, employmentId, query, startDate, endDate,this).invoke();
+    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(TimebankFilterDTO timebankFilterDTO,Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
+        Object[] objects = getDayTypeDetails(timebankFilterDTO);
+        Set<DayOfWeek> dayOfWeeks = (Set<DayOfWeek>)objects[1];
+        Set<LocalDate> dates = (Set<LocalDate>)objects[0];
+        AdvanceViewData advanceViewData = new AdvanceViewData(dates,dayOfWeeks,unitId, employmentId, query, startDate, endDate,this).invoke();
         endDate = advanceViewData.getEndDate();
         List<EmploymentWithCtaDetailsDTO> employmentDetails = advanceViewData.getEmploymentDetails();
-        List<Interval> intervals = advanceViewData.getIntervals();
+        List<DateTimeInterval> intervals = advanceViewData.getIntervals();
         long totalTimeBankBeforeStartDate = advanceViewData.getTotalTimeBankBeforeStartDate();
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = advanceViewData.getShiftQueryResultWithActivities();
         List<TimeTypeDTO> timeTypeDTOS = advanceViewData.getTimeTypeDTOS();
         List<PayOutPerShift> payOutPerShifts = advanceViewData.getPayOutPerShifts();
         List<Long> employmentIds = advanceViewData.getEmploymentIds();
-        List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
-        Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
+        List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(dates,dayOfWeeks,employmentIds, endDate);
+        Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
         boolean includeTimeTypeCalculation = !newHashSet("DAILY-VIEW", "INDIVIDUAL-VIEW").contains(query);
-        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
+        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(dates,dayOfWeeks,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
     }
 
     /**
@@ -709,6 +713,22 @@ public class TimeBankService {
         if(isCollectionNotEmpty(updatedDailyTimebanks)) {
             timeBankRepository.saveEntities(updatedDailyTimebanks);
         }
+    }
+
+    private Object[] getDayTypeDetails(TimebankFilterDTO timebankFilterDTO){
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<LocalDate> dates = new HashSet<>();
+        if(isNotNull(timebankFilterDTO) && isCollectionNotEmpty(timebankFilterDTO.getDayTypeIds())) {
+            List<DayTypeDTO> dayTypeDTOS = dayTypeRepository.findAllByIdInAndDeletedFalse(timebankFilterDTO.getDayTypeIds());
+            for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
+                if (dayTypeDTO.isHolidayType()) {
+                    dates.addAll(dayTypeDTO.getCountryHolidayCalenderData().stream().map(countryHolidayCalenderDTO -> countryHolidayCalenderDTO.getHolidayDate()).collect(Collectors.toSet()));
+                } else {
+                    dayOfWeeks.add(DayOfWeek.valueOf(dayTypeDTO.getValidDays().get(0).toString()));
+                }
+            }
+        }
+        return new Object[]{dates,dayOfWeeks};
     }
 
     public long getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

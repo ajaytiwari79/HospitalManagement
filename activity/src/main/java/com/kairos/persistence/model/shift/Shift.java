@@ -22,13 +22,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.addMinutes;
-import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.shift.ShiftType.SICK;
 
@@ -93,15 +93,8 @@ public class Shift extends MongoBaseEntity {
     private Long employmentTypeId;
     private Long expertiseId;
     private String stopBrickGlue;
-
-    public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.employmentId = employmentId;
-        this.activities = shiftActivities;
-        this.shiftStartTime = timeInSeconds(this.getStartDate());
-        this.shiftEndTime = timeInSeconds(this.getEndDate());
-    }
+    private LocalDate shiftDate;
+    private DayOfWeek dayOfWeek;
 
     // This is used in absance shift
     public Shift(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
@@ -115,28 +108,8 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
         this.shiftStartTime = timeInSeconds(this.getStartDate());
         this.shiftEndTime = timeInSeconds(this.getEndDate());
-
-    }
-
-    public Shift(Date startDate, Date endDate, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long employmentId, BigInteger parentOpenShiftId, BigInteger copiedFromShiftId, BigInteger phaseId, BigInteger planningPeriodId, Long staffUserId, ShiftType shiftType) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.remarks = remarks;
-        this.activities = activities;
-        this.staffId = staffId;
-        this.unitId = unitId;
-        this.externalId = externalId;
-        this.employmentId = employmentId;
-        this.parentOpenShiftId = parentOpenShiftId;
-        this.copiedFromShiftId = copiedFromShiftId;
-        this.scheduledMinutes = scheduledMinutes;
-        this.durationMinutes = durationMinutes;
-        this.phaseId = phaseId;
-        this.planningPeriodId = planningPeriodId;
-        this.staffUserId = staffUserId;
-        this.shiftType = shiftType;
-        this.shiftStartTime = timeInSeconds(this.getStartDate());
-        this.shiftEndTime = timeInSeconds(this.getEndDate());
+        this.shiftDate = asLocalDate(startDate);
+        this.dayOfWeek = shiftDate.getDayOfWeek();
     }
 
     public void setBreakActivities(List<ShiftActivity> breakActivities) {
@@ -257,11 +230,15 @@ public class Shift extends MongoBaseEntity {
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
         this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftDate = asLocalDate(startDate);
+        this.dayOfWeek = shiftDate.getDayOfWeek();
     }
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
         this.shiftEndTime = timeInSeconds(this.getEndDate());
+        this.shiftDate = asLocalDate(startDate);
+        this.dayOfWeek = shiftDate.getDayOfWeek();
     }
 
 

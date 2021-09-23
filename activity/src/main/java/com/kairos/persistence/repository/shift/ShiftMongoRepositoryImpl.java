@@ -38,6 +38,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -117,28 +118,38 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift) {
-        return findAllShiftsBetweenDurationByEmploymentIds(shiftId,newArrayList(employmentId),startDate,endDate,draftShift,newHashSet());
+        return findAllShiftsBetweenDurationByEmploymentIds(null,null,shiftId,newArrayList(employmentId),startDate,endDate,draftShift,newHashSet());
     }
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds) {
-        return findAllShiftsBetweenDurationByEmploymentIds(shiftId,newArrayList(employmentId),startDate,endDate,draftShift,shiftIds);
+        return findAllShiftsBetweenDurationByEmploymentIds(null,null,shiftId,newArrayList(employmentId),startDate,endDate,draftShift,shiftIds);
     }
 
     @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds) {
-        Criteria criteria;
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(Set<LocalDate> dateSet, Set<DayOfWeek> dayOfWeekSet, BigInteger shiftId, Collection<Long> employmentIds, Date startDate, Date endDate, Boolean draftShift, Set<BigInteger> shiftIds) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("_id").nin(shiftIds);
         shiftIds.add(shiftId);
-        if (Optional.ofNullable(endDate).isPresent()) {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
-                    .and(START_DATE).gte(startDate).lt(endDate).and("_id").nin(shiftIds);
-        } else {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
-                    .and(START_DATE).gte(startDate).and("_id").nin(shiftIds);
-        }
         if(isNotNull(draftShift)){
             criteria.and(DRAFT).is(draftShift);
         }
+        if(isCollectionNotEmpty(dayOfWeekSet)) {
+            criteria = criteria.and("dayOfWeek").in(dayOfWeekSet);
+        }
+        if(isCollectionNotEmpty(dateSet)){
+            if(Optional.ofNullable(endDate).isPresent()){
+                criteria = criteria.and(START_DATE).in(dateSet).gte(startDate).lt(endDate);
+            }else {
+                criteria = criteria.and(START_DATE).in(dateSet).gte(startDate);
+            }
+        }
+        else if (Optional.ofNullable(endDate).isPresent()) {
+            criteria =
+                    criteria.and(START_DATE).gte(startDate).lt(endDate);
+        } else {
+            criteria = criteria.and(START_DATE).gte(startDate);
+        }
+
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
 

@@ -20,14 +20,8 @@ import java.util.Set;
 @Repository
 public interface PayOutRepository extends MongoBaseRepository<PayOutPerShift,BigInteger>,CustomPayOutRepository {
 
-    @Query("{employmentId:{$in:?0},date:{$gte:?1 , $lte:?2},deleted:false}")
-    List<PayOutPerShift> findAllByEmploymentsAndDate(Collection<Long> employmentIds, Date startDate, Date endDate);
-
     @Query("{employmentId:?0,date:{$gte:?1 , $lte:?2},deleted:false}")
     List<PayOutPerShift> findAllByEmploymentAndDate(Long employmentId, Date startDate, Date endDate);
-    
-    @Query("{employmentId:?0,date:{$lt:?1},deleted:false}")
-    List<PayOutPerShift> findAllByEmploymentAndBeforeDate(Long employmentId, Date payOutDate);
 
     @Query("{shiftId:?0,deleted:false}")
     PayOutPerShift findAllByShiftId(BigInteger shiftId);

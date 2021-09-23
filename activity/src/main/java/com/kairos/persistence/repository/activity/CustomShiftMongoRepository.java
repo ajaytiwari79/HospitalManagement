@@ -15,6 +15,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -74,7 +75,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long employmentId,Date startDate,Date endDate);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift,Set<BigInteger> shiftIds);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(Set<LocalDate> dateSet, Set<DayOfWeek> dayOfWeekSet, BigInteger shiftId, Collection<Long> employmentIds, Date startDate, Date endDate, Boolean draftShift, Set<BigInteger> shiftIds);
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
 

@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -137,8 +139,8 @@ public class PayOutCalculationService {
      * @param employmentWithCtaDetailsDTOS
      * @return PayOutDTO
      */
-    public PayOutDTO getAdvanceViewPayout(List<Interval> intervals, List<PayOutPerShift> payOutPerShifts, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
-        Map<Interval, List<PayOutPerShift>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOutPerShifts);
+    public PayOutDTO getAdvanceViewPayout(List<DateTimeInterval> intervals, List<PayOutPerShift> payOutPerShifts, long payoutMinutesBefore, Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
+        Map<DateTimeInterval, List<PayOutPerShift>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOutPerShifts);
         List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutMinutesBefore, payoutTransactionAndIntervalMap, employmentWithCtaDetailsDTOS, query);
         List<CTADistributionDTO> scheduledCTADistributions = payoutIntervalDTOS.stream().flatMap(ti -> ti.getPayOutDistribution().getScheduledCTADistributions().stream()).collect(Collectors.toList());
         Map<String, Integer> ctaDistributionMap = scheduledCTADistributions.stream().collect(Collectors.groupingBy(CTADistributionDTO::getName, Collectors.summingInt(CTADistributionDTO::getMinutes)));
@@ -152,7 +154,7 @@ public class PayOutCalculationService {
         long payoutFromCTA = payoutCalculatedValue[3];
         long protectedDaysOffMinutes = payoutCalculatedValue[4];
         PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(scheduledCTADistributions, getCTABonusDistributions(ctaBonusDistributionMap, employmentWithCtaDetailsDTOS.get(0)),payoutFromCTA);
-        return new PayOutDTO(intervals.get(0).getStart().toDate(), intervals.get(intervals.size() - 1).getEnd().toDate(), payoutAfter, payoutBefore, payoutChange, payoutIntervalDTOS, payOutCTADistributionDTO,protectedDaysOffMinutes);
+        return new PayOutDTO(intervals.get(0).getStartDate(), intervals.get(intervals.size() - 1).getEndDate(), payoutAfter, payoutBefore, payoutChange, payoutIntervalDTOS, payOutCTADistributionDTO,protectedDaysOffMinutes);
     }
 
     private CTARuletemplateBonus getCTABonusDistributions(Map<String, Integer> ctaDistributionMap, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
@@ -184,8 +186,8 @@ public class PayOutCalculationService {
      * @param payOutPerShifts
      * @return Map<Interval, List<PayOutPerShift>>
      */
-    private Map<Interval, List<PayOutPerShift>> getPayoutIntervalsMap(List<Interval> intervals, List<PayOutPerShift> payOutPerShifts) {
-        Map<Interval, List<PayOutPerShift>> timeBanksIntervalMap = new HashMap<>(intervals.size());
+    private Map<DateTimeInterval, List<PayOutPerShift>> getPayoutIntervalsMap(List<DateTimeInterval> intervals, List<PayOutPerShift> payOutPerShifts) {
+        Map<DateTimeInterval, List<PayOutPerShift>> timeBanksIntervalMap = new HashMap<>(intervals.size());
         intervals.forEach(i -> timeBanksIntervalMap.put(i, getPayoutsByInterval(i, payOutPerShifts)));
         return timeBanksIntervalMap;
     }
@@ -196,7 +198,7 @@ public class PayOutCalculationService {
      * @param payOutPerShifts
      * @return List<PayOutPerShift>
      */
-    private List<PayOutPerShift> getPayoutsByInterval(Interval interval, List<PayOutPerShift> payOutPerShifts) {
+    private List<PayOutPerShift> getPayoutsByInterval(DateTimeInterval interval, List<PayOutPerShift> payOutPerShifts) {
         List<PayOutPerShift> payOutPerShiftList = new ArrayList<>();
         payOutPerShifts.forEach(payOut -> {
             if (interval.contains(DateUtils.asDate(payOut.getDate()).getTime()) || interval.getStart().equals(DateUtils.toJodaDateTime(payOut.getDate()))) {
@@ -214,12 +216,12 @@ public class PayOutCalculationService {
      * @param employmentWithCtaDetailsDTOS
      * @return List<PayOutIntervalDTO>
      */
-    private List<PayOutIntervalDTO> getPayoutIntervals(List<Interval> intervals, Map<Interval, List<PayOutPerShift>> payoutsIntervalMap, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
+    private List<PayOutIntervalDTO> getPayoutIntervals(List<DateTimeInterval> intervals, Map<DateTimeInterval, List<PayOutPerShift>> payoutsIntervalMap, long payoutMinutesBefore, Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
         List<PayOutIntervalDTO> payOutIntervalDTOS = new ArrayList<>(intervals.size());
         Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsHourlyCostMap = employmentWithCtaDetailsDTOS.stream().filter(distinctByKey(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId())).collect(Collectors.toMap(k->k.getId(), v->v.getEmploymentLines()));
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = employmentWithCtaDetailsDTOS.stream().flatMap(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getCtaRuleTemplates().stream()).filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(Collectors.toList());
         int sequence=1;
-        for (Interval interval : intervals) {
+        for (DateTimeInterval interval : intervals) {
             List<PayOutPerShift> payOutPerShifts = payoutsIntervalMap.get(interval);
             List<PayOutTransaction> payOutTransactionList = payoutTransactionAndIntervalMap.get(interval);
             Long payoutChange = payOutPerShifts.stream().mapToLong(PayOutPerShift::getTotalPayOutMinutes).sum();
@@ -235,7 +237,7 @@ public class PayOutCalculationService {
             Map<String, Double> ctaCostDistributionMap = payOutPerShiftCTADistributions.stream().collect(Collectors.groupingBy(PayOutPerShiftCTADistribution::getCtaName, Collectors.summingDouble(PayOutPerShiftCTADistribution::getCost)));
             PayOutCTADistributionDTO payOutCTADistributionDTO = getDistributionOfPayout(ctaDistributionMap, ctaRuleTemplateDTOS,payoutFromCTA,ctaCostDistributionMap);
             String title = getTitle(query, interval);
-            PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate(), payoutAfter, payoutMinutesBefore, payoutChange, payOutCTADistributionDTO, DayOfWeek.of(interval.getStart().getDayOfWeek()), title,payoutCost.floatValue());
+            PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStartDate(), interval.getEndDate(), payoutAfter, payoutMinutesBefore, payoutChange, payOutCTADistributionDTO, interval.getStart().getDayOfWeek(), title,payoutCost.floatValue());
             payoutMinutesBefore+=payoutChange;
             payOutIntervalDTO.setProtectedDaysOffMinutes(protectedDaysOffMinutes);
             payOutIntervalDTO.setSequence(sequence++);
@@ -272,18 +274,18 @@ public class PayOutCalculationService {
         return new PayOutCTADistributionDTO(scheduledCTADistributions, new CTARuletemplateBonus(timeBankCTADistributionDTOS, ctaBonusMinutes),plannedMinutesOfPayOut);
     }
 
-    private String getTitle(String query, Interval interval) {
+    private String getTitle(String query, DateTimeInterval interval) {
         switch (query) {
             case DAILY:
                 return interval.getStart().toLocalDate().toString();
             case WEEKLY:
-                return StringUtils.capitalize(AppConstants.WEEKLY) + " " + interval.getStart().getWeekOfWeekyear();
+                return StringUtils.capitalize(AppConstants.WEEKLY) + " " + interval.getStart().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
             case MONTHLY:
-                return interval.getStart().monthOfYear().getAsText();
+                return interval.getStart().getMonth().toString();
             case ANNUALLY:
                 return StringUtils.capitalize(AppConstants.YEAR) + " " + interval.getStart().getYear();
             case QUATERLY:
-                return StringUtils.capitalize(AppConstants.QUARTER) + " " + (interval.getStart().dayOfMonth().withMinimumValue().equals(interval.getStart()) ? interval.getStart().getMonthOfYear() / 3 : (interval.getStart().getMonthOfYear() / 3) + 1);
+                return StringUtils.capitalize(AppConstants.QUARTER) + " " + (interval.getStart().truncatedTo(ChronoUnit.DAYS).equals(interval.getStart()) ? interval.getStart().getMonthValue() / 3 : (interval.getStart().getMonthValue() / 3) + 1);
             default:
                 break;
         }
