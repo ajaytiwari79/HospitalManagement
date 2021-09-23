@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.utils.RestClientUrlUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class RestClientURLUtil {
     private static String plannerServiceUrl;
     private static String schedulerServiceUrl;
     private static String gdprServiceUrl;
+    public static String kpiServiceUrl;
 
     @Value("${gateway.plannerservice.url}")
     public void setPlannerServiceUrl(String plannerServiceUrl) {
@@ -33,6 +35,10 @@ public class RestClientURLUtil {
     @Value("${gateway.gdprservice.url}")
     public void setGdprServiceUrl(String gdprServiceUrl) {
         RestClientURLUtil.gdprServiceUrl = gdprServiceUrl;
+    }
+
+    @Value("${gateway.kpiservice.url}")
+    public  void setKPIServiceUrl(String kpiServiceUrl) {RestClientURLUtil.kpiServiceUrl = kpiServiceUrl;
     }
 
     public final static String getBaseUrl(boolean hasUnitInUrl) {

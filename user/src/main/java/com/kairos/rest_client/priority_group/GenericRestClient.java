@@ -2,7 +2,9 @@ package com.kairos.rest_client.priority_group;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.apache.http.NameValuePair;
@@ -24,7 +26,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
+import static com.kairos.enums.rest_client.RestClientUrlType.COUNTRY;
+import static com.kairos.rest_client.RestClientURLUtil.*;
 
 @Service
 public class GenericRestClient {
@@ -94,6 +97,51 @@ public class GenericRestClient {
             exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
         return responseData;
+    }
+
+    public <T extends Object, V> V publishRequestToKPIService(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getKPIServiceBaseUrl(restClientUrlType, id) + uri;
+        String url = baseUrl +getURIWithParam(queryParam);
+        V responseData = null;
+        try {
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    restTemplate.exchange(
+                            url,
+                            httpMethod,
+                            new HttpEntity<>(t), typeReference, pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                exceptionService.internalError(response.getMessage());
+            }
+            responseData = response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+        }
+        return responseData;
+    }
+
+    public static String getKPIServiceBaseUrl(RestClientUrlType restClientUrlType,Long id){
+        String baseUrl = null;
+
+        switch (restClientUrlType){
+            case UNIT:baseUrl = new StringBuilder(kpiServiceUrl ).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUserDetails().getLastSelectedOrganizationId())).toString();
+                break;
+            case COUNTRY:baseUrl = new StringBuilder(kpiServiceUrl ).append(COUNTRY).append(id).toString();
+                break;
+            case ORGANIZATION:baseUrl = new StringBuilder(kpiServiceUrl ).toString();
+                break;
+            case COUNTRY_WITHOUT_PARENT_ORG:
+                baseUrl = new StringBuilder(kpiServiceUrl).append(COUNTRY).append(id).toString();
+                break;
+            case UNIT_WITHOUT_PARENT_ORG:
+                baseUrl = new StringBuilder(kpiServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                break;
+            default:break;
+
+        }
+        return baseUrl;
     }
 
     public String getURIWithParam(List<NameValuePair> queryParam){
