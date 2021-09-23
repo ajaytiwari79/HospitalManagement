@@ -30,10 +30,7 @@ import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftDataHelper;
-import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.wta.StaffWTACounter;
@@ -75,6 +72,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -158,6 +156,8 @@ public class ShiftValidatorService {
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private GeneralSettingsService generalSettingsService;
     private static ExceptionService exceptionService;
+    @Lazy
+    @Inject private CoverShiftService coverShiftService;
     @Autowired
     public void setExceptionService(ExceptionService exceptionService) {
         this.exceptionService = exceptionService;
@@ -746,8 +746,9 @@ public class ShiftValidatorService {
         }
         if(STOP_BRICK.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType())){
             boolean overLapWithRequestShift = true;
-            for (ShiftDTO absenceShift : overlappedShifts) {
-                if(!(absenceShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST) || absenceShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST))){
+            for (ShiftDTO overlappedShift : overlappedShifts) {
+                CoverShift coverShift = coverShiftService.getCoverShiftDetails(overlappedShift.getId(), overlappedShift.getStaffId());
+                if(isNull(coverShift) && (!(overlappedShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST) || overlappedShift.getActivities().get(0).getStatus().contains(ShiftStatus.REQUEST)))){
                     overLapWithRequestShift = false;
                     break;
                 }
