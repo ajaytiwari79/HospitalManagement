@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -20,7 +19,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ViolatedRulesDTO implements Serializable {
+public class ViolatedRulesDTO {
 
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
     private List<ActivityRuleViolation> activities = new ArrayList<>();
@@ -30,10 +29,6 @@ public class ViolatedRulesDTO implements Serializable {
     private boolean draft;
     private BigInteger overlapWithShiftId;
     private String overlapMessage;
-
-    public ViolatedRulesDTO(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {
-        this.workTimeAgreements = workTimeAgreements;
-    }
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
         workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());

@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 /**
  * Created by prerna on 30/4/18.
  */
@@ -14,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilterDetailDTO implements Serializable {
+public class FilterDetailDTO {
 
     private String id;
     private String value;

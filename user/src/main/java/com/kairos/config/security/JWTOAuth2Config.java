@@ -1,7 +1,6 @@
 package com.kairos.config.security;
 
 import com.kairos.service.auth.UserService;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +15,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -33,7 +33,6 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     private RedisService redisService;
     @Autowired
     private UserService userService;
-    @Autowired private ExceptionService exceptionService;
 
     private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
 
@@ -49,12 +48,12 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Primary
     public AuthorizationServerTokenServices customTokenServices() {
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
-        CustomDefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService,jwtTokenStore,exceptionService);
+        DefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices(userService, redisService);
+        defaultTokenServices.setTokenStore(jwtTokenStore);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
         defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
         defaultTokenServices.setAccessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS);
         defaultTokenServices.setSupportRefreshToken(true);
-        userService.setCustomDefaultTokenServices(defaultTokenServices);
         return defaultTokenServices;
     }
 

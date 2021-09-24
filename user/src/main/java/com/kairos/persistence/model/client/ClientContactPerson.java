@@ -21,7 +21,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CLIEN
 @NoArgsConstructor
 public class ClientContactPerson extends UserBaseEntity {
 
-    private static final long serialVersionUID = 6036945424095399118L;
     @Relationship(type = CLIENT_CONTACT_PERSON_STAFF)
     private Staff staff;
 

@@ -13,6 +13,9 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.VALIDATED_BY;
 
 public class TimeAndAttendanceFilter <G> implements ShiftFilter {
+
+
+
     private Map<FilterType, Set<G>> filterCriteriaMap;
     private List<BigInteger> shiftStateIds;
 

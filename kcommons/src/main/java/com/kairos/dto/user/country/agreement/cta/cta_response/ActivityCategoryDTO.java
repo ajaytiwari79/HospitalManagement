@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.Objects;
@@ -19,9 +18,8 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityCategoryDTO implements Serializable {
+public class ActivityCategoryDTO {
 
-    private static final long serialVersionUID = 7877279567029162429L;
     private String name;
     private BigInteger id;
     private Long countryId;

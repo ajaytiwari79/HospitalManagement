@@ -70,4 +70,16 @@ public class CitizenController {
         return "Citizen Relative Data Sync";
     }
 
+    /**
+     *
+     * @param unitId
+     * @return
+     */
+   @GetMapping(value = "/unit/{unitId}/getTimeSlots")
+    public String getTimeSlots( @PathVariable Long unitId){
+        authService.kmdAuth();
+        citizenService.getTimeSlots( unitId);
+        return "KMD Time slot Data Sync";
+    }
+
 }

@@ -60,4 +60,6 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
         staffingLevelSkills.removeIf(Objects::isNull);
         return staffingLevelSkills;
     }
+
+
 }

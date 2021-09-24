@@ -77,8 +77,7 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
             "Match (skill:Skill)-[skillTagRel:"+HAS_TAG+"]-(tag) WHERE id(skill) = {1} DELETE  skillTagRel ")
     void removeAllOrganizationTags(long orgId, long skillId);
 
-    @Query("Match (skill:Skill) where id(skill) IN {0} RETURN distinct skill")
-    List<Skill> findSkillByIds(List<Long> skillIds);
+
 
     List<Skill> findSkillByNameIn(List<String> skillNames);
 

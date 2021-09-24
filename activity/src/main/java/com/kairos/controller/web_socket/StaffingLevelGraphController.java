@@ -6,7 +6,7 @@ import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import org.slf4j.Logger;
@@ -42,11 +42,11 @@ public class StaffingLevelGraphController {
     private EnvConfig envConfig;
 
     @RequestMapping(value = API_UNIT_URL +"/staffing_level/graph", method = RequestMethod.GET)
-    public StaffingLevelDTO dynamicStaffingLevelGraphSyncResponsetest(){
+    public PresenceStaffingLevelDto dynamicStaffingLevelGraphSyncResponsetest(){
 
         Duration duration=new Duration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
-        StaffingLevelDTO dto=new StaffingLevelDTO(new BigInteger("1"), DateUtils.getDate(),20,staffingLevelSetting);
+        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(new BigInteger("1"), DateUtils.getDate(),20,staffingLevelSetting);
         List<StaffingLevelInterval> staffingLevelTimeSlots=new ArrayList<>();
 
         for(int i=0;i<=95;i++){

@@ -5,6 +5,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.cta.CompensationType;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 import static com.kairos.commons.utils.DateUtils.getDateByIntervalType;

@@ -15,7 +15,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Profile extends UserBaseEntity {
-    private static final long serialVersionUID = -8040233714233278512L;
     private String name;
 
 }

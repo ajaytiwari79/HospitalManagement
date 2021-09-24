@@ -1,12 +1,10 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
 /**
  * Created by prerna on 10/4/18.
  */
-public enum DurationType implements Serializable {
-    MONTHS("Months"), WEEKS("Weeks"), DAYS("Days"), HOURS("Hours"), MINUTES("Minutes"), YEAR("Year");
+public enum DurationType {
+    MONTHS("Months"),WEEKS("Weeks"),DAYS("Days"),HOURS("Hours"),MINUTES("Minutes"),YEAR("Year");
 
     private String value;
 
@@ -14,7 +12,7 @@ public enum DurationType implements Serializable {
         this.value = value;
     }
 
-    public String toValue() {
+    public String toValue(){
         return value;
     }
 

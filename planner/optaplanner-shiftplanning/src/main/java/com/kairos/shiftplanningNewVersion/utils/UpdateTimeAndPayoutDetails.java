@@ -11,6 +11,7 @@ import com.kairos.shiftplanning.constraints.activityconstraint.CountryHolidayCal
 import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
+
 import com.kairos.shiftplanning.domain.staff.BreakSettings;
 import com.kairos.shiftplanning.domain.staff.CTARuleTemplate;
 import com.kairos.shiftplanning.domain.staff.Employment;

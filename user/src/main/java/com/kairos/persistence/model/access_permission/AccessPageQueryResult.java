@@ -1,20 +1,15 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.OrganizationCategory;
-import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 
@@ -26,9 +21,8 @@ import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AccessPageQueryResult implements Serializable {
+public class AccessPageQueryResult {
 
-    private static final long serialVersionUID = -8499590569706361922L;
     private long id;
     private String name;
     private boolean selected;
@@ -48,7 +42,6 @@ public class AccessPageQueryResult implements Serializable {
     private boolean hasSubTabs;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
     private String helperText;
     private String url;

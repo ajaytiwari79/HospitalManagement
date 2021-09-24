@@ -10,7 +10,6 @@ import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.service.counter.KPIBuilderCalculationService;
-import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.TimeBankOffKPIService;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -37,7 +36,7 @@ public class TimeBankOffKpiTest {
     @InjectMocks
     private TimeBankOffKPIService timeBankOffKPIService;
     @Mock
-    private KPICalculationRelatedInfo kpiCalculationRelated;
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelated;
 
     @Mock
     private KPIBuilderCalculationService kpiBuilderCalculationService;
@@ -51,7 +50,7 @@ public class TimeBankOffKpiTest {
     private Map<BigInteger,List<TodoDTO>> activityIdTodoListMap;
     private Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdActivityIdTodoMap;
     private List<XAxisConfig> xAxisConfigs;
-    private KPICalculationRelatedInfo kpiCalculationRelatedInfo;
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo;
     private FilterType filterType;
 
 
@@ -104,8 +103,8 @@ public class TimeBankOffKpiTest {
         return staffIdActivityIdTodoMap;
     }
 
-    private KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
-        KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPICalculationRelatedInfo();
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
+        KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPIBuilderCalculationService().new KPICalculationRelatedInfo();
         kpiCalculationRelatedInfo.setCalculationTypes(Arrays.asList(STAFF_SKILLS_COUNT));
         kpiCalculationRelatedInfo.setUnitId(unitId);
         kpiCalculationRelatedInfo.setStaffIds(staffIds);

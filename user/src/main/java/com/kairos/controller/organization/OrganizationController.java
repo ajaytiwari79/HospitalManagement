@@ -4,11 +4,13 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationGeneral;
@@ -20,6 +22,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.DayTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.resources.ResourceService;
@@ -29,11 +32,11 @@ import com.kairos.service.staff.StaffFilterService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,10 +45,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -62,6 +62,8 @@ public class OrganizationController {
     private OrganizationServiceService organizationServiceService;
     @Inject
     private SkillService skillService;
+    @Inject
+    private TimeSlotService timeSlotService;
     @Inject
     private IntegrationConfigurationService integrationConfigurationService;
     @Inject
@@ -83,12 +85,13 @@ public class OrganizationController {
     @Inject
     private UnitService unitService;
     @Inject
+    private DayTypeService dayTypeService;
+    @Inject
     private StaffFilterService staffFilterService;
     @Inject
     private StaffCreationService staffCreationService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
-    @Inject private TranslationService translationService;
 
 
     @ApiOperation(value = "Get Organization by Id")
@@ -184,11 +187,79 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, services);
     }
 
+    @ApiOperation(value = "Get Organization Time Slots")
+    @GetMapping(UNIT_URL + "/time_slot")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlots(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlots(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slots")
+    @GetMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlots(@PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByTimeSlotSet(timeSlotSetId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slot sets")
+    @GetMapping(UNIT_URL + "/time_slot_set")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlotSets(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotSets(unitId));
+    }
+
+    @ApiOperation(value = "create new time slot set")
+    @PostMapping(UNIT_URL + "/time_slot")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createTimeSlotSet(@PathVariable long unitId, @Validated @RequestBody TimeSlotSetDTO timeSlotSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlotSet(unitId, timeSlotSetDTO));
+    }
+
+    @ApiOperation(value = "create new time slot set")
+    @PostMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createTimeSlot(@PathVariable Long timeSlotSetId, @Validated @RequestBody TimeSlotDTO timeSlotDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlot(timeSlotSetId, timeSlotDTO));
+    }
+
+    @ApiOperation(value = "delete time slot set")
+    @DeleteMapping(UNIT_URL + "/time_slot_set/{timeSlotId}")
+    public ResponseEntity<Map<String, Object>> deleteTimeSlotSet(@PathVariable Long unitId, @PathVariable Long timeSlotId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.deleteTimeSlotSet(unitId, timeSlotId));
+    }
+
+    @ApiOperation(value = "update time slot set")
+    @PutMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}")
+    public ResponseEntity<Map<String, Object>> updateTimeSlotSet(@PathVariable Long unitId, @PathVariable Long timeSlotSetId, @Validated @RequestBody TimeSlotSetDTO timeSlotSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlotSet(unitId, timeSlotSetId, timeSlotSetDTO));
+    }
+
+    @ApiOperation(value = "update time slot type")
+    @PutMapping(UNIT_URL + "/time_slot_type")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTimeSlotType(@PathVariable long unitId, @RequestBody Map<String, Object> timeSlotType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlotType(unitId, (boolean) timeSlotType.get("standardTimeSlot")));
+    }
+
+    @ApiOperation(value = "Update time slot")
+    @PutMapping(UNIT_URL + "/time_slot_set/{timeSlotId}/time_slot")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTimeSlot(@Validated @RequestBody List<TimeSlotDTO> timeSlotDTO, @PathVariable Long timeSlotId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlot(timeSlotDTO, timeSlotId));
+    }
+
+    @ApiOperation(value = "Delete time slot")
+    @DeleteMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot/{timeSlotId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteTimeSlot(@PathVariable long timeSlotId, @PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.deleteTimeSlot(timeSlotId, timeSlotSetId));
+    }
+
     @ApiOperation(value = "Get Organization Hierarchy")
     @GetMapping("/organization_flow/hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.generateHierarchy(UserContext.getUserDetails().getId()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.generateHierarchy());
     }
 
     @GetMapping("/staff/available/{organizationId}")
@@ -494,6 +565,11 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getCommonDataOfOrganization(unitId));
     }
 
+    @ApiOperation("get visitation info for a unit")
+    @GetMapping(UNIT_URL + "/unit_visitation")
+    public ResponseEntity<Map<String, Object>> getUnitVisitationInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getUnitVisitationInfo(unitId));
+    }
 
     @ApiOperation(value = "Get skills of organization")
     @GetMapping(UNIT_URL + "/skills")
@@ -501,13 +577,18 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getSkillsOfOrganization(unitId));
     }
 
-    //TODO Integrated
-//    @ApiOperation(value = "Get current time slots of organization")
-//    @GetMapping(UNIT_URL + "/current/time_slots")
-//    public ResponseEntity<Map<String, Object>> getCurrentTimeSlotsOfOrganization(@PathVariable long unitId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getCurrentTimeSlotOfUnit(unitId));
-//    }
+    @ApiOperation(value = "Get current time slots of organization")
+    @GetMapping(UNIT_URL + "/current/time_slots")
+    public ResponseEntity<Map<String, Object>> getCurrentTimeSlotsOfOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getCurrentTimeSlotOfUnit(unitId));
+    }
 
+    @ApiOperation("get time slot info by unit id and timeslot name")
+    //@RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
+    @PostMapping(UNIT_URL + "/time_slot_name")
+    public ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody Long timeSlotExternalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, timeSlotExternalId));
+    }
 
 
     @ApiOperation("get TaskDemand Supplier  info by unit id ")
@@ -534,11 +615,11 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
     }
 
-//    @ApiOperation(value = "Get time slot")
-//    @GetMapping(UNIT_URL + "/time_slot/{timeSlotId}")
-//    public ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotId(@PathVariable long unitId, @PathVariable long timeSlotId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId));
-//    }
+    @ApiOperation(value = "Get time slot")
+    @GetMapping(UNIT_URL + "/time_slot/{timeSlotId}")
+    public ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotId(@PathVariable long unitId, @PathVariable long timeSlotId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId));
+    }
 
     @ApiOperation("get organization by external id ")
     @GetMapping("/external/{externalId}")
@@ -594,6 +675,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.saveKMDExternalId(unitId, organizationExternalIdsDTO));
     }
 
+    @PostMapping(UNIT_URL + "/saveTimeSlotDeduction")
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveTimeSlotDeduction(@PathVariable long unitId, @RequestBody TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.saveTimeSlotPercentageDeduction(unitId, timeSlotsDeductionDTO));
+    }
+
     @GetMapping(UNIT_URL + "/saveKMDExternal")
     @ApiOperation("Save KMD External of unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -601,6 +689,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getKMDExternalId(unitId));
     }
 
+    @GetMapping(UNIT_URL + "/saveTimeSlotDeduction")
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlotDeduction(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getTimeSlotPercentageDeduction(unitId));
+    }
 
     @ApiOperation(value = "Get skills and organizationTypes of organization")
     @GetMapping(UNIT_URL + "/skill/orgTypes")
@@ -616,13 +710,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(unitId));
     }
 
-    //TODO Integrated
-//    @GetMapping(UNIT_URL + "/dayTypebydate")
-//    @ApiOperation("get dayType in country")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(date));
-//    }
+    @GetMapping(UNIT_URL + "/dayTypebydate")
+    @ApiOperation("get dayType in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(date));
+    }
 
     @PostMapping(UNIT_URL + "/addStaffFavouriteFilters")
     @ApiOperation("verify staff has unit employment in unit or not ")
@@ -652,15 +745,14 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId, unitId));
     }
 
-    //TODO Replaced with activity micro service API
-//    @ApiOperation(value = "Get DayType by unitID")
-//    @GetMapping(UNIT_URL + "/dayType")
-//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getDayTypeByOrganization(@PathVariable Long unitId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllDayTypeofOrganization());
-//    }
+    @ApiOperation(value = "Get DayType by unitID")
+    @GetMapping(UNIT_URL + "/dayType")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypeByOrganization(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllDayTypeofOrganization());
+    }
 
-    @ApiOperation(value = "Get unit hierarchy by unitID")
+    @ApiOperation(value = "Get DayType by unitID")
     @GetMapping(UNIT_URL + "/units")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitsByOrganizationID(@PathVariable Long unitId) {
@@ -703,7 +795,7 @@ public class OrganizationController {
     @GetMapping(UNIT_URL + "/cta/default-data")
     @ApiOperation("get default data for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTA(null, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(null, unitId));
     }
 
     @GetMapping(UNIT_URL + "/activity-mapping-details")
@@ -740,20 +832,20 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getAllTimeZoneByUnitIds(@RequestBody Set<Long> unitIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getTimeZoneStringsByUnitIds(unitIds));
     }
-//
-//    @ApiOperation(value = "Get Organization Time Slot sets")
-//    @GetMapping(UNIT_URL + "/shift_planning/time_slot_set")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotSetsByUnit(@PathVariable Long unitId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotSetsByUnit(unitId));
-//    }
 
-//    @ApiOperation(value = "Get Organization Time Slots")
-//    @GetMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/shift_planning/time_slot")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
-//    }
+    @ApiOperation(value = "Get Organization Time Slot sets")
+    @GetMapping(UNIT_URL + "/shift_planning/time_slot_set")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotSetsByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotSetsByUnit(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slots")
+    @GetMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/shift_planning/time_slot")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
+    }
 
     @ApiOperation(value = "Get Default data for Orders")
     @GetMapping(UNIT_URL + "/order/default_data")
@@ -762,6 +854,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
     }
 
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @GetMapping(UNIT_URL + "/getWtaTemplateDefaultDataInfoByUnitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getWtaTemplateDefaultDataInfoByUnitId(unitId));
+
+    }
 
     @ApiOperation(value = "Get Default data for Rule Template")
     @GetMapping("/country/{countryId}/rule_template/default_data")
@@ -853,13 +952,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, organizationService.getPublicHolidaysReasonCodeAndDayTypeUnitId(unitId));
     }
 
-    //TODO Integrated
-//    @ApiOperation(value = "Get DayType for unit")
-//    @GetMapping(value = UNIT_URL + "/day_type")
-//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getDayTypeForUnit(@PathVariable long unitId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeForUnit(unitId));
-//    }
+    @ApiOperation(value = "Get DayType for unit")
+    @GetMapping(value = UNIT_URL + "/day_type")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypeForUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeForUnit(unitId));
+    }
 
     @ApiOperation(value = "get cuntry id by unit id ")
     @GetMapping(value = UNIT_URL + "/country_id")
@@ -867,17 +965,17 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryIdByUnitId(unitId));
     }
 
-//    @ApiOperation(value = "Get time slots of organization")
-//    @GetMapping(UNIT_URL + "/get_time_slots")
-//    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnit(@PathVariable long unitId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlot(unitId));
-//    }
+    @ApiOperation(value = "Get time slots of organization")
+    @GetMapping(UNIT_URL + "/get_time_slots")
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlot(unitId));
+    }
 
-//    @ApiOperation(value = "Get time slots of organization")
-//    @GetMapping(UNIT_URL + "/get_time_slots_by_id")
-//    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnitById(@PathVariable Long unitId, @RequestParam Set<String> timeSlotIds) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlotByNames(unitId, timeSlotIds));
-//    }
+    @ApiOperation(value = "Get time slots of organization")
+    @GetMapping(UNIT_URL + "/get_time_slots_by_id")
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnitById(@PathVariable Long unitId, @RequestParam Set<String> timeSlotIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlotByNames(unitId, timeSlotIds));
+    }
 
     @ApiOperation(value = "Get time slots of organization")
     @PostMapping(UNIT_URL + "/get_filter_data")
@@ -916,21 +1014,14 @@ public class OrganizationController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateTranslation(id,translations));
     }
 
     @RequestMapping(value = UNIT_URL+"/organization/{id}/languageSettings", method = RequestMethod.PUT)
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivityOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
-    }
-
-    @RequestMapping(value = "transfer_reason_code")
-    @ApiOperation("Add translated data")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> transferReasonCode() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.transferReasonCode());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
     }
 
 

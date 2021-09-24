@@ -120,7 +120,7 @@ public class SchedulerServiceRestClient {
         try {
             uri= uri+builder.build().toString();
         } catch (URISyntaxException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
         return uri;
     }

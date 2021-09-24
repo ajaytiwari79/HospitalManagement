@@ -43,7 +43,7 @@ public class MonthlyFrequency {
         this.weekOfMonth = weekOfMonth;
     }
 
-    public enum DayOfWeek implements Serializable {
+    public enum DayOfWeek{
 
         MONDAY("Monday"),
         TUESDAY("Tuesday"),
@@ -67,7 +67,7 @@ public class MonthlyFrequency {
         }
     }
 
-    public enum WeekOfMonth implements Serializable {
+    public enum WeekOfMonth{
 
         FIRST("First"),
         SECOND("Second"),

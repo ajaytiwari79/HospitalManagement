@@ -9,7 +9,6 @@ import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
@@ -57,7 +56,6 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     @NotNull(message = "message.shift.shiftDate")
     protected LocalDate shiftDate;
     protected Long allowedBreakDurationInMinute;
-
     protected ShiftTemplateDTO template;
     @NotEmpty(message = "message.shift.activity.empty")
     protected List<ShiftActivityDTO> activities = new ArrayList<>();
@@ -70,7 +68,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected LocalDateTime clockOut;
     protected BigInteger shiftId;
     protected AccessGroupRole accessGroupRole;
-    protected boolean editable=true;
+    protected boolean editable;
     protected boolean functionDeleted;
     protected ShiftType shiftType;
     protected BigInteger shiftStatePhaseId;
@@ -99,13 +97,6 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     private Map<String,Object> changes;
     protected List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     protected List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions = new ArrayList<>();
-    private ShiftActivityDTO replacedActivity;
-    private Date coverShiftDate;
-    private boolean fillGap;
-    private boolean createdByCoverShift;
-    protected ShiftDeletedBy deletedBy;
-    private Long employmentTypeId;
-    private String stopBrickGlue;
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;

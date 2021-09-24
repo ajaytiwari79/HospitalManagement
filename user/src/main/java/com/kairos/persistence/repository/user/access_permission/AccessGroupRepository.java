@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -10,7 +11,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,12 +49,16 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "Match (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') return accessGroup")
     List<AccessGroup> getAccessGroups(Long unitId);
 
-        @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) " +
             "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) " +
-            " WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
-            "RETURN DISTINCT accessGroup.translations as translations," +
-            "id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, accessGroup.dayTypeIds AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes,pag as parentAccessGroup ORDER BY accessGroup.name")
+            "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]-(dayType:DayType) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
+            "RETURN " +
+            "{english :{name: CASE WHEN accessGroup.`translatedNames.english` IS NULL THEN '' ELSE accessGroup.`translatedNames.english` END, description : CASE WHEN accessGroup.`translatedDescriptions.english` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN accessGroup.`translatedNames.hindi` IS NULL THEN '' ELSE accessGroup.`translatedNames.hindi` END, description : CASE WHEN accessGroup.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN accessGroup.`translatedNames.danish` IS NULL THEN '' ELSE accessGroup.`translatedNames.danish` END, description : CASE WHEN accessGroup.`translatedDescriptions.danish` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN accessGroup.`translatedNames.britishenglish` IS NULL THEN '' ELSE accessGroup.`translatedNames.britishenglish` END, description : CASE WHEN accessGroup.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, collect(id(dayType)) AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes,pag as parentAccessGroup ORDER BY accessGroup.name")
     List<AccessGroupQueryResult> getAccessGroupsForUnit(Long refId);
 
 
@@ -208,21 +212,29 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "RETURN hubCount, unionCount")
     AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
 
-    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1}\n" +
-            "OPTIONAL MATCH (ag)-[:" +ORGANIZATION_HAS_ACCESS_GROUPS+ "]-(org:Organization) with ag,org\n" +
-            "OPTIONAL MATCH (ag)-[:" +HAS_ACCESS_GROUP+ "]-(up:UnitPermission)-[:" +HAS_UNIT_PERMISSIONS+ "]-(position:Position)-[:" +BELONGS_TO+ "]-(staff:Staff) with ag,org,staff\n" +
-            " RETURN ag.translations as translations,id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role, ag.enabled AS enabled,ag.startDate AS startDate, ag.endDate AS endDate, ag.dayTypeIds AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes,count(org) as unitCount,count(staff) as staffCount")
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} " +
+            "OPTIONAL MATCH(ag)-[:" + DAY_TYPES + "]-(dayType:DayType{isEnabled:true})  \n" +
+            "RETURN " +
+            "{english :{name: CASE WHEN ag.`translatedNames.english` IS NULL THEN '' ELSE ag.`translatedNames.english` END, description : CASE WHEN ag.`translatedDescriptions.english` IS NULL THEN '' ELSE ag.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ag.`translatedNames.hindi` IS NULL THEN '' ELSE ag.`translatedNames.hindi` END, description : CASE WHEN ag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ag.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ag.`translatedNames.danish` IS NULL THEN '' ELSE ag.`translatedNames.danish` END, description : CASE WHEN ag.`translatedDescriptions.danish` IS NULL THEN '' ELSE ag.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ag.`translatedNames.britishenglish` IS NULL THEN '' ELSE ag.`translatedNames.britishenglish` END, description : CASE WHEN ag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ag.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role, ag.enabled AS enabled,ag.startDate AS startDate, ag.endDate AS endDate, collect(id(dayType)) AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false,enabled:true})  WHERE id(c)={0} AND r.organizationCategory={1} " +
-            "AND   (ag.endDate IS NULL OR date(ag.endDate) >= date()) " +
-            "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role, ag.enabled AS enabled,ag.startDate AS startDate, ag.endDate AS endDate, ag.dayTypeIds AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes")
+            "OPTIONAL MATCH(ag)-[:" + DAY_TYPES + "]-(dayType:DayType{isEnabled:true}) WHERE  (ag.endDate IS NULL OR date(ag.endDate) >= date()) " +
+            "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role, ag.enabled AS enabled,ag.startDate AS startDate, ag.endDate AS endDate, collect(dayType) AS dayTypes,ag.allowedDayTypes AS allowedDayTypes")
     List<AccessGroupQueryResult> getCountryAccessGroupByCategory(Long countryId, String organizationCategory);
 
     @Query("MATCH(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]-(unitPermission:UnitPermission) WHERE id(position) IN {0} \n" +
             "MATCH(unitPermission)-[rel_has_access_group:" + HAS_ACCESS_GROUP + " ]-(ag:AccessGroup) OPTIONAL MATCH(unitPermission)-[rel_has_customized_permission:" + HAS_CUSTOMIZED_PERMISSION + "]-" +
             "(accesspage:AccessPage) delete rel_has_access_group, rel_has_customized_permission")
     void deleteAccessGroupRelationAndCustomizedPermissionRelation(List<Long> positionIds);
+
+    @Query("MATCH(org:Organization) WHERE id(org) IN {0} MATCH(ag:AccessGroup) WHERE id(ag)={1} \n" +
+            "MERGE(org)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag)")
+    void createAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false, enabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND ag.role={2} AND (ag.endDate IS NULL OR date(ag.endDate) >= date()) \n" +
             "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role,ag.allowedDayTypes AS allowedDayTypes")
@@ -245,11 +257,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (unitP)-[:" + HAS_ACCESS_GROUP + "]-(agp:AccessGroup) RETURN id(s) AS staffId, Collect(DISTINCT id(agp)) AS accessGroupIds")
     List<StaffAccessGroupQueryResult> getStaffIdsAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId);
 
-    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false})-[:HAS_ACCOUNT_TYPE]->(accountType:AccountType) WHERE id(c)={0} AND id(accountType)={1} AND ag.role IN {2} \n" +
-            "OPTIONAL MATCH (ag)<-[:" + HAS_PARENT_ACCESS_GROUP+ "]-(cag:AccessGroup) with ag,cag "+
-            "OPTIONAL MATCH (cag)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS+ "]-(org:Organization) with ag,cag,org  \n" +
-            "OPTIONAL MATCH (cag)-[:" + HAS_ACCESS_GROUP+ "]-(up:UnitPermission)-[:" + HAS_UNIT_PERMISSIONS+ "]-(position:Position)-[:" + BELONGS_TO+ "]-(staff:Staff) with ag,org,staff \n" +
-            "RETURN  ag.translations as translations, id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.role AS role, ag.enabled AS enabled , ag.startDate AS startDate, ag.endDate AS endDate, ag.dayTypeIds AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes,count(org) as unitCount,count(staff) as staffCount")
+    @Query("MATCH (c:Country)-[r:" + HAS_ACCESS_GROUP + "]->(ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType:AccountType) WHERE id(c)={0} AND id(accountType)={1} AND ag.role IN {2}" +
+            "OPTIONAL MATCH (ag)-[:" + DAY_TYPES + "]-(dayType:DayType) \n" +
+            "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.role AS role, ag.enabled AS enabled , ag.startDate AS startDate, ag.endDate AS endDate, collect(id(dayType)) AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes")
     List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId, List<String> role);
 
 
@@ -262,7 +272,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
 
     @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) WHERE id(accessGroup)={1}" +
-            "RETURN id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, ag.dayTypeIds AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes")
+            "OPTIONAL MATCH (accessGroup)-[:" + DAY_TYPES + "]-(dayType:DayType)   " +
+            "RETURN id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, collect(dayType) AS dayTypes,accessGroup.allowedDayTypes AS allowedDayTypes")
     AccessGroupQueryResult findByAccessGroupId(Long unitId, Long accessGroupId);
 
     @Query("MATCH(countryAccessGroup:AccessGroup{deleted:false})<-[:" + HAS_PARENT_ACCESS_GROUP + "]-(unitAccessGroup:AccessGroup{deleted:false})-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(org:Organization) WHERE id(org) ={0} AND id(countryAccessGroup) ={1} " +
@@ -289,25 +300,38 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(organization)\n" +
             "WHERE id(organization)={0} AND id(user)={1}\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(organization)\n" +
-            "RETURN \n" +
-            "organization,id(staff) AS staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes,dayTypeIds:accessGroup.dayTypeIds}}) AS dayTypesByAccessGroup")
+            "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]->(dayType:DayType)\n" +
+            "OPTIONAL MATCH(dayType)-[:" + DAY_TYPE + "]-(chc:CountryHolidayCalender)\n" +
+            "WITH organization,id(staff) AS staffId,accessGroup,dayType,CASE WHEN dayType IS NULL THEN [] ELSE \n" +
+            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) END AS countryHolidayCalender\n" +
+            "WITH organization, staffId,accessGroup,countryHolidayCalender,CASE WHEN dayType IS NULL THEN [] ELSE\n" +
+            "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) END AS dayType\n" +
+            "RETURN\n" +
+            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
     AccessGroupStaffQueryResult getAccessGroupDayTypesAndUserId(Long unitId, Long userId);
 
 
     @Query("MATCH(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(organization)\n" +
             "WHERE id(organization)={0} AND id(staff)={1}\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(organization)\n" +
-            "WITH organization,id(staff) AS staffId,accessGroup\n" +
+            "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]->(dayType:DayType)\n" +
+            "OPTIONAL MATCH(dayType)-[:" + DAY_TYPE + "]-(chc:CountryHolidayCalender)\n" +
+            "WITH organization,id(staff) AS staffId,accessGroup,dayType,\n" +
+            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS countryHolidayCalender\n" +
+            "WITH organization, staffId,accessGroup,countryHolidayCalender,\n" +
+            "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
             "RETURN\n" +
-            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes,dayTypeIds:accessGroup.dayTypeIds}}) AS dayTypesByAccessGroup")
+            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
     AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long staffId);
 
+    @Query("MATCH(ag:AccessGroup)-[r:" + DAY_TYPES + "]->(dayType:DayType) WHERE id(ag)={0} DETACH DELETE r\n")
+    void unlinkDayTypes(Long accessGroupId);
 
     @Query("MATCH (staff:Staff),(org) WHERE id(staff)={0} AND id(org)={1} \n" +
             "WITH org,staff MATCH (staff)-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org) \n" +
             "MATCH(position)<-[:HAS_POSITIONS]-(organization:Organization)-[:BELONGS_TO]-(country:Country) \n" +
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) " +
-            " RETURN ag ")
+            "OPTIONAL MATCH(ag)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
     List<AccessGroup> getAccessGroupWithDayTypesByStaffIdAndUnitId(Long staffId, Long unitId);
 
     @Query("MATCH (n:AccessGroup) where n.name='SUPER_ADMIN' return id(n)")
@@ -349,62 +373,12 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             " ON MATCH SET r.hasPermission={4}  RETURN distinct true ")
     void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Set<Long> actionIds,boolean hasPermission);
 
+    @Query("MATCH (staff:Staff) WHERE  id(staff)={0}  with staff " +
+            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(action:KPermissionAction) WHERE id(kPermissionModel) ={3} WITH staff,action " +
+            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
+            "MATCH (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_ACTION +"{accessGroupId:{2}}]->(action) SET r.hasPermission=FALSE ")
+    void disableActionPermissions(Long staffId, Long unitId, Long accessGroupId,Long modelId);
 
-    @Query("MATCH(user:User)<-[:BELONGS_TO]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[: HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WHERE ID(accessGroup) IN {0}\n" +
-            "return DISTINCT id(user)")
-    List<Long> getUserIdsByAccessGroupId(Collection<Long> accessGroupIds);
-
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} with organization\n" +
-            "MATCH (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false}) with organization,accessGroup\n" +
-            "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) \n" +
-            "WHERE NOT (accessGroup.name='SUPER_ADMIN') with organization,accessGroup,pag\n" +
-            "OPTIONAL MATCH (accessGroup)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(org:Organization) with organization,accessGroup,pag,org\n" +
-            "OPTIONAL MATCH (accessGroup)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with organization,accessGroup,pag,org,staff\n" +
-            "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) \n" +
-            "WHERE NOT (accessGroup.name='SUPER_ADMIN') \n" +
-            "RETURN DISTINCT accessGroup.translations as translations, id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, accessGroup.dayTypeIds AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes,count(org) as unitCount,count(staff) as staffCount,pag as parentAccessGroup ORDER BY accessGroup.name")
-    List<AccessGroupQueryResult> getAccessGroupsForUnitWithLinkUnitAndStaffCount(Long refId);
-
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} with ag\n" +
-            "OPTIONAL MATCH (ag)<-[:"+HAS_PARENT_ACCESS_GROUP+"]-(cag:AccessGroup) with cag \n" +
-            "OPTIONAL MATCH (cag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff) with staff\n" +
-            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
-            "with staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes\n" +
-            "OPTIONAL MATCH (staff)-[:STAFF_HAS_EXPERTISE]-(exp:Expertise) with staff,employmentTypeName,totalWeeklyMinutes,exp RETURN exp.name as expertiseName,id(exp) as expertiseId,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
-    List<Map> getCountryAccessGroupLinkingDetailsByExpertise(Long accessGroupId);
-
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} with ag \n" +
-            "OPTIONAL MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with staff \n" +
-            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
-            "with staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes\n" +
-            "OPTIONAL MATCH (staff)-[:STAFF_HAS_EXPERTISE]-(exp:Expertise) with staff,employmentTypeName,totalWeeklyMinutes,exp RETURN exp.name as expertiseName,id(exp) as expertiseId,collect({staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
-    List<Map> getOrganizationAccessGroupLinkingDetailsByExpertise(Long accessGroupId);
-
-    @Query("MATCH (org:Organization)-[:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag:AccessGroup{deleted:false}) where id(ag)={0} with org \n" +
-            "MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with org,staff\n" +
-            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
-            "with org,staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes \n" +
-            "RETURN id(org) as organizationId,org.name as name,collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
-    List<Map> getOrganizationAccessGroupLinkingDetailsByOrganization(Long accessGroupId);
-
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)= {0}\n" +
-            "OPTIONAL MATCH(ag)<-[HAS_PARENT_ACCESS_GROUP]-(pag:AccessGroup) with pag\n" +
-            "OPTIONAL MATCH (pag)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(org:Organization) with pag,org\n" +
-            "MATCH (pag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff) with org,staff\n" +
-            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
-            "with org,staff,CASE WHEN employmentLine IS NULL THEN null ELSE employmentType.name END as employmentTypeName,CASE WHEN employmentLine IS NULL THEN null ELSE employmentLine.totalWeeklyMinutes END as totalWeeklyMinutes \n" +
-            "RETURN id(org) as organizationId,org.name as name,collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),employmentTypeName:employmentTypeName,totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
-    List<Map> getCountryAccessGroupLinkingDetailsByOrganization(Long accessGroupId);
-
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0}\n" +
-            "OPTIONAL MATCH (ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission)-[:"+HAS_UNIT_PERMISSIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)-[relation:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) with employmentLine.totalWeeklyMinutes as totalWeeklyMinutes,employmentType,staff RETURN id(employmentType) as employmentTypeId,employmentType.name as employmentTypeName, collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
-    List<Map> getOrganizationAccessGroupLinkingDetailsByEmploymentType(Long accessGroupId);
-
-    @Query("MATCH (ag:AccessGroup{deleted:false}) WHERE id(ag)={0} \n" +
-            "OPTIONAL MATCH(ag)-[HAS_PARENT_ACCESS_GROUP]->(pag:AccessGroup) with pag \n" +
-            "OPTIONAL MATCH (ag)-[:HAS_ACCESS_GROUP]-(up:UnitPermission)-[:HAS_UNIT_PERMISSIONS]-(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[relation:HAS_EMPLOYMENT_TYPE]->(employmentType :EmploymentType) \n" +
-            "with employmentLine.totalWeeklyMinutes as totalWeeklyMinutes,employmentType,staff RETURN id(employmentType) as employmentTypeId,employmentType.name as employmentTypeName, collect(distinct {staffName:staff.firstName+staff.lastName,profilePic:staff.profilePic,id:id(staff),totalWeeklyMinutes:totalWeeklyMinutes}) as staffs")
-    List<Map> getCountryAccessGroupLinkingDetailsByEmploymentType(Long accessGroupId);
 
 
 }

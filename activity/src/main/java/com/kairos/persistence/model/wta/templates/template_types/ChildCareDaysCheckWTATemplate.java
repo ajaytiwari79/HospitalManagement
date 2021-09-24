@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCareDays;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
 
 /**
  * Created by pavan on 23/4/18.
@@ -48,7 +48,6 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private int transferLeaveCount;
     private int borrowLeaveCount;
     private List<ActivityCutOffCount> activityCutOffCounts = new ArrayList<>();
-    private transient DateTimeInterval interval;
 
 
     public ChildCareDaysCheckWTATemplate() {
@@ -61,11 +60,12 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
             WorkTimeAgreementBalancesCalculationService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
             if (isCollectionNotEmpty(infoWrapper.getChildCareDays())) {
                 long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
-                if (isNotNull(interval)) {
-                    List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && interval.contains(shift.getStartDate())).collect(Collectors.toList());
+                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
+                if (isNotNull(dateTimeInterval)) {
+                    List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
                     ActivityCutOffCount activityLeaveCount = this.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());
                     if (leaveCount + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount() < (shifts.size() + 1)) {
-                        boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap().get(activityIds.get(0)).getActivity(), infoWrapper.getShift(), interval, infoWrapper.getLastPlanningPeriodEndDate(), this, leaveCount,infoWrapper.getStaffAge(),infoWrapper.getSeniorCareDays(),infoWrapper.getChildCareDays());
+                        boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(), activityIds.get(0), infoWrapper.getShift(), dateTimeInterval, infoWrapper.getLastPlanningPeriodEndDate(), WTATemplateType.WTA_FOR_CARE_DAYS, leaveCount,activityLeaveCount.getEndDate());
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,

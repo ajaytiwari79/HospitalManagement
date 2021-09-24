@@ -206,71 +206,62 @@ public class TaskDemandService extends MongoBaseService {
         double hours = 0;
         float tasks = 0;
         Map<String, String> citizenDemandData = new HashMap<String, String>();
-        List<TaskDemand> taskDemands = taskDemandMongoRepository.findAllByCitizenIdAndUnitIdAndRecurrencePattern(clientId, unitId, TaskDemand.RecurrencePattern.WEEKLY);
-        for (TaskDemand taskDemand : taskDemands) {
+        List<TaskDemand> taskDemands = taskDemandMongoRepository.findAllByCitizenIdAndUnitIdAndRecurrencePattern(clientId,unitId, TaskDemand.RecurrencePattern.WEEKLY);
+        for(TaskDemand taskDemand : taskDemands){
             int weekDayFrequency = 1;
             int weekEndFrequency = 1;
             if (taskDemand.getWeekdayFrequency() != null) {
-                weekDayFrequency = getWeekDayFrequency(taskDemand, weekDayFrequency);
+                switch (taskDemand.getWeekdayFrequency()) {
+                    case ONE_WEEK:
+                        weekDayFrequency = 1;
+                        break;
+                    case TWO_WEEK:
+                        weekDayFrequency = 2;
+                        break;
+                    case THREE_WEEK:
+                        weekDayFrequency = 3;
+                        break;
+                    case FOUR_WEEK:
+                        weekDayFrequency = 4;
+                        break;
+                    default:
+                        break;
+                }
                 for (TaskDemandVisit taskDemandVisit : taskDemand.getWeekdayVisits()) {
                     hours += taskDemandVisit.getVisitCount() * taskDemandVisit.getVisitDuration();
                     tasks += taskDemandVisit.getVisitCount();
                 }
-                if (hours != 0) hours = hours / weekDayFrequency;
-                if (tasks != 0) tasks = tasks / weekDayFrequency;
+                if(hours != 0)  hours = hours / weekDayFrequency;
+                if(tasks != 0) tasks = tasks / weekDayFrequency;
             }
-            if (taskDemand.getWeekendFrequency() != null) {
-                weekEndFrequency = getWeekEndFrequency(taskDemand, weekEndFrequency);
-                for (TaskDemandVisit taskDemandVisit : taskDemand.getWeekendVisits()) {
-                    hours += taskDemandVisit.getVisitCount() * taskDemandVisit.getVisitDuration();
-                    tasks += taskDemandVisit.getVisitCount();
+            if (taskDemand.getWeekendFrequency() != null){
+                switch (taskDemand.getWeekendFrequency()){
+                    case ONE_WEEK: weekEndFrequency = 1;
+                        break;
+                    case TWO_WEEK: weekEndFrequency = 2;
+                        break;
+                    case THREE_WEEK: weekEndFrequency = 3;
+                        break;
+                    case FOUR_WEEK: weekEndFrequency = 4;
+                        break;
+                    default:
+                        break;
                 }
-                if (hours != 0) hours = hours / weekEndFrequency;
-                if (tasks != 0) tasks = tasks / weekEndFrequency;
+                for(TaskDemandVisit  taskDemandVisit : taskDemand.getWeekendVisits()){
+                    hours += taskDemandVisit.getVisitCount()*taskDemandVisit.getVisitDuration();
+                    tasks += taskDemandVisit.getVisitCount() ;
+                }
+                if(hours != 0)  hours = hours/weekEndFrequency;
+                if(tasks != 0) tasks = tasks/weekEndFrequency;
+
             }
+
+
         }
         DecimalFormat df = new DecimalFormat("###.##");
-        citizenDemandData.put("hours", df.format(hours / 60));
+        citizenDemandData.put("hours", df.format(hours/60));
         citizenDemandData.put("tasks", df.format(tasks));
         return citizenDemandData;
-    }
-    private int getWeekDayFrequency(TaskDemand taskDemand, int weekDayFrequency) {
-        switch (taskDemand.getWeekdayFrequency()) {
-            case ONE_WEEK:
-                weekDayFrequency = 1;
-                break;
-            case TWO_WEEK:
-                weekDayFrequency = 2;
-                break;
-            case THREE_WEEK:
-                weekDayFrequency = 3;
-                break;
-            case FOUR_WEEK:
-                weekDayFrequency = 4;
-                break;
-            default:
-                break;
-        }
-        return weekDayFrequency;
-    }
-    private int getWeekEndFrequency(TaskDemand taskDemand, int weekEndFrequency) {
-        switch (taskDemand.getWeekendFrequency()) {
-            case ONE_WEEK:
-                weekEndFrequency = 1;
-                break;
-            case TWO_WEEK:
-                weekEndFrequency = 2;
-                break;
-            case THREE_WEEK:
-                weekEndFrequency = 3;
-                break;
-            case FOUR_WEEK:
-                weekEndFrequency = 4;
-                break;
-            default:
-                break;
-        }
-        return weekEndFrequency;
     }
 
     /**

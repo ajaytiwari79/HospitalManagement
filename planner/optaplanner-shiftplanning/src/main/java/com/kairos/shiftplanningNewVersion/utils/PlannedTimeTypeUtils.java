@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
+
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanningNewVersion.entity.Shift;
 

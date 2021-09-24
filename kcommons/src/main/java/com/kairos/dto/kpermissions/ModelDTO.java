@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -16,9 +15,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ModelDTO implements Serializable {
+public class ModelDTO {
 
-    private static final long serialVersionUID = 4335555182715765843L;
     private Long id;
     private String modelName;
     private String modelClass;

@@ -5,7 +5,6 @@ import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
-import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.*;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.cta.AccountType;
@@ -117,7 +116,7 @@ public class ShiftPlanningGenerator {
         List<Employee> employees= generateEmployeeList(planningDays,unit,timeTypes);
         unresolvedSolution.setEmployees(employees);
         unresolvedSolution.setShifts(generateShiftForAssignments( employees));
-        int[] activitiesRank=activities.stream().mapToInt(a->a.getRanking()).toArray();
+        int[] activitiesRank=activities.stream().mapToInt(a->a.getActivityPrioritySequence()).toArray();
         unresolvedSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(unresolvedSolution.getWeekDates(),unresolvedSolution.getActivityLineIntervals(),INTERVAL_MINS,unresolvedSolution.getActivities()), activitiesRank));
         return unresolvedSolution;
     }
@@ -290,62 +289,51 @@ public class ShiftPlanningGenerator {
         EmploymentType fullTimer = EmploymentType.builder().id(123l).name("FullTimer").employmentCategories(newHashSet(EmploymentCategory.PERMANENT)).build();
         EmploymentType hourlyPaid = EmploymentType.builder().id(126l).name("FullTimer").employmentCategories(newHashSet(EmploymentCategory.TEMPORARY)).build();
         EmploymentLine employmentLine = EmploymentLine.builder().startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).hourlyCost(BigDecimal.TEN).totalWeeklyMinutes(35*60).workingDaysInWeek(5).build();
-        Employment employment = getEmployement(planningDays, expertise, fullTimer, employmentLine, EmploymentSubType.MAIN);
+        Employment employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
+        Employee employee = getEmployee("145","Sachin Verma",employment,createTags1(),unit);
+        Map<LocalDate, Function> functionMap = getFunctionMap(planningDays);
         Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaTemplateMap = getWTAMap(planningDays);
-        Map<LocalDate, List<CTARuleTemplate>> localDateListMap = getCTAListMap(planningDays);
+        Set<Long> functionIds = functionMap.values().stream().map(function -> function.getId()).collect(Collectors.toSet());
+        Map<LocalDate,List<CTARuleTemplate>> localDateListMap = getCtaRuletemplateMap(planningDays, functionIds);
         Activity breakActivity = new Activity(idGenerator(),new ArrayList<>(createSkillSet()),"Team A",timeTypes[2], 1,10, null,new HashSet<>());
         BreakSettings breakSettings = BreakSettings.builder().breakDurationInMinute(15l).shiftDurationInMinute(60l).activity(breakActivity).build();
-        Employee employee = getEmployee(unit, employment, wtaTemplateMap, localDateListMap, breakSettings);
+        employee.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee.setBreakSettings(breakSettings);
+        employee.setLocalDateCTARuletemplateMap(localDateListMap);
         employees.add(employee);
-        employment = getEmployement(planningDays, expertise, fullTimer, employmentLine, EmploymentSubType.MAIN);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
         Employee employee2 = getEmployee("160","Pradeep Singh",employment,createTags2(), unit);
-        updateEmployee(wtaTemplateMap,localDateListMap,breakSettings,employee2);
+        employee2.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee2.setBreakSettings(breakSettings);
+        employee2.setLocalDateCTARuletemplateMap(localDateListMap);
         employee2.setNightWorker(true);
         employees.add(employee2);
-        employment = getEmployement(planningDays, expertise, hourlyPaid, employmentLine, EmploymentSubType.SECONDARY);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.SECONDARY).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(hourlyPaid).build();
         Employee employee3 = getEmployee("170", "Arvind Das", employment, createTags2(), unit);
-        updateEmployee(wtaTemplateMap, localDateListMap, breakSettings, employee3);
+        employee3.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee3.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee3.setBreakSettings(breakSettings);
         employee3.setNightWorker(true);
         employees.add(employee3);
-        employment = getEmployement(planningDays, expertise, fullTimer, employmentLine, EmploymentSubType.MAIN);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
         Employee employee4 = getEmployee("180","Ulrik",employment,createTags3(), unit);
-        updateEmployee(wtaTemplateMap, localDateListMap, breakSettings, employee4);
+        employee4.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee4.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee4.setBreakSettings(breakSettings);
         employees.add(employee4);
-        employment = getEmployement(planningDays, expertise, hourlyPaid, employmentLine, EmploymentSubType.SECONDARY);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.SECONDARY).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(hourlyPaid).build();
         Employee employee5 = getEmployee("190", "Ramanuj", employment, createTags4(), unit);
-        updateEmployee(wtaTemplateMap, localDateListMap, breakSettings, employee5);
+        employee5.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee5.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee5.setBreakSettings(breakSettings);
         employees.add(employee5);
-        employment = getEmployement(planningDays, expertise, fullTimer, employmentLine, EmploymentSubType.MAIN);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
         Employee employee6 = getEmployee("195", "Dravid", employment, createTags4(), unit);
         employee6.setLocalDateCTARuletemplateMap(localDateListMap);
         employee6.setBreakSettings(breakSettings);
         employee6.setWtaRuleTemplateMap(wtaTemplateMap);
         employees.add(employee6);
         return employees;
-    }
-
-    private Map<LocalDate, List<CTARuleTemplate>> getCTAListMap(List<LocalDate> planningDays) {
-        Map<LocalDate, Function> functionMap = getFunctionMap(planningDays);
-        Set<Long> functionIds = functionMap.values().stream().map(function -> function.getId()).collect(Collectors.toSet());
-        return getCtaRuletemplateMap(planningDays, functionIds);
-    }
-
-    private Employment getEmployement(List<LocalDate> planningDays, Expertise expertise, EmploymentType fullTimer, EmploymentLine employmentLine, EmploymentSubType main) {
-        return Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(main).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size() - 1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
-    }
-
-    private void updateEmployee(Map<LocalDate, Map<ConstraintSubType, WTABaseRuleTemplate>> wtaTemplateMap, Map<LocalDate, List<CTARuleTemplate>> localDateListMap, BreakSettings breakSettings, Employee employee4) {
-        employee4.setWtaRuleTemplateMap(wtaTemplateMap);
-        employee4.setLocalDateCTARuletemplateMap(localDateListMap);
-        employee4.setBreakSettings(breakSettings);
-    }
-
-    private Employee getEmployee(Unit unit, Employment employment, Map<LocalDate, Map<ConstraintSubType, WTABaseRuleTemplate>> wtaTemplateMap, Map<LocalDate, List<CTARuleTemplate>> localDateListMap, BreakSettings breakSettings) {
-        Employee employee = getEmployee("145","Sachin Verma",employment,createTags1(),unit);
-        employee.setWtaRuleTemplateMap(wtaTemplateMap);
-        employee.setBreakSettings(breakSettings);
-        employee.setLocalDateCTARuletemplateMap(localDateListMap);
-        return employee;
     }
 
     private Map<LocalDate, Function> getFunctionMap(List<LocalDate> planningDays) {

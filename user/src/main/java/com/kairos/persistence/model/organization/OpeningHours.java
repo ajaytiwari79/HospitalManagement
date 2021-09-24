@@ -9,7 +9,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class OpeningHours extends UserBaseEntity {
 
-    private static final long serialVersionUID = -953266261517273740L;
+
     private DayType.DayTypeEnum day;
     private String timing;
     private int index;

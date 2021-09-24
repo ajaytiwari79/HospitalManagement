@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.wta.rule_template;
 
 
-import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -29,6 +29,5 @@ public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<
 
     List<WTABaseRuleTemplate> findAllByIdIn(List<BigInteger> ids);
     List<WTABaseRuleTemplate> findAllByIdInAndDeletedFalse(List<BigInteger> ids);
-    List<WTABaseRuleTemplate> findAllByIdInAndWtaTemplateType(List<BigInteger> ids, WTATemplateType wtaTemplateType);
 
 }

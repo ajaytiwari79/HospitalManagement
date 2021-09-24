@@ -1,9 +1,12 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.company_category.CompanyCategoryDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.company.CompanyCategoryResponseDTO;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -12,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -52,9 +57,14 @@ public class CompanyCategoryService{
     }
 
     public List<CompanyCategoryResponseDTO> getCompanyCategories(Long countryId) {
-        List<CompanyCategory> companyCategories = companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(companyCategories, CompanyCategoryResponseDTO.class);
-     }
+        List<CompanyCategory> companyCategories =companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId);
+        List<CompanyCategoryResponseDTO> companyCategoryResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(companyCategories,CompanyCategoryResponseDTO.class);
+        companyCategoryResponseDTOS.forEach(companyCategoryResponseDTO -> {
+            companyCategoryResponseDTO.setCountryId(countryId);
+            companyCategoryResponseDTO.setTranslations(TranslationUtil.getTranslatedData(companyCategoryResponseDTO.getTranslatedNames(),companyCategoryResponseDTO.getTranslatedDescriptions()));
+        });
+        return companyCategoryResponseDTOS;
+    }
 
     public CompanyCategoryResponseDTO updateCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
 
@@ -89,6 +99,20 @@ public class CompanyCategoryService{
         companyCategory.setDeleted(true);
         companyCategoryGraphRepository.save(companyCategory);
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfCompanyCategory(Long companyCategoryId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        CompanyCategory companyCategory =companyCategoryGraphRepository.findOne(companyCategoryId);
+        companyCategory.setTranslatedNames(translatedNames);
+        companyCategory.setTranslatedDescriptions(translatedDescriptios);
+        companyCategoryGraphRepository.save(companyCategory);
+        return companyCategory.getTranslatedData();
     }
 
 }

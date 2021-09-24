@@ -37,7 +37,7 @@ public class SchedulerConfig implements SchedulingConfigurer,AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(8);
+        executor.setCorePoolSize(5);
         executor.setMaxPoolSize(25);
         executor.setQueueCapacity(50);
         executor.setThreadNamePrefix("MyExecutor-");

@@ -236,6 +236,8 @@ public class GetWorkShiftsFromWorkPlaceByIdResult {
     }
 
     public Date getStartDate() {
+
+        System.out.println("Get start date ::: ");
         DateTime dateTime = new DateTime(StartDate).toDateTime(DateTimeZone.UTC);
         return dateTime.toDate();
     }

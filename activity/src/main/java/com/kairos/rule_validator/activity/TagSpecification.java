@@ -6,7 +6,6 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
@@ -32,7 +31,7 @@ public class TagSpecification extends AbstractSpecification<ShiftWithActivityDTO
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO, RuleExecutionType ruleExecutionType) {
+    public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO) {
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
             TagDTO tagDTO = getTagFromActivity(shiftActivityDTO);
             if (ObjectUtils.isNotNull(tagDTO)) {

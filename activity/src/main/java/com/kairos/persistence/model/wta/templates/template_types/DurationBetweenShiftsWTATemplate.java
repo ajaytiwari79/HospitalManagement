@@ -39,7 +39,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     private Set<BigInteger> timeTypeIds = new HashSet<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
-    private transient DateTimeInterval interval;
 
     public DurationBetweenShiftsWTATemplate(String name, boolean disabled, String description) {
         this.name = name;
@@ -56,10 +55,13 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && isCollectionNotEmpty(plannedTimeIds) && containsAny(plannedTimeIds, infoWrapper.getShift().getActivitiesPlannedTimeIds()) && isCollectionNotEmpty(timeTypeIds) && containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds())) {
             if(isCollectionNotEmpty(infoWrapper.getShifts())){
+                int restingHours = getRestingHoursByTimeType(infoWrapper,true);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-                boolean isValid = getRestingHoursByTimeType(infoWrapper,true,limitAndCounter[0]);
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], restingHours) || restingHours==NOT_VALID_VALUE;
                 if (isValid) {
-                    isValid = getRestingHoursByTimeType(infoWrapper,false,limitAndCounter[0]);
+                    restingHours = getRestingHoursByTimeType(infoWrapper,false);
+                    limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
+                    isValid = isValid(minMaxSetting, limitAndCounter[0], restingHours) || restingHours==NOT_VALID_VALUE;
                 }
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS.toValue(), getHoursByMinutes(limitAndCounter[0],this.name));
             }
@@ -72,23 +74,23 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         return (this != durationBetweenShiftsWTATemplate) && !(Float.compare(durationBetweenShiftsWTATemplate.recommendedValue, recommendedValue) == 0 && Objects.equals(plannedTimeIds, durationBetweenShiftsWTATemplate.plannedTimeIds) && Objects.equals(timeTypeIds, durationBetweenShiftsWTATemplate.timeTypeIds) && minMaxSetting == durationBetweenShiftsWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues, durationBetweenShiftsWTATemplate.phaseTemplateValues));
     }
 
-    public boolean getRestingHoursByTimeType(RuleTemplateSpecificInfo ruleTemplateSpecificInfo,boolean checkBefore,int value){
+    public int getRestingHoursByTimeType(RuleTemplateSpecificInfo ruleTemplateSpecificInfo,boolean checkBefore){
         ShiftActivityDTO shiftActivityDTO = checkBefore ? ruleTemplateSpecificInfo.getShift().getFirstActivity() : ruleTemplateSpecificInfo.getShift().getLastActivity();
         TimeTypeEnum timeTypeEnum = getTimeTypeEnum(shiftActivityDTO);
         switch (timeTypeEnum){
             case ABSENCE:
-                return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.PRESENCE),value);
+                return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.PRESENCE));
             case PRESENCE:
-                return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.PRESENCE,TimeTypeEnum.ABSENCE),value);
+                return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.PRESENCE,TimeTypeEnum.ABSENCE));
                 default:
                     break;
         }
-        return true;
+        return NOT_VALID_VALUE;
     }
 
-    private boolean getDurationByAbsenceOrPresenceType(List<ShiftWithActivityDTO> shifts, ShiftActivityDTO shiftActivityDTO, boolean checkBefore, Set<TimeTypeEnum> timeTypeEnums,int value) {
+    private int getDurationByAbsenceOrPresenceType(List<ShiftWithActivityDTO> shifts, ShiftActivityDTO shiftActivityDTO, boolean checkBefore, Set<TimeTypeEnum> timeTypeEnums) {
         Date date = checkBefore ? shiftActivityDTO.getStartDate() : shiftActivityDTO.getEndDate();
-        int restingHours = Integer.MAX_VALUE;
+        int restingHours = NOT_VALID_VALUE;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shifts) {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if(checkBefore && !activity.getEndDate().after(date) && timeTypeEnums.contains(activity.getActivity().getActivityBalanceSettings().getTimeType())){
@@ -101,7 +103,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 }
             }
         }
-        return isValid(minMaxSetting, value, restingHours) && restingHours != NOT_VALID_VALUE;
+        return restingHours;
     }
 
     public TimeTypeEnum getTimeTypeEnum(ShiftActivityDTO shiftActivityDTO){

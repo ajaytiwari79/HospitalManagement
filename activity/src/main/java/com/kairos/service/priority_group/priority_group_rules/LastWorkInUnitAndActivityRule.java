@@ -11,8 +11,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-
 public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
 
     private Map<Long,List<Shift>> shiftEmploymentsMap;
@@ -49,34 +47,32 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
     }
 
     private void removeStaffFromList(Iterator<StaffEmploymentQueryResult> staffEmploymentIterator, DateTimeInterval unitDateTimeInterval, DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
-        while (staffEmploymentIterator.hasNext()) {
-            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
-            List<Shift> shifts = shiftEmploymentsMap.get(staffEmploymentQueryResult.getEmploymentId());
+                while(staffEmploymentIterator.hasNext()) {
             int shiftCountUnit = 0;
             int shiftCountActivity = 0;
-            if (isCollectionNotEmpty(shifts)) {
+            StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
+            List<Shift> shifts = shiftEmploymentsMap.get(staffEmploymentQueryResult.getEmploymentId());
+            if(Optional.ofNullable(shifts).isPresent()&&!shifts.isEmpty()) {
                 for (Shift shift : shifts) {
-                    boolean validShiftActivity = Optional.ofNullable(unitDateTimeInterval).isPresent() && unitDateTimeInterval.overlaps(shift.getInterval());
-                    if (validShiftActivity) {
-                        shiftCountUnit++;
-                        if (shiftCountActivity > 0) {
+                    if (Optional.ofNullable(unitDateTimeInterval).isPresent()&&unitDateTimeInterval.overlaps(shift.getInterval())) {
+                            shiftCountUnit++;
+                            if(shiftCountActivity>0){
+                                break;
+                            }
+                        }
+                    if(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shift.getActivities().get(0).getActivityId().equals(activityId)&&(activityDateTimeInterval.overlaps(shift.getInterval()))) {
+                            shiftCountActivity++;
+                        if(shiftCountUnit>0){
                             break;
                         }
-                    }
-                    boolean validShift = Optional.ofNullable(activityDateTimeInterval).isPresent() && shift.getActivities().get(0).getActivityId().equals(activityId) && (activityDateTimeInterval.overlaps(shift.getInterval()));
-                    if (validShift) {
-                        shiftCountActivity++;
-                        if (shiftCountUnit > 0) {
-                            break;
                         }
                     }
                 }
-            }
-            if (Optional.ofNullable(unitDateTimeInterval).isPresent() && shiftCountUnit == 0 || (Optional.ofNullable(activityDateTimeInterval).isPresent() && shiftCountActivity == 0)) {
+            if(Optional.ofNullable(unitDateTimeInterval).isPresent()&&shiftCountUnit==0||(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shiftCountActivity==0)){
                 staffEmploymentIterator.remove();
 
             }
+                }
         }
-    }
     }
 

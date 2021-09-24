@@ -22,7 +22,8 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             "match(level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality)\n" +
             "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description, municipality as municipality, " +
             "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis," +
-            "level.translations as translations")
+            "{english: CASE WHEN payGroupArea.`translatedNames.english` IS NULL THEN '' ELSE payGroupArea.`translatedNames.english` END,danish: CASE WHEN payGroupArea.`translatedNames.danish` IS NULL THEN '' ELSE payGroupArea.`translatedNames.danish` END,hindi: CASE WHEN payGroupArea.`translatedNames.hindi` IS NULL THEN '' ELSE payGroupArea.`translatedNames.hindi` END,britishenglish:CASE WHEN payGroupArea.`translatedNames.britishenglish` IS NULL THEN '' ELSE payGroupArea.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN payGroupArea.`translatedDescriptions.english` IS NULL THEN '' ELSE payGroupArea.`translatedDescriptions.english` END,danish: CASE WHEN payGroupArea.`translatedDescriptions.danish` IS NULL THEN '' ELSE payGroupArea.`translatedDescriptions.danish` END,hindi: CASE WHEN payGroupArea.`translatedDescriptions.hindi` IS NULL THEN '' ELSE payGroupArea.`translatedDescriptions.hindi` END,britishenglish:CASE WHEN payGroupArea.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE payGroupArea.`translatedDescriptions.britishenglish` END}as translatedDescriptions")
     List<PayGroupAreaQueryResult> getPayGroupAreaWithMunicipalityByOrganizationLevelId(Long organizationLevelId);
 
 

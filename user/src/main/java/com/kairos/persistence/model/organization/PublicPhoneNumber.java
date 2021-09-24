@@ -9,7 +9,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class PublicPhoneNumber extends UserBaseEntity {
 
-    private static final long serialVersionUID = 7447644740764801736L;
     private String phoneNumber;
 
     public String getPhoneNumber() {

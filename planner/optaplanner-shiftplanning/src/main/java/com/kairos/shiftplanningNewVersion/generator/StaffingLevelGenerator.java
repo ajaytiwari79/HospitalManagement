@@ -13,7 +13,6 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.phase.PhaseType;
@@ -190,7 +189,29 @@ public class StaffingLevelGenerator {
             localDates.add(localDateListEntry.getKey());
             Map<BigInteger,List<ALI>> aliByActivity = aliMapByActivityAndDate.getOrDefault(localDateListEntry.getKey(),new HashMap<>());
             for (StaffingLevelInterval staffingLevelInterval : localDateListEntry.getValue()) {
-                updateALIs(activityLineIntervalList, dateActivityMap, activityMap, activitiesPerDay, activitiesIdsPerDay, localDateListEntry, aliByActivity, staffingLevelInterval);
+                for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
+                    if (activityMap.containsKey(staffingLevelActivity.getActivityId()) && staffingLevelActivity.getMinNoOfStaff()>0) {
+                        Activity activity = activityMap.get(staffingLevelActivity.getActivityId());
+                        Set<BigInteger> activitiesIdsPerDayOrDefault = activitiesIdsPerDay.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
+                        if(!activitiesIdsPerDayOrDefault.contains(activity.getId())){
+                            List<Activity> activities = activitiesPerDay.getOrDefault(localDateListEntry.getKey(),new ArrayList<>());
+                            activities.add(activity);
+                            activitiesPerDay.put(localDateListEntry.getKey(),activities);
+                            activitiesIdsPerDayOrDefault.add(activity.getId());
+                            activitiesIdsPerDay.put(localDateListEntry.getKey(),activitiesIdsPerDayOrDefault);
+                        }
+                        Set<Activity> activityList = dateActivityMap.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
+                        activityList.add(activity);
+                        dateActivityMap.put(localDateListEntry.getKey(), activityList);
+                        ZonedDateTime zonedDateTime = asZonedDateTime(localDateListEntry.getKey(), staffingLevelInterval.getStaffingLevelDuration().getFrom());
+                        //Prepare DateWise Required/Demanding activities for optaplanner
+                        List<ALI> activityLineIntervals = getInterval(activity, zonedDateTime, staffingLevelInterval.getStaffingLevelDuration(), staffingLevelActivity);
+                        List<ALI> aliTreeSet = aliByActivity.getOrDefault(staffingLevelActivity.getActivityId(),new ArrayList<>());
+                        aliTreeSet.addAll(activityLineIntervals);
+                        aliByActivity.put(staffingLevelActivity.getActivityId(),aliTreeSet);
+                        activityLineIntervalList.addAll(activityLineIntervals);
+                    }
+                }
             }
             aliMapByActivityAndDate.put(localDateListEntry.getKey(),aliByActivity);
         }
@@ -198,7 +219,7 @@ public class StaffingLevelGenerator {
         List<ALI> alis = (List<ALI>)objects[0];
         List<List<ALI>> aliPerDayByActivity = (List<List<ALI>>)objects[1];
         staffingLevelSolution.setActivityLineIntervals(alis);
-        List<Activity> activityList = dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getRanking)).collect(Collectors.toList());
+        List<Activity> activityList = dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getActivityPrioritySequence)).collect(Collectors.toList());
         staffingLevelSolution.setActivities(activityList);
         staffingLevelSolution.setWeekDates(new ArrayList<>(localDates));
         staffingLevelSolution.setActivitiesPerDay(activitiesPerDay);
@@ -206,32 +227,6 @@ public class StaffingLevelGenerator {
         bigIntegerListMap.values().forEach(listEntry -> staffingLevelSolution.getAliPerActivities().add(listEntry));*/
         staffingLevelSolution.setAliPerActivities(aliPerDayByActivity);
         return activityMap;
-    }
-
-    private void updateALIs(List<ALI> activityLineIntervalList, Map<LocalDate, Set<Activity>> dateActivityMap, Map<BigInteger, Activity> activityMap, Map<LocalDate, List<Activity>> activitiesPerDay, Map<LocalDate, Set<BigInteger>> activitiesIdsPerDay, Map.Entry<LocalDate, List<StaffingLevelInterval>> localDateListEntry, Map<BigInteger, List<ALI>> aliByActivity, StaffingLevelInterval staffingLevelInterval) {
-        for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
-            if (activityMap.containsKey(staffingLevelActivity.getActivityId()) && staffingLevelActivity.getMinNoOfStaff()>0) {
-                Activity activity = activityMap.get(staffingLevelActivity.getActivityId());
-                Set<BigInteger> activitiesIdsPerDayOrDefault = activitiesIdsPerDay.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
-                if(!activitiesIdsPerDayOrDefault.contains(activity.getId())){
-                    List<Activity> activities = activitiesPerDay.getOrDefault(localDateListEntry.getKey(),new ArrayList<>());
-                    activities.add(activity);
-                    activitiesPerDay.put(localDateListEntry.getKey(),activities);
-                    activitiesIdsPerDayOrDefault.add(activity.getId());
-                    activitiesIdsPerDay.put(localDateListEntry.getKey(),activitiesIdsPerDayOrDefault);
-                }
-                Set<Activity> activityList = dateActivityMap.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
-                activityList.add(activity);
-                dateActivityMap.put(localDateListEntry.getKey(), activityList);
-                ZonedDateTime zonedDateTime = asZonedDateTime(localDateListEntry.getKey(), staffingLevelInterval.getStaffingLevelDuration().getFrom());
-                //Prepare DateWise Required/Demanding activities for optaplanner
-                List<ALI> activityLineIntervals = getInterval(activity, zonedDateTime, staffingLevelInterval.getStaffingLevelDuration(), staffingLevelActivity);
-                List<ALI> aliTreeSet = aliByActivity.getOrDefault(staffingLevelActivity.getActivityId(),new ArrayList<>());
-                aliTreeSet.addAll(activityLineIntervals);
-                aliByActivity.put(staffingLevelActivity.getActivityId(),aliTreeSet);
-                activityLineIntervalList.addAll(activityLineIntervals);
-            }
-        }
     }
 
     public Object[] getMergedALI(Map<LocalDate, Map<BigInteger, List<ALI>>> aliMapByActivityAndDate) {
@@ -297,8 +292,6 @@ public class StaffingLevelGenerator {
                     ali.setDuration(15);
                     alis.add(ali);
                 break;
-                default:
-                    break;
             }
         }else {
             ALI ali = ObjectMapperUtils.copyPropertiesByMapper(needToAdd, ALI.class);
@@ -330,7 +323,7 @@ public class StaffingLevelGenerator {
                 .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getActivityRulesSettings().getDayTypes()))
                 .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getActivitySkillSettings().getActivitySkills(), Skill.class))
                 //    .tags(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getTags(), Tag.class))
-                .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).ranking(activityDTO.getActivitySequence()).build();
+                .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).activityPrioritySequence(activityDTO.getActivitySequence()).build();
     }
 
     private TimeType getTimeType(ActivityDTO activityDTO, Map<BigInteger, TimeTypeDTO> timeTypeMap) {

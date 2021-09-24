@@ -30,7 +30,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @NoArgsConstructor
 public class Tag extends UserBaseEntity {
 
-    private static final long serialVersionUID = 3825088904878219093L;
     @NotBlank(message = "error.Tag.name.notEmptyOrNotNull")
     private String name;
 

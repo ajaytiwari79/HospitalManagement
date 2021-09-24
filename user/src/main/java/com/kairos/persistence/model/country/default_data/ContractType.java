@@ -22,7 +22,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class ContractType extends UserBaseEntity {
 
-    private static final long serialVersionUID = -1593910436107705106L;
     @NotBlank(message = "error.ContractType.name.notEmpty")
     private String name;
     @NotNull(message = "error.ContractType.code.notEmpty")

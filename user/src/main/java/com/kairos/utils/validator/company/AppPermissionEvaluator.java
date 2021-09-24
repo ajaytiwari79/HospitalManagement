@@ -18,7 +18,7 @@ public class AppPermissionEvaluator implements PermissionEvaluator {
     @Inject
     private ExceptionService exceptionService;
 
-    public boolean isValid(String modelName, PermissionAction action) {
+    public <T> boolean isValid(String modelName, PermissionAction action) {
         if(!UserContext.getUserDetails().isSystemAdmin()){
             boolean authorized= permissionService.validPermissionAction(modelName,action, UserContext.getUserDetails().getLastSelectedOrganizationId());
             if(!authorized){

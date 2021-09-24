@@ -1,6 +1,5 @@
 package com.kairos.dto.user.country.day_type;
 
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DayTypeEmploymentTypeWrapper {
-    private List<DayTypeDTO> dayTypes;
+    private List<DayType> dayTypes;
     private List<EmploymentTypeDTO> employmentTypes;
 }

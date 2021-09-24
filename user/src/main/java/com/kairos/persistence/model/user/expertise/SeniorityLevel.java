@@ -21,7 +21,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_B
 @Setter
 @NoArgsConstructor
 public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel> {
-    private static final long serialVersionUID = 4715064639916391541L;
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years
 

@@ -1,8 +1,10 @@
 package com.planner.component.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
+import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import org.springframework.core.ParameterizedTypeReference;
@@ -11,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+
+import static com.kairos.shiftplanning.integration.RestClientUtil.publishRequest;
 
 @Service
 @Transactional

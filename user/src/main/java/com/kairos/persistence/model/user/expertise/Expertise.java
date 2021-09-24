@@ -16,10 +16,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
@@ -37,7 +34,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class Expertise extends UserBaseEntity {
-    private static final long serialVersionUID = 8079884125098345162L;
     @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL)
     private String name;
     private String description;
@@ -48,6 +44,9 @@ public class Expertise extends UserBaseEntity {
     private Country country;
 
     private boolean published;
+
+    @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
 
     @Relationship(type = HAS_EXPERTISE_LINES)
     private List<ExpertiseLine> expertiseLines = new ArrayList<>();

@@ -3,8 +3,6 @@
  import com.kairos.commons.utils.DateUtils;
  import com.kairos.commons.utils.ObjectMapperUtils;
  import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
- import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
- import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
  import com.kairos.enums.Employment;
  import com.kairos.enums.FilterType;
  import com.kairos.enums.ModuleId;
@@ -26,7 +24,6 @@
  import java.util.stream.Collectors;
  import java.util.stream.StreamSupport;
 
- import static com.kairos.commons.utils.ObjectUtils.getBigIntegerString;
  import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
  import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -87,7 +84,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) " +
                 "OPTIONAL MATCH (staff)-[staffTeamRel:" + TEAM_HAS_MEMBER + "]-(team:Team) " +
                 "OPTIONAL MATCH(staff)-[:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail)" +
-                " WITH  collect({id:id(expertiseLine),numberOfWorkingDaysInWeek:expertiseLine.numberOfWorkingDaysInWeek,fullTimeWeeklyMinutes:expertiseLine.fullTimeWeeklyMinutes,startDate:expertiseLine.startDate,endDate:expertiseLine.endDate}) as explinew,employmentLine,payGrade,empType,employment,staff,expertise,org,user,CASE WHEN staffTeamRel IS NULL THEN [] else COLLECT( distinct {id:id(team),name:team.name,teamType:staffTeamRel.teamType,activityId:team.activityId}) END as teams," +
+                " WITH  collect({id:id(expertiseLine),numberOfWorkingDaysInWeek:expertiseLine.numberOfWorkingDaysInWeek,fullTimeWeeklyMinutes:expertiseLine.fullTimeWeeklyMinutes,startDate:expertiseLine.startDate,endDate:expertiseLine.endDate}) as explinew,employmentLine,payGrade,empType,employment,staff,expertise,org,user,CASE WHEN staffTeamRel IS NULL THEN [] else COLLECT( distinct {id:id(team),name:team.name,teamType:staffTeamRel.teamType,activityIds:team.activityIds}) END as teams," +
                 "CASE WHEN staffChildDetail IS NULL THEN [] ELSE COLLECT(distinct {id:id(staffChildDetail),name:staffChildDetail.name,cprNumber:staffChildDetail.cprNumber}) END as staffChildDetails " +
                 "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),seniorityLevel:employmentLine.seniorityLevel,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),employmentStatus:employmentLine.employmentStatus, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,employmentSubType:employment.employmentSubType,\n" +
                 "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,payGradeLevel:payGrade.payGradeLevel,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,{id:id(expertise),expertiseLines:explinew} as expertiseQueryResult,teams,staffChildDetails\n" +
@@ -158,7 +155,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query += " WITH engineerType, staff,employments, user,expertiseList,employmentList,tags Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) ";
         query += " RETURN distinct {id:id(staff),tags:tags, employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " + "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
                 "age:duration.between(date(user.dateOfBirth),date()).years,joiningDate:user.joiningDate,dateOfBirth:user.dateOfBirth," + "badgeNumber:staff.badgeNumber, userName:staff.userName,currentStatus:staff.currentStatus,externalId:staff.externalId, access_token:staff.access_token," +
-                "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, canRankTeam: staff.canRankTeam, familyName: staff.familyName, " + "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType),user_id:staff.user_id,userId:id(user) } as staff ORDER BY staff.id\n";
+                "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, " + "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType),user_id:staff.user_id,userId:id(user) } as staff ORDER BY staff.id\n";
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
 
@@ -243,6 +240,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("searchText", qText);
             query.append(" AND (staff.firstName=~ {searchText} OR staff.lastName=~ {searchText} OR user.cprNumber=~ {searchText} ) ");
         }
+//        query.append(" OR id(user)={loggedInUserId} ");
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
                 .append(" user.gender as gender, {imagePath} + staff.profilePic as profilePic,staff.user_id as user_id,  ")
                 .append(" staff.currentStatus as currentStatus, ")
@@ -257,7 +255,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
         query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines " +
                 "MATCH(staff)-["+STAFF_HAS_EXPERTISE+"]->(expList:Expertise) " +
-                "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skillList:Skill{isEnabled:true}) ");
+                "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"]->(skillList:Skill) ");
         returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList, collect( distinct { id : id(expList),name: expList.name}) as expertiseList , CASE WHEN skillList IS NULL THEN [] ELSE collect( distinct { id : id(skillList),name: skillList.name}) END as skillList ").append(" ORDER BY staff.currentStatus, staff.firstName");
         query.append(returnData);
         LOGGER.debug(query.toString());
@@ -605,50 +603,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         String value = (countOfSubString == 0 ? " WHERE" : " AND" );
         return countOfSubString<0 ? "" : value;
     }
-
-    @Override
-    public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShift(Long unitId,NotEligibleStaffDataDTO notEligibleStaffDataDTO){
-        Map<String, Object> queryParameters = new HashMap<>();
-        queryParameters.put(UNIT_ID, unitId);
-        queryParameters.put("date",DateUtils.formatLocalDate(notEligibleStaffDataDTO.getShiftDate(), "yyyy-MM-dd"));
-        StringBuilder query = new StringBuilder("MATCH (organization:Unit)<-[:IN_UNIT]-(employment:Employment) WHERE id(organization)={unitId} AND (employment.endDate is null OR date(employment.endDate) >= date({date}))");
-        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getEmploymentTypeIds())){
-            queryParameters.put(EMPLOYMENT_TYPE_IDS, notEligibleStaffDataDTO.getEmploymentTypeIds());
-            query.append(" MATCH (employment)-[:HAS_EMPLOYMENT_LINES]-(empLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(empType) where id(empType) in {employmentTypeIds}");
-        }
-        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getStaffIds())){
-            queryParameters.put("notIncludeStaffIds", notEligibleStaffDataDTO.getStaffIds());
-            query.append(" MATCH (employment)<-[:BELONGS_TO_STAFF]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(up:UnitPermission) WHERE NOT id(staff) in {notIncludeStaffIds}");
-        }else{
-            query.append(" MATCH (employment)<-[:BELONGS_TO_STAFF]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(up:UnitPermission)");
-        }
-        query.append(" WITH staff,organization,collect(id(employment)) AS employmentIds ")
-        .append(" MATCH (staff)-[:BELONGS_TO]->(user:User) WITH staff,organization,employmentIds,user")
-                .append(" OPTIONAL MATCH (staff)-[:HAS_CHILDREN]->(staffChildDetail:StaffChildDetail) WITH staff,collect(staffChildDetail) AS  staffChildDetails,organization,employmentIds,user");
-        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getActivityIds())){
-            //queryParameters.put("activityIds", notEligibleStaffDataDTO.getActivityIds());
-            query.append(" MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) where teams.activityId in").append(getBigIntegerString(notEligibleStaffDataDTO.getActivityIds().iterator()));
-        }else{
-            query.append(" OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff)");
-        }
-        query.append(" WITH staff,collect(id(teams)) AS teams,organization,employmentIds,user,staffChildDetails");
-        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getTagIds())){
-            queryParameters.put(TAG_IDS, notEligibleStaffDataDTO.getTagIds());
-            query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag) where id(tag) in {tagIds}");
-        }else {
-            query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag)");
-        }
-        query.append(" WITH staff,staffChildDetails,teams,organization,employmentIds,user,COLLECT(tag) AS tags RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName as lastName,staff.profilePic AS profilePic,teams,id(organization) AS unitId,employmentIds as employmentIds,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags");
-        Result result = session.query(query.toString(), queryParameters);
-        Iterator si = result.iterator();
-        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = new ArrayList<>();
-        while (si.hasNext()) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(si.next(), StaffAdditionalInfoDTO.class);
-            staffAdditionalInfoDTOS.add(staffAdditionalInfoDTO);
-        }
-        return staffAdditionalInfoDTOS;
-    }
-
 
 
 }

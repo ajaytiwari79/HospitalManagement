@@ -1,6 +1,5 @@
 package com.kairos.shiftplanning.executioner;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.planner.solverconfig.ConstraintDTO;
@@ -42,7 +41,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static org.optaplanner.core.config.solver.SolverConfig.createFromXmlFile;
@@ -64,7 +63,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     boolean readSecondaryFromFile = false;
     boolean enableSecondarySolver = false;
     public static final String BENCH_MARKER_CONFIG = "com/kairos/shiftplanning/configuration/ShiftPlanningBenchmark.solver.xml";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShiftPlanningSolver.class);
+    private static Logger log = LoggerFactory.getLogger(ShiftPlanningSolver.class);
     Solver<ShiftPlanningSolution> solver;
     SolverFactory<ShiftPlanningSolution> solverFactory;
     Solver<BreaksIndirectAndActivityPlanningSolution> solverBreaks;
@@ -117,7 +116,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     }
 
     public ShiftPlanningSolver(List<File> droolsFiles, File configurationFile) {
-        DateUtils.LOGGER.info("solver file exists {}", configurationFile.exists());
+        LOGGER.info("solver file exists {}", configurationFile.exists());
         solverFactory = getSolverFactory(droolsFiles, configurationFile);
         solver = solverFactory.buildSolver();
     }
@@ -139,7 +138,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         ShiftPlanningSolution solution = disablePrimarySolver ? unsolvedSolution : solver.solve(unsolvedSolution);
         ShiftPlanningUtility.printStaffingLevelMatrix(ShiftPlanningUtility.reduceStaffingLevelMatrix
                 (solution.getStaffingLevelMatrix().getStaffingLevelMatrix(), solution.getShifts(), null, null, 15), null);
-        LOGGER.info("Solver took: {}", (System.currentTimeMillis() - start) / 1000);
+        log.info("Solver took: {}", (System.currentTimeMillis() - start) / 1000);
         if (!readFromFile)
             toXml(solution, "shift_solution");
         director = solver.getScoreDirectorFactory().buildScoreDirector();
@@ -169,7 +168,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         sb.append("\n");
         solvedBreaksSolution.getIndirectActivities().
                 forEach(ia -> sb.append("[" + ia.getEmployees().stream().map(e -> e.getName()).collect(Collectors.toList()) + ":" + ia.getStartTime() + "]"));
-        LOGGER.info(INFO, sb);
+        log.info(INFO, sb);
     }
 
     private BreaksIndirectAndActivityPlanningSolution runAndGetBreaksSolution(ShiftPlanningSolution solution) {
@@ -187,7 +186,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     }
 
     private void printIndictment(Map<Object, Indictment> indictmentMap) {
-        LOGGER.info("*************Indictment**************");
+        log.info("*************Indictment**************");
         MutableInt unassignedIntervals = new MutableInt(0);
         indictmentMap.forEach((entity, indictment) -> {
             if (entity instanceof ShiftImp && !((ShiftImp) entity).isLocked() && ((ShiftImp) entity).getInterval() != null) {
@@ -200,8 +199,8 @@ public class ShiftPlanningSolver implements QuarkusApplication {
                 printInctmentMapOfEmployee(entity, indictment);
             }
         });
-        LOGGER.info("unassignedIntervals: {}", unassignedIntervals);
-        LOGGER.info("*************Indictment End**************");
+        log.info("unassignedIntervals: {}", unassignedIntervals);
+        log.info("*************Indictment End**************");
     }
 
     private void printInctmentMapOfShift(ShiftImp entity, Indictment indictment) {
@@ -217,7 +216,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             sb.append(constraintMatch.getConstraintName() + "--" + constraintMatch.getScore().toString() + "\n");
         });
         if (any.isTrue()) {
-            LOGGER.info(INFO, sb);
+            log.info(INFO, sb);
         }
     }
 
@@ -239,7 +238,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             sb.append("-------------" + constraintMatch.getConstraintName() + "----------" + constraintMatch.getScore().toString() + "\n");
         });
         if (any.isTrue()) {
-            LOGGER.info(INFO, sb);
+            log.info(INFO, sb);
         }
     }
 
@@ -256,7 +255,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             sb.append("------" + constraintMatch.getConstraintName() + "-------" + constraintMatch.getScore().toString() + "\n");
         });
         if (any.isTrue()) {
-            LOGGER.info(INFO, sb);
+            log.info(INFO, sb);
         }
     }
 
@@ -274,7 +273,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             sb.append("------" + constraintMatch.getConstraintName() + "--------" + constraintMatch.getScore().toString() + "\n");
         });
         if (any.isTrue()) {
-            LOGGER.info(INFO, sb);
+            log.info(INFO, sb);
         }
     }
 
@@ -283,15 +282,15 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     }
 
     private void printSolvedSolution(ShiftPlanningSolution solution) {
-        LOGGER.info("-------Printing solution:-------");
-        LOGGER.info("total intervals: {}", solution.getActivityLineIntervals().stream().count());
-        LOGGER.info("total assigned intervals: {}", solution.getActivityLineIntervals().stream().filter(i -> i.getShift() != null).count());
+        log.info("-------Printing solution:-------");
+        log.info("total intervals: {}", solution.getActivityLineIntervals().stream().count());
+        log.info("total assigned intervals: {}", solution.getActivityLineIntervals().stream().filter(i -> i.getShift() != null).count());
         solution.getEmployees().forEach(emp ->
                 solution.getShifts().forEach(shift -> {
                     if (!emp.getId().equals(shift.getEmployee().getId())) {
                         return;
                     }
-                    LOGGER.info("Shift A--------" + shift.getId() + "," + shift.getEmployee().getId() + "," + shift.getStartDate() + ":[" + shift.getInterval() + "(" + shift.getShiftActivities().size() + ")" + "]:" + shift.getShiftActivities() +
+                    log.info("Shift A--------" + shift.getId() + "," + shift.getEmployee().getId() + "," + shift.getStartDate() + ":[" + shift.getInterval() + "(" + shift.getShiftActivities().size() + ")" + "]:" + shift.getShiftActivities() +
                             "[" + Optional.ofNullable(shift.getBreaks()).orElse(Collections.emptyList()).stream().collect(StringBuilder::new, (b1, b2) -> b1.append(b2.toString()), (b1, b2) -> b2.append(",").append(b1)) + "]");
                 })
         );
@@ -304,7 +303,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
                 shiftsAssignedToSkillIntervals.put(skillLineInterval.getShift(), new ArrayList<>());
             }
         });
-        LOGGER.info("-------Printing solution Finished:-------");
+        log.info("-------Printing solution Finished:-------");
     }
 
     private ShiftPlanningSolution getUnsolvedSolution(boolean loadFromFile) {
@@ -323,7 +322,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         try {
             ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS, solvedSolution.getUnit().getId());
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -379,7 +378,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             String xmlString = xstream.toXML(solution);
             writeXml(xmlString, fileName);
         } catch (Exception e) {
-            LOGGER.error(ERROR, e.getMessage());
+            log.error(ERROR, e.getMessage());
         }
     }
 
@@ -387,7 +386,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         try (PrintWriter out = new PrintWriter(new File("" + fileName + ".xml"))) {
             out.write(xmlString);
         } catch (FileNotFoundException e) {
-            LOGGER.error(ERROR, e.getMessage());
+            log.error(ERROR, e.getMessage());
         }
     }
 
@@ -410,7 +409,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             unSolvedsolution = shiftPlanningSolver.runSolverOnRequest(unSolvedsolution);
             //writeSolutionToFile(unSolvedsolution);
         }catch (Exception e){
-            LOGGER.error(e.getMessage());
+            e.printStackTrace();
             File file = new File(System.getProperty(USER_HOME) + "/" + "exception.text");
             if(!file.exists()){
                 file.createNewFile();

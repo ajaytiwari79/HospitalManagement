@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.staffing_level;
 
-import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
@@ -8,15 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepository{
@@ -36,7 +41,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     }
 
     @Override
-    public List<StaffingLevelDTO> findByUnitIdAndDatesAndActivityId(Long unitId, Date startDate, Date endDate, BigInteger activityId){
+    public List<PresenceStaffingLevelDto> findByUnitIdAndDatesAndActivityId(Long unitId, Date startDate, Date endDate, BigInteger activityId){
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(CURRENT_DATE).gte(startDate).lte(endDate)),
                 Aggregation.unwind(PRESENCE_STAFFING_LEVEL_INTERVAL),
@@ -59,7 +64,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
                 Aggregation.group(CURRENT_DATE,"staffingLevelSetting").push(PRESENCE_STAFFING_LEVEL_INTERVAL).as(PRESENCE_STAFFING_LEVEL_INTERVAL),
                 Aggregation.project(PRESENCE_STAFFING_LEVEL_INTERVAL).andExclude("_id").and("_id.currentDate").as(CURRENT_DATE).and("_id.staffingLevelSetting").as("staffingLevelSetting")
         );
-        return mongoTemplate.aggregate(aggregation,StaffingLevel.class, StaffingLevelDTO.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregation,StaffingLevel.class, PresenceStaffingLevelDto.class).getMappedResults();
     }
 
     @Override

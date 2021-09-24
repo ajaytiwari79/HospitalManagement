@@ -8,7 +8,6 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.service.region.MunicipalityService;
 import com.kairos.service.region.ProvinceService;
 import com.kairos.service.region.RegionService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,8 +40,6 @@ public class RegionController {
 
     @Inject
     private MunicipalityService municipalityService;
-
-    @Inject private TranslationService translationService;
 
 
 
@@ -264,26 +261,25 @@ public class RegionController {
     @RequestMapping(value = "/{regionId}/language_settings", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationsOfRegion(@PathVariable Long regionId, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(regionId,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.updateTranslationOfRegion(regionId,translations));
     }
 
     @ApiOperation(value = "GET Province to Region")
     @RequestMapping(value = "/province/{provinceId}/language_settings", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> updateTranslationsOfProvince(@PathVariable Long provinceId, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(provinceId,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, provinceService.updateTranslationOfProvince(provinceId,translations));
     }
 
     @ApiOperation(value = "GET Province to Region")
     @RequestMapping(value = "/province/municipality/{municipalityId}/language_settings", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> updateTranslationsOfMunicipality(@PathVariable Long municipalityId, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(municipalityId,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateTranslationOfMunicipality(municipalityId,translations));
     }
 
     @ApiOperation(value = "GET Province to Region")
     @RequestMapping(value = "/province/municipality/zipcode/{zipcodeId}/language_settings", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> updateTranslationsOfZipCode(@PathVariable Long zipcodeId, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(zipcodeId,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateTranslationOfZipCode(zipcodeId,translations));
     }
-
 
 }

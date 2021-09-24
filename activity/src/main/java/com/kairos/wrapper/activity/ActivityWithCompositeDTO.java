@@ -2,8 +2,6 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
@@ -16,10 +14,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pavan on 8/2/18.
@@ -30,16 +30,15 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityWithCompositeDTO implements Serializable {
+public class ActivityWithCompositeDTO {
 
-    private static final long serialVersionUID = -3544658576963067202L;
     private BigInteger id;
     private String name;
     private ActivityGeneralSettings activityGeneralSettings;
     private TimeCalculationActivityDTO activityTimeCalculationSettings;
-    private List<CompositeActivityDTO> compositeActivities = new ArrayList<>();
-    private List<Long> expertises = new ArrayList<>();
-    private List<Long> employmentTypes = new ArrayList<>();
+    private List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
+    private List<Long> expertises= new ArrayList<>();
+    private List<Long> employmentTypes= new ArrayList<>();
     private ActivityRulesSettings activityRulesSettings;
     private ActivitySkillSettings activitySkillSettings;
     private ActivityPhaseSettings activityPhaseSettings;
@@ -62,12 +61,9 @@ public class ActivityWithCompositeDTO implements Serializable {
     private Set<BigInteger> childActivityIds=new HashSet<>();
     private Set<BigInteger> availableChildActivityIds =new HashSet<>();
     private BigInteger parentActivityId;
-    private int ranking;
+    private String activityPriorityName;
+    private int activityPriority;
     private TimeTypeEnum secondLevelTimtype;
     private int mostlyUsedCount;
-    private Map<String, TranslationInfo> translations;
-
-    public String getName(){
-        return TranslationUtil.getName(translations,name);
-    }
+    private BigInteger activityPriorityId;
 }

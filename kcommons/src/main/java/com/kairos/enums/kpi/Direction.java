@@ -1,8 +1,6 @@
 package com.kairos.enums.kpi;
 
-import java.io.Serializable;
-
-public enum Direction implements Serializable {
+public enum Direction {
 
     ASC, DESC;
 

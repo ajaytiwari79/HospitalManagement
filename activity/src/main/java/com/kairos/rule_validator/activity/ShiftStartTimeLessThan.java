@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.shift.ShiftValidatorService;
 
 import java.time.Duration;
@@ -27,7 +26,7 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
+    public void validateRules(ShiftWithActivityDTO shift) {
         shift.getActivities().forEach(shiftActivityDTO -> {
             shiftActivityDTO.getChildActivities().forEach(childActivity->validateShiftActivityStartTime(childActivity));
             validateShiftActivityStartTime(shiftActivityDTO);

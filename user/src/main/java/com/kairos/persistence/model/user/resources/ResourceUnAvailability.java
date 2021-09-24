@@ -26,7 +26,6 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATE_SOMETHINGW
 @NoArgsConstructor
 public class ResourceUnAvailability extends UserBaseEntity {
 
-    private static final long serialVersionUID = 1073192210088064671L;
     @Inject
     private ExceptionService exceptionService;
     private Long date;

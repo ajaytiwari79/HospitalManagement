@@ -16,7 +16,10 @@ import java.util.List;
 
 //@PropertySource("classpath:taskplanner.properties")
 public class GraphHopper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GraphHopper.class);
+	Logger log = LoggerFactory.getLogger(GraphHopper.class);
+
+	private String matrixKey = "7ba37151-7141-4ea4-a89f-28a2ae297a0a";
+
 
 	public void getLocationData(List<Location> locations) {
 		//getLatLongByAddress("");
@@ -35,7 +38,7 @@ public class GraphHopper {
 		try {
 			response =  api.matrixGet(getApiKey(), point, fromPoint, toPoint, requiredFields, vehicle);
 		} catch (ApiException e) {
-			LOGGER.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return response;
 	}
@@ -64,9 +67,9 @@ public class GraphHopper {
 		GeocodingResponse response;
 		try {
 			response = geoApi.geocodeGet(getApiKey(), address, "en", 1, false, "", "default");
-			LOGGER.info("latitude "+response.getHits().get(0).getPoint().getLat()+" longitude "+response.getHits().get(0).getPoint().getLat());
+			log.info("latitude "+response.getHits().get(0).getPoint().getLat()+" longitude "+response.getHits().get(0).getPoint().getLat());
 		} catch (ApiException e) {
-			LOGGER.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -85,9 +88,9 @@ public class GraphHopper {
 			  prop.load(new FileInputStream(new File("/media/pradeep/bak/multiOpta/task-planner/src/main/resources/taskplanner.properties")));
 		 String key = prop.getProperty("graphhopper.key"); 
 		 
-		  } catch (IOException e) { logger.error(e.getMessage()); }*/
-		String matrixKey = "7ba37151-7141-4ea4-a89f-28a2ae297a0a";
-		LOGGER.info(matrixKey);
+		  } catch (IOException e) { e.printStackTrace(); }*/
+		 
+		log.info(matrixKey);
 		return matrixKey;
 	}
 

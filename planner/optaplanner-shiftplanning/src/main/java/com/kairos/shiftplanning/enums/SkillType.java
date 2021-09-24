@@ -1,8 +1,6 @@
 package com.kairos.shiftplanning.enums;
 
-import java.io.Serializable;
-
-public enum SkillType implements Serializable {
+public enum SkillType {
     BASIC("Basic"), ADVANCE("Advance"), EXPERT("Expert");
 
     private String value;

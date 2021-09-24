@@ -21,39 +21,51 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
 
     @Query("Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag {countryTag:true})\n" +
             "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
-            "return tag.translations as translations,\n" +
+            "return " +
+            "{english: CASE WHEN tag.`translatedNames.english` IS NULL THEN '' ELSE tag.`translatedNames.english` END,danish: CASE WHEN tag.`translatedNames.danish` IS NULL THEN '' ELSE tag.`translatedNames.danish` END,hindi: CASE WHEN tag.`translatedNames.hindi` IS NULL THEN '' ELSE tag.`translatedNames.hindi` END,britishenglish: CASE WHEN tag.`translatedNames.britishenglish` IS NULL THEN '' ELSE tag.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN tag.`translatedDescriptions.english` IS NULL THEN '' ELSE tag.`translatedDescriptions.english` END,danish: CASE WHEN tag.`translatedDescriptions.danish` IS NULL THEN '' ELSE tag.`translatedDescriptions.danish` END,hindi: CASE WHEN tag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE tag.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN tag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE tag.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
             "id(tag) as id, tag.name as name, tag.color as color , tag.shortName as shortName,tag.ultraShortName as ultraShortName, tag.countryTag as countryTag, tag.masterDataType as masterDataType,tag.orgTypeId as orgTypeId,tag.orgSubTypeIds as orgSubTypeIds")
     List<TagQueryResult> getListOfCountryTags(Long countryId, boolean deleted, String searchTextRegex);
 
     @Query("Match (country:Country)-[r:COUNTRY_HAS_TAG]->(tag:Tag {countryTag:true})\n" +
             "WHERE id(country)={0} AND tag.deleted = {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
-            "return tag.translations as translations,\n" +
+            "return \n" +
+            "{english: CASE WHEN tag.`translatedNames.english` IS NULL THEN '' ELSE tag.`translatedNames.english` END,danish: CASE WHEN tag.`translatedNames.danish` IS NULL THEN '' ELSE tag.`translatedNames.danish` END,hindi: CASE WHEN tag.`translatedNames.hindi` IS NULL THEN '' ELSE tag.`translatedNames.hindi` END,britishenglish: CASE WHEN tag.`translatedNames.britishenglish` IS NULL THEN '' ELSE tag.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN tag.`translatedDescriptions.english` IS NULL THEN '' ELSE tag.`translatedDescriptions.english` END,danish: CASE WHEN tag.`translatedDescriptions.danish` IS NULL THEN '' ELSE tag.`translatedDescriptions.danish` END,hindi: CASE WHEN tag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE tag.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN tag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE tag.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
             "id(tag) as id, tag.name as name, tag.color as color,tag.shortName as shortName,tag.ultraShortName as ultraShortName, tag.countryTag as countryTag, tag.masterDataType as masterDataType,tag.orgTypeId as orgTypeId,tag.orgSubTypeIds as orgSubTypeIds")
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId, boolean deleted, String searchTextRegex, String masterDataType);
 
     @Query("Match (org)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
-            "return tag.translations as translations,\n" +
+            "return " +
+            "{english: CASE WHEN tag.`translatedNames.english` IS NULL THEN '' ELSE tag.`translatedNames.english` END,danish: CASE WHEN tag.`translatedNames.danish` IS NULL THEN '' ELSE tag.`translatedNames.danish` END,hindi: CASE WHEN tag.`translatedNames.hindi` IS NULL THEN '' ELSE tag.`translatedNames.hindi` END,britishenglish: CASE WHEN tag.`translatedNames.britishenglish` IS NULL THEN '' ELSE tag.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN tag.`translatedDescriptions.english` IS NULL THEN '' ELSE tag.`translatedDescriptions.english` END,danish: CASE WHEN tag.`translatedDescriptions.danish` IS NULL THEN '' ELSE tag.`translatedDescriptions.danish` END,hindi: CASE WHEN tag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE tag.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN tag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE tag.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
             "id(tag) as id, tag.name as name, tag.color as color,tag.shortName as shortName,tag.ultraShortName as ultraShortName, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +
             "UNION\n" +
             "MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag {countryTag:true})\n" +
             "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
-            "return tag.translations as translations,\n" +
+            "return " +
+            "{english: CASE WHEN tag.`translatedNames.english` IS NULL THEN '' ELSE tag.`translatedNames.english` END,danish: CASE WHEN tag.`translatedNames.danish` IS NULL THEN '' ELSE tag.`translatedNames.danish` END,hindi: CASE WHEN tag.`translatedNames.hindi` IS NULL THEN '' ELSE tag.`translatedNames.hindi` END,britishenglish: CASE WHEN tag.`translatedNames.britishenglish` IS NULL THEN '' ELSE tag.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN tag.`translatedDescriptions.english` IS NULL THEN '' ELSE tag.`translatedDescriptions.english` END,danish: CASE WHEN tag.`translatedDescriptions.danish` IS NULL THEN '' ELSE tag.`translatedDescriptions.danish` END,hindi: CASE WHEN tag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE tag.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN tag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE tag.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
             "id(tag) as id, tag.name as name, tag.color as color,tag.shortName as shortName,tag.ultraShortName as ultraShortName, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n")
     List<TagQueryResult> getListOfOrganizationTags(Long orgId, boolean deleted, String searchTextRegex);
 
     @Query("Match (org)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false})\n" +
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "OPTIONAL MATCH (tag)-[:"+HAS_PENALTY_SCORE+"]->(penaltyScore:PenaltyScore)\n" +
-            "return tag.translations as translations,\n" +
+            "return " +
+            "{english: CASE WHEN tag.`translatedNames.english` IS NULL THEN '' ELSE tag.`translatedNames.english` END,danish: CASE WHEN tag.`translatedNames.danish` IS NULL THEN '' ELSE tag.`translatedNames.danish` END,hindi: CASE WHEN tag.`translatedNames.hindi` IS NULL THEN '' ELSE tag.`translatedNames.hindi` END,britishenglish: CASE WHEN tag.`translatedNames.britishenglish` IS NULL THEN '' ELSE tag.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN tag.`translatedDescriptions.english` IS NULL THEN '' ELSE tag.`translatedDescriptions.english` END,danish: CASE WHEN tag.`translatedDescriptions.danish` IS NULL THEN '' ELSE tag.`translatedDescriptions.danish` END,hindi: CASE WHEN tag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE tag.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN tag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE tag.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
             "id(tag) as id, tag.name as name, tag.color as color,tag.shortName as shortName,tag.ultraShortName as ultraShortName, tag.countryTag as countryTag, tag.masterDataType as masterDataType, penaltyScore\n" +
             "UNION\n" +
             "MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag{countryTag:true})\n" +
             "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "OPTIONAL MATCH (tag)-[:"+HAS_PENALTY_SCORE+"]->(penaltyScore:PenaltyScore)\n" +
-            "return tag.translations as translations,\n" +
+            "return " +
+            "{english: CASE WHEN tag.`translatedNames.english` IS NULL THEN '' ELSE tag.`translatedNames.english` END,danish: CASE WHEN tag.`translatedNames.danish` IS NULL THEN '' ELSE tag.`translatedNames.danish` END,hindi: CASE WHEN tag.`translatedNames.hindi` IS NULL THEN '' ELSE tag.`translatedNames.hindi` END,britishenglish: CASE WHEN tag.`translatedNames.britishenglish` IS NULL THEN '' ELSE tag.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN tag.`translatedDescriptions.english` IS NULL THEN '' ELSE tag.`translatedDescriptions.english` END,danish: CASE WHEN tag.`translatedDescriptions.danish` IS NULL THEN '' ELSE tag.`translatedDescriptions.danish` END,hindi: CASE WHEN tag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE tag.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN tag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE tag.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
             "id(tag) as id, tag.name as name, tag.color as color,tag.shortName as shortName,tag.ultraShortName as ultraShortName, tag.countryTag as countryTag, tag.masterDataType as masterDataType, penaltyScore\n")
     List<TagQueryResult> getListOfOrganizationTagsByMasterDataType(Long orgId, boolean deleted, String searchTextRegex, String masterDataType);
 

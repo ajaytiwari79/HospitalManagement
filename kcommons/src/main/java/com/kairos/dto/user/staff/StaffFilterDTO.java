@@ -39,8 +39,6 @@ public class StaffFilterDTO {
     private Map<Long, Boolean> nightWorkerDetails;
     private Map<Long,List<WTAResponseDTO>> employmentIdAndWtaResponseMap;
     private boolean includeWorkTimeAgreement;
-    private Long staffFavouriteFiltersId;
-    private Long staffId;
 
     public StaffFilterDTO(String moduleId, List<FilterSelectionDTO> filtersData){
         this.moduleId = moduleId;

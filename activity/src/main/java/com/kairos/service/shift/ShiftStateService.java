@@ -5,9 +5,9 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.expertise.ExpertisePublishSetting;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -18,15 +18,13 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
-import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
-import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.expertise.ExpertisePublishSettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.scheduling.annotation.Async;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -39,15 +37,15 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
-import static com.kairos.constants.ActivityMessagesConstants.SHIFT_STATE_NOT_FOUND_TANDA;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import static java.util.stream.Collectors.groupingBy;
 
 /*
  *Created By Pavan on 21/12/18
  *
  */
-
 @Service
 public class ShiftStateService {
 
@@ -68,9 +66,6 @@ public class ShiftStateService {
     @Inject private ShiftService shiftService;
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
     @Inject private ShiftValidatorService shiftValidatorService;
-    @Inject private DayTypeService dayTypeService;
-    @Inject private TimeSlotMongoRepository timeSlotMongoRepository;
-    @Inject private ExpertisePublishSettingService expertisePublishSettingService;
 
 
     public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate,Long staffId){
@@ -81,7 +76,6 @@ public class ShiftStateService {
         return true;
     }
 
-    @Async
     public void createShiftState(List<Shift> shifts,boolean checkIn,Long unitId){
         List<Phase> phases=phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String, Phase> phaseMap = phases.stream().collect(Collectors.toMap(p->p.getPhaseEnum().toString(), Function.identity()));
@@ -127,16 +121,11 @@ public class ShiftStateService {
     }
 
     public List<ShiftState> createTimeAndAttendanceShiftState(List<Shift> shifts,Phase phase){
-        //TODO Need to check the workflow of shift state
         List<ShiftState> oldTimeAndAttendanceShiftStates=shiftStateMongoRepository.findAllByShiftIdInAndShiftStatePhaseIdAndValidatedNotNull(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet()),phase.getId());
-        Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v,(s1, s2) -> s2));
+        Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
-        if(isCollectionEmpty(timeAndAttendanceShiftStates)){
-            exceptionService.dataNotFoundException(SHIFT_STATE_NOT_FOUND_TANDA);
-        }
-        String timeZone = userIntegrationService.getTimeZoneByUnitId(timeAndAttendanceShiftStates.get(0).getUnitId());
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
-            if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase,timeZone)){
+            if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase)){
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -154,9 +143,8 @@ public class ShiftStateService {
     private void createManagementShiftStateAfterStaffGracePeriodExpire(Phase phase, List<ShiftState> timeAndAttendanceShiftStates) {
         ShiftState newshiftState;
         List<ShiftState> shiftState = new CopyOnWriteArrayList<>(timeAndAttendanceShiftStates);
-        String timeZone = userIntegrationService.getTimeZoneByUnitId(timeAndAttendanceShiftStates.get(0).getUnitId());
         for (ShiftState timeAndAttendanceShiftState : shiftState) {
-            if(!shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase,timeZone) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
+            if(!shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
                 newshiftState=ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState,ShiftState.class);
                 newshiftState.setId(null);
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -200,8 +188,8 @@ public class ShiftStateService {
 
 
     public void deleteDraftShiftsViaTimeAndAttendanceJob(Long unitId){
-        shiftMongoRepository.removeDraftShiftByExpertiseSettings(unitId);
-        //shiftService.deleteDraftShiftAndViolatedRules(draftShifts);
+        List<Shift> draftShifts = shiftMongoRepository.findDraftShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(asDate(getLocalDate().plusDays(1))),asDate(getEndOfDayFromLocalDateTime().plusDays(1)),unitId);
+        shiftService.deleteDraftShiftAndViolatedRules(draftShifts);
     }
 
     public ShiftDTO updateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, BigInteger shiftStateId, BigInteger shiftStatePhaseId) {
@@ -232,7 +220,37 @@ public class ShiftStateService {
         return newShiftStates;
     }
 
+    public void updateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, List<Shift> shiftsList, Long unitId) {
+        if (isCollectionEmpty(shifts)) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_IDS);
+        }
+        List<Long> staffIds = shifts.stream().map(Shift::getStaffId).collect(Collectors.toList());
+        List<Long> employmentIds = shifts.stream().map(Shift::getEmploymentId).collect(Collectors.toList());
+        List<NameValuePair> requestParam = new ArrayList<>();
+        requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
+        requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+        shifts.sort(Comparator.comparing(Shift::getStartDate));
+        shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
+        Date startDate = shifts.get(0).getStartDate();
+        Date endDate = shifts.get(shifts.size() - 1).getEndDate();
+        Date shiftStartDate = shiftsList.get(0).getStartDate();
+        Date shiftEndDate = shiftsList.get(shiftsList.size() - 1).getEndDate();
+        startDate = startDate.before(shiftStartDate) ? startDate : shiftStartDate;
+        endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
+        /*List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, startDate, endDate);
+        Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
+        staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
+            if (employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId()) != null) {
+                List<CTAResponseDTO> ctaResponseDTOSList = employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId());
+                List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+                staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaRuleTemplateDTOS);
+                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+            }
+        });*/
+        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, startDate, endDate);
 
+    }
 
 
     public List<ShiftState> findAllByShiftIdsByAccessgroupRole(Set<BigInteger> shiftIds, Set<String> accessGroupRole){
@@ -243,8 +261,15 @@ public class ShiftStateService {
         ButtonConfig buttonConfig = new ButtonConfig();
         if (management && isCollectionNotEmpty(shifts)) {
             Set<BigInteger> shiftIds = shifts.stream().map(ShiftDTO::getId).collect(Collectors.toSet());
-            long count = shiftStateMongoRepository.getCountByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds, MANAGEMENT);
-            buttonConfig.setSendToPayrollEnabled(count == shiftIds.size());
+            List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds, MANAGEMENT);
+            Set<BigInteger> shiftStateIds = shiftStates.stream().map(ShiftState::getShiftId).collect(Collectors.toSet());
+            for (BigInteger shiftId : shiftIds) {
+                if (!shiftStateIds.contains(shiftId)) {
+                    buttonConfig.setSendToPayrollEnabled(false);
+                    break;
+                }
+                buttonConfig.setSendToPayrollEnabled(true);
+            }
         }
         return buttonConfig;
     }

@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Document
 public class StaffingLevelGraphConfiguration extends MongoBaseEntity {
-    private static final long serialVersionUID = 1066350833651504944L;
     private WeeklyGraphConfiguration weeklyGraphConfiguration;
     private DailyGraphConfiguration dailyGraphConfiguration;
     private Long userId;

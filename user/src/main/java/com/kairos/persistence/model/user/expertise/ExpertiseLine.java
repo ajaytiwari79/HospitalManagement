@@ -17,7 +17,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUPPO
 @Getter
 @Setter
 public class ExpertiseLine extends UserBaseEntity {
-    private static final long serialVersionUID = 6160776547074018244L;
     private LocalDate startDate;
     private LocalDate endDate;
 

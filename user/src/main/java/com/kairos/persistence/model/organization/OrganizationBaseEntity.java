@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -14,6 +15,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.utils.ZoneIdStringConverter;
 import lombok.Getter;
@@ -31,6 +33,7 @@ import java.util.List;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_FORMAL_NOTNULL;
+import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Getter
@@ -55,6 +58,8 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected String pNumber;
     @Relationship(type = KAIROS_STATUS)
     protected KairosStatus kairosStatus;
+    //Fixme move to activity micro service
+    protected TimeSlotMode timeSlotMode = STANDARD;
 
     @Relationship(type = TYPE_OF)
     protected OrganizationType organizationType;
@@ -86,9 +91,14 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected String estimoteAppId;
     //fixme move to task/shift planning
     protected String estimoteAppToken;
-
+    //fixme move to shift planning
+    protected int endTimeDeduction = 5; //in percentage
 
     protected String kmdExternalId; //kmd External Id
+    //fixme move to shift planning
+    protected int dayShiftTimeDeduction = 4; //in percentage
+    //fixme move to shift planning
+    protected int nightShiftTimeDeduction = 7; //in percentage
     //fixme move to shift planning and use method to check
     protected boolean phaseGenerated = true;
     protected Boolean showCountryTags = true;
@@ -126,6 +136,9 @@ public class OrganizationBaseEntity extends UserBaseEntity {
 
     @Relationship(type = HAS_LEVEL)
     protected Level level;
+
+    @Relationship(type = HAS_TIME_SLOT_SET)
+    protected List<TimeSlotSet> timeSlotSets = new ArrayList<>();
 
     //fixme review
     @Relationship(type = HAS_UNIT_TYPE)

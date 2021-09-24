@@ -2,12 +2,11 @@ package com.kairos.enums;
 
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-public enum StaffWorkingType implements Serializable {
+public enum StaffWorkingType {
     NIGHT_WORKER("Night Worker"), NOT_NIGHT_WORKER("Not Night Worker");
     public String value;
 

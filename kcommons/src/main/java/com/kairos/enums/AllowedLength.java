@@ -1,8 +1,6 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
-public enum AllowedLength implements Serializable {
+public enum AllowedLength {
     LONGER_SHIFT,
     USE_MIN_MAX
 }

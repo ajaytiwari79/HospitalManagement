@@ -9,7 +9,6 @@ import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.service.counter.KPIBuilderCalculationService;
-import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.PayLevelKPIService;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -38,7 +37,7 @@ public class PayLevelKpiTest {
     private List<StaffKpiFilterDTO> staffKpiFilterDTOS;
     private Long unitId;
     private DateTimeInterval dateTimeInterval;
-    private KPICalculationRelatedInfo kpiCalculationRelatedInfo;
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo;
     private FilterType filterType;
 
     static {
@@ -59,8 +58,8 @@ public class PayLevelKpiTest {
 
     }
 
-    private KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
-        KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPICalculationRelatedInfo();
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
+        KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPIBuilderCalculationService().new KPICalculationRelatedInfo();
         kpiCalculationRelatedInfo.setCalculationTypes(Arrays.asList(STAFF_SKILLS_COUNT));
         kpiCalculationRelatedInfo.setUnitId(unitId);
         kpiCalculationRelatedInfo.setStaffIds(staffIds);

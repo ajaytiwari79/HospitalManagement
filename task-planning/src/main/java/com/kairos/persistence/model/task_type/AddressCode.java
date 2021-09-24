@@ -3,7 +3,7 @@ package com.kairos.persistence.model.task_type;
 /**
  * Created by oodles on 9/2/17.
  */
-public enum AddressCode implements Serializable {
+public enum AddressCode {
     UNIT("-1"),HOME("0");
 
     private String value;

@@ -4,8 +4,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
-import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
+import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.pay_table.PayTable;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -14,6 +14,7 @@ import com.kairos.persistence.model.user.employment.EmploymentLine;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
@@ -35,7 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 @Service
@@ -48,6 +49,8 @@ public class EmploymentDetailsValidatorService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private AsynchronousService asynchronousService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -118,7 +121,11 @@ public class EmploymentDetailsValidatorService {
             if (!Optional.ofNullable(employmentDTO.getReasonCodeId()).isPresent()) {
                 exceptionService.actionNotPermittedException(MESSAGE_REGION_ENDDATE);
             }
-            employment.setReasonCodeId(employmentDTO.getReasonCodeId());
+            Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
+            if (!Optional.ofNullable(reasonCode).isPresent()) {
+                exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
+            }
+            employment.setReasonCode(reasonCode.get());
             employment.setEndDate(employmentDTO.getEndDate());
         }
 
@@ -165,16 +172,18 @@ public class EmploymentDetailsValidatorService {
             DateTimeInterval expertiseLineInterval = new DateTimeInterval(expertiseLine.getStartDate(), expertiseLine.getEndDate());
             DateTimeInterval employmentInterval = new DateTimeInterval(employmentDTO.getStartDate(), employmentDTO.getEndDate());
             if (expertiseLineInterval.overlaps(employmentInterval)) {
-                List<FunctionDTO> functionsDTOS = functionGraphRepository.getFunctionsByExpertiseLineId(expertiseLine.getId());
                 List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString(),employmentDTO.getStartDate().toString());
                 if (isCollectionEmpty(payTables)) {
-                    addEmploymentLinesAccordingFunctionTable(functionsDTOS, employmentDTO, employmentLines, expertiseLine, employmentDTO.getStartDate().isAfter(expertiseLine.getStartDate()) ? employmentDTO.getStartDate() : expertiseLine.getStartDate(), expertiseLine.getEndDate());
+                    addEmploymentLines(employmentDTO, employmentLines, expertiseLine, employmentDTO.getStartDate().isAfter(expertiseLine.getStartDate()) ? employmentDTO.getStartDate() : expertiseLine.getStartDate(), expertiseLine.getEndDate());
                 } else {
                     payTables.sort(Comparator.comparing(PayTable::getStartDateMillis));
                     for (PayTable payTable : payTables) {
-                        startDateForLine = getStartDate(startDateForLine, expertiseLine, payTable.getStartDateMillis());
-                        endDateForLine = getEndDate(expertiseLine, payTable.getEndDateMillis());
-                        startDateForLine = addEmploymentLinesAccordingFunctionTable(functionsDTOS, employmentDTO, employmentLines, expertiseLine, startDateForLine, endDateForLine);
+                        startDateForLine = getStartDate(startDateForLine, expertiseLine, payTable);
+                        endDateForLine = getEndDate(expertiseLine, payTable);
+                        addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDateForLine, endDateForLine);
+                        if (endDateForLine != null) {
+                            startDateForLine = endDateForLine.plusDays(1);
+                        }
                     }
                 }
             }
@@ -184,41 +193,6 @@ public class EmploymentDetailsValidatorService {
             employmentLines.get(0).setEndDate(employment.getEndDate());
         }
         return employmentLines;
-    }
-
-    private LocalDate addEmploymentLinesAccordingFunctionTable(List<FunctionDTO> functionsDTOS, EmploymentDTO employmentDTO, List<EmploymentLine> employmentLines, ExpertiseLine expertiseLine, LocalDate startDate, LocalDate endDate) {
-        List<FunctionDTO> functions = getApplicableFunction(functionsDTOS, startDate, endDate);
-        if(isCollectionNotEmpty(functions)){
-            functions.sort(Comparator.comparing(FunctionDTO::getStartDate));
-            for (FunctionDTO function : functions) {
-                startDate = getStartDate(startDate, expertiseLine, function.getStartDate());
-                endDate = getEndDate(expertiseLine, function.getEndDate());
-                addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDate, endDate);
-                if (endDate != null) {
-                    startDate = endDate.plusDays(1);
-                }
-            }
-        } else {
-            addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDate, endDate);
-            if (endDate != null) {
-                startDate = endDate.plusDays(1);
-            }
-        }
-        return startDate;
-    }
-
-    private List<FunctionDTO> getApplicableFunction(List<FunctionDTO> functionsDTOS, LocalDate startDate, LocalDate endDate) {
-        List<FunctionDTO> functions = new ArrayList<>();
-        if(isCollectionNotEmpty(functionsDTOS)){
-            for (FunctionDTO functionsDTO : functionsDTOS) {
-                if((startDate.isBefore(functionsDTO.getStartDate()) && (isNull(endDate) || endDate.isAfter(functionsDTO.getStartDate())))
-                        || (isNotNull(functionsDTO.getEndDate()) && startDate.isBefore(functionsDTO.getEndDate()) && (isNull(endDate) || endDate.isAfter(functionsDTO.getEndDate())))
-                ){
-                    functions.add(functionsDTO);
-                }
-            }
-        }
-        return functions;
     }
 
     private void addEmploymentLines(EmploymentDTO employmentDTO, List<EmploymentLine> employmentLines, ExpertiseLine expertiseLine, LocalDate startDate, LocalDate endDate) {
@@ -234,15 +208,15 @@ public class EmploymentDetailsValidatorService {
                 .build());
     }
 
-    private LocalDate getStartDate(LocalDate startDateForLine, ExpertiseLine expertiseLine, LocalDate startDate) {
-        return expertiseLine.getStartDate().isBefore(startDateForLine) ? startDateForLine : startDate.isAfter(expertiseLine.getStartDate()) ? startDate : expertiseLine.getStartDate();
+    private LocalDate getStartDate(LocalDate startDateForLine, ExpertiseLine expertiseLine, PayTable payTable) {
+        return expertiseLine.getStartDate().isBefore(startDateForLine) ? startDateForLine : payTable.getStartDateMillis().isAfter(expertiseLine.getStartDate()) ? payTable.getStartDateMillis() : expertiseLine.getStartDate();
     }
 
-    private LocalDate getEndDate(ExpertiseLine expertiseLine, LocalDate endDate) {
-        if (expertiseLine.getEndDate() == null && endDate != null) {
-            return endDate;
-        } else if (expertiseLine.getEndDate() != null && endDate != null) {
-            return endDate.isBefore(expertiseLine.getEndDate()) ? endDate : expertiseLine.getEndDate();
+    private LocalDate getEndDate(ExpertiseLine expertiseLine, PayTable payTable) {
+        if (expertiseLine.getEndDate() == null && payTable.getEndDateMillis() != null) {
+            return payTable.getEndDateMillis();
+        } else if (expertiseLine.getEndDate() != null && payTable.getEndDateMillis() != null) {
+            return payTable.getEndDateMillis().isBefore(expertiseLine.getEndDate()) ? payTable.getEndDateMillis() : expertiseLine.getEndDate();
         }
         return expertiseLine.getEndDate();
     }

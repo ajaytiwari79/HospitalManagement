@@ -36,7 +36,6 @@ public class CurrentUserDetails {
     private String profilePic;
     private boolean systemAdmin;
     private SystemLanguageDTO userLanguage;
-    private Boolean hubMember;
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,

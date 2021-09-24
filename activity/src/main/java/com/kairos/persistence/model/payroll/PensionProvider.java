@@ -12,7 +12,6 @@ import java.math.BigInteger;
  */
 @Document
 public class PensionProvider extends MongoBaseEntity {
-    private static final long serialVersionUID = -7308412806911936004L;
     private String name;
     private String paymentNumber;
     private Long countryId;

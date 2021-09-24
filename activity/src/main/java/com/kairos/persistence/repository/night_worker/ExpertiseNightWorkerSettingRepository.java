@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.night_worker;
 
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
@@ -17,7 +16,6 @@ public interface ExpertiseNightWorkerSettingRepository extends MongoBaseReposito
     @Query(value = "{ expertiseId:{$in:?0},countryId:{$exists:true}, deleted:false}")
     List<ExpertiseNightWorkerSetting> findAllByCountryAndExpertiseIds(List<Long> expertiseIds);
 
-    @Cacheable(value = "findByExpertiseIdAndUnitId", key = "{#expertiseId, #unitId}", cacheManager = "cacheManager")
     @Query(value = "{ expertiseId:?0, unitId:?1,deleted:false}")
     ExpertiseNightWorkerSetting findByExpertiseIdAndUnitId(Long expertiseId, Long unitId);
 

@@ -25,7 +25,6 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_RESOURCE_ICON_NOT
 @Getter
 @Setter
 public class Vehicle extends UserBaseEntity {
-    private static final long serialVersionUID = 3317297951771731588L;
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private String name;
     private String description;

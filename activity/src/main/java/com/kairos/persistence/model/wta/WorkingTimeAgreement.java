@@ -22,7 +22,6 @@ import java.util.Optional;
 @Document
 public class WorkingTimeAgreement extends MongoBaseEntity implements Comparable<WorkingTimeAgreement>{
 
-    private static final long serialVersionUID = -4070274897457370782L;
     @NotNull(message = "error.WorkingTimeAgreement.name.notnull")
     private String name;
 

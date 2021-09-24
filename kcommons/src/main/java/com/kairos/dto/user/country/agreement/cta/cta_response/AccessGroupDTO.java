@@ -1,6 +1,5 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +7,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Set;
 @Getter
@@ -23,10 +21,9 @@ public class AccessGroupDTO {
     @NotNull(message = "error.startDate.notnull")
     private LocalDate startDate;
     private LocalDate endDate;
-    private Set<BigInteger> dayTypeIds;
+    private Set<Long> dayTypeIds;
     private boolean allowedDayTypes;
 
-    @JsonIgnore
     @AssertTrue(message = "Access group can't be blank")
     public boolean isValid() {
         return !this.name.trim().isEmpty();

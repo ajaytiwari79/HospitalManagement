@@ -6,33 +6,36 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
+import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
@@ -44,22 +47,21 @@ import com.kairos.persistence.repository.user.access_permission.AccessPermission
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
 import java.util.*;
@@ -107,14 +109,19 @@ public class AccessGroupService {
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
     @Inject
+    private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject private UserGraphRepository userGraphRepository;
-    @Inject private ActivityIntegrationService activityIntegrationService;
-    @Inject private PermissionService permissionService;
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
-    public AccessGroupDTO createAccessGroup(Long organizationId, AccessGroupDTO accessGroupDTO) {
+
+    public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
@@ -127,8 +134,12 @@ public class AccessGroupService {
         if (organization.isKairosHub() && AccessGroupRole.STAFF.equals(accessGroupDTO.getRole())) {
             exceptionService.duplicateDataException("error.org.access.management.notnull");
         }
+        List<DayType> dayTypes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
+        }
         AccessGroup accessGroup = ObjectMapperUtils.copyPropertiesByMapper(accessGroupDTO, AccessGroup.class);
-        accessGroup.setDayTypeIds(accessGroupDTO.getDayTypeIds());
+        accessGroup.setDayTypes(dayTypes);
 
         organization.getAccessGroups().add(accessGroup);
         organization.getUnits().forEach(unit->unit.getAccessGroups().add(accessGroup));
@@ -141,17 +152,24 @@ public class AccessGroupService {
         return accessGroupDTO;
     }
 
-    public AccessGroupDTO updateAccessGroup(Long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
+    public AccessGroupDTO updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
+        accessGroupRepository.unlinkDayTypes(accessGroupId);
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
+
         }
         if (accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId)) {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
+
+        }
+        List<DayType> dayTypes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
@@ -159,16 +177,14 @@ public class AccessGroupService {
         accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         accessGrpToUpdate.setStartDate(accessGroupDTO.getStartDate());
         accessGrpToUpdate.setEndDate(accessGroupDTO.getEndDate());
-        accessGrpToUpdate.setDayTypeIds(accessGroupDTO.getDayTypeIds());
+        accessGrpToUpdate.setDayTypes(dayTypes);
         accessGrpToUpdate.setAllowedDayTypes(accessGroupDTO.isAllowedDayTypes());
         accessGroupRepository.save(accessGrpToUpdate);
         accessGroupDTO.setId(accessGrpToUpdate.getId());
-        resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
         return accessGroupDTO;
     }
 
-
-    public boolean deleteAccessGroup(Long accessGroupId) {
+    public boolean deleteAccessGroup(long accessGroupId) {
         AccessGroup objectToDelete = accessGroupRepository.findOne(accessGroupId);
         if (objectToDelete == null) {
             return false;
@@ -193,7 +209,7 @@ public class AccessGroupService {
             List<AccessGroupQueryResult> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organization.getOrganizationCategory().toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroupQueryResult countryAccessGroup : countryAccessGroups) {
-                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypeIds(), countryAccessGroup.getStartDate(), countryAccessGroup.getEndDate());
+                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypes(), countryAccessGroup.getStartDate(), countryAccessGroup.getEndDate());
                 accessGroupRepository.save(accessGroup);
                 countryAndOrgAccessGroupIdsMap.put(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroup.getId(), accessGroup.getId());
@@ -237,9 +253,9 @@ public class AccessGroupService {
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
         List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
         for (AccessGroupQueryResult currentAccessGroup : accessGroupList) {
-            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypeIds(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+            AccessGroup parent = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             parent.setId(currentAccessGroup.getId());
-            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypeIds(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole(), currentAccessGroup.getDayTypes(), company ? DateUtils.getCurrentLocalDate() : currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
             accessGroup.setParentAccessGroup(parent);
             accessGroup.setLastModificationDate(accessGroup.getCreationDate());
             countryAndOrgAccessGroupIdsMap.put(currentAccessGroup.getId(), null);
@@ -264,37 +280,29 @@ public class AccessGroupService {
         return countryAndOrgAccessGroupIdsMap;
     }
 
-    public List<AccessGroupQueryResult> getAccessGroupsForUnit(Long organizationId) {
+    public List<AccessGroupQueryResult> getAccessGroupsForUnit(long organizationId) {
         Organization organization = organizationService.fetchParentOrganization(organizationId);
-        return accessGroupRepository.getAccessGroupsForUnitWithLinkUnitAndStaffCount(organization.getId());
+        return accessGroupRepository.getAccessGroupsForUnit(organization.getId());
     }
 
-    public List<AccessGroup> getAccessGroups(Long organizationId) {
+    public List<AccessGroup> getAccessGroups(long organizationId) {
         Organization organization=organizationService.fetchParentOrganization(organizationId);
         return accessGroupRepository.getAccessGroups(organization.getId());
     }
 
+    public boolean assignAccessGroupToStaff(List<String> accessGroupIds, long staffId) {
 
-    public boolean assignAccessGroupToStaff(List<String> accessGroupIds, Long staffId,Long unitId) {
         List<Long> accessGroupLongValue = new ArrayList<Long>(accessGroupIds.size());
         for (String accessGroupId : accessGroupIds) {
             accessGroupLongValue.add(Long.valueOf(accessGroupId));
         }
+
         Staff staff = accessGroupRepository.assignGroupToStaff(staffId, accessGroupLongValue);
-        resetPermissionByAccessGroupIds(unitId,accessGroupLongValue);
         return staff != null;
     }
 
-    //@Async
-    public boolean resetPermissionByAccessGroupIds(Long unitId, Collection<Long> accessGroupIds){
-        List<Long> userIds = accessGroupRepository.getUserIdsByAccessGroupId(accessGroupIds);
-        for (Long userId : userIds) {
-            permissionService.resetPerMissionByUserId(unitId,userId);
-        }
-        return true;
-    }
-
     public AccessPage createAccessPage(String name, List<Map<String, Object>> childPage, boolean isModule) {
+
         AccessPage parentAccessPage = new AccessPage(name);
         List<AccessPage> accessPageList = new ArrayList<>();
         for (Map<String, Object> childAccessPage : childPage) {
@@ -308,11 +316,11 @@ public class AccessGroupService {
         return parentAccessPage;
     }
 
-    public List<AccessPage> getAccessModulesForUnits(Long parentOrganizationId, Long userId) {
+    public List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId) {
         return accessPageRepository.getAccessModulesForUnits(parentOrganizationId, userId);
     }
 
-    public List<AccessPageQueryResult> getAccessPageHierarchy(Long accessGroupId, Long countryId) {
+    public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
         // Check if access group is of country
         if (Optional.ofNullable(countryId).isPresent()) {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
@@ -326,12 +334,11 @@ public class AccessGroupService {
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
         for (Map<String, Object> accessPage : accessPages) {
-            Map<String, Object> data = ObjectMapperUtils.copyPropertiesByMapper(accessPage.get("data"), HashedMap.class);
-            TranslationUtil.convertTranslationFromStringToMap(data);
-            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue(data, AccessPageQueryResult.class);
+            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue((Map<String, Object>) accessPage.get("data"), AccessPageQueryResult.class);
             queryResults.add(accessPageQueryResult);
         }
         List<AccessPageQueryResult> treeData = getAccessPageHierarchy(queryResults, queryResults);
+
         List<AccessPageQueryResult> modules = new ArrayList<>();
         for (AccessPageQueryResult accessPageQueryResult : treeData) {
             if (accessPageQueryResult.isModule()) {
@@ -341,7 +348,7 @@ public class AccessGroupService {
         return modules;
     }
 
-    public List<AccessPageQueryResult> getAccessPageByAccessGroup(Long accessGroupId, Long unitId, Long staffId) {
+    public List<AccessPageQueryResult> getAccessPageByAccessGroup(long accessGroupId, long unitId, long staffId) {
         Organization organization = organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> accessPages = accessPageRepository.getAccessPagePermissionOfStaff(organization.getId(), unitId, staffId, accessGroupId);
 
@@ -362,19 +369,23 @@ public class AccessGroupService {
         return modules;
     }
 
-    public Boolean setAccessPagePermissions(Long accessGroupId, List<Long> accessPageIds, boolean isSelected, Long countryId) {
+    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds, boolean isSelected, Long countryId) {
         // Check if access group is of country
         if (Optional.ofNullable(countryId).isPresent()) {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
+
             }
         }
         long creationDate = DateUtils.getDate().getTime();
         long lastModificationDate = DateUtils.getDate().getTime();
         Boolean read = isSelected;
         Boolean write = isSelected;
+
+
         accessGroupRepository.updateAccessPagePermission(accessGroupId, accessPageIds, isSelected, creationDate, lastModificationDate, read, write);
+
         // Update read/write permission of successive parent tabs
         updateReadWritePermissionOfSuccessiveParentTabForAccessGroup(accessGroupId, accessPageIds.get(0));
         // Remove customized permission for accessPageIds of accessGroupId
@@ -382,17 +393,19 @@ public class AccessGroupService {
         return true;
     }
 
-    public Map<String, Object> setPagePermissionToUser(Long staffId, Long unitId, Long accessGroupId, Long tabId, boolean read, boolean write,Long userId) {
-        resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
+    public Map<String, Object> setPagePermissionToUser(long staffId, long unitId, long accessGroupId, long tabId, boolean read, boolean write) {
+
         return accessPermissionGraphRepository.setPagePermissionToUser(unitId, staffId, accessGroupId, tabId, read, write);
 
     }
 
     public List<AccessPageQueryResult> getAccessPageHierarchy(List<AccessPageQueryResult> allResults, List<AccessPageQueryResult> accessPageQueryResults) {
+
         for (AccessPageQueryResult accessPageQueryResult : accessPageQueryResults) {
             accessPageQueryResult.setChildren(getChilds(allResults, accessPageQueryResult));
             getAccessPageHierarchy(allResults, accessPageQueryResult.getChildren());
         }
+
         return allResults;
     }
 
@@ -416,7 +429,7 @@ public class AccessGroupService {
         return result.getChildren();
     }
 
-    public List<Map<String, Object>> getAccessPermissions(Long staffId) {
+    public List<Map<String, Object>> getAccessPermissions(long staffId) {
 
         return accessGroupRepository.getAccessPermissions(staffId);
     }
@@ -441,7 +454,6 @@ public class AccessGroupService {
         accessPageRepository.updateAccessPagePermissionsForAccessGroup(accessGroupId, parentTabId, parentTabRead, parentTabWrite);
         updateReadWritePermissionOfSuccessiveParentTabForAccessGroup(parentTabId, accessGroupId);
     }
-
 
     public void updateReadWritePermissionOfParentTab(Long accessGroupId, Boolean read, Boolean write, Long tabId, Long orgId, Long unitId, Long staffId) {
 
@@ -471,7 +483,7 @@ public class AccessGroupService {
         updateReadWritePermissionOfParentTab(accessGroupId, parentTabRead, parentTabWrite, parentTabId, orgId, unitId, staffId);
     }
 
-    public void assignPermission(Long accessGroupId, AccessPermissionDTO accessPermissionDTO) {
+    public void assignPermission(long accessGroupId, AccessPermissionDTO accessPermissionDTO) {
         Organization organization = organizationService.fetchParentOrganization(accessPermissionDTO.getUnitId());
         AccessPageQueryResult readAndWritePermissionForAccessGroup = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPermissionDTO.getPageId());
         AccessPageQueryResult customReadAndWritePermissionForAccessGroup = accessPageRepository.getCustomPermissionOfTab(organization.getId(), accessPermissionDTO.getStaffId(), accessPermissionDTO.getUnitId(), accessPermissionDTO.getPageId(), accessGroupId);
@@ -502,14 +514,16 @@ public class AccessGroupService {
         if (Optional.ofNullable(parentTabId).isPresent()) {
             updateReadWritePermissionOfParentTab(accessGroupId, read, write, accessPermissionDTO.getPageId(), organization.getId(), accessPermissionDTO.getUnitId(), accessPermissionDTO.getStaffId());
         }
-        resetPermissionByAccessGroupIds(accessPermissionDTO.getUnitId(),newArrayList(accessGroupId));
     }
 
-    public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren,Long unitId) {
+    public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren) {
+
         AccessPageQueryResult readAndWritePermissionOfAccessPage = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPageId);
         List<Long> organizationAccessGroupIds = accessGroupRepository.getOrganizationAccessGroupIdsList(accessGroupId);
+
         Boolean write = accessPermissionDTO.isWrite();
         Boolean read = accessPermissionDTO.isRead();
+
         // If change has been done in read and if it is false then set write as false too
         if (readAndWritePermissionOfAccessPage.isRead() != read && !read) {
             write = false;
@@ -523,10 +537,11 @@ public class AccessGroupService {
                 accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, organizationAccessGroupId, read, write);
             }
         }
-        resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
+
         if (updateChildren) {
             // Update read/write permission of tab and its children
             return accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, accessGroupId, read, write);
+
         } else {
             // Update read/write permission of tab itself
             return accessGroupRepository.updatePermissionsForAccessTabOfAccessGroup(accessPageId, accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite());
@@ -534,6 +549,7 @@ public class AccessGroupService {
     }
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
+
     private void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
         switch (organizationCategory) {
             case HUB:
@@ -551,14 +567,18 @@ public class AccessGroupService {
     }
 
 
-    public CountryAccessGroupDTO createCountryAccessGroup(Long countryId, CountryAccessGroupDTO accessGroupDTO) {
+    public CountryAccessGroupDTO createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
         validateDetails(countryId, accessGroupDTO);
         List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
         if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
             exceptionService.dataNotMatchedException(MESSAGE_ACCOUNTTYPE_NOTFOUND);
         }
+        List<DayType> dayTypes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
+            dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
+        }
         Country country = countryGraphRepository.findOne(countryId);
-        AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) ? new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), accountType, accessGroupDTO.getDayTypeIds(), accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate()) : new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), accessGroupDTO.getDayTypeIds(), accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate());
+        AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) ? new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), accountType, dayTypes, accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate()) : new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), dayTypes, accessGroupDTO.getStartDate(), accessGroupDTO.getEndDate());
         CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country, accessGroup, accessGroupDTO.getOrganizationCategory());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         countryGraphRepository.save(country);
@@ -569,7 +589,7 @@ public class AccessGroupService {
         return accessGroupDTO;
     }
 
-    private void validateDetails(Long countryId, CountryAccessGroupDTO accessGroupDTO) {
+    private void validateDetails(long countryId, CountryAccessGroupDTO accessGroupDTO) {
         if (HUB.equals(accessGroupDTO.getOrganizationCategory()) && AccessGroupRole.STAFF.equals(accessGroupDTO.getRole())) {
             exceptionService.duplicateDataException("error.org.access.management.notnull");
         }
@@ -597,8 +617,9 @@ public class AccessGroupService {
         }
     }
 
-    public AccessGroup updateCountryAccessGroup(Long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
+    public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
         validateDetails(countryId,accessGroupDTO);
+        accessGroupRepository.unlinkDayTypes(accessGroupId);
         AccessGroup accessGrpToUpdate = accessGroupRepository.findById(accessGroupId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId)));
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
@@ -606,13 +627,13 @@ public class AccessGroupService {
         accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         accessGrpToUpdate.setStartDate(accessGroupDTO.getStartDate());
         accessGrpToUpdate.setEndDate(accessGroupDTO.getEndDate());
-        accessGrpToUpdate.setDayTypeIds(accessGroupDTO.getDayTypeIds());
+        accessGrpToUpdate.setDayTypes(dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds()));
         accessGrpToUpdate.setAllowedDayTypes(accessGroupDTO.isAllowedDayTypes());
         accessGroupRepository.save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
 
-    public boolean deleteCountryAccessGroup(Long accessGroupId) {
+    public boolean deleteCountryAccessGroup(long accessGroupId) {
         AccessGroup accessGroupToDelete = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroupToDelete).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
@@ -700,7 +721,7 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypeIds(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
         accessGroupRepository.save(accessGroup);
         organization.getAccessGroups().add(accessGroup);
         organization.getUnits().forEach(unit->unit.getAccessGroups().add(accessGroup));
@@ -711,7 +732,7 @@ public class AccessGroupService {
 
     }
 
-    public CountryAccessGroupDTO copyCountryAccessGroup(Long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
+    public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
         validateDayTypes(countryAccessGroupDTO.isAllowedDayTypes(), countryAccessGroupDTO.getDayTypeIds());
         if (countryAccessGroupDTO.getEndDate() != null && countryAccessGroupDTO.getEndDate().isBefore(countryAccessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
@@ -729,7 +750,7 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, countryAccessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), currentAccessGroup.get().getRole(), currentAccessGroup.get().getAccountType(), currentAccessGroup.get().getDayTypeIds(), currentAccessGroup.get().getStartDate(), currentAccessGroup.get().getEndDate());
+        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), currentAccessGroup.get().getRole(), currentAccessGroup.get().getAccountType(), currentAccessGroup.get().getDayTypes(), currentAccessGroup.get().getStartDate(), currentAccessGroup.get().getEndDate());
 
         CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country.get(), accessGroup, countryAccessGroupDTO.getOrganizationCategory());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
@@ -814,7 +835,9 @@ public class AccessGroupService {
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
-        return new ReasonCodeWrapper(userAccessRoleDTO);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeService.getReasonCodesByUnitId(unitId,ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
+
+        return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
 
 
@@ -867,33 +890,27 @@ public class AccessGroupService {
     public StaffAccessGroupQueryResult getAccessGroupWithDayTypesByStaffIdAndUnitId(Long unitId){
         Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), UserContext.getUserDetails().getId());
-        StaffAccessGroupQueryResult accessGroupStaffQueryResult = new StaffAccessGroupQueryResult();
+        StaffAccessGroupQueryResult accessGroupStaffQueryResult=new StaffAccessGroupQueryResult();
         if(staffAtHub!=null){
             accessGroupStaffQueryResult.setCountryAdmin(true);
             return accessGroupStaffQueryResult;
         }
         Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
         List<AccessGroup> accessGroups=accessGroupRepository.getAccessGroupWithDayTypesByStaffIdAndUnitId(staffId,unitId);
+
         accessGroupStaffQueryResult.setAccessGroups(accessGroups);
         return  accessGroupStaffQueryResult;
     }
 
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
+
+        AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
         if(!UserContext.getUserDetails().isSystemAdmin()){
-            AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
-            if(isNull(accessGroupStaffQueryResult)){
-                exceptionService.dataNotFoundByIdException(ERROR_POSITION_ACCESSGROUP_NOTFOUND);
-            }
             List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
-            Map<Long,Set<BigInteger>> accessGroupAndDayTypeMap= getMapOfAccessGroupAndDayType(accessGroupDayTypesQueryResults);
-            Set<BigInteger> dayTypesIds=new HashSet<>();
-            accessGroupAndDayTypeMap.forEach((k,v)->dayTypesIds.addAll(v));
-            List<DayTypeDTO> dayTypeDTOS=activityIntegrationService.getDayTypeByIds(dayTypesIds);
             for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
                 if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
-                    List<DayTypeDTO> dayTypeDTOList=dayTypeDTOS.stream().filter(k->accessGroupAndDayTypeMap.get(accessGroupDayTypesQueryResult.getAccessGroup().getId()).contains(k.getId())).collect(Collectors.toList());
-                    if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() || isDayTypeValid(date,dayTypeDTOList)){
+                    if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
                         accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
                     }
                 }
@@ -903,25 +920,19 @@ public class AccessGroupService {
         return accessGroups;
     }
 
-    public Map<Long, Set<BigInteger>> getMapOfAccessGroupAndDayType(List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults) {
-        Map<Long,Set<BigInteger>> accessGroupAndDayTypeMap=new HashMap<>();
-        accessGroupDayTypesQueryResults.forEach(k->accessGroupAndDayTypeMap.put(k.getAccessGroup().getId(),k.getAccessGroup().getDayTypeIds()));
-        return accessGroupAndDayTypeMap;
-    }
-
-    public boolean isDayTypeValid(Date date, List<DayTypeDTO> dayTypeDTOs) {
+    public boolean isDayTypeValid(Date date, List<DayTypeCountryHolidayCalenderQueryResult> dayTypeCountryHolidayCalenderQueryResults) {
         boolean valid = false;
-        for (DayTypeDTO dayTypeDTO : dayTypeDTOs) {
-            if (dayTypeDTO.isHolidayType()) {
-                for (CountryHolidayCalenderDTO countryHolidayCalendarQueryResult : dayTypeDTO.getCountryHolidayCalenderData()) {
-                    DateTimeInterval dateTimeInterval = getDateTimeInterval(dayTypeDTO, countryHolidayCalendarQueryResult);
+        for (DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult : dayTypeCountryHolidayCalenderQueryResults) {
+            if (dayTypeCountryHolidayCalenderQueryResult.isHolidayType()) {
+                for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : dayTypeCountryHolidayCalenderQueryResult.getCountryHolidayCalenders()) {
+                    DateTimeInterval dateTimeInterval = getDateTimeInterval(dayTypeCountryHolidayCalenderQueryResult, countryHolidayCalendarQueryResult);
                     valid = dateTimeInterval.contains(date);
                     if (valid) {
                         break;
                     }
                 }
             } else {
-                valid = isCollectionNotEmpty(dayTypeDTO.getValidDays()) && dayTypeDTO.getValidDays().contains(Day.fromValue(asLocalDate(date).getDayOfWeek().toString()));
+                valid = isCollectionNotEmpty(dayTypeCountryHolidayCalenderQueryResult.getValidDays()) && dayTypeCountryHolidayCalenderQueryResult.getValidDays().contains(Day.fromValue(asLocalDate(date).getDayOfWeek().toString()));
             }
             if (valid) {
                 break;
@@ -930,7 +941,7 @@ public class AccessGroupService {
         return valid;
     }
 
-    private DateTimeInterval getDateTimeInterval(DayTypeDTO dayTypeCountryHolidayCalenderQueryResult, CountryHolidayCalenderDTO countryHolidayCalendarQueryResult) {
+    private DateTimeInterval getDateTimeInterval(DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult, CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult) {
         DateTimeInterval dateTimeInterval;
         if (dayTypeCountryHolidayCalenderQueryResult.isAllowTimeSettings()) {
             LocalTime holidayEndTime = countryHolidayCalendarQueryResult.getEndTime().get(ChronoField.MINUTE_OF_DAY) == 0 ? LocalTime.MAX : countryHolidayCalendarQueryResult.getEndTime();
@@ -941,7 +952,7 @@ public class AccessGroupService {
         return dateTimeInterval;
     }
 
-    private void validateDayTypes(boolean allowedDayTypes, Set<BigInteger> dayTypeIds) {
+    private void validateDayTypes(boolean allowedDayTypes, Set<Long> dayTypeIds) {
         if ((allowedDayTypes && CollectionUtils.isEmpty(dayTypeIds))) {
             exceptionService.actionNotPermittedException(ERROR_DAY_TYPE_ABSENT);
         } else if ((!allowedDayTypes && CollectionUtils.isNotEmpty(dayTypeIds))) {
@@ -962,19 +973,36 @@ public class AccessGroupService {
         return organizationService.fetchParentOrganization(unitId).getAccessGroups().stream().map(k->k.getId()).collect(Collectors.toSet());
     }
 
-    public Map<String,List<Map>> getCountryAccessGroupLinkingDetails(Long accessGroupId){
-        Map<String,List<Map>> accessGroupDetails = new HashMap<>();
-        accessGroupDetails.put("expertiseDetails",accessGroupRepository.getCountryAccessGroupLinkingDetailsByExpertise(accessGroupId));
-        accessGroupDetails.put("organizationDetails",accessGroupRepository.getCountryAccessGroupLinkingDetailsByOrganization(accessGroupId));
-        accessGroupDetails.put("employmentTypeDetails",accessGroupRepository.getCountryAccessGroupLinkingDetailsByEmploymentType(accessGroupId));
-        return accessGroupDetails;
+    public Map<String, TranslationInfo> updateTranslation(Long accessGroupId, Map<String,TranslationInfo> translations) {
+        Map<String,Map<String,String>> translatedMap = getMapOfTranslationData(translations);
+        AccessGroup accessGroup =accessGroupRepository.findOne(accessGroupId);
+        accessGroup.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
+        accessGroup.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
+        accessGroupRepository.save(accessGroup);
+        return accessGroup.getTranslatedData();
     }
 
-    public Map<String,List<Map>> getOrganizationAccessGroupLinkingDetails(Long accessGroupId){
-        Map<String,List<Map>> accessGroupDetails = new HashMap<>();
-        accessGroupDetails.put("expertiseDetails",accessGroupRepository.getOrganizationAccessGroupLinkingDetailsByExpertise(accessGroupId));
-        accessGroupDetails.put("organizationDetails",accessGroupRepository.getOrganizationAccessGroupLinkingDetailsByOrganization(accessGroupId));
-        accessGroupDetails.put("employmentTypeDetails",accessGroupRepository.getOrganizationAccessGroupLinkingDetailsByEmploymentType(accessGroupId));
-        return accessGroupDetails;
+    public Map<String, TranslationInfo> updateTranslationOfAccessPage(Long accessPageId, Map<String,TranslationInfo> translations) {
+        Map<String,Map<String,String>> translatedMap = getMapOfTranslationData(translations);
+        AccessPage accessPage =accessPageRepository.findOne(accessPageId);
+        accessPage.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
+        accessPage.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
+        accessPageRepository.save(accessPage);
+        return accessPage.getTranslatedData();
     }
+
+    public Map<String,Map<String,String>> getMapOfTranslationData(Map<String,TranslationInfo> translations){
+        Map<String,Map<String,String>> tanslationMap = new HashMap<>();
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        tanslationMap.put(TRANSLATED_NAMES,translatedNames);
+        tanslationMap.put(TRANSLATED_DESCRIPTIONS,translatedDescriptios);
+        return tanslationMap;
+    }
+
+
 }

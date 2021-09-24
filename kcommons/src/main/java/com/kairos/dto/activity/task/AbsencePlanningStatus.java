@@ -1,11 +1,9 @@
 package com.kairos.dto.activity.task;
 
-import java.io.Serializable;
-
 /**
  * Created by oodles on 7/2/17.
  */
-public enum AbsencePlanningStatus implements Serializable {
+public enum AbsencePlanningStatus {
     ERROR, NOT_SYNCHRONISED, SYNCHRONISED, CHANGES_DONE ;
 
 

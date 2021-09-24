@@ -6,7 +6,7 @@ import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationSetting;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.repository.organization.OpenningHourGraphRepository;
+import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -29,7 +29,7 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNIT_ID_NOTFOUN
 public class OpenningHourService {
 
     @Inject
-    private OpenningHourGraphRepository openingHourGraphRepository;
+    private OpeningHourGraphRepository openingHourGraphRepository;
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
@@ -78,12 +78,12 @@ public class OpenningHourService {
     public List<Object> getOrganizationHolidays(long unitId) {
         Long id = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Object> response = new ArrayList<>();
-        List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidays(id);
-        for (Map map : data) {
-            Object o = map.get("result");
-            response.add(o);
-        }
-        return response;
+            List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidays(id);
+            for (Map map : data) {
+                Object o = map.get("result");
+                response.add(o);
+            }
+            return response;
     }
 
 

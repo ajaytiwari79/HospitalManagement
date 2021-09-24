@@ -9,6 +9,7 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
+import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 
 @Service
-public class WTABuilderService {
+public class WTABuilderService extends MongoBaseService {
 
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;

@@ -1,7 +1,5 @@
 package com.kairos.enums.gdpr;
 
-import java.io.Serializable;
-
-public enum  RetentionDuration implements Serializable {
+public enum  RetentionDuration {
     DAYS,WEEKS,YEAR,MONTHS
 }

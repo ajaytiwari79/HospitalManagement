@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.shift;
 
+import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.springframework.stereotype.Repository;

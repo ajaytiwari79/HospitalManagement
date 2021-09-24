@@ -648,7 +648,7 @@ public class TaskTypeService extends MongoBaseService {
         if (isNullOrDeleted(taskType) || sourceTaskType == null) {
             return null;
         }
-        taskType = ObjectMapperUtils.copyPropertiesByMapper(sourceTaskType,TaskType.class);
+        taskType = taskType.copyAllSettings(sourceTaskType);
         taskType.setSourceTaskId(sourceTaskTypeId);
         taskType.setSourceTaskTypeTitle(sourceTaskType.getTitle());
         save(taskType);

@@ -1,8 +1,6 @@
 package com.kairos.enums.kpermissions;
 
-import java.io.Serializable;
-
-public enum FieldLevelPermission implements Serializable {
+public enum FieldLevelPermission {
     READ("Read"),
     WRITE("Write"),
     HIDE("Hide"),

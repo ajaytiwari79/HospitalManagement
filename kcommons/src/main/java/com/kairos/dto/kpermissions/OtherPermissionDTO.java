@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
@@ -21,9 +20,8 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OtherPermissionDTO implements Serializable {
+public class OtherPermissionDTO {
 
-    private static final long serialVersionUID = 7618845778148781807L;
     private Set<Long> expertiseIds;
     private Set<Long> unionIds;
     private Set<Long> teamIds;
@@ -35,8 +33,7 @@ public class OtherPermissionDTO implements Serializable {
 
     public boolean isValid(OtherPermissionDTO otherPermissionDTO){
        boolean expertiseValid = isCollectionEmpty(expertiseIds) || CollectionUtils.containsAny(expertiseIds,otherPermissionDTO.expertiseIds);
-       //TODO remove after union issue fixed
-       boolean unionValid = true;//isCollectionEmpty(unionIds) || CollectionUtils.containsAny(unionIds,otherPermissionDTO.unionIds);
+        boolean unionValid = isCollectionEmpty(unionIds) || CollectionUtils.containsAny(unionIds,otherPermissionDTO.unionIds);
         boolean teamValid = isCollectionEmpty(teamIds) || CollectionUtils.containsAny(teamIds,otherPermissionDTO.teamIds);
         boolean employmentTypeValid = isCollectionEmpty(employmentTypeIds) || CollectionUtils.containsAny(employmentTypeIds,otherPermissionDTO.employmentTypeIds);
         boolean tagValid = isCollectionEmpty(tagIds) || CollectionUtils.containsAny(tagIds,otherPermissionDTO.tagIds);

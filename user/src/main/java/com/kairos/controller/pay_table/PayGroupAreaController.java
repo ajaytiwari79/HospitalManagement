@@ -3,7 +3,6 @@ package com.kairos.controller.pay_table;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.pay_group_area.PayGroupAreaService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,8 +27,6 @@ public class PayGroupAreaController {
 
     @Inject
     private PayGroupAreaService payGroupAreaService;
-
-    @Inject private TranslationService translationService;
 
     @PostMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area")
     public ResponseEntity<Map<String, Object>> savePayGroupArea(@PathVariable Long countryId,
@@ -75,7 +72,7 @@ public class PayGroupAreaController {
     @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.updateTranslationOfPayGroupArea(id,translations));
     }
 
 

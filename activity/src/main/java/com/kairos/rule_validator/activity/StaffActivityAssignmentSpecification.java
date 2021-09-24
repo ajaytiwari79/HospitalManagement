@@ -3,7 +3,6 @@ package com.kairos.rule_validator.activity;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.rule_validator.RuleExecutionType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class StaffActivityAssignmentSpecification extends AbstractSpecification<
     }
 
     @Override
-    public void validateRules(StaffDTO staffDTO, RuleExecutionType ruleExecutionType) {
+    public void validateRules(StaffDTO staffDTO) {
         //Not in use
     }
 

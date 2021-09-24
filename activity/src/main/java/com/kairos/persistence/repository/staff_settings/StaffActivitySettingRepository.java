@@ -31,6 +31,6 @@ public interface StaffActivitySettingRepository extends MongoBaseRepository<Staf
     @Query("{unitId :?0, activityId:{$in:?1}, deleted:false }")
     List<StaffActivitySetting> findByUnitIdAndActivityIdAndDeletedFalse(Long unitId, List<BigInteger> activityIds);
 
-    @Query(value = "{staffId :?0, deleted:false }",fields = "{'activityId':1,'staffId':1,'earliestStartTime':1,'latestStartTime':1,'shortestTime':1,'longestTime':1}")
+    @Query(value = "{staffId :?0, deleted:false }",fields = "{'earliestStartTime':1,'latestStartTime':1,'shortestTime':1,'longestTime':1}")
     List<StaffActivitySettingDTO> findAllByStaffIdAndDeletedFalse(Long staffId);
 }

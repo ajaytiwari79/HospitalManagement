@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,9 +16,8 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FieldDTO implements Serializable {
+public class FieldDTO {
 
-    private static final long serialVersionUID = 1383330090951424267L;
     private Long id;
     private String fieldName;
     private Set<OrganizationCategory> organizationCategories;

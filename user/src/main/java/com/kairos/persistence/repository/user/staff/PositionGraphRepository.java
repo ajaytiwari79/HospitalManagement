@@ -1,7 +1,10 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.staff.permission.UnitPermission;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -43,16 +46,24 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
     List<ExpiredPositionsQueryResult> findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(List<Long> positionIds);
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} " +
-            "  RETURN position ")
-    Position findPositionOfStaff(Long staffId);
+            "OPTIONAL MATCH(position)-[:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode)  RETURN position, reasonCode")
+    PositionReasonCodeQueryResult findEmploymentreasonCodeByStaff(Long staffId);
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} " +
-            "RETURN position")
+            "OPTIONAL MATCH(position)-[r:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode)" +
+            "RETURN position,r,reasonCode")
     Position findByStaffId(Long staffId);
 
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} set position.startDateMillis = {1}")
     void updatePositionStartDateOfStaff(Long staffId, Long startDateMillis);
+
+    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO + "]-(position:Position)" +
+            " MATCH(position)-[r:"+ HAS_REASON_CODE +"]-(reasonCode:ReasonCode) WHERE id(staff)={0} delete r")
+    void deletePositionReasonCodeRelation(Long staffId);
+    
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]-(position:Position) WHERE id(position)={0} RETURN staff")
+    Staff findStaffByPositionId(Long positionId);
 
     @Query("MATCH (organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
             "MATCH (user)-[:"+ BELONGS_TO +"]-(staff:Staff)" +

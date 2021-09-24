@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.user.region.Municipality;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Map;
@@ -36,7 +34,6 @@ public class PayGroupAreaQueryResult {
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
 

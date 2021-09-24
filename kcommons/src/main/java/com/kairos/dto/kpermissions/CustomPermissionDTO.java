@@ -1,6 +1,7 @@
 package com.kairos.dto.kpermissions;
 
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import lombok.Getter;
 import lombok.Setter;
 

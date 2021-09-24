@@ -17,7 +17,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClinicType extends UserBaseEntity {
 
-    private static final long serialVersionUID = 5792675983397080853L;
     @NotBlank(message = "error.ClinicType.name.notEmpty")
     private String name;
     private String description;

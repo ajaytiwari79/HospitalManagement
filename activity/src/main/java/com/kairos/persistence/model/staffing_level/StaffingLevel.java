@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.dto.activity.staffing_level.presence.StaffingLevelActivityDetails;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,10 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level")
@@ -24,7 +26,6 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 public class StaffingLevel extends MongoBaseEntity {
-    private static final long serialVersionUID = 9078681960018781377L;
     @Indexed
     private Date currentDate;
     private Integer weekCount;
@@ -34,7 +35,6 @@ public class StaffingLevel extends MongoBaseEntity {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval = new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval = new ArrayList<>();
-    private Set<StaffingLevelActivityDetails> staffingLevelActivityDetails =new LinkedHashSet<>();
 
     public StaffingLevel(Date currentDate, Integer weekCount,
                          Long organizationId, BigInteger phaseId, StaffingLevelSetting staffingLevelSetting) {

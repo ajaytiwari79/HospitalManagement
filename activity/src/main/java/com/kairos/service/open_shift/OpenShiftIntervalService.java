@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_OVERLAP_I
 
 @Service
 @Transactional
-public class OpenShiftIntervalService{
+public class OpenShiftIntervalService extends MongoBaseService {
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
     @Inject
@@ -32,7 +33,7 @@ public class OpenShiftIntervalService{
         }
         OpenShiftInterval openShiftInterval = new OpenShiftInterval();
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
-        openShiftIntervalRepository.save(openShiftInterval);
+        save(openShiftInterval);
         openShiftIntervalDTO.setId(openShiftInterval.getId());
         return openShiftIntervalDTO;
     }
@@ -53,7 +54,7 @@ public class OpenShiftIntervalService{
             exceptionService.actionNotPermittedException(EXCEPTION_OVERLAP_INTERVAL);
         }
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
-        openShiftIntervalRepository.save(openShiftInterval);
+        save(openShiftInterval);
         return openShiftIntervalDTO;
     }
 
@@ -63,7 +64,7 @@ public class OpenShiftIntervalService{
             exceptionService.dataNotFoundByIdException(EXCEPTION_NOOPENSHIFTINTERVALFOUND, "OpenShiftInterval", openShiftIntervalId);
         }
         openShiftInterval.setDeleted(true);
-        openShiftIntervalRepository.save(openShiftInterval);
+        save(openShiftInterval);
         return true;
     }
 

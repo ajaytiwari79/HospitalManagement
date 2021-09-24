@@ -12,7 +12,6 @@ import java.util.List;
  */
 public class NightWorker extends MongoBaseEntity{
 
-    private static final long serialVersionUID = 4711954393642228677L;
     private boolean nightWorker;
     private LocalDate startDate;
     private PersonType personType;

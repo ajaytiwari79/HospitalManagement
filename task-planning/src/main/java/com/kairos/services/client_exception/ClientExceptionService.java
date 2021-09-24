@@ -117,11 +117,55 @@ public class ClientExceptionService extends MongoBaseService {
         List<ClientException> sickExceptions = null;
         switch (clientExceptionType.getValue()) {
             case SICK: {
-                sickExceptions = getClientExceptionList(clientExceptionDto, unitId, clientId, clientExceptionType, clientExceptions, allUnhandledTasks);
+                sickExceptions = new ArrayList<>();
+                Optional<String> date = clientExceptionDto.getSelectedDates().stream().findFirst();
+                if (!date.isPresent()) {
+                    exceptionService.internalError(ERROR_EXCEPTION_DATE_NOTFOUND);
+                }
+                DateTime initialDate = new DateTime(date.get());
+                validateSickException(initialDate, clientExceptionDto.getDaysToReview(), clientId);
+                int exceptionCount = 0;
+                while (exceptionCount < clientExceptionDto.getDaysToReview()) {
+                    DateTime startOfDay = initialDate.withTimeAtStartOfDay();
+                    DateTime endOfDay = initialDate.withTime(DAY_END_HOUR, DAY_END_MINUTE, DAY_END_SECOND, DAY_END_NANO);
+                    clientException = clientExceptionMongoRepository.getSickExceptionForDate(clientId, startOfDay.toDate());
+                    if (clientException == null) {
+                        clientException = getClientExceptionObj(clientExceptionDto, startOfDay.toDate(), endOfDay.toDate(), clientExceptionType, clientId, unitId);
+                        save(clientException);
+                        sickExceptions.add(clientException);
+                    }
+                    clientExceptions.add(clientException);
+                    initialDate = initialDate.plusDays(1);
+                    exceptionCount++;
+                    tasksToReturn = updateTasksInKairosAndVisitour(clientExceptionDto, unitId, clientId, startOfDay.toDate(), endOfDay.toDate(), clientException, false, null);
+                    allUnhandledTasks.addAll(tasksToReturn);
+                }
                 break;
             }
             case IN_HOSPITAL: {
-                getExceptionInCaseOfHospital(clientExceptionDto, unitId, clientId, clientExceptionType, clientExceptions, fromTime, toTime, allUnhandledTasks);
+                if (clientExceptionDto.getFromTime() != null && clientExceptionDto.getToTime() != null) {
+                    fromTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDto.getFromTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
+                    toTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDto.getToTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
+                }
+                for (String selectedDate : clientExceptionDto.getSelectedDates()) {
+                    if (fromTime != null && toTime != null) {
+                        timeFrom = LocalDate.parse(selectedDate).atTime(fromTime.getHour(), fromTime.getMinute());
+                        timeTo = LocalDate.parse(selectedDate).atTime(toTime.getHour(), toTime.getMinute());
+                        dateFrom = Date.from(timeFrom.atZone(ZoneId.systemDefault()).toInstant());
+                        dateTo = Date.from(timeTo.atZone(ZoneId.systemDefault()).toInstant());
+                    } else {
+                        dateFrom = DateUtils.convertToOnlyDate(selectedDate, ONLY_DATE);
+                        dateTo = DateUtils.convertToOnlyDate(selectedDate, ONLY_DATE);
+                        dateTo.setHours(DAY_END_HOUR);
+                        dateTo.setMinutes(DAY_END_MINUTE);
+                    }
+                    validateClientException(Arrays.asList(clientId), dateFrom, dateTo, clientExceptionType.getId());
+                    clientException = getClientExceptionObj(clientExceptionDto, dateFrom, dateTo, clientExceptionType, clientId, unitId);
+                    clientExceptionMongoRepository.save(clientException);
+                    clientExceptions.add(clientException);
+                    tasksToReturn = updateTasksInKairosAndVisitour(clientExceptionDto, unitId, clientId, dateFrom, dateTo, clientException, false, null);
+                    allUnhandledTasks.addAll(tasksToReturn);
+                }
                 break;
 
             }
@@ -168,68 +212,6 @@ public class ClientExceptionService extends MongoBaseService {
         map.put(EXCEPTION_LIST, clientExceptions);
         map.put(TASK_LIST, plannerService.customizeTaskData(allUnhandledTasks));
         return map;
-    }
-
-    private void getExceptionInCaseOfHospital(ClientExceptionDTO clientExceptionDto, long unitId, long clientId, ClientExceptionType clientExceptionType, List<ClientException> clientExceptions, LocalDateTime fromTime, LocalDateTime toTime, List<Task> allUnhandledTasks) {
-        LocalDateTime timeFrom;
-        LocalDateTime timeTo;
-        Date dateFrom;
-        Date dateTo;
-        ClientException clientException;
-        List<Task> tasksToReturn;
-        if (clientExceptionDto.getFromTime() != null && clientExceptionDto.getToTime() != null) {
-            fromTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDto.getFromTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
-            toTime = LocalDateTime.ofInstant(DateUtils.convertToOnlyDate(clientExceptionDto.getToTime(), MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
-        }
-        for (String selectedDate : clientExceptionDto.getSelectedDates()) {
-            if (fromTime != null && toTime != null) {
-                timeFrom = LocalDate.parse(selectedDate).atTime(fromTime.getHour(), fromTime.getMinute());
-                timeTo = LocalDate.parse(selectedDate).atTime(toTime.getHour(), toTime.getMinute());
-                dateFrom = Date.from(timeFrom.atZone(ZoneId.systemDefault()).toInstant());
-                dateTo = Date.from(timeTo.atZone(ZoneId.systemDefault()).toInstant());
-            } else {
-                dateFrom = DateUtils.convertToOnlyDate(selectedDate, ONLY_DATE);
-                dateTo = DateUtils.convertToOnlyDate(selectedDate, ONLY_DATE);
-                dateTo.setHours(DAY_END_HOUR);
-                dateTo.setMinutes(DAY_END_MINUTE);
-            }
-            validateClientException(Arrays.asList(clientId), dateFrom, dateTo, clientExceptionType.getId());
-            clientException = getClientExceptionObj(clientExceptionDto, dateFrom, dateTo, clientExceptionType, clientId, unitId);
-            clientExceptionMongoRepository.save(clientException);
-            clientExceptions.add(clientException);
-            tasksToReturn = updateTasksInKairosAndVisitour(clientExceptionDto, unitId, clientId, dateFrom, dateTo, clientException, false, null);
-            allUnhandledTasks.addAll(tasksToReturn);
-        }
-    }
-
-    private List<ClientException> getClientExceptionList(ClientExceptionDTO clientExceptionDto, long unitId, long clientId, ClientExceptionType clientExceptionType, List<ClientException> clientExceptions, List<Task> allUnhandledTasks) {
-        List<ClientException> sickExceptions;
-        ClientException clientException;
-        List<Task> tasksToReturn;
-        sickExceptions = new ArrayList<>();
-        Optional<String> date = clientExceptionDto.getSelectedDates().stream().findFirst();
-        if (!date.isPresent()) {
-            exceptionService.internalError(ERROR_EXCEPTION_DATE_NOTFOUND);
-        }
-        DateTime initialDate = new DateTime(date.get());
-        validateSickException(initialDate, clientExceptionDto.getDaysToReview(), clientId);
-        int exceptionCount = 0;
-        while (exceptionCount < clientExceptionDto.getDaysToReview()) {
-            DateTime startOfDay = initialDate.withTimeAtStartOfDay();
-            DateTime endOfDay = initialDate.withTime(DAY_END_HOUR, DAY_END_MINUTE, DAY_END_SECOND, DAY_END_NANO);
-            clientException = clientExceptionMongoRepository.getSickExceptionForDate(clientId, startOfDay.toDate());
-            if (clientException == null) {
-                clientException = getClientExceptionObj(clientExceptionDto, startOfDay.toDate(), endOfDay.toDate(), clientExceptionType, clientId, unitId);
-                save(clientException);
-                sickExceptions.add(clientException);
-            }
-            clientExceptions.add(clientException);
-            initialDate = initialDate.plusDays(1);
-            exceptionCount++;
-            tasksToReturn = updateTasksInKairosAndVisitour(clientExceptionDto, unitId, clientId, startOfDay.toDate(), endOfDay.toDate(), clientException, false, null);
-            allUnhandledTasks.addAll(tasksToReturn);
-        }
-        return sickExceptions;
     }
 
     private Map<String, Object> createChangeLocationException(Long unitId, Long clientId, ClientExceptionDTO clientExceptionDTO,

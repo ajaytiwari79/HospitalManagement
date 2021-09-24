@@ -7,9 +7,8 @@ import com.kairos.enums.OrganizationLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 
-import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +20,8 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-public class QueryResult implements Serializable {
+public class QueryResult {
 
-    private static final long serialVersionUID = -734491936294262433L;
     private String name;
     private long id;
     private List<QueryResult> children = new ArrayList<>();
@@ -43,7 +41,6 @@ public class QueryResult implements Serializable {
     private CompanyType type;
     private String startDate;
     private String endDate;
-    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public QueryResult(String name, long id, List<QueryResult> children) {

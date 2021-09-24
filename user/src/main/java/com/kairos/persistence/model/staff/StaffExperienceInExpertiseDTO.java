@@ -1,18 +1,13 @@
 package com.kairos.persistence.model.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Created by pavan on 27/3/18.
@@ -30,8 +25,6 @@ public class StaffExperienceInExpertiseDTO {
     @DateLong
     private Date expertiseStartDate;
     private Integer nextSeniorityLevelInMonths;
-    @Convert(TranslationConverter.class)
-    private Map<String, TranslationInfo> translations;
 
     public StaffExperienceInExpertiseDTO(Long id, String name, Long expertiseId, Integer relevantExperienceInMonths, Date expertiseStartDate) {
         this.id = id;
@@ -51,9 +44,5 @@ public class StaffExperienceInExpertiseDTO {
         sb.append(", expertiseStartDate=").append(expertiseStartDate);
         sb.append('}');
         return sb.toString();
-    }
-
-    public String getName(){
-        return TranslationUtil.getName(translations,name);
     }
 }

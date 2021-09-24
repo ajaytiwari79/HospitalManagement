@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
-import com.kairos.dto.activity.common.OrderAndActivityDTO;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
@@ -16,19 +15,15 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityRankingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
+import com.kairos.persistence.model.user.expertise.response.OrderAndActivityDTO;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -42,10 +37,10 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
@@ -238,67 +233,12 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
     }
 
+    public Set<BigInteger> getActivitiesWithAllChildren(Long unitId,Set<BigInteger> activityIds) {
+        return genericRestClient.publishRequest(activityIds, unitId, true, IntegrationOperation.UPDATE, "/activity/get_all_Children", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
+    }
 
     public List<CTACompensationSettingDTO> getCTACompensationSettingByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/cta_compensations", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTACompensationSettingDTO>>>(){});
-    }
-
-    public Set<BigInteger> getApplicableDayTypes(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/active_dayTypes", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
-    }
-
-    public List<DayTypeDTO> getDayTypesByCountryId(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/dayType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
-    }
-
-    public List<CountryHolidayCalenderDTO> getCountryHolidaysByCountryId(Long countryId){
-        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/holiday/all", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CountryHolidayCalenderDTO>>>(){});
-    }
-
-    public void linkProtectedDaysOff(Long expertiseId,Long countryId) {
-        BasicNameValuePair expertiseParam = new BasicNameValuePair("expertiseId", expertiseId + "");
-        List<NameValuePair> param = new ArrayList<>();
-        param.add(expertiseParam);
-        genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.CREATE, "/link_protected_days_off", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
-    }
-
-    public List<ReasonCodeDTO> getReasonCodeByType(Long unitId, ReasonCodeType reasonCodeType) {
-        BasicNameValuePair expertiseParam = new BasicNameValuePair("reasonCodeType", reasonCodeType + "");
-        List<NameValuePair> param = new ArrayList<>();
-        param.add(expertiseParam);
-       return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/reason_codes", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ReasonCodeDTO>>>(){});
-    }
-
-    public void updateTimeZoneInUnitSettings(Long unitId, ZoneId zoneIdString) {
-        genericRestClient.publishRequest(zoneIdString, unitId, true, IntegrationOperation.UPDATE, "/update_time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
-    }
-
-    public List<DayTypeDTO> getDayTypeByIds(Set<BigInteger> dayTypeIds) {
-        return isCollectionEmpty(dayTypeIds)?new ArrayList<>():genericRestClient.publishRequest(dayTypeIds, null, false, IntegrationOperation.UPDATE, "/dayType_byIds", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
-    }
-
-    public void transferReasonCode(List<ReasonCodeDTO> reasonCodeDTOS) {
-        genericRestClient.publishRequest(reasonCodeDTOS, null, false, IntegrationOperation.CREATE, "/transfer_reason_code", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
-    }
-
-    @Async
-    public void setAbsenceRankingForExpertise(ActivityRankingDTO absenceRankingForExpertise) {
-        genericRestClient.publishRequest(absenceRankingForExpertise, null, false, IntegrationOperation.CREATE, "/expertise/{expertiseId}/absence_ranking", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){},absenceRankingForExpertise.getExpertiseId());
-    }
-
-    public void createNewWTALine(Long unitId, Long employmentId, LocalDate publishDate) {
-        Map<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put("date", publishDate);
-        queryParams.put("employmentId", employmentId);
-        restClientForSchedulerMessages.publish(null, unitId, true, IntegrationOperation.CREATE, "/create_wta_line_on_update_weekly_hours", queryParams);
-    }
-
-    public void createDefaultGranularitySetting(Long countryId, Long orgTypeId) {
-        Map<String,Object> requestBody = new HashMap<>();
-        requestBody.put("granularityInMinute",15);
-        requestBody.put("countryId",countryId);
-        requestBody.put("organisationTypeId",orgTypeId);
-        restClientForSchedulerMessages.publish(requestBody, countryId, false, IntegrationOperation.CREATE, "/granularity_setting", null);
     }
 }
 

@@ -25,7 +25,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_F
 @Setter
 @NoArgsConstructor
 public class Group extends UserBaseEntity {
-    private static final long serialVersionUID = -7329797974121078964L;
     private String name;
     private String description;
     @Relationship(type = HAS_FILTERS)

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.employment.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
+import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
 import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
@@ -45,7 +45,7 @@ public class ExpertiseResponseDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long expertiseLineId;
-    private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
 
 
     @AssertTrue(message = "message.start_date.less_than.end_date")

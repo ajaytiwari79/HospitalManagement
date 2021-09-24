@@ -22,7 +22,10 @@ public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> 
     List<Region> findAll();
 
     @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0}" +
-            " return r.translations as translations,\n" +
+            " return {english :{name: CASE WHEN r.`translatedNames.english` IS NULL THEN '' ELSE r.`translatedNames.english` END, description : CASE WHEN r.`translatedDescriptions.english` IS NULL THEN '' ELSE r.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN r.`translatedNames.hindi` IS NULL THEN '' ELSE r.`translatedNames.hindi` END, description : CASE WHEN r.`translatedDescriptions.hindi` IS NULL THEN '' ELSE r.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN r.`translatedNames.danish` IS NULL THEN '' ELSE r.`translatedNames.danish` END, description : CASE WHEN r.`translatedDescriptions.danish` IS NULL THEN '' ELSE r.`translatedDescriptions.danish` END} ,\n" +
+            "britishenglish:{name: CASE WHEN r.`translatedNames.britishenglish` IS NULL THEN '' ELSE r.`translatedNames.britishenglish` END, description : CASE WHEN r.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE r.`translatedDescriptions.britishenglish` END}} as translations,\n" +
             "r.name as name, r.code as code, r.geoFence as geoFence, r.latitude   as latitude, r.longitude as longitude ,id(r) as id")
     List<RegionQueryResult> findAllRegionsByCountryId(Long countryId);
 

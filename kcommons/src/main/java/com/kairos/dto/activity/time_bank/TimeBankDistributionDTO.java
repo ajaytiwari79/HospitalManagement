@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -13,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeBankDistributionDTO implements Serializable {
+public class TimeBankDistributionDTO {
 
     //cta ruletemplate based distributions
     private String ctaName;

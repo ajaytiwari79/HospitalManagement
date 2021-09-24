@@ -4,13 +4,9 @@ package com.kairos.commons.custom_exception;
  * Created by oodles on 8/2/17.
  */
     public class AddressNotVerifiedByTomTom extends RuntimeException{
-    private final transient Object[] params;
-    public AddressNotVerifiedByTomTom(String message,Object... params) {
+    @Deprecated//Please use ExceptionService
+    public AddressNotVerifiedByTomTom(String message) {
         super(message);
-        this.params = params;
-    }
-    public Object[] getParams() {
-        return params;
     }
 
 }

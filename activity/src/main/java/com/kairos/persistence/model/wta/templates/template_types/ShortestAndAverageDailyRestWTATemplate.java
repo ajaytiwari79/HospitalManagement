@@ -21,6 +21,7 @@ import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.CAMELCASE_DAYS;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -40,7 +41,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     private float recommendedValue;
     private Set<BigInteger> plannedTimeIds = new HashSet<>();
     private Set<BigInteger> timeTypeIds = new HashSet<>();
-    private transient DateTimeInterval interval;
 
     public ShortestAndAverageDailyRestWTATemplate(String name,  boolean disabled,
                                                   String description, long intervalLength, String intervalUnit) {
@@ -59,47 +59,34 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
-            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval,infoWrapper.getShifts());
+            List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds);
+            shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
+            shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getIntervals(interval);
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
-            boolean isValid = true;
             for (DateTimeInterval dateTimeInterval : intervals) {
                 int totalMin = (int)dateTimeInterval.getMinutes();
                 for (ShiftWithActivityDTO shift : shifts) {
                     if(dateTimeInterval.overlaps(shift.getDateTimeInterval())){
                         totalMin -= (int)dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                     }
-                    if(!isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()))){
-                        isValid = false;
-                    }
                 }
+                boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS.toValue(),getHoursByMinutes(limitAndCounter[0],this.name));
             }
         }
     }
 
-    public List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts) {
-        List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
-        shifts.forEach(shift -> {
-            boolean isValidShift = (org.apache.commons.collections.CollectionUtils.isNotEmpty(timeTypeIds) && org.apache.commons.collections.CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (org.apache.commons.collections.CollectionUtils.isNotEmpty(plannedTimeIds) && org.apache.commons.collections.CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
-            if (isValidShift && (dateTimeInterval.contains(shift.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(shift.getEndLocalDate()))) {
-                updatedShifts.add(shift);
-            }
-        });
-        return updatedShifts;
-    }
-
-
     public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){
         ZonedDateTime zonedDateTime = null;
         switch (intervalUnit){
-            case CAMELCASE_DAYS:zonedDateTime = dateTime.plusDays(intervalLength);
+            case CAMELCASE_DAYS:dateTime.plusDays(intervalLength);
                 break;
-            case WEEKS:zonedDateTime = dateTime.plusWeeks(intervalLength);
+            case WEEKS:dateTime.plusWeeks(intervalLength);
                 break;
-            case MONTHS:zonedDateTime = dateTime.plusMonths(intervalLength);
+            case MONTHS:dateTime.plusMonths(intervalLength);
                 break;
-            case YEARS:zonedDateTime = dateTime.plusYears(intervalLength);
+            case YEARS:dateTime.plusYears(intervalLength);
                 break;
             default:
                 break;

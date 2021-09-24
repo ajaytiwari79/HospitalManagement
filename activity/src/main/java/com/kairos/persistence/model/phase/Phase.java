@@ -31,7 +31,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class Phase extends MongoBaseEntity {
-    private static final long serialVersionUID = -8311397313784918878L;
     @NotNull(message = "error.phase.name.notnull")
     private String name;
     private String description;

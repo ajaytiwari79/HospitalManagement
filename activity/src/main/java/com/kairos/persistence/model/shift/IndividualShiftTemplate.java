@@ -4,14 +4,12 @@ package com.kairos.persistence.model.shift;
 import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.dto.activity.shift.ShiftTemplateActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalTime;
 import java.util.List;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_EMPTY;
 
-@Document
 public class IndividualShiftTemplate extends MongoBaseEntity {
     private String name;
     private String remarks;

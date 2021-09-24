@@ -1,11 +1,9 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
 /**
  * Created by pavan on 8/3/18.
  */
-public enum RuleTemplates implements Serializable {
+public enum RuleTemplates {
     MAXIMUM_SHIFT_LENGTH,
     MINIMUM_SHIFT_LENGTH,
     MAXIMUM_NUMBER_OF_CONSECUTIVE_DAYS,

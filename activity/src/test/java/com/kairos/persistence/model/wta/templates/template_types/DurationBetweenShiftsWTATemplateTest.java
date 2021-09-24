@@ -55,9 +55,9 @@ public class DurationBetweenShiftsWTATemplateTest {
 
     @Test
     public void getRestingHoursByTimeType() {
-        boolean valid = new DurationBetweenShiftsWTATemplate().getRestingHoursByTimeType(ruleTemplateSpecificInfo,true,1020);
-        Assert.assertEquals(valid,true);
-        valid = new DurationBetweenShiftsWTATemplate().getRestingHoursByTimeType(ruleTemplateSpecificInfo,false,1020);
-        Assert.assertEquals(valid,true);
+        int duration = new DurationBetweenShiftsWTATemplate().getRestingHoursByTimeType(ruleTemplateSpecificInfo,true);
+        Assert.assertEquals(duration,1020);
+        duration = new DurationBetweenShiftsWTATemplate().getRestingHoursByTimeType(ruleTemplateSpecificInfo,false);
+        Assert.assertEquals(duration,1080);
     }
 }

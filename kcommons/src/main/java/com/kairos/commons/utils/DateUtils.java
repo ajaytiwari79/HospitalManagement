@@ -10,6 +10,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -227,7 +228,7 @@ public  class DateUtils {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static Date asDate(LocalDate localDate) {
+    public static Date asDate(@NotNull(message = "date can not be null") LocalDate localDate) {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
@@ -270,10 +271,6 @@ public  class DateUtils {
 
     public static LocalDateTime asLocalDateTime(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-
-    public static LocalDateTime asLocalDateTime(LocalDate date) {
-        return LocalDateTime.of(date,LocalTime.MIN);
     }
 
     public static Date onlyDate(Date date) {
@@ -531,10 +528,6 @@ public  class DateUtils {
         return LocalDateTime.now(unitTimeZone);
     }
 
-    public static ZonedDateTime getZonedDateTimeFromZoneId(ZoneId unitTimeZone) {
-        return ZonedDateTime.now(unitTimeZone);
-    }
-
     public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone, Long dateMillis) {
         LocalDate date = Instant.ofEpochMilli(dateMillis).atZone(ZoneId.systemDefault()).toLocalDate();
         ZonedDateTime zdt = ZonedDateTime.of(date, LocalTime.MAX, zone);
@@ -621,10 +614,6 @@ public  class DateUtils {
 
     public static LocalDate getLocalDateFromTimezone(String timeZone){
         return LocalDate.now(ZoneId.of(timeZone));
-    }
-
-    public static LocalDate getLocalDateFromTimezone(ZoneId timeZone){
-        return LocalDate.now(timeZone);
     }
 
     public static int getHourFromDate(Date date) {
@@ -949,14 +938,10 @@ public  class DateUtils {
     }
 
     public  static  int getMinutesFromTime(String time){
-        if(!time.contains(".")){
-            return Integer.parseInt(time)*60;
-        }
         int indexOfDot=time.indexOf(".");
         String hrs=time.substring(0,indexOfDot);
         int minutes=Integer.parseInt(hrs)*60;
         return minutes+Integer.parseInt(time.substring(indexOfDot+1));
     }
-
 
 }

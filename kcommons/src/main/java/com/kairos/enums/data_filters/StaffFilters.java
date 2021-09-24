@@ -1,8 +1,6 @@
 package com.kairos.enums.data_filters;
 
-import java.io.Serializable;
-
-public enum StaffFilters implements Serializable {
+public enum StaffFilters {
 
     EMPLOYMENT_TYPE("Employment Type"), EXPERTISE("Expertise"), STAFF_STATUS("Staff Status"), GENDER("Gender"),
     ORGANIZATION_TYPE("Organization Type"),

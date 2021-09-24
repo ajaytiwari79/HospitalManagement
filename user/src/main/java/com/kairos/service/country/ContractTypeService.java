@@ -1,9 +1,12 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.model.country.default_data.ContractTypeDTO;
+import com.kairos.persistence.model.country.default_data.VatType;
 import com.kairos.persistence.repository.user.country.ContractTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -11,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -49,7 +54,12 @@ public class ContractTypeService {
 
     public List<ContractTypeDTO> getContractTypeByCountryId(long countryId){
         List<ContractType> contractTypes = contractTypeGraphRepository.findContractTypeByCountry(countryId);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(contractTypes, ContractTypeDTO.class);
+        List<ContractTypeDTO> contractTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(contractTypes,ContractTypeDTO.class);
+        for(ContractTypeDTO contractTypeDTO :contractTypeDTOS){
+            contractTypeDTO.setCountryId(countryId);
+            contractTypeDTO.setTranslations(TranslationUtil.getTranslatedData(contractTypeDTO.getTranslatedNames(),contractTypeDTO.getTranslatedDescriptions()));
+        }
+        return contractTypeDTOS;
     }
 
     public ContractTypeDTO updateContractType(long countryId, ContractTypeDTO contractTypeDTO){
@@ -76,6 +86,17 @@ public class ContractTypeService {
             exceptionService.duplicateDataException("error.VatType.notfound");
         }
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long contractTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        ContractType contractType =contractTypeGraphRepository.findOne(contractTypeId);
+        contractType.setTranslatedNames(translatedNames);
+        contractType.setTranslatedDescriptions(translatedDescriptions);
+        contractTypeGraphRepository.save(contractType);
+        return contractType.getTranslatedData();
     }
 
 }

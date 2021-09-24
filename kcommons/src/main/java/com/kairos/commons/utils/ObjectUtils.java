@@ -5,7 +5,6 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,12 +70,6 @@ public class ObjectUtils {
 
     public static <E> HashSet<E> newHashSet(E... elements) {
         HashSet<E> set = new HashSet<>(elements.length);
-        Collections.addAll(set, elements);
-        return set;
-    }
-
-    public static <E> LinkedHashSet<E> newLinkedHashSet(E... elements) {
-        LinkedHashSet<E> set = new LinkedHashSet<>(elements.length);
         Collections.addAll(set, elements);
         return set;
     }
@@ -175,42 +168,4 @@ public class ObjectUtils {
             }
         }
     }
-
-    public static <T> int indexOf(Set<T> set, T element){
-        List<T> list = new ArrayList<>(set);
-        return list.indexOf(element);
-    }
-
-    public static List<Long> getLongValue(List<Object> objects) {
-        return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toList()) : new ArrayList<>();
-    }
-
-    public static Set<Long> getLongValueSet(List<Object> objects) {
-        return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toSet()) : new HashSet<>();
-    }
-
-    public static <G> Set<Long> getLongValueSetBySetOfObjects(Set<G> objects) {
-        return isCollectionNotEmpty(objects) ? objects.stream().map(o -> Long.valueOf(o.toString())).collect(Collectors.toSet()) : new HashSet<>();
-    }
-
-    public static List<LocalDate> getLocalDate(List<Object> objects) {
-        return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> (o instanceof LocalDate) ? (LocalDate) o : DateUtils.asLocalDate((String) o)).collect(Collectors.toList()) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
-    }
-
-    public static List<BigInteger> getBigIntegerValue(List<Object> objects) {
-        return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toList());
-    }
-
-    public static Set<BigInteger> getBigIntegerSet(List<Object> objects) {
-        return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toSet());
-    }
-
-    public static Set<DayOfWeek> getDaysOfWeeksfromString(List<Object> objects) {
-        return objects.stream().map(o -> DayOfWeek.valueOf((o.toString()))).collect(Collectors.toSet());
-    }
-
-    public static <T> Set<String> getStringByList(Set<T> objects) {
-        return objects.stream().map(o -> o.toString()).collect(Collectors.toSet());
-    }
-
 }

@@ -12,7 +12,6 @@ import java.util.List;
 public class OrganizationSetting extends UserBaseEntity {
 
 
-    private static final long serialVersionUID = 8060522225022179044L;
     private List<OpeningHours> openingHour;
     private String workingDays;
 

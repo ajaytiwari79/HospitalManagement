@@ -18,6 +18,7 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
 import com.kairos.service.exception.ExceptionService;
@@ -34,7 +35,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NAME_ALREADYEXIST;
 
 /**
@@ -44,7 +44,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NAME_AL
 
 @Service
 @Transactional
-public class CountryCTAService {
+public class CountryCTAService extends MongoBaseService {
     public static final String ORGANIZATION_SUB_TYPE_ID = "organizationSubTypeId";
     public static final String EXPERTISE_ID = "expertiseId";
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
@@ -157,7 +157,7 @@ public class CountryCTAService {
             ctaRuleTemplateRepository.saveEntities(ruleTemplates);
             ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
         }
-        if (creatingFromCountry && isNotNull(ctaBasicDetailsDTO)) {
+        if (creatingFromCountry) {
             Expertise expertise = new Expertise(ctaBasicDetailsDTO.getExpertise().getId(), ctaBasicDetailsDTO.getExpertise().getName(), ctaBasicDetailsDTO.getExpertise().getDescription());
             costTimeAgreement.setExpertise(expertise);
             if (!doUpdate) {
@@ -265,6 +265,7 @@ public class CountryCTAService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair(ORGANIZATION_SUB_TYPE_ID, collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
         requestParam.add(new BasicNameValuePair(EXPERTISE_ID, collectiveTimeAgreementDTO.getExpertise().getId().toString()));
+        CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId, requestParam);
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
@@ -278,7 +279,7 @@ public class CountryCTAService {
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         updateCostTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
-        buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, null, null);
+        buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, ctaBasicDetailsDTO, null);
         costTimeAgreementRepository.save(updateCostTimeAgreement);
         return addTagsInResponse( updateCostTimeAgreement, tagDTOS);
     }

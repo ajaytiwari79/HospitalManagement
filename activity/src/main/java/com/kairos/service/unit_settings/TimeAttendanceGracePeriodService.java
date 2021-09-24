@@ -3,6 +3,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Optional;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_GRACEPERIOD_NOTFOUND;
 
 @Service
-public class TimeAttendanceGracePeriodService {
+public class TimeAttendanceGracePeriodService extends MongoBaseService {
 
    @Inject
    private ExceptionService exceptionService;
@@ -37,7 +38,7 @@ public class TimeAttendanceGracePeriodService {
         }
         tAndAGracePeriod.setStaffGracePeriodDays(tAndAGracePeriodSettingDTO.getStaffGracePeriodDays());
         tAndAGracePeriod.setManagementGracePeriodDays(tAndAGracePeriodSettingDTO.getManagementGracePeriodDays());
-        tAndAGracePeriodRepository.save(tAndAGracePeriod);
+        save(tAndAGracePeriod);
        return tAndAGracePeriodSettingDTO;
    }
 

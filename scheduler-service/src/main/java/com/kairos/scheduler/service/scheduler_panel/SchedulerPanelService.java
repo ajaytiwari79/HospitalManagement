@@ -133,9 +133,7 @@ public class SchedulerPanelService extends MongoBaseService {
             //schedulerPanel.setProcessType(integrationConfiguration.getName());
             String interval;
             String cronExpression = null;
-            if (JobFrequencyType.YEARLY.equals(schedulerPanel.getJobFrequencyType())) {
-                cronExpression = cronExpressionEveryYearBuilder(schedulerPanelDTO.getYearlyJobTriggerDate());
-            } else if (JobFrequencyType.MONTHLY.equals(schedulerPanel.getJobFrequencyType())) {
+            if (JobFrequencyType.MONTHLY.equals(schedulerPanel.getJobFrequencyType())) {
                 cronExpression = cronExpressionEveryMonthBuilder(schedulerPanelDTO.getMonthlyJobTriggerDate());
             } else if (!schedulerPanel.isOneTimeTrigger()) {
                 if (schedulerPanel.getRunOnce() == null) {
@@ -201,8 +199,6 @@ public class SchedulerPanelService extends MongoBaseService {
                 }
                 panel.setStartMinute(schedulerPanelDTO.getStartMinute());
 
-            } else if (JobFrequencyType.YEARLY.equals(panel.getJobFrequencyType())) {
-                cronExpression = cronExpressionEveryYearBuilder(schedulerPanelDTO.getYearlyJobTriggerDate());
             } else if (JobFrequencyType.MONTHLY.equals(panel.getJobFrequencyType())) {
                 cronExpression = cronExpressionEveryMonthBuilder(schedulerPanelDTO.getMonthlyJobTriggerDate());
             } else {
@@ -279,8 +275,6 @@ public class SchedulerPanelService extends MongoBaseService {
                 schedulerPanelDB.setInterval(interval);
                 if (schedulerPanelDTO.getRunOnce() == null) {
                     cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getStartMinute(), schedulerPanelDTO.getSelectedHours());
-                } else if (JobFrequencyType.YEARLY.equals(schedulerPanelDTO.getJobFrequencyType())) {
-                    cronExpression = cronExpressionEveryYearBuilder(schedulerPanelDTO.getYearlyJobTriggerDate());
                 } else if (JobFrequencyType.MONTHLY.equals(schedulerPanelDTO.getJobFrequencyType())) {
                     cronExpression = cronExpressionEveryMonthBuilder(schedulerPanelDTO.getMonthlyJobTriggerDate());
                 } else {
@@ -396,11 +390,6 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
     private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {
-        String cronExpressionRunOnce = "0 {0} {1} {2} {3} ?";
-        return MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()), String.valueOf(localDateTime.getMonth()));
-    }
-
-    private String cronExpressionEveryYearBuilder(LocalDateTime localDateTime) {
         String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
         return MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
     }

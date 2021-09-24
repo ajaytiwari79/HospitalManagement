@@ -1,8 +1,6 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
-public enum OrganizationHierarchy implements Serializable {
+public enum OrganizationHierarchy {
     ORGANIZATION,
     UNIT
 }

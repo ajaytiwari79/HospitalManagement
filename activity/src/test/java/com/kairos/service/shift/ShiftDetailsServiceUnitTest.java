@@ -7,6 +7,8 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +53,7 @@ public class ShiftDetailsServiceUnitTest {
                 "'endDate':'2019-01-09T23:00:00.000+0000'}";
         ShiftWithActivityDTO shiftWithActivityDTO = mapper.readValue(jsonString, ShiftWithActivityDTO.class);
 
-        ReasonCodeDTO reasonCodeDTO = new ReasonCodeDTO(new BigInteger("4"), "testReasonCode");
+        ReasonCodeDTO reasonCodeDTO = new ReasonCodeDTO(4l, "testReasonCode");
         Map<String, Object> contactAddressData = new HashMap<>();
         contactAddressData.put("municipalityId", 20991);
         contactAddressData.put("city", "Glostrup");
@@ -62,8 +64,10 @@ public class ShiftDetailsServiceUnitTest {
         contactAddressData.put("street", "central");
         contactAddressData.put("floorNumber", 0);
         ReasonCodeWrapper reasonCodeWrapper = new ReasonCodeWrapper(Collections.singletonList(reasonCodeDTO), contactAddressData);
+        List<NameValuePair> requestParam = new ArrayList<>();
         Set<Long> reasonCodeIds= new HashSet<Long>(){{add(4l);}};
-        when(userIntegrationService.getUnitInfoAndReasonCodes(unitId)).thenReturn(reasonCodeWrapper);
+        requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", reasonCodeIds.toString()));
+        when(userIntegrationService.getUnitInfoAndReasonCodes(unitId,requestParam)).thenReturn(reasonCodeWrapper);
         when(shiftMongoRepository.findAllShiftsByIds(shiftIds)).thenReturn(Arrays.asList(shiftWithActivityDTO));
         List<ShiftWithActivityDTO> response=shiftDetailsService.shiftDetailsById(unitId, shiftIds,false);
         Assert.assertEquals(response.get(0).getActivities().get(0).getReasonCode().getId(),reasonCodeDTO.getId());

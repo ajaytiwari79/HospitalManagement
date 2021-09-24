@@ -25,7 +25,6 @@ import java.util.List;
 @NoArgsConstructor
 public class WTABaseRuleTemplate extends MongoBaseEntity{
 
-    private static final long serialVersionUID = 5416910411596298183L;
     protected String name;
     protected String description;
     protected boolean disabled;

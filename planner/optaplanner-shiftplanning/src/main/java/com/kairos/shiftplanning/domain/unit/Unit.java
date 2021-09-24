@@ -1,7 +1,6 @@
 package com.kairos.shiftplanning.domain.unit;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;

@@ -4,6 +4,7 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.table_settings.TableSetting;
 import com.kairos.persistence.repository.table_settings.TableSettingMongoRepository;
+import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
  */
 @Transactional
 @Service
-public class TableSettingService {
+public class TableSettingService extends MongoBaseService {
 
     @Inject
     private TableSettingMongoRepository tableSettingMongoRepository;
@@ -59,7 +60,7 @@ public class TableSettingService {
                 tableConfiguration.setSettings(tableConf);
             }
         }
-        tableSettingMongoRepository.save(tableSetting);
+        save(tableSetting);
         return tableConfiguration;
 
     }
@@ -100,7 +101,7 @@ public class TableSettingService {
      * @return
      * @auther anil maurya
      */
-    public TableConfiguration getTableConfiguration(Long staffId, long unitId) {
+    public TableConfiguration getTableConfiguration(long staffId, long unitId) {
 
         TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, ORGANIZATION_CITIZEN_TABLE_ID);
 
@@ -110,8 +111,11 @@ public class TableSettingService {
     }
 
     // TODO MIGHT refactor above query .....')
-    public TableConfiguration getTableConfigurationByTabId(Long unitId, BigInteger tableId) {
-        TableConfiguration tableConfiguration = tableSettingMongoRepository.findTableConfigurationByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, tableId.toString());
+    public TableConfiguration getTableConfigurationByTabId(long unitId, BigInteger tableId) {
+
+        TableSetting tableSetting = tableSettingMongoRepository.findByUserIdAndOrganizationId(UserContext.getUserDetails().getId(), unitId, tableId.toString());
+
+        TableConfiguration tableConfiguration = TableSettingService.getTableConfiguration(tableSetting, tableId.toString());
         return Optional.ofNullable(tableConfiguration).orElse(new TableConfiguration());
 
     }

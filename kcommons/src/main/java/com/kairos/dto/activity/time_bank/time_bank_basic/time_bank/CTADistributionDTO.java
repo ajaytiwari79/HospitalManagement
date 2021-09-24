@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -17,7 +16,7 @@ import java.math.BigInteger;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CTADistributionDTO  implements Serializable {
+public class CTADistributionDTO {
     private BigInteger id;
     private String name;
     private int minutes;

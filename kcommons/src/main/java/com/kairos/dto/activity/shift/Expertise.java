@@ -2,7 +2,6 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import lombok.Getter;
@@ -24,17 +23,15 @@ public class Expertise {
     private Long id;
     private String name;
     private BreakPaymentSetting breakPaymentSetting;
-    private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
     private List<ExpertiseLineDTO> expertiseLines;
 
     public Expertise() {
         //Not in use
     }
 
-    public Expertise(Long id) {
-        this.id = id;
-    }
-    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSettings() {
+
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
         return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
     }
 

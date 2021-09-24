@@ -1,8 +1,6 @@
 package com.kairos.dto.activity.counter.enums;
 
-import java.io.Serializable;
-
-public enum ConfLevel implements Serializable {
+public enum ConfLevel {
 
     DEFAULT(0),
     COUNTRY(1),

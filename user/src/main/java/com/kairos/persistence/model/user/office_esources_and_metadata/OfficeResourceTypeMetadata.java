@@ -17,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OfficeResourceTypeMetadata extends UserBaseEntity {
-    private static final long serialVersionUID = -5393579924442492211L;
     private List<String> officeResource;
     private List<String> vehicleResource;
 

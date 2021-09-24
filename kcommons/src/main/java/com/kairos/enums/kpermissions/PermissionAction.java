@@ -1,10 +1,9 @@
 package com.kairos.enums.kpermissions;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum PermissionAction implements Serializable {
+public enum PermissionAction {
     ADD("Add"),
     EDIT("Edit"),
     DELETE("Delete");

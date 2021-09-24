@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.todo;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
@@ -67,11 +66,4 @@ public class TodoDTO {
         this.pendingOn = pendingOn;
     }
 
-    public String getActivityName(){
-        return TranslationUtil.getName(translations,activityName);
-    }
-
-    public String getDescription(){
-        return TranslationUtil.getDescription(translations,description);
-    }
 }

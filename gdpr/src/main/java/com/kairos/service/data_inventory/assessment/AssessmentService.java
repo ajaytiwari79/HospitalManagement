@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.assessment.*;
 import com.kairos.dto.user_context.CurrentUserDetails;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.*;

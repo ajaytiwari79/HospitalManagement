@@ -24,7 +24,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<BigInteger> activityIds = new ArrayList<>();
     private CutOffIntervalUnit cutOffIntervalUnit;
     protected float recommendedValue;
-    private List<ActivityCutOffCount> activityCutOffCounts = new ArrayList<>();
 
     public ChildCareDaysCheckWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;

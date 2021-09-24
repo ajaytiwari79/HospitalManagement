@@ -20,7 +20,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @Setter
 public class IntegrationConfiguration extends UserBaseEntity {
 
-    private static final long serialVersionUID = 8934145378254129845L;
     @NotBlank(message = "name can not be null")
     private String name;
     private String description;

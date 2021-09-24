@@ -11,7 +11,6 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.shift.ShiftValidatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class StaffingLevelAndRankSpecification extends AbstractSpecification<Shi
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO, RuleExecutionType ruleExecutionType) {
+    public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO) {
       //shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities,unitId,activities,phase,userAccessRoleDTO);
     }
 

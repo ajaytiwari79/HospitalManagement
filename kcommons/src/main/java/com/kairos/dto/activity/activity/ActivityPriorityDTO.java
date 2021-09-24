@@ -7,15 +7,13 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Map;
 
 @Getter
 @Setter
-public class ActivityPriorityDTO implements Serializable {
+public class ActivityPriorityDTO {
 
-    private static final long serialVersionUID = -2123916502467586035L;
     private BigInteger id;
     private Long countryId;
     private Long organizationId;

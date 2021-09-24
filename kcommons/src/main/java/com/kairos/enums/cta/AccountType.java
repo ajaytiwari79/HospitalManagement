@@ -1,8 +1,6 @@
 package com.kairos.enums.cta;
 
-import java.io.Serializable;
-
-public enum  AccountType implements Serializable {
+public enum  AccountType {
     DUTYTIME_ACCOUNT("Duty Time Account"),TIMEBANK_ACCOUNT("Time Bank Account"),FLEX_ACCOUNT("Flex Account"),PAID_OUT("Paid Out");
     private String accountType;
     AccountType(String accountType){

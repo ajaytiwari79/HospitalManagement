@@ -15,7 +15,6 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @Document
 public class BreakSettings extends MongoBaseEntity {
-    private static final long serialVersionUID = 7266988493920137542L;
     private Long countryId;
     private Long shiftDurationInMinute;
     private Long breakDurationInMinute;

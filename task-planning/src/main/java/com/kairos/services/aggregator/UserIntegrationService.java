@@ -773,6 +773,10 @@ public class UserIntegrationService {
         });
     }
 
+    public DefaultKpiDataDTO getKpiAllDefaultData(Long countryId, StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return genericRestClient.publishRequest(staffEmploymentTypeDTO, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, KPI_ALL_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
+        });
+    }
 
     public DefaultKpiDataDTO getKpiFilterDefaultData(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, KPI_FILTER_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {

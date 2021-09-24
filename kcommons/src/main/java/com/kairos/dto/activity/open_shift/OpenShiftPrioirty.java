@@ -1,8 +1,6 @@
 package com.kairos.dto.activity.open_shift;
 
-import java.io.Serializable;
-
-public enum OpenShiftPrioirty implements Serializable {
+public enum OpenShiftPrioirty {
 ONE,TWO,THREE
 
 }

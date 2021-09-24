@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.open_shift;
 
-import java.io.Serializable;
-
-public enum Priority implements Serializable {
+public enum Priority {
     HIGH,MEDIUM,LOW
 }

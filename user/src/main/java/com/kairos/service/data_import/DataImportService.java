@@ -766,7 +766,7 @@ public class DataImportService {
             long endTime = System.currentTimeMillis();
             System.out.println(endTime - startTime + "ms");
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
 
     }
@@ -1208,7 +1208,7 @@ public class DataImportService {
 
 
         } catch (Exception e){
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
 
 

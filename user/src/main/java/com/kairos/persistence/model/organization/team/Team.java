@@ -14,7 +14,9 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_LOCATION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
@@ -32,7 +34,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 @AllArgsConstructor
 public class Team extends UserBaseEntity {
 
-    private static final long serialVersionUID = -7287662943308577836L;
     private String name;
     private String description;
 
@@ -43,7 +44,7 @@ public class Team extends UserBaseEntity {
     private ContactAddress contactAddress;
 
     private boolean isEnabled = true;
-    private BigInteger activityId;
+    private Set<BigInteger> activityIds=new HashSet<>();
 
 
     public Team(String name, String description,  ContactAddress contactAddress) {

@@ -54,7 +54,7 @@ public class AddressVerificationService {
       By Yasir
       Commented below method as we are no longer using FLS Visitour
     */
-    public Map<String, Object> verifyAddress(AddressDTO contactAddress, Long unitId) {
+    public Map<String, Object> verifyAddress(AddressDTO contactAddress, long unitId) {
         /*Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         ZipCode zipCodeData = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId());
         int zipCode;
@@ -88,7 +88,7 @@ public class AddressVerificationService {
     By Yasir
     Commented below method as we are no longer using FLS Visitour
      */
-    public Map<String, Object> verifyAddressSheet(AddressDTO contactAddress, Long unitId) {
+    public Map<String, Object> verifyAddressSheet(AddressDTO contactAddress, long unitId) {
 //        int zipCode = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId()).getZipCode();
        /* logger.debug("Verifying with Information \n house: " + contactAddress.getHouseNumber() + "\n City:" + contactAddress.getCity() + "\n ZipCode: " + contactAddress.getZipCodeValue() +
                 "\n Street: " + contactAddress.getStreet());

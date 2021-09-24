@@ -1,7 +1,5 @@
 package com.kairos.enums.widget;
 
-import java.io.Serializable;
-
-public enum WidgetFilterType implements Serializable {
+public enum WidgetFilterType {
     CURRENTLY_WORKING,UPCOMING_SHIFTS,ON_LEAVE,RESTING,SLEEPING,TIME_TYPE
 }

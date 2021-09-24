@@ -1,11 +1,9 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
 /**
  * Created by prabjot on 19/10/16.
  */
-public enum RequestType implements Serializable {
+public enum RequestType {
 
     SKILLS("Skills"), SERVICE("Service"), EXPERTISE("Expertise");
     public String value;

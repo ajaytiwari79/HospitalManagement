@@ -12,6 +12,7 @@ ext {
 }
 
 sourceCompatibility = 1.8
+//sourceSets.main.java.srcDirs = ["build/classes/java/main","src/main/java"]
 repositories {
     mavenCentral()
     jcenter()
@@ -23,9 +24,9 @@ dependencies {
     compile ('com.sendgrid:sendgrid-java:4.0.1')
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
     compile 'javax.validation:validation-api:2.0.0.Final'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.2'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.5.Final'
-    //compile group: 'com.google.guava', name: 'guava', version: '24.1-jre'
+    compile group: 'com.google.guava', name: 'guava', version: '24.1-jre'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile group: 'org.springframework', name: 'spring-context', version: '5.0.9.RELEASE'
     compile group: 'de.danielbechler', name: 'java-object-diff', version: '0.95'
@@ -37,13 +38,15 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
     compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.0.8.RELEASE'
 
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb:2.0.9.RELEASE")
+    compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.1.6.RELEASE'
     compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
     compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
     compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.714'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.714'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.714'
+    compile group: 'com.mindscapehq', name: 'core', version: '3.0.0'
+    compile group: 'com.mindscapehq', name: 'webprovider', version: '3.0.0'
     compile group: 'org.json', name: 'json', version: '20160810'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
 

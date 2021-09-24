@@ -1,6 +1,6 @@
 package com.kairos.controller.organization;
 
-import com.kairos.dto.user.organization.OrganizationServiceDTO;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class OrganizationTypeController {
     @RequestMapping(value = "/organization_type/{orgTypeId}/organization_service", method = RequestMethod.GET)
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationServices(@PathVariable long orgTypeId) {
-        List<OrganizationServiceDTO> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
+            List<Map<String,Object>> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 

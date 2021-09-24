@@ -2,11 +2,10 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlot;
+import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -48,7 +47,6 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     private int restingTime;
     private PartOfDay sequenceShiftFrom;
     private PartOfDay sequenceShiftTo;
-    private transient DateTimeInterval interval;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
@@ -59,40 +57,38 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
-            TimeSlot timeSlotWrapper = getTimeSlotWrapper(infoWrapper, infoWrapper.getShift());
+            TimeSlotWrapper timeSlotWrapper = getTimeSlotWrapper(infoWrapper, infoWrapper.getShift());
             if(isNotNull(timeSlotWrapper)) {
+                int totalOccurrencesSequenceShift = getOccurrencesSequenceShift(infoWrapper);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-                boolean isValid = getOccurrencesSequenceShift(infoWrapper,limitAndCounter[0]);
+                boolean isValid = isValid(MAXIMUM, limitAndCounter[0], totalOccurrencesSequenceShift);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                         limitAndCounter[2], DurationType.DAYS.toValue(),String.valueOf(limitAndCounter[0]));
             }
         }
     }
 
-    private boolean getOccurrencesSequenceShift(RuleTemplateSpecificInfo infoWrapper,int value){
+    private int getOccurrencesSequenceShift(RuleTemplateSpecificInfo infoWrapper){
         int totalOccurrencesSequenceShift = 0;
         List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts();
         shifts.add(infoWrapper.getShift());
         shifts = infoWrapper.getShifts().stream().sorted(Comparator.comparing(k->k.getStartDate())).collect(Collectors.toList());
         for(int i=0; i<shifts.size()-1; i++){
-            TimeSlot timeSlot = getTimeSlotWrapper(infoWrapper, shifts.get(i));
-            TimeSlot nextTimeSlot = getTimeSlotWrapper(infoWrapper, shifts.get(i+1));
+            TimeSlotWrapper timeSlot = getTimeSlotWrapper(infoWrapper, shifts.get(i));
+            TimeSlotWrapper nextTimeSlot = getTimeSlotWrapper(infoWrapper, shifts.get(i+1));
             List<PartOfDay> partOfDays = newArrayList(sequenceShiftFrom,sequenceShiftTo);
             if(partOfDays.contains(PartOfDay.valueOf(timeSlot.getName().toUpperCase())) && partOfDays.contains(PartOfDay.valueOf(nextTimeSlot.getName().toUpperCase())) && !timeSlot.getName().equals(nextTimeSlot.getName())){
                 Period period = Period.between(asLocalDate(shifts.get(i).getStartDate()), asLocalDate(shifts.get(i+1).getStartDate()));
                 if(period.getDays() < 2) {
                     totalOccurrencesSequenceShift++;
-                    if(!isValid(MAXIMUM, value, totalOccurrencesSequenceShift)){
-                        return false;
-                    }
                 }
             }
         }
-        return true;
+        return totalOccurrencesSequenceShift;
     }
 
-    private TimeSlot getTimeSlotWrapper(RuleTemplateSpecificInfo infoWrapper, ShiftWithActivityDTO shift){
-        TimeSlot timeSlotWrapper = null;
+    private TimeSlotWrapper getTimeSlotWrapper(RuleTemplateSpecificInfo infoWrapper, ShiftWithActivityDTO shift){
+        TimeSlotWrapper timeSlotWrapper = null;
         for (String key : infoWrapper.getTimeSlotWrapperMap().keySet()) {
             timeSlotWrapper = infoWrapper.getTimeSlotWrapperMap().get(key);
             int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();

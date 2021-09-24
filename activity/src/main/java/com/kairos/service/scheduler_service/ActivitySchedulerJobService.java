@@ -15,6 +15,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.shift.ShiftReminderService;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.service.period.PlanningPeriodService.SCHEDULER_PANEL;
 
 @Service
-public class ActivitySchedulerJobService {
+public class ActivitySchedulerJobService extends MongoBaseService {
 
     @Inject private SchedulerServiceRestClient schedulerRestClient;
     @Inject private ShiftReminderService shiftReminderService;
@@ -159,15 +160,6 @@ public class ActivitySchedulerJobService {
             reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
         }
         return repeatTriggerDateTimes;
-    }
-
-    public boolean createJobForPublicHoliday() {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.PUBLIC_HOLIDAY, JobFrequencyType.YEARLY, getLocalDateTime(getFirstDayOfYear(getLocalDate().getYear()), 00, 05, 00), false));
-        LOGGER.info("create job for add public holiday");
-        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-        });
-        LOGGER.info("job registered of add public holiday");
-        return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 }
 

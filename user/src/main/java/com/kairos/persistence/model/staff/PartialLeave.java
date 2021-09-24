@@ -11,7 +11,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PartialLeave extends UserBaseEntity {
 
-    private static final long serialVersionUID = -891846835144264124L;
     private long startDate;
     private long endDate;
     private LeaveType leaveType;

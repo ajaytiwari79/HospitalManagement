@@ -16,7 +16,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class TimeAndAttendance extends MongoBaseEntity {
-    private static final long serialVersionUID = -7688680974867485194L;
     private Long userId;
     private Long staffId;
     private LocalDate date;

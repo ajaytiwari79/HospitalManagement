@@ -9,7 +9,6 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,12 +29,5 @@ public class DayTypeCountryHolidayCalenderQueryResult {
     private boolean isEnabled = true;
     private boolean allowTimeSettings = false;
     private List<CountryHolidayCalendarQueryResult> countryHolidayCalenders;
-
-    //TODO Will remove it after production build
-    private Long holidayId;
-    private LocalDate publicHolidayDate;
-    private boolean protectedDaysOff;
-    private Long dayTypeId;
-    private Long expertiseId;
 
 }

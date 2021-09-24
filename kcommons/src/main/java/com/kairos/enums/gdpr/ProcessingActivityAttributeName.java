@@ -1,8 +1,6 @@
 package com.kairos.enums.gdpr;
 
-import java.io.Serializable;
-
-public enum ProcessingActivityAttributeName implements Serializable {
+public enum ProcessingActivityAttributeName {
 
 NAME("name"),DESCRIPTION("description"),PROCESSING_PURPOSES("processingPurposes"),DATA_SOURCES("dataSources"),
     TRANSFER_METHOD("transferMethods"),ACCESSOR_PARTY("accessorParties"),PROCESSING_LEGAL_BASIS("processingLegalBasis"),RESPONSIBILITY_TYPE("responsibilityType"),CONTROLLER_CONTACT_INFO("controllerContactInfo")

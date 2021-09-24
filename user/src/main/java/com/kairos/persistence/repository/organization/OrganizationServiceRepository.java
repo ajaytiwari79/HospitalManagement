@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -37,9 +39,15 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query(" MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o)={0} " +
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +
             " RETURN {" +
-            "translations:os.translations,\n" +
+            "translations:{english :{name: CASE WHEN os.`translatedNames.english` IS NULL THEN '' ELSE os.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE os.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN os.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN os.`translatedDescriptions.hindi` IS NULL THEN '' ELSE os.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN os.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE os.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN os.`translatedNames.britishenglish` IS NULL THEN '' ELSE os.`translatedNames.britishenglish` END, description : CASE WHEN os.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE os.`translatedDescriptions.britishenglish` END}},\n" +
             "children: case when os  is NULL then [] else collect({" +
-            "translations:ss.translations,\n" +
+            "translations:{english :{name: CASE WHEN ss.`translatedNames.english` IS NULL THEN '' ELSE ss.`translatedNames.english` END, description : CASE WHEN ss.`translatedDescriptions.english` IS NULL THEN '' ELSE ss.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ss.`translatedNames.hindi` IS NULL THEN '' ELSE ss.`translatedNames.hindi` END, description : CASE WHEN ss.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ss.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ss.`translatedNames.danish` IS NULL THEN '' ELSE ss.`translatedNames.danish` END, description : CASE WHEN ss.`translatedDescriptions.danish` IS NULL THEN '' ELSE ss.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ss.`translatedNames.britishenglish` IS NULL THEN '' ELSE ss.`translatedNames.britishenglish` END, description : CASE WHEN ss.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ss.`translatedDescriptions.britishenglish` END}},\n" +
             "id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")
     List<Map<String,Object>> getOrgServicesByOrgType(long organizationType);
 
@@ -58,6 +66,13 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService{isEnabled:true}) WHERE id(os)={0} AND ss.name=~ {1} return ss")
     OrganizationService checkDuplicateSubService(Long id, String name);
 
+    @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE id(os)={0} AND ss.name= {1} return ss")
+    Optional<OrganizationService> checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
+
+    OrganizationService findByKmdExternalId(String kmdExternalId);
+
+    @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return id(os) as id, r.customName as name, os.description as description")
+    List<OrganizationServiceQueryResult> getOrganizationServiceByOrgId(Long organizationId);
 
     @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0} AND id(os) IN {1} return id(os) as id, r.customName as name, os.description as description")
     List<OrganizationServiceQueryResult> getOrganizationServiceByOrgIdAndServiceIds(Long organizationId, List<Long> serviceId);

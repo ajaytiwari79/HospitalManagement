@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 /**
  * Created by vipul on 24/8/17.
  */
@@ -15,9 +13,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityBonusSettings implements Serializable {
-
-    private static final long serialVersionUID = -555758265267242594L;
+public class ActivityBonusSettings {
     @KPermissionField
     private String bonusHoursType;
     @KPermissionField

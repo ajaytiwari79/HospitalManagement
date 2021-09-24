@@ -27,7 +27,7 @@ import java.math.BigInteger;
 @Setter
 @Getter
 @NoArgsConstructor
-public class TaskType extends MongoBaseEntity implements Clonable {
+public class TaskType extends MongoBaseEntity {
 
     public static final String HAS_BIDDING = "hasBidding";
     public static final String HAS_DUTY_TIME = "hasDutyTime";
@@ -505,6 +505,92 @@ public class TaskType extends MongoBaseEntity implements Clonable {
         map.put("onlyVisitatorCanTaskFrequency", this.onlyVisitatorCanTaskFrequency);
         map.put("onlyVisitatorCanAssignToClients", this.onlyVisitatorCanAssignToClients);
         return map;
+    }
+    // copy task settings
+    public TaskType copyAllSettings(TaskType taskType) {
+        this.title = taskType.title;
+        this.description = taskType.description;
+        this.union = taskType.union;
+        this.agreement = taskType.agreement;
+        this.startPeriod = taskType.startPeriod;
+        this.endPeriod = taskType.endPeriod;
+        this.taskTypeVisibility = taskType.taskTypeVisibility;
+        this.taskTypeCount = taskType.taskTypeCount;
+        this.taskTypeIncluded = taskType.taskTypeIncluded;
+        this.taskTypeSchedule = taskType.taskTypeSchedule;
+        this.taskTypeWorkType = taskType.taskTypeWorkType;
+        this.taskTypeTime = taskType.taskTypeTime;
+        this.multiDayTask = taskType.multiDayTask;
+        this.taskTypeDate = taskType.taskTypeDate;
+        this.hasBidding = taskType.hasDutyTime;
+        this.reminderBySms = taskType.reminderBySms;
+        this.notificationBySms = taskType.notificationBySms;
+        this.serviceLevelDays = taskType.serviceLevelDays;
+        this.serviceLevelHours = taskType.serviceLevelHours;
+        this.costType = taskType.costType;
+        this.expiryCost = taskType.expiryCost;
+        this.billable = taskType.billable;
+        this.waitingTime = taskType.waitingTime;
+        this.drivingTime = taskType.drivingTime;
+        this.setup = taskType.setup;
+        this.overHead = taskType.overHead;
+        this.flexiTime = taskType.flexiTime;
+        this.overNightStay = taskType.overNightStay;
+        this.collectiveAgreement = taskType.collectiveAgreement;
+        this.distanceRelatedCost = taskType.distanceRelatedCost;
+        this.creators = taskType.creators;
+        this.definations = taskType.definations;
+        this.hasFinishToStart = taskType.hasFinishToStart;
+        this.uniqueName = taskType.uniqueName;
+        this.colorForGantt = taskType.colorForGantt;
+        this.colorForMap = taskType.colorForMap;
+        this.generalDescription = taskType.generalDescription;
+        this.uploadPicture = taskType.uploadPicture;
+        this.icon = taskType.icon;
+        this.organizationTypes = taskType.organizationTypes;
+        this.organizationServices = taskType.organizationServices;
+        this.isExportedToVisitour = taskType.isExportedToVisitour;
+        this.isImportedToVisitour = taskType.isImportedToVisitour;
+        this.organizations = taskType.organizations;
+        this.hasDateOfCreation = taskType.hasDateOfCreation;
+        this.hasDateOfChange = taskType.hasDateOfChange;
+        this.isMainTask = taskType.isMainTask;
+        this.hasCompositeShift = taskType.hasCompositeShift;
+        this.isArrival = taskType.isArrival;
+        this.minutes = taskType.minutes;
+        this.hours = taskType.hours;
+        this.isAssignedToClipBoard = taskType.isAssignedToClipBoard;
+        this.useInShiftPlanning = taskType.useInShiftPlanning;
+        this.shiftPlanningPhases = taskType.shiftPlanningPhases;
+        this.pointMethods = taskType.pointMethods;
+        this.restingHours = taskType.restingHours;
+        this.restingMinutes = taskType.restingMinutes;
+        //this.taskTypeSkillCategories = taskType.taskTypeSkillCategories;
+        this.hasSubcontractors = taskType.hasSubcontractors;
+        this.employees = taskType.employees;
+        this.sequenceGroup = taskType.sequenceGroup;
+        this.causeGroup = taskType.causeGroup;
+        this.forbiddenDayTypeIds = taskType.forbiddenDayTypeIds;
+        this.deliverOutsideUnitHours = taskType.deliverOutsideUnitHours;
+        this.firstVisit = taskType.firstVisit;
+        this.lastVisit = taskType.lastVisit;
+        this.isCalculateEndTime = taskType.isCalculateEndTime;
+        this.durationType = taskType.durationType;
+        this.timeTypes = taskType.timeTypes;
+        this.isDivideByWeeklyHours = taskType.isDivideByWeeklyHours;
+        this.weeklyHours = taskType.weeklyHours;
+        this.isDivideByFullTime = taskType.isDivideByFullTime;
+        this.fullTimeHours = taskType.fullTimeHours;
+        this.reduceBreakTime = taskType.reduceBreakTime;
+        this.fixedLengthDuration = taskType.fixedLengthDuration;
+        this.multiplier = taskType.multiplier;
+        this.dayType = taskType.dayType;
+        this.onlyVisitatorCanAssignDuration = taskType.onlyVisitatorCanAssignDuration;
+        this.onlyVisitatorCanTaskFrequency = taskType.onlyVisitatorCanTaskFrequency;
+        this.onlyVisitatorCanAssignToClients = taskType.onlyVisitatorCanAssignToClients;
+        this.isTaskResumable = taskType.isTaskResumable;
+        this.visitourId = taskType.visitourId;
+        return this;
     }
 
     public Set<Long> getOrganizationSubTypes() {

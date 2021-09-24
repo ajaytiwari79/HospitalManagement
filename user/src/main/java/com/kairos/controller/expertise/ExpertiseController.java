@@ -3,16 +3,17 @@ package com.kairos.controller.expertise;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -48,7 +51,7 @@ public class ExpertiseController {
     @Inject
     private ExpertiseUnitService expertiseUnitService;
     @Inject private EmploymentCTAWTAService employmentCTAWTAService;
-    @Inject private TranslationService translationService;
+
 
     @ApiOperation(value = "find an expertise by id")
     @GetMapping(value = "country/{countryId}/expertise/{expertiseId}")
@@ -168,18 +171,17 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, expertiseDTO));
     }
 
-    //TODO 2 Below Integrated
-//    @ApiOperation(value = "add proteched days off setting")
-//    @PostMapping(value =   "/expertise/{expertiseId}/protected_days_off")
-//    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
-//    }
+    @ApiOperation(value = "add proteched days off setting")
+    @PostMapping(value =   "/expertise/{expertiseId}/protected_days_off")
+    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
+    }
 
-//    @ApiOperation(value = "add proteched days off setting")
-//    @GetMapping(value =   "/expertise/{expertiseId}/protected_days_off")
-//    public ResponseEntity<Map<String, Object>> getProtechedDaysOffSetting(@PathVariable Long expertiseId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getProtectedDaysOffSetting(expertiseId));
-//    }
+    @ApiOperation(value = "add proteched days off setting")
+    @GetMapping(value =   "/expertise/{expertiseId}/protected_days_off")
+    public ResponseEntity<Map<String, Object>> getProtechedDaysOffSetting(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getProtectedDaysOffSetting(expertiseId));
+    }
 
 
 
@@ -241,27 +243,17 @@ public class ExpertiseController {
     }
 
 
-
+    @ApiOperation(value = "create protected Days off Setting")
+    @GetMapping(value =  "/protected_days_setting")
+    public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(new ArrayList<>(),new ArrayList<>()));
+    }
 
     @PutMapping(value = UNIT_URL+"/expertise/{id}/languageSettings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
-    }
-
-    @GetMapping(value = COUNTRY_URL+"/all_expertise_by_country")
-    @ApiOperation("Add translated data")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getAllCountryExpertiseIds(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseIdsByCountryId(countryId));
-    }
-
-    @GetMapping(value = COUNTRY_URL+"/expertise_of_country")
-    @ApiOperation("all expertise")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getAllExpertiseOfCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByCountryId(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
     }
 
 }

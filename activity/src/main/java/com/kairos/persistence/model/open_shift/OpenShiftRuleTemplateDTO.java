@@ -14,11 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -58,7 +55,4 @@ public class OpenShiftRuleTemplateDTO {
     }
 
 
-    public Map<String, TranslationInfo> getTranslations() {
-        return isNull(translations) ? new HashMap<>() : translations;
-    }
 }

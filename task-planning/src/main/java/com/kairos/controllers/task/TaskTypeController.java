@@ -711,7 +711,8 @@ public class TaskTypeController {
     @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTaskTypes(@PathVariable long subServiceId, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, taskTypeService.getTaskTypes(unitId, subServiceId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                taskTypeService.getTaskTypes(unitId, subServiceId));
     }
 
     @ApiOperation(value = "Add/ Remove TaskType to Organization")

@@ -20,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FilterSelection<T> extends UserBaseEntity {
-    private static final long serialVersionUID = 4220970460034521898L;
     private FilterType name;
     private List<T> value;
     private int sequence;

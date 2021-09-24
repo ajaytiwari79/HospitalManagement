@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.tag;
 
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.tag.Tag;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -23,14 +24,8 @@ public interface TagMongoRepository extends MongoRepository<Tag,BigInteger>,Cust
     @Query(value = "{ 'name' :{$regex:?1,$options:'i'},'countryId' : ?0, 'deleted' : ?2, 'countryTag' : true} ")
     List<Tag> findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(Long countryId, String filterText, boolean deleted);
 
-    @Query(value = "{ 'name' :{$regex:?1,$options:'i'},'countryId' : ?0, 'deleted' : ?2, 'countryTag' : true} ")
-    List<com.kairos.dto.user.country.tag.TagDTO> findAllTagByCountryIdAndNameAndDeletedAndCountryTag(Long countryId, String filterText, boolean deleted);
-
     @Query(value = "{ 'name' :{$regex:?1,$options:'i'},'countryId' : ?0, 'masterDataType' : ?2, 'deleted' : ?3, 'countryTag' : true} ")
     List<Tag> findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(Long countryId, String filterText, String masterDataTypeEnum, boolean deleted);
-
-    @Query(value = "{ 'name' :{$regex:?1,$options:'i'},'countryId' : ?0, 'masterDataType' : ?2, 'deleted' : ?3, 'countryTag' : true} ")
-    List<com.kairos.dto.user.country.tag.TagDTO> findAllTagByCountryIdAndNameAndMasterDataTypeAndDeleted(Long countryId, String filterText, String masterDataTypeEnum, boolean deleted);
 
     Tag findTagByIdAndCountryIdAndDeletedAndCountryTagTrue(BigInteger id, Long countryId, boolean deleted);
 

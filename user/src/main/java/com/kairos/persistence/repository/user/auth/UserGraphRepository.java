@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.auth;
 
-import com.kairos.enums.user.ChatStatus;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
@@ -130,11 +129,4 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (user:User)-[:BELONGS_TO_SUPER_ADMIN]-(ag:AccessGroup) WHERE id(user)={0} AND ag.name='SUPER_ADMIN' RETURN COUNT(user)>0")
     boolean isSystemAdmin(Long id);
-
-    @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(staff)={0} RETURN id(user)")
-    Long getUserIdByStaffId(Long staffId);
-
-    @Query("MATCH (user:User) WHERE id(user)={0} SET user.chatStatus={1} return user")
-    User updateChatStatusByUserId(Long userId, ChatStatus status);
-
 }

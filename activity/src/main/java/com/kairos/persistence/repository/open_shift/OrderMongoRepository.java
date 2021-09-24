@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.open_shift;
 
-import com.kairos.dto.activity.open_shift.OrderResponseDTO;
 import com.kairos.persistence.model.open_shift.Order;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -16,6 +15,6 @@ public interface OrderMongoRepository extends MongoBaseRepository<Order, BigInte
     Order findOrderByIdAndEnabled(BigInteger id);
 
     @Query("{'deleted':false, 'unitId':?0}")
-    List<OrderResponseDTO> findOrdersByUnitId(Long unitId);
+    List<Order> findOrdersByUnitId(Long unitId);
 }
 

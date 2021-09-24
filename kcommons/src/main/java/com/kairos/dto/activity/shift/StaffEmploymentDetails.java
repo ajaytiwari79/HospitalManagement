@@ -3,7 +3,6 @@ package com.kairos.dto.activity.shift;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.staff.Staff;
@@ -64,12 +63,8 @@ public class StaffEmploymentDetails {
     private LocalDate accumulatedTimebankDate;
     private CTAResponseDTO costTimeAgreement;
     private EmploymentSubType employmentSubType;
-    private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
 
-
-    public StaffEmploymentDetails(List<FunctionDTO> appliedFunctions) {
-        this.appliedFunctions = appliedFunctions;
-    }
 
     public StaffEmploymentDetails(Long id, Long staffId, List<EmploymentLinesDTO> employmentLines, CTAResponseDTO costTimeAgreement) {
         this.id = id;
@@ -79,15 +74,6 @@ public class StaffEmploymentDetails {
     }
 
     public StaffEmploymentDetails(Long id,Expertise expertise, LocalDate endDate, LocalDate startDate, Long unitId, EmploymentSubType employmentSubType) {
-        this.id=id;
-        this.expertise = expertise;
-        this.endDate = endDate;
-        this.StartDate = startDate;
-        this.unitId = unitId;
-        this.employmentSubType = employmentSubType;
-    }
-
-    public StaffEmploymentDetails(Long id,Expertise expertise, LocalDate startDate ,LocalDate endDate, Long unitId) {
         this.id=id;
         this.expertise = expertise;
         this.endDate = endDate;
@@ -121,7 +107,7 @@ public class StaffEmploymentDetails {
         return isNullOrElse(expertise,new Expertise());
     }
 
-    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSettings() {
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
         return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
     }
 }

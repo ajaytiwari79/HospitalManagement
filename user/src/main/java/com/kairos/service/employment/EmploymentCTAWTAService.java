@@ -15,6 +15,7 @@ import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResult;
@@ -32,6 +33,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -51,7 +53,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;

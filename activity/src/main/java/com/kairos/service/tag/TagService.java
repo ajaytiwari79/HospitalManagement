@@ -1,6 +1,7 @@
 package com.kairos.service.tag;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.controller.staffing_level.StaffingLevelController;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
@@ -11,6 +12,7 @@ import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +25,9 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
@@ -33,7 +35,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
  */
 @Transactional
 @Service
-public class TagService {
+public class TagService extends MongoBaseService {
 
     private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
 
@@ -57,7 +59,7 @@ public class TagService {
         if( tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)  != null){
            exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName() );
         }
-        return tagMongoRepository.save(buildTag(tagDTO, true, countryId));
+        return this.save(buildTag(tagDTO, true, countryId));
     }
 
     public Tag  updateCountryTag(Long countryId, BigInteger tagId, TagDTO tagDTO) {
@@ -73,27 +75,34 @@ public class TagService {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
-        tagMongoRepository.save(tag);
+        this.save(tag);
         return tag;
     }
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType,boolean includeStaffTags){
-        if (!userIntegrationService.isCountryExists(countryId)) {
+        if ( !userIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID,countryId);
         }
-        filterText = isNull(filterText) ? "" : filterText;
+
+        if(filterText == null){
+            filterText = "";
+        }/* else {
+            filterText = "/"+filterText+"/i";
+        }*/
+
         HashMap<String,Object> tagsData = new HashMap<>();
         List<Tag> tags;
         List<TagDTO> tagDTOS ;
         if(masterDataType == null){
-            tagDTOS = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTag(countryId, filterText, false);
+            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false);
         } else {
-            tagDTOS = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeleted(countryId, filterText, masterDataType.toString(), false);
+            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false);
         }
+
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
-            tags = userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true);
-            tagDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class));
+            tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true));
         }
+        tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class);
         tagsData.put("tags",tagDTOS);
         return tagsData;
     }
@@ -107,7 +116,7 @@ public class TagService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
         }
         tag.setDeleted(true);
-        tagMongoRepository.save(tag);
+        this.save(tag);
         return true;
     }
 
@@ -121,7 +130,7 @@ public class TagService {
         if( tagMongoRepository.findTagByNameIgnoreCaseAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)  != null){
            exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName());
         }
-        return tagMongoRepository.save(buildTag(tagDTO, false, organizationId));
+        return this.save(buildTag(tagDTO, false, organizationId));
     }
 
     public Tag  updateOrganizationTag(Long organizationId, BigInteger tagId, TagDTO tagDTO) {
@@ -134,7 +143,7 @@ public class TagService {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
-        tagMongoRepository.save(tag);
+        this.save(tag);
         return tag;
     }
 
@@ -176,7 +185,7 @@ public class TagService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
         }
         tag.setDeleted(true);
-        tagMongoRepository.save(tag);
+        this.save(tag);
         return true;
     }
 
@@ -206,7 +215,7 @@ public class TagService {
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger tagId, Map<String,TranslationInfo> translations) {
         Tag tag =tagMongoRepository.findTagByIdAndEnabled(tagId);
-        if(isNull(tag)){
+        if(ObjectUtils.isNull(tag)){
             exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
         }
         tag.setTranslations(translations);

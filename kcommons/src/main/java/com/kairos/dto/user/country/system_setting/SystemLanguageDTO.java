@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.system_setting;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;

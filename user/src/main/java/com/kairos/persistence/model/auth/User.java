@@ -49,7 +49,6 @@ import static com.kairos.utils.CPRUtil.getGenderFromCPRNumber;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User extends UserBaseEntity {
-    private static final long serialVersionUID = -6897455974022060142L;
     @KPermissionField
     protected String cprNumber;
     private String userName;
@@ -169,7 +168,7 @@ public class User extends UserBaseEntity {
 
     public String getUserName() {
         if(userName != null) {
-            userName = userName.toLowerCase();
+            userName.toLowerCase();
         }
         return userName;
     }

@@ -1,6 +1,7 @@
 package com.kairos.controller.country;
 
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.language.Language;
@@ -8,8 +9,8 @@ import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.service.country.*;
 import com.kairos.service.language.LanguageLevelService;
 import com.kairos.service.language.LanguageService;
+import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.payment_type.PaymentTypeService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,8 @@ public class CountryDefaultDataController {
 
     @Inject
     private CountryService countryService;
+    @Inject
+    private DayTypeService dayTypeService;
     @Inject
     private ClinicTypeService clinicTypeService;
     @Inject
@@ -65,14 +68,20 @@ public class CountryDefaultDataController {
     private LanguageLevelService languageLevelService;
     @Inject
     private CitizenStatusService citizenStatusService;
-    @Inject private TranslationService translationService;
+    @Inject
+    private TimeSlotService timeSlotService;
 
-    // TODO Integrated
-//    @ApiOperation(value = "Get day types by id")
-//    @RequestMapping(value = "/day_types", method = RequestMethod.POST)
-//    public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
-//    }
+    @ApiOperation(value = "Get day types by id")
+    @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry());
+    }
+
+    @ApiOperation(value = "Get day types by id")
+    @RequestMapping(value = "/day_types", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
+    }
 
     @RequestMapping(value = COUNTRY_URL + "/level", method = RequestMethod.POST)
     @ApiOperation("Add level in country")
@@ -545,35 +554,35 @@ public class CountryDefaultDataController {
     public ResponseEntity<Map<String, Object>> deleteVatType(@PathVariable long vatTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.deleteVatType(vatTypeId));
     }
-     //TODO All 4 below Integrated
-//    @ApiOperation(value = "Get DayType by countryId")
-//    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
-//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
-//    }
 
-//    @ApiOperation(value = "Add DayType by countryId")
-//    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.POST)
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> addDayType(@PathVariable long countryId, @Validated @RequestBody DayTypeDTO dayTypeDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.createDayType(dayTypeDTO, countryId));
-//    }
+    @ApiOperation(value = "Get DayType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
+    }
 
-//    @ApiOperation(value = "Update DayType")
-//    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.PUT)
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> updateDayType(@Validated @RequestBody DayTypeDTO dayTypeDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateDayType(dayTypeDTO));
-//    }
+    @ApiOperation(value = "Add DayType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addDayType(@PathVariable long countryId, @Validated @RequestBody DayTypeDTO dayTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.createDayType(dayTypeDTO, countryId));
+    }
 
-//    @ApiOperation(value = "Delete DayType by dayTypeId")
-//    @RequestMapping(value = COUNTRY_URL + "/dayType/{dayTypeId}", method = RequestMethod.DELETE)
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> deleteDayType(@PathVariable long dayTypeId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.deleteDayType(dayTypeId));
-//
-//    }
+    @ApiOperation(value = "Update DayType")
+    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateDayType(@Validated @RequestBody DayTypeDTO dayTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateDayType(dayTypeDTO));
+    }
+
+    @ApiOperation(value = "Delete DayType by dayTypeId")
+    @RequestMapping(value = COUNTRY_URL + "/dayType/{dayTypeId}", method = RequestMethod.DELETE)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteDayType(@PathVariable long dayTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.deleteDayType(dayTypeId));
+
+    }
 
     @ApiOperation(value = "Get DayType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/clinicType", method = RequestMethod.GET)
@@ -637,119 +646,126 @@ public class CountryDefaultDataController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfLevel(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/day_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfDayType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/industry_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfIndustryType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/clinic_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfClinicType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/ownership_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfOwnershipType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/vat_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfVatType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/contract_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfContractType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/business_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfBuisnessType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, businessTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/kairos_status/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfKairosStatus(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kairosStatusService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/employee_limit/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfEmployeeLimit(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employeeLimitService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/payment_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfPaymentType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, paymentTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/engineer_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfEngineerType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, engineerTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/location_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfLocationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, locationTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/language/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfLanguage(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, languageService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/housing_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfHousingType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, housingTypeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/currency/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfCurrency(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, currencyService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/citizen_status/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfCitizenStatus(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, citizenStatusService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/relation_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateTranslationOfRelationType(id,translations));
     }
 
 }

@@ -14,7 +14,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_CO
 //  Created By vipul   On 9/8/18
 @NodeEntity
 public class UnitType extends UserBaseEntity {
-    private static final long serialVersionUID = -4026399226778161104L;
     private String name;
     private String description;
     @Relationship(type = IN_COUNTRY)

@@ -49,6 +49,7 @@ public class CustomAggregationQuery {
             matchQuery +=  ", 'taskList.startDate' : { '$gte' : { '$date' : '"+startTimeOfDay+"'} , '$lt' : { '$date' : '"+endTimeOfDay+"'}} ";
         }
         matchQuery += "}} ";
+        System.out.println("matchQuery-----> "+matchQuery);
         return matchQuery;
     }
 

@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.counter.enums;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +8,7 @@ import java.util.Map;
  * @dated: Jun/26/2018
  */
 
-public enum CounterSize implements Serializable {
+public enum CounterSize {
     SIZE_1X1(1,1),
     SIZE_2X2(2,2),
     SIZE_8X2(8,2),

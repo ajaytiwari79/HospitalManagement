@@ -24,7 +24,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
 @Setter
 public class FilterGroup extends UserBaseEntity {
 
-    private static final long serialVersionUID = -4598278605377424162L;
     @Relationship(type = APPLICABLE_FOR)
     private List<AccessPage> accessPages;
 

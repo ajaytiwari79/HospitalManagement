@@ -24,7 +24,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NoArgsConstructor
 public class Language extends UserBaseEntity {
 
-    private static final long serialVersionUID = 9049811839114787569L;
     @NotBlank(message = "error.Language.name.notEmpty")
     private String name;
     private String description;

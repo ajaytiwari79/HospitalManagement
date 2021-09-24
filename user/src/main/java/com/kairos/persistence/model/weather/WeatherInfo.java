@@ -18,7 +18,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeatherInfo extends UserBaseEntity {
-    private static final long serialVersionUID = -1131929101474906935L;
     private Long unitId;
     private LocalDate date;
     private String weatherInfoInJson;

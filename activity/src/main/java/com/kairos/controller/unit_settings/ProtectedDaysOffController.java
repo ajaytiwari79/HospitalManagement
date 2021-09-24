@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApiConstants.*;
 
 /**
@@ -45,25 +44,6 @@ public class ProtectedDaysOffController {
     @PostMapping(COUNTRY_URL + "/protected_days_off")
     public ResponseEntity<Map<String,Object>> createAutoProtectedDaysOffOfAllUnits(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.createAutoProtectedDaysOffOfAllUnits(countryId));
-    }
-
-    @ApiOperation("create old unit protected days off ")
-    @PostMapping(COUNTRY_URL + "/link_protected_days_off")
-    public ResponseEntity<Map<String,Object>> linkProtectedDaysOff(@PathVariable Long countryId,@RequestParam("expertiseId") Long expertiseId) {
-        protectedDaysOffService.linkProtectedDaysOffSetting(null,newHashSet(expertiseId),countryId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-    }
-
-    @ApiOperation(value = "add proteched days off setting")
-    @GetMapping(value =   "/expertise/{expertiseId}/protected_days_off")
-    public ResponseEntity<Map<String, Object>> getProtechedDaysOffSetting(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.getProtectedDaysOffByExpertiseId(expertiseId));
-    }
-
-    @ApiOperation(value = "add proteched days off setting")
-    @PostMapping(value =  "/expertise/{expertiseId}/protected_days_off")
-    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
     }
 
 

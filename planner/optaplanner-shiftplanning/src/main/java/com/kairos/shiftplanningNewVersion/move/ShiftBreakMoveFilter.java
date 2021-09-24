@@ -2,6 +2,7 @@ package com.kairos.shiftplanningNewVersion.move;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.kairos.shiftplanningNewVersion.solution.StaffingLevelSolution;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;

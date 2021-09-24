@@ -1,7 +1,10 @@
 package com.kairos.service.payment_type;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.EmployeeLimit;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.default_data.PaymentTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -12,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 9/1/17.
@@ -46,7 +51,12 @@ public class PaymentTypeService {
 
     public List<PaymentTypeDTO> getPaymentTypes(long countryId) {
         List<PaymentType> paymentTypes = paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(paymentTypes, PaymentTypeDTO.class);
+        List<PaymentTypeDTO> paymentTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(paymentTypes,PaymentTypeDTO.class);
+        for(PaymentTypeDTO paymentTypeDTO:paymentTypeDTOS){
+            paymentTypeDTO.setCountryId(countryId);
+            paymentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(paymentTypeDTO.getTranslatedNames(),paymentTypeDTO.getTranslatedDescriptions()));
+        }
+        return  paymentTypeDTOS;
     }
 
     public PaymentTypeDTO updatePaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {
@@ -72,5 +82,16 @@ public class PaymentTypeService {
             exceptionService.dataNotFoundByIdException("error.PaymentType.notfound");
         }
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long paymentTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        PaymentType paymentType =paymentTypeGraphRepository.findOne(paymentTypeId);
+        paymentType.setTranslatedNames(translatedNames);
+        paymentType.setTranslatedDescriptions(translatedDescriptions);
+        paymentTypeGraphRepository.save(paymentType);
+        return paymentType.getTranslatedData();
     }
 }

@@ -6,7 +6,10 @@ import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFi
 import org.optaplanner.core.impl.heuristic.selector.move.generic.SwapMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.util.Objects;
+
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 public class ALISwapMoveFilter implements SelectionFilter<StaffingLevelSolution, SwapMove> {
     @Override

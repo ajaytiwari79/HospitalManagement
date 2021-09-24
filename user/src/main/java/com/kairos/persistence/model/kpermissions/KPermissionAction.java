@@ -24,7 +24,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @NodeEntity
 public class KPermissionAction extends UserBaseEntity {
 
-    private static final long serialVersionUID = 677565453187577510L;
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private PermissionAction action;
 

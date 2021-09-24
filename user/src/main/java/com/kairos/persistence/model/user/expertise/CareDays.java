@@ -11,7 +11,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @Setter
 @NoArgsConstructor
 public class CareDays extends UserBaseEntity implements Comparable<CareDays> {
-    private static final long serialVersionUID = 881129300715413198L;
     private Integer from;
     private Integer to;
     private Integer leavesAllowed;

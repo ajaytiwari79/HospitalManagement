@@ -9,7 +9,6 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
-import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.WeeklyEmploymentHoursKPIService;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -44,7 +43,7 @@ public class WeeklyHoursEmploymentKPIServiceTest {
     private List<Long> staffIds;
     private Long unitId;
     private DateTimeInterval dateTimeInterval;
-    private KPICalculationRelatedInfo kpiCalculationRelatedInfo;
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo;
     private List<StaffKpiFilterDTO> staffKpiFilterDTOS;
     private FilterType filterType;
 
@@ -66,8 +65,8 @@ public class WeeklyHoursEmploymentKPIServiceTest {
     }
 
 
-    private KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
-        KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPICalculationRelatedInfo();
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo getKpiCalculationRelatedInfo(){
+        KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPIBuilderCalculationService().new KPICalculationRelatedInfo();
         kpiCalculationRelatedInfo.setCalculationTypes(Arrays.asList(STAFF_SKILLS_COUNT));
         kpiCalculationRelatedInfo.setUnitId(unitId);
         kpiCalculationRelatedInfo.setStaffIds(staffIds);

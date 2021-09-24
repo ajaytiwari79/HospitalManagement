@@ -4,17 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityWrapper implements Serializable {
-    private static final long serialVersionUID = -1555089459872201303L;
+public class ActivityWrapper {
     private Activity activity;
     private String timeType;
     private TimeType timeTypeInfo;
-    private Integer ranking;
+    private ActivityPriority activityPriority;
 
     public ActivityWrapper(Activity activity, String timeType) {
         this.activity = activity;

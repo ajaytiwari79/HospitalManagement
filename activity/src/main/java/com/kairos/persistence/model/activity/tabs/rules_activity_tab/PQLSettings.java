@@ -9,11 +9,9 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
 import com.kairos.dto.activity.open_shift.DurationField;
 
-import java.io.Serializable;
 import java.util.Optional;
 
-public class PQLSettings implements Serializable {
-    private static final long serialVersionUID = -1837586518202954653L;
+public class PQLSettings {
     @KPermissionField
     private DurationField approvalTimeInAdvance; // TODO need to rename
     @KPermissionField

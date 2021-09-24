@@ -4,8 +4,6 @@ import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.session.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.repository.support.SimpleNeo4jRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -19,9 +17,6 @@ import static com.kairos.service.kpermissions.PermissionService.checkAndUpdateRe
 @Transactional(readOnly = true)
 public class Neo4jBaseRepositoryImpl<T extends UserBaseEntity, ID extends Serializable>
 extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
-
-	private final Logger logger = LoggerFactory.getLogger(Neo4jBaseRepositoryImpl.class);
-
 	private static final int DEFAULT_QUERY_DEPTH = 1;
 	private static final String ID_MUST_NOT_BE_NULL = "The given id must not be null!";
 
@@ -83,7 +78,7 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 				try {
 					oldEntity = (S) entity.getClass().newInstance();
 				} catch (InstantiationException | IllegalAccessException e) {
-					logger.error(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}
@@ -120,7 +115,7 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 			try {
 				oldEntity = (S)entity.getClass().newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
-				logger.error(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 		session.save(entity, depth);

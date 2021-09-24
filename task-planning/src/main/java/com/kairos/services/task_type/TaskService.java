@@ -847,31 +847,28 @@ public class TaskService extends MongoBaseService {
             TaskAddress taskAddress = createTaskAddress(kmdTask);
             List<String> taskIds = new ArrayList<>();
             if (kmdTask.getPatientResourceList() != Collections.EMPTY_LIST) {
-                updateTaskDetails(kmdTask, grantCount, taskDemand, citizen, staffIds, taskAddress, taskIds);
-            }
-        }
-    }
-    private void updateTaskDetails(ImportTaskDTO kmdTask, Integer grantCount, TaskDemand taskDemand, Client citizen, List<Long> staffIds, TaskAddress taskAddress, List<String> taskIds) {
-        for (PatientResourceList patientResourceList : kmdTask.getPatientResourceList()) {
-            for (Grants grants : patientResourceList.getGrants()) {
-                String grantId = grants.getId();
-                taskDemand = taskDemandMongoRepository.findByKmdExternalId(String.valueOf(grantId));
-                if (citizen == null) return true;
-                TaskType taskType = taskTypeMongoRepository.findOne(taskDemand.getTaskTypeId());
-                if (taskDemand == null) return true;
-                grantCount += 1;
-                Task task = createKMDPlannedTask(kmdTask, taskType, taskDemand, taskAddress, staffIds);
-                taskIds.add(task.getId().toString());
-            }
-        }
-        if (grantCount > 1) {
-            String uniqueID = UUID.randomUUID().toString();
-            uniqueID = uniqueID.substring(0, uniqueID.indexOf("-"));
-            try {
-                Task task = tasksMergingService.mergeTasksWithIds(taskIds, taskDemand.getUnitId(), taskDemand.getCitizenId(), AppConstants.MERGED_TASK_NAME, false, uniqueID, taskAddress, null, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null);
-                task.setAssignedStaffIds(staffIds);
-            } catch (CloneNotSupportedException exception) {
-                LOGGER.warn("Exception occurs while merging Imported KMD Tasks----> " + exception.getMessage());
+                for (PatientResourceList patientResourceList : kmdTask.getPatientResourceList()) {
+                    for (Grants grants : patientResourceList.getGrants()) {
+                        String grantId = grants.getId();
+                        taskDemand = taskDemandMongoRepository.findByKmdExternalId(String.valueOf(grantId));
+                        if (citizen == null) return;
+                        TaskType taskType = taskTypeMongoRepository.findOne(taskDemand.getTaskTypeId());
+                        if (taskDemand == null) return;
+                        grantCount += 1;
+                        Task task = createKMDPlannedTask(kmdTask, taskType, taskDemand, taskAddress, staffIds);
+                        taskIds.add(task.getId().toString());
+                    }
+                }
+                if (grantCount > 1) {
+                    String uniqueID = UUID.randomUUID().toString();
+                    uniqueID = uniqueID.substring(0, uniqueID.indexOf("-"));
+                    try {
+                        Task task = tasksMergingService.mergeTasksWithIds(taskIds, taskDemand.getUnitId(), taskDemand.getCitizenId(), AppConstants.MERGED_TASK_NAME, false, uniqueID, taskAddress, null, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null);
+                        task.setAssignedStaffIds(staffIds);
+                    } catch (CloneNotSupportedException exception) {
+                        LOGGER.warn("Exception occurs while merging Imported KMD Tasks----> " + exception.getMessage());
+                    }
+                }
             }
         }
     }

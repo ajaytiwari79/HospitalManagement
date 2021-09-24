@@ -8,12 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
@@ -26,7 +24,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Getter
 @Setter
 @NoArgsConstructor
-@Document
 public class PlanningPeriod extends MongoBaseEntity {
 
     private LocalDate startDate;
@@ -66,44 +63,12 @@ public class PlanningPeriod extends MongoBaseEntity {
     }
 
 
-     public DateTimeInterval interval(){
+     public DateTimeInterval takeInterval(){
         return new DateTimeInterval(asDate(startDate),asDate(endDate));
     }
 
     public boolean contains(LocalDate localDate){
-        return interval().contains(asDate(localDate)) || endDate.equals(localDate);
-    }
-
-    public Map<LocalDate,BigInteger> getLocalDatePhaseIdMap(){
-        AtomicReference<LocalDate> start = new AtomicReference<>(startDate);
-        Map<LocalDate,BigInteger> localDateMap = new HashMap<LocalDate, BigInteger>(){{
-            while (!start.get().isAfter(endDate)){
-                put(start.get(),currentPhaseId);
-                start.set(start.get().plusDays(1));
-            }
-        }};
-        return localDateMap;
-    }
-
-    public Map<LocalDate,Boolean> getLocalDatePublishPlanningMap(Long employmentTypeId){
-        AtomicReference<LocalDate> start = new AtomicReference<>(startDate);
-        Map<LocalDate,Boolean> localDateMap = new HashMap<LocalDate, Boolean>(){{
-            while (!start.get().isAfter(endDate)){
-                put(start.get(),publishEmploymentIds.contains(employmentTypeId));
-                start.set(start.get().plusDays(1));
-            }
-        }};
-        return localDateMap;
-    }
-
-    public Set<LocalDate> getLocalDates(){
-        LocalDate start = startDate;
-        Set<LocalDate> localDates = new HashSet<>();
-        while (!start.isAfter(endDate)){
-            localDates.add(start);
-            start = start.plusDays(1);
-        }
-        return localDates;
+        return takeInterval().contains(asDate(localDate)) || endDate.equals(localDate);
     }
 
     public enum Type {

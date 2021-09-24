@@ -5,11 +5,8 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.ShiftDataHelper;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -30,10 +27,9 @@ public interface CustomPlanningPeriodMongoRepository {
     PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate);
     Phase getCurrentPhaseByDateUsingPlanningPeriod(Long unitId, LocalDate date);
     PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId);
-    List<PlanningPeriodDTO> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
+    List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
     List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate, Date requestedEndDate);
     List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
     PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId);
     ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO);
-    ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole);;
 }

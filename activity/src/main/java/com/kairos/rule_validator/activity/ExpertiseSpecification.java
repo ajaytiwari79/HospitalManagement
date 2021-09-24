@@ -5,7 +5,6 @@ import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.util.*;
@@ -44,7 +43,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
+    public void validateRules(ShiftWithActivityDTO shift) {
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {

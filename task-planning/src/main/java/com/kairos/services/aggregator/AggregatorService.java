@@ -117,11 +117,14 @@ public class AggregatorService extends MongoBaseService {
 
 
     private void aggregatorOneWeek(Long organizationId) {
+
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(0, 7, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
             LOGGER.debug("taskIds map for one week: " + map);
             List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get(TASK_IDS);
             Long  citizenId = Long.valueOf(map.get("_id").toString());
+
+
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
             Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
@@ -129,13 +132,64 @@ public class AggregatorService extends MongoBaseService {
             if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
             }
-            clientAggregator = ObjectMapperUtils.copyPropertiesByMapper(clientAggregatorDTO,ClientAggregator.class);
+
+
             clientAggregator.setUnitId(organizationId);
             clientAggregator.setCitizenId(citizenId);
+            clientAggregator.setEscalationOneWeekCount(clientAggregatorDTO.getEscalationCount());
+            clientAggregator.setLongDrivingOneWeekCount(clientAggregatorDTO.getLongDrivingCount());
+            clientAggregator.setMostDrivenOneWeekCount(clientAggregatorDTO.getMostDrivenCount());
+            clientAggregator.setEscalationOneWeekTasks(clientAggregatorDTO.getEscalationTasks());
+            clientAggregator.setMostDrivenOneWeekTasks(clientAggregatorDTO.getMostDrivenTasks());
+            clientAggregator.setLongDrivingOneWeekTasks(clientAggregatorDTO.getLongDrivingTasks());
+            clientAggregator.setWaitingOneWeekCount(clientAggregatorDTO.getWaitingCount());
+            clientAggregator.setWaitingOneWeekTasks(clientAggregatorDTO.getWaitingTasks());
+            clientAggregator.setPlannedStatusOneWeekCount(clientAggregatorDTO.getPlannedStatusCount());
+            clientAggregator.setPlannedStatusOneWeekTasks(clientAggregatorDTO.getPlannedStatusTasks());
             clientAggregator.setTotalPlannedProblemsOneWeekCount(clientAggregatorDTO.getEscalationCount() + clientAggregatorDTO.getLongDrivingCount() + clientAggregatorDTO.getMostDrivenCount()+ clientAggregatorDTO.getPlannedStatusCount() + clientAggregatorDTO.getWaitingCount());
             clientAggregator.setTotalPlannedProblemsOneWeekTasks(ApplicationUtil.removingDuplicatesFromOneList(clientAggregatorDTO.getTotalPlannedProblemsTasks()));
+            clientAggregator.setEscalationTwoWeekCount(clientAggregator.getEscalationOneWeekCount());
+            clientAggregator.setLongDrivingTwoWeekCount(clientAggregator.getLongDrivingOneWeekCount());
+            clientAggregator.setMostDrivenTwoWeekCount(clientAggregator.getMostDrivenOneWeekCount());
+            clientAggregator.setWaitingTwoWeekCount(clientAggregator.getWaitingOneWeekCount());
+            clientAggregator.setPlannedStatusTwoWeekCount(clientAggregator.getPlannedStatusOneWeekCount());
+            clientAggregator.setTotalPlannedProblemsTwoWeekCount(clientAggregator.getTotalPlannedProblemsOneWeekCount());
+            clientAggregator.setEscalationTwoWeekTasks(clientAggregatorDTO.getEscalationTasks());
+            clientAggregator.setLongDrivingTwoWeekTasks(clientAggregatorDTO.getLongDrivingTasks());
+            clientAggregator.setMostDrivenTwoWeekTasks(clientAggregatorDTO.getMostDrivenTasks());
+            clientAggregator.setPlannedStatusTwoWeekTasks(clientAggregatorDTO.getPlannedStatusTasks());
+            clientAggregator.setWaitingTwoWeekTasks(clientAggregatorDTO.getWaitingTasks());
+            clientAggregator.setTotalPlannedProblemsTwoWeekTasks(clientAggregator.getTotalPlannedProblemsOneWeekTasks());
+            clientAggregator.setEscalationThreeWeekCount(clientAggregator.getEscalationOneWeekCount());
+            clientAggregator.setLongDrivingThreeWeekCount(clientAggregator.getLongDrivingOneWeekCount());
+            clientAggregator.setMostDrivenThreeWeekCount(clientAggregator.getMostDrivenOneWeekCount());
+            clientAggregator.setWaitingThreeWeekCount(clientAggregator.getWaitingOneWeekCount());
+            clientAggregator.setPlannedStatusThreeWeekCount(clientAggregator.getPlannedStatusOneWeekCount());
+            clientAggregator.setTotalPlannedProblemsThreeWeekCount(clientAggregator.getTotalPlannedProblemsOneWeekCount());
+            clientAggregator.setEscalationThreeWeekTasks(clientAggregatorDTO.getEscalationTasks());
+            clientAggregator.setLongDrivingThreeWeekTasks(clientAggregatorDTO.getLongDrivingTasks());
+            clientAggregator.setMostDrivenThreeWeekTasks(clientAggregatorDTO.getMostDrivenTasks());
+            clientAggregator.setPlannedStatusThreeWeekTasks(clientAggregatorDTO.getPlannedStatusTasks());
+            clientAggregator.setWaitingThreeWeekTasks(clientAggregatorDTO.getWaitingTasks());
+            clientAggregator.setTotalPlannedProblemsThreeWeekTasks(clientAggregator.getTotalPlannedProblemsOneWeekTasks());
+            clientAggregator.setEscalationFourWeekCount(clientAggregator.getEscalationOneWeekCount());
+            clientAggregator.setLongDrivingFourWeekCount(clientAggregator.getLongDrivingOneWeekCount());
+            clientAggregator.setMostDrivenFourWeekCount(clientAggregator.getMostDrivenOneWeekCount());
+            clientAggregator.setWaitingFourWeekCount(clientAggregator.getWaitingOneWeekCount());
+            clientAggregator.setPlannedStatusFourWeekCount(clientAggregator.getPlannedStatusOneWeekCount());
+            clientAggregator.setTotalPlannedProblemsFourWeekCount(clientAggregator.getTotalPlannedProblemsOneWeekCount());
+            clientAggregator.setEscalationFourWeekTasks(clientAggregatorDTO.getEscalationTasks());
+            clientAggregator.setLongDrivingFourWeekTasks(clientAggregatorDTO.getLongDrivingTasks());
+            clientAggregator.setMostDrivenFourWeekTasks(clientAggregatorDTO.getMostDrivenTasks());
+            clientAggregator.setPlannedStatusFourWeekTasks(clientAggregatorDTO.getPlannedStatusTasks());
+            clientAggregator.setWaitingFourWeekTasks(clientAggregatorDTO.getWaitingTasks());
+            clientAggregator.setTotalPlannedProblemsFourWeekTasks(clientAggregator.getTotalPlannedProblemsOneWeekTasks());
             save(clientAggregator);
+
+
         }
+
+
     }
 
 
@@ -153,7 +207,7 @@ public class AggregatorService extends MongoBaseService {
             if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
             }
-            clientAggregator = ObjectMapperUtils.copyPropertiesByMapper(clientAggregatorDTO,ClientAggregator.class);
+
             clientAggregator.setEscalationTwoWeekCount(clientAggregatorDTO.getEscalationCount() + clientAggregator.getEscalationOneWeekCount());
             clientAggregator.setLongDrivingTwoWeekCount(clientAggregatorDTO.getLongDrivingCount() + clientAggregator.getLongDrivingOneWeekCount());
             clientAggregator.setMostDrivenTwoWeekCount(clientAggregatorDTO.getMostDrivenCount() + clientAggregator.getMostDrivenOneWeekCount());
@@ -166,7 +220,28 @@ public class AggregatorService extends MongoBaseService {
             clientAggregator.setMostDrivenTwoWeekTasks(ApplicationUtil.removingDuplicates(clientAggregatorDTO.getMostDrivenTasks(), clientAggregator.getMostDrivenOneWeekTasks()));
             clientAggregator.setPlannedStatusTwoWeekTasks(ApplicationUtil.removingDuplicates(clientAggregatorDTO.getPlannedStatusTasks(), clientAggregator.getPlannedStatusOneWeekTasks()));
             clientAggregator.setTotalPlannedProblemsTwoWeekTasks(ApplicationUtil.removingDuplicates(clientAggregatorDTO.getTotalPlannedProblemsTasks(), clientAggregator.getTotalPlannedProblemsOneWeekTasks()));
-
+            clientAggregator.setEscalationThreeWeekCount(clientAggregator.getEscalationTwoWeekCount());
+            clientAggregator.setLongDrivingThreeWeekCount(clientAggregator.getLongDrivingTwoWeekCount());
+            clientAggregator.setMostDrivenThreeWeekCount(clientAggregator.getMostDrivenTwoWeekCount());
+            clientAggregator.setWaitingThreeWeekCount(clientAggregator.getWaitingTwoWeekCount());
+            clientAggregator.setPlannedStatusThreeWeekCount(clientAggregator.getPlannedStatusTwoWeekCount());
+            clientAggregator.setTotalPlannedProblemsThreeWeekCount(clientAggregator.getTotalPlannedProblemsTwoWeekCount());
+            clientAggregator.setEscalationThreeWeekTasks(clientAggregator.getEscalationTwoWeekTasks());
+            clientAggregator.setLongDrivingThreeWeekTasks(clientAggregator.getLongDrivingTwoWeekTasks());
+            clientAggregator.setMostDrivenThreeWeekTasks(clientAggregator.getMostDrivenTwoWeekTasks());
+            clientAggregator.setPlannedStatusThreeWeekTasks(clientAggregator.getPlannedStatusTwoWeekTasks());
+            clientAggregator.setTotalPlannedProblemsThreeWeekTasks(clientAggregator.getTotalPlannedProblemsTwoWeekTasks());
+            clientAggregator.setEscalationFourWeekCount(clientAggregator.getEscalationTwoWeekCount());
+            clientAggregator.setLongDrivingFourWeekCount(clientAggregator.getLongDrivingTwoWeekCount());
+            clientAggregator.setMostDrivenFourWeekCount(clientAggregator.getMostDrivenTwoWeekCount());
+            clientAggregator.setWaitingFourWeekCount(clientAggregator.getWaitingTwoWeekCount());
+            clientAggregator.setPlannedStatusFourWeekCount(clientAggregator.getPlannedStatusTwoWeekCount());
+            clientAggregator.setTotalPlannedProblemsFourWeekCount(clientAggregator.getTotalPlannedProblemsTwoWeekCount());
+            clientAggregator.setEscalationFourWeekTasks(clientAggregator.getEscalationTwoWeekTasks());
+            clientAggregator.setLongDrivingFourWeekTasks(clientAggregator.getLongDrivingTwoWeekTasks());
+            clientAggregator.setMostDrivenFourWeekTasks(clientAggregator.getMostDrivenTwoWeekTasks());
+            clientAggregator.setPlannedStatusFourWeekTasks(clientAggregator.getPlannedStatusTwoWeekTasks());
+            clientAggregator.setTotalPlannedProblemsFourWeekTasks(clientAggregator.getTotalPlannedProblemsTwoWeekTasks());
             save(clientAggregator);
 
 

@@ -33,7 +33,7 @@ public class ObjectMapperUtils {
     public static final DateTimeFormatter LOCALTIME_FORMATTER = ofPattern("HH:mm");
     public static final String ERROR = "error {}";
 
-    public static ObjectMapper mapper;
+    private static ObjectMapper mapper;
 
     private static  final Logger LOGGER = LoggerFactory.getLogger(ObjectMapperUtils.class);
 

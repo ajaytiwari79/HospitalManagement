@@ -18,7 +18,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class Currency extends UserBaseEntity {
 
-    private static final long serialVersionUID = 2823035106529082887L;
     @NotBlank(message = ERROR_CURRENCY_NAME_NOTEMPTY)
     private String name;
     private String description;

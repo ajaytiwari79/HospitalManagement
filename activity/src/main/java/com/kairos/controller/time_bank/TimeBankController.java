@@ -1,12 +1,14 @@
 package com.kairos.controller.time_bank;
 
+
 import com.kairos.constants.ApiConstants;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.service.time_bank.AsyncTimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +24,8 @@ import java.util.Map;
 public class TimeBankController {
 
 
-    @Inject
+    @Autowired
     private TimeBankService timeBankService;
-    @Inject
-    private AsyncTimeBankCalculationService asyncTimeBankCalculationService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
 
@@ -77,8 +77,8 @@ public class TimeBankController {
     //As discussed with Shiv kumar API name should be get_timebank_metadata
     @ApiOperation("Get accumulated timebank and delta timebank")
     @GetMapping("/get_timebank_metadata")
-    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long employmentId,@RequestParam(required = false) boolean includeActualTimebank){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,asyncTimeBankCalculationService.getAccumulatedTimebankAndDelta(employmentId,unitId,!includeActualTimebank,null,null));
+    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long employmentId,@RequestParam(required = false) Boolean includeActualTimebank){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDelta(employmentId,unitId,includeActualTimebank));
     }
 
     //Todo remove this API after sprint 46 is closed
@@ -93,6 +93,14 @@ public class TimeBankController {
     @GetMapping("/get_cta_rultemplate_by_employmentId")
     public ResponseEntity<Map<String,Object>> getCTARultemplateByEmploymentId(@PathVariable Long unitId,@RequestParam Long employmentId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getCTARultemplateByEmploymentId(employmentId));
+    }
+
+    //remove after test qa
+    @ApiOperation("update time bank of protected days off")
+    @PutMapping("/test_timebank")
+    public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDTO){
+
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
 
 

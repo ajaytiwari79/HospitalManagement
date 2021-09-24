@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -18,8 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityLocationSettings implements Serializable {
-    private static final long serialVersionUID = -5767089276245635842L;
+public class ActivityLocationSettings {
     @KPermissionField
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
     @KPermissionField

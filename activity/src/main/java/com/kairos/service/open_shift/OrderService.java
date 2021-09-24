@@ -8,6 +8,7 @@ import com.kairos.dto.activity.open_shift.OrderResponseDTO;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.persistence.model.open_shift.Order;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import static com.kairos.constants.AppConstants.PRIORITY_GROUP1_NAME;
 
 @Service
 @Transactional
-public class OrderService {
+public class OrderService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);
     @Inject
@@ -42,7 +43,7 @@ public class OrderService {
     OrderResponseDTO orderResponseDTO = orderOpenshiftResponseDTO.getOrder();
     List<OpenShiftResponseDTO> openShiftResponseDTOs = orderOpenshiftResponseDTO.getOpenshifts();
     ObjectMapperUtils.copyProperties(orderResponseDTO,order);
-    orderMongoRepository.save(order);
+    save(order);
     orderResponseDTO.setId(order.getId());
     //priorityGroupService.copyPriorityGroupsForOrder(orderResponseDTO.getUnitId(),order.getId());
        for(OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
@@ -72,7 +73,7 @@ public class OrderService {
             throw new DataNotFoundByIdException("Order doesn not exist by id"+ orderId);
         }
         ObjectMapperUtils.copyProperties(orderResponseDTO,order);
-        orderMongoRepository.save(order);
+        save(order);
         orderResponseDTO.setId(order.getId());
         openShiftResponseDTOS = openShiftService.updateOpenShift(openShiftResponseDTOS,orderId);
         List<PriorityGroupDTO> priorityGroupDTOs=orderOpenShiftResponseDTO.getPriorityGroups();
@@ -90,12 +91,12 @@ public class OrderService {
             throw new DataNotFoundByIdException("Order doesn not exist by id"+ orderId);
         }
         order.setDeleted(true);
-        orderMongoRepository.save(order);
+        save(order);
 
     }
 
 
-    public List<OrderResponseDTO> getOrdersByUnitId(Long unitId) {
+    public List<Order> getOrdersByUnitId(Long unitId) {
         return orderMongoRepository.findOrdersByUnitId(unitId);
     }
 

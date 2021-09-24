@@ -1,13 +1,11 @@
 package com.kairos.enums.constraint;
 
-import java.io.Serializable;
-
 /**
  * @author pradeep
  * @date - 20/6/18
  */
 
-public enum ScoreLevel implements Serializable {
+public enum ScoreLevel {
 
     HARD("Hard"),MEDIUM("Medium"),SOFT("Soft");
 

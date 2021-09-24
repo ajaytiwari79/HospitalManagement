@@ -21,7 +21,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class KairosStatus extends UserBaseEntity {
 
-    private static final long serialVersionUID = -1271251629903425956L;
     @NotBlank(message = "error.KairosStatus.name.notEmpty")
     private String name;
     private String description;

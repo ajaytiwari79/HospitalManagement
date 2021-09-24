@@ -20,6 +20,7 @@ import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
@@ -30,6 +31,7 @@ import com.kairos.persistence.repository.organization.OrganizationBaseRepository
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -47,6 +49,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -120,11 +123,17 @@ public class CompanyCreationService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
+    private TimeSlotService timeSlotService;
+    @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private ReasonCodeService reasonCodeService;
     @Inject
     private SchedulerServiceRestClient schedulerRestClient;
     @Inject
@@ -445,6 +454,7 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
+        reasonCodeService.createReasonCodeForUnit(unit, country.getId());
         unitGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
@@ -581,10 +591,11 @@ public class CompanyCreationService {
         userSchedulerJobService.createJobForAddPlanningPeriod(organization);
         addStaffsInChatServer(staffPersonalDetailQueryResults.stream().map(StaffPersonalDetailQueryResult::getStaff).collect(Collectors.toList()));
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
+        List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
         List<Long> employmentIds = employmentTypeGraphRepository.getEmploymentTypeIdsByCountryId(countryId);
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization instanceof Organization, employmentIds);
-        createDefaultDataForOrganizationAndUnit(countryId, parentOrganizationId, organization, parent, countryAndOrgAccessGroupIdsMap,  orgTypeAndSubTypeDTO);
+        createDefaultDataForOrganizationAndUnit(countryId, parentOrganizationId, organization, parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO);
         QueryResult organizationQueryResult = generateOrgHierarchyQueryResult(organization, parent);
         createDefaultKPISettings(staffPersonalDetailQueryResults, unitIds);
         organizationQueryResult.setHubId(unitGraphRepository.getHubIdByOrganizationId(organizationId));
@@ -611,12 +622,12 @@ public class CompanyCreationService {
         return units;
     }
 
-    private void createDefaultDataForOrganizationAndUnit(Long countryId, Long parentOrganizationId, OrganizationBaseEntity organization, Organization parent, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+    private void createDefaultDataForOrganizationAndUnit(Long countryId, Long parentOrganizationId, OrganizationBaseEntity organization, Organization parent, Map<Long, Long> countryAndOrgAccessGroupIdsMap, List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         if (parentOrganizationId == null) {
-            companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap,  orgTypeAndSubTypeDTO, countryId);
-            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId);
+            companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
+            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId, timeSlots);
         } else {
-            companyDefaultDataService.createDefaultDataInUnit(parentOrganizationId, Arrays.asList((Unit) organization), countryId);
+            companyDefaultDataService.createDefaultDataInUnit(parentOrganizationId, Arrays.asList((Unit) organization), countryId, timeSlots);
         }
     }
 

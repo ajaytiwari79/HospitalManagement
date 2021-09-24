@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -48,7 +49,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
     private ShiftLengthAndAverageSetting shiftLengthAndAverageSetting = ShiftLengthAndAverageSetting.DIFFERENCE_BETWEEN_START_END_TIME;
-    private transient DateTimeInterval interval;
 
     public AverageScheduledTimeWTATemplate(String name, boolean disabled,
                                            String description, long intervalLength,String intervalUnit) {
@@ -68,14 +68,16 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                 throwException("message.ruleTemplate.interval.notNull");
             }
             if (isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())) {
-                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts();
+                DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                infoWrapper.getShifts().add(infoWrapper.getShift());
+                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
+                shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                 List<DateTimeInterval> intervals = getIntervals(interval);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                 for (DateTimeInterval dateTimeInterval : intervals) {
                     int totalMin = 0;
                     for (ShiftWithActivityDTO shift : shifts) {
-                        boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
-                        if (isValidShift && dateTimeInterval.overlaps(shift.getDateTimeInterval())) {
+                        if (dateTimeInterval.overlaps(shift.getDateTimeInterval())) {
                             totalMin += getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shift);
                         }
                     }

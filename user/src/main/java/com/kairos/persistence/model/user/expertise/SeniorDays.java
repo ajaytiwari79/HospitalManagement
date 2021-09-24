@@ -11,7 +11,9 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_EXPERTISE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CARE_DAYS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.VERSION_OF;
 
 @NodeEntity
 @Getter
@@ -19,7 +21,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeniorDays extends UserBaseEntity{
-    private static final long serialVersionUID = -1427491727211230586L;
     @Relationship(type = BELONGS_TO_EXPERTISE)
     private Expertise expertise;
     private LocalDate startDate;

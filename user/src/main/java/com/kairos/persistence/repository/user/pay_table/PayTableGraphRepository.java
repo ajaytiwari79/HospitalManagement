@@ -33,7 +33,11 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false})\n" +
             "with level,count(payTable) as totalPayTable \n" +
             "OPTIONAL MATCH  (level:Level)-[:"+IN_LEVEL+"]-(payGroupArea:PayGroupArea{deleted:false})\n" +
-            "return level.translations as translations,\n" +
+            "return " +
+            "{english :{name: CASE WHEN level.`translatedNames.english` IS NULL THEN '' ELSE level.`translatedNames.english` END, description : CASE WHEN level.`translatedDescriptions.english` IS NULL THEN '' ELSE level.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN level.`translatedNames.hindi` IS NULL THEN '' ELSE level.`translatedNames.hindi` END, description : CASE WHEN level.`translatedDescriptions.hindi` IS NULL THEN '' ELSE level.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN level.`translatedNames.danish` IS NULL THEN '' ELSE level.`translatedNames.danish` END, description : CASE WHEN level.`translatedDescriptions.danish` IS NULL THEN '' ELSE level.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN level.`translatedNames.britishenglish` IS NULL THEN '' ELSE level.`translatedNames.britishenglish` END, description : CASE WHEN level.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE level.`translatedDescriptions.britishenglish` END}} as translations,\n" +
             "id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
             "collect({ payGroupAreaId:id(payGroupArea),name:payGroupArea.name}) else [] end as payGroupAreas,totalPayTable as payTablesCount ORDER BY name")
     List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId);
@@ -68,7 +72,11 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     PayTableResponse getParentPayTableByPayTableId(Long payTableId);
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where id(level)={0} " +
-            "RETURN payTable.translations as translations,\n" +
+            "RETURN " +
+            "{english :{name: CASE WHEN payTable.`translatedNames.english` IS NULL THEN '' ELSE payTable.`translatedNames.english` END, description : CASE WHEN payTable.`translatedDescriptions.english` IS NULL THEN '' ELSE payTable.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN payTable.`translatedNames.hindi` IS NULL THEN '' ELSE payTable.`translatedNames.hindi` END, description : CASE WHEN payTable.`translatedDescriptions.hindi` IS NULL THEN '' ELSE payTable.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN payTable.`translatedNames.danish` IS NULL THEN '' ELSE payTable.`translatedNames.danish` END, description : CASE WHEN payTable.`translatedDescriptions.danish` IS NULL THEN '' ELSE payTable.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN payTable.`translatedNames.britishenglish` IS NULL THEN '' ELSE payTable.`translatedNames.britishenglish` END, description : CASE WHEN payTable.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE payTable.`translatedDescriptions.britishenglish` END}} as translations,\n" +
             "id(payTable) as id,payTable.name as name,payTable.published as published,payTable.percentageValue as percentageValue,payTable.editable as editable,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis,payTable.creationDate")
     List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId);
 
@@ -84,9 +92,4 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "OR ({2} IS NOT NULL AND  (DATE({2}) >= DATE(payTable.startDateMillis) AND (payTable.endDateMillis is null OR DATE({1}) <= DATE(payTable.endDateMillis)) ))) \n" +
             "RETURN payTable")
     List<PayTable> findAllActivePayTable(Long levelId,String startDate,String endDate,String employmentStartDate);
-
-    @Query("MATCH(payTable:PayTable)-[rel:HAS_TEMP_PAY_TABLE]->(draftPayTable:PayTable{deleted:false}) WHERE id(payTable)={0} \n" +
-            "SET draftPayTable.deleted=true \n" +
-            "DELETE rel")
-    PayTable deleteOldDraftPayTable(Long parentId);
 }

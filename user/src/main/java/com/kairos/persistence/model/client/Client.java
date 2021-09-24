@@ -38,7 +38,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @ToString
 public class Client extends UserBaseEntity {
-    private static final long serialVersionUID = -3657706200600394102L;
     @Relationship(type = CIVILIAN_STATUS)
     private CitizenStatus civilianStatus;
     private String profilePic;

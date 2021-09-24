@@ -19,7 +19,6 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 @NoArgsConstructor
 public class VehicleLocation  extends UserBaseEntity {
 
-    private static final long serialVersionUID = -8830140008406620529L;
     @NotNull(message = ERROR_NAME_NOTNULL)
     private String name;
     private String description;

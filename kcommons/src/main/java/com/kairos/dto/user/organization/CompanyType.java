@@ -1,6 +1,5 @@
 package com.kairos.dto.user.organization;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -9,7 +8,7 @@ import java.util.List;
 /**
  * Created by oodles on 16/4/18.
  */
-public enum CompanyType implements Serializable {
+public enum CompanyType {
     HUB("HUB"), COMPANY("Company"),UNION("union"),UNIT("Unit");
 
 

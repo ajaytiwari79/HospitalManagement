@@ -13,6 +13,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ import java.util.List;
 public class CountryCalenderService {
 
     @Inject
+    private CountryHolidayCalenderGraphRepository countryHolidayGraphRepository;
+
+    @Inject
     private CountryGraphRepository countryGraphRepository;
 
     private  static final org.slf4j.Logger logger = LoggerFactory.getLogger(CountryCalenderService.class);
@@ -43,7 +47,7 @@ public class CountryCalenderService {
             AppConstants.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             AppConstants.DATA_STORE_FACTORY = new FileDataStoreFactory(AppConstants.DATA_STORE_DIR);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -98,7 +102,7 @@ public class CountryCalenderService {
 
         } catch (IOException e) {
             logger.info("Exception occured: {}",e.getCause());
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
         return itemsList;
     }

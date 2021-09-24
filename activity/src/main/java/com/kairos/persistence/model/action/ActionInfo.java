@@ -15,7 +15,6 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActionInfo extends MongoBaseEntity {
-    private static final long serialVersionUID = 1971473566186477192L;
     private Long unitId;
     private Long staffId;
     private Map<String,Long> actionCount;

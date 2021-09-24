@@ -23,7 +23,6 @@ public class RestClientUrlUtil {
     private static  String userServiceUrl;
     private static  String plannerServiceUrl;
     private static String schedulerServiceUrl;
-    private static String kpiServiceUrl;
 
     //~==============resolve
     @Value("${gateway.plannerservice.url}")
@@ -37,11 +36,6 @@ public class RestClientUrlUtil {
     @Value("${gateway.userservice.url}")
     public  void setUserServiceUrl(String userServiceUrl) {
         RestClientUrlUtil.userServiceUrl = userServiceUrl;
-    }
-
-    @Value("${gateway.kpiservice.url}")
-    public  void setKPIServiceUrl(String kpiServiceUrl) {
-        RestClientUrlUtil.kpiServiceUrl = kpiServiceUrl;
     }
 
 
@@ -74,28 +68,6 @@ public class RestClientUrlUtil {
                 break;
             case UNIT_WITHOUT_PARENT_ORG:
                 baseUrl = new StringBuilder(userServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-                break;
-            default:break;
-
-        }
-        return baseUrl;
-    }
-
-    public static String getKPIServiceBaseUrl(RestClientUrlType restClientUrlType,Long id){
-        String baseUrl = null;
-
-        switch (restClientUrlType){
-            case UNIT:baseUrl = new StringBuilder(kpiServiceUrl ).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUserDetails().getLastSelectedOrganizationId())).toString();
-                break;
-            case COUNTRY:baseUrl = new StringBuilder(kpiServiceUrl ).append(COUNTRY).append(id).toString();
-                break;
-            case ORGANIZATION:baseUrl = new StringBuilder(kpiServiceUrl ).toString();
-                break;
-            case COUNTRY_WITHOUT_PARENT_ORG:
-                baseUrl = new StringBuilder(kpiServiceUrl).append(COUNTRY).append(id).toString();
-                break;
-            case UNIT_WITHOUT_PARENT_ORG:
-                baseUrl = new StringBuilder(kpiServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
             default:break;
 

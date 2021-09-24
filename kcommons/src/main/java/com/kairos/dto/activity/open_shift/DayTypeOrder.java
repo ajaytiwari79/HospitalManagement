@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.open_shift;
 
-import java.io.Serializable;
-
-public enum DayTypeOrder implements Serializable {
+public enum DayTypeOrder {
     SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY
 }

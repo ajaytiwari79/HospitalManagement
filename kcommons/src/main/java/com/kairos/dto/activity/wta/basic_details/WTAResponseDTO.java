@@ -7,6 +7,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

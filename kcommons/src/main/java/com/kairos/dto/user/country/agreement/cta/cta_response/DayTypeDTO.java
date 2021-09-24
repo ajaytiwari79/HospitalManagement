@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Day;
@@ -8,19 +9,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class DayTypeDTO implements Serializable {
+public class DayTypeDTO {
 
-    private static final long serialVersionUID = 5492777590254886956L;
-    private BigInteger id;
+    private Long id;
     @NotBlank(message = "error.DayType.name.notEmpty")
     private String name;
     private List<Day> validDays = new ArrayList<>();
@@ -36,7 +35,7 @@ public class DayTypeDTO implements Serializable {
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
 
-    public DayTypeDTO(BigInteger id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings) {
+    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings) {
         this.id = id;
         this.name = name;
         this.validDays = validDays;
@@ -45,7 +44,7 @@ public class DayTypeDTO implements Serializable {
         this.allowTimeSettings = allowTimeSettings;
     }
 
-    public DayTypeDTO(BigInteger id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings,String colorCode) {
+    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings,String colorCode) {
         this.id = id;
         this.name = name;
         this.validDays = validDays;

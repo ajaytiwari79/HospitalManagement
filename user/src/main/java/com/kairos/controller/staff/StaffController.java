@@ -3,7 +3,6 @@ package com.kairos.controller.staff;
 import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PositionDTO;
@@ -26,7 +25,6 @@ import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
@@ -78,7 +76,7 @@ public class StaffController {
     private EmploymentJobService employmentJobService;
     @Inject private StaffCreationService staffCreationService;
     @Inject private ClientService clientService;
-    @Inject private TranslationService translationService;
+
 
     @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
     @ApiOperation("update staff employment details")
@@ -274,8 +272,8 @@ public class StaffController {
 
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
     @ApiOperation("get staff")
-    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId,  @RequestParam String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffWithFilter(unitId, staffFilterDTO, moduleId));
+    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId, @RequestParam long id, @RequestParam String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffWithFilter(unitId, id, staffFilterDTO, moduleId));
     }
 
 
@@ -424,7 +422,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) permission.get("accessGroupId"));
         long tabId = Long.parseLong((String) permission.get("tabId"));
         long unitId = Long.parseLong((String) permission.get("unitId"));
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write,UserContext.getUserDetails().getId()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write));
     }
 
     @RequestMapping(value = "/{staffId}/external_id", method = RequestMethod.POST)
@@ -684,41 +682,15 @@ public class StaffController {
     @PutMapping(value ="/organization/language_settings" )
     @ApiOperation("update organization staff translation data")
     public ResponseEntity<Map<String, Object>>  updateStaffOrganizationTranslations(@PathVariable Long unitId,@RequestBody Map<String, TranslationInfo> translations){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(unitId,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffOrganizationTranslatedData(unitId,translations));
     }
 
     @PutMapping(value ="/{staffId}/staff_child/{staffChildId}/language_settings" )
     @ApiOperation("update staff child translation data")
-    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(staffChildId,translations));
+    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long unitId,@PathVariable Long staffId,@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffChildTranslatedData(staffChildId,translations,staffId,unitId));
     }
 
-    @PostMapping(value ="/get_eligible_staffs_for_cover_shifts" )
-    @ApiOperation("get eligible staffs for cover shifts")
-    public ResponseEntity<Map<String, Object>> getEligibleStaffsForCoverShifts(@PathVariable Long unitId,@RequestBody NotEligibleStaffDataDTO notEligibleStaffData){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getEligibleStaffsForCoverShifts(unitId,notEligibleStaffData));
-    }
 
-    @GetMapping(value = "/staff_employment_details/{employmentId}")
-    @ApiOperation("get staff Employement by employmentId")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentDatailsByEmploymentId(@PathVariable long unitId,
-                                                                                     @PathVariable Long employmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDatailsByEmploymentId(employmentId, unitId));
-    }
-
-    @PutMapping(value ="/{staffId}/allow_personal_ranking" )
-    @ApiOperation("update staff child translation data")
-    public ResponseEntity<Map<String, Object>>  allowPersonalRanking(@PathVariable Long staffId,@RequestParam boolean canRankTeam){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.allowPersonalRanking(staffId,canRankTeam));
-    }
-
-    @GetMapping(value = "/staff_details_for_balances/{employmentId}")
-    @ApiOperation("Get staff details for balances")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffDetailsForBalances(@PathVariable long unitId,
-                                                                                       @PathVariable Long employmentId,@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffDetailsForBalances(employmentId, unitId,startDate));
-    }
 
 }

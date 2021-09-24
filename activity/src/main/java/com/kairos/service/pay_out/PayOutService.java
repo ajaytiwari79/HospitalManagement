@@ -6,11 +6,14 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.shift.Shift;
@@ -18,9 +21,11 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.unit_settings.ProtectedDaysOffService;
+import com.kairos.service.shift.ShiftService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +46,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_
  * */
 @Transactional
 @Service
-public class PayOutService {
+public class PayOutService extends MongoBaseService {
 
 
     @Inject
@@ -55,9 +60,24 @@ public class PayOutService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
-    @Inject private ProtectedDaysOffService protectedDaysOffService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private ShiftService shiftService;
 
 
+    /**
+     * @param employmentDetails
+     * @param shifts
+     * @param activities
+     */
+    public void savePayOuts(StaffEmploymentDetails employmentDetails, List<Shift> shifts, List<Activity> activities, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<DayTypeDTO> dayTypeDTOS) {
+        if (isNull(activityWrapperMap)) {
+            activityWrapperMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> new ActivityWrapper(v, "")));
+        }
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(employmentDetails,dayTypeDTOS);
+        for (Shift shift : shifts) {
+            updatePayOut(staffAdditionalInfoDTO,shift,activityWrapperMap);
+        }
+    }
 
 
     /**
@@ -67,7 +87,7 @@ public class PayOutService {
     public boolean approvePayOutRequest(BigInteger payOutTransactionId) {
         PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(), payOutTransaction.getEmploymentId(), PayOutTrasactionStatus.APPROVED, payOutTransaction.getMinutes(), LocalDate.now());
-        payOutTransactionMongoRepository.save(approvedPayOutTransaction);
+        save(approvedPayOutTransaction);
         PayOutPerShift payOutPerShift = new PayOutPerShift(payOutTransaction.getEmploymentId(), payOutTransaction.getStaffId(), payOutTransaction.getMinutes(), payOutTransaction.getDate());
         PayOutPerShift lastPayOutPerShift = payOutRepository.findLastPayoutByEmploymentId(payOutTransaction.getEmploymentId(), DateUtils.asDate(payOutTransaction.getDate()));
         if (lastPayOutPerShift != null) {
@@ -89,9 +109,8 @@ public class PayOutService {
         if (employmentWithCtaDetailsDTO == null) {
             exceptionService.invalidRequestException(MESSAGE_EMPLOYMENT_ABSENT);
         }
-        employmentWithCtaDetailsDTO.getExpertise().setProtectedDaysOffSettings(protectedDaysOffService.getProtectedDaysOffByExpertiseId(employmentWithCtaDetailsDTO.getExpertise().getId()));
         PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId, employmentId, PayOutTrasactionStatus.REQUESTED, amount, LocalDate.now());
-        payOutTransactionMongoRepository.save(requestPayOutTransaction);
+        save(requestPayOutTransaction);
         return true;
 
     }
@@ -115,16 +134,6 @@ public class PayOutService {
             updatePayoutDetailInShift(draftShiftWithActivityDTO,shift.getDraftShift());
         }
         //shiftMongoRepository.save(shift);
-    }
-
-    public PayOutPerShift updatePayOutForCoverShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        updateActivityWrapper(shift,activityWrapperMap);
-        ZonedDateTime startDate = DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = startDate.plusDays(1);
-        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-        ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift,activityWrapperMap);
-        PayOutPerShift payOutPerShift = new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId());
-        return payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shiftWithActivityDTO, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
     }
 
     private void updatePayoutDetailInShift(ShiftWithActivityDTO shiftWithActivityDTO,Shift shift){
@@ -156,12 +165,9 @@ public class PayOutService {
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftWithActivityDTO.class);
-        shift.getActivities().forEach(shiftActivityDTO -> {
-            Activity activity = activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity();
-            shiftActivityDTO.setActivityName(activity.getName());
-            shiftActivityDTO.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
-            shiftActivityDTO.setShortName(activity.getActivityGeneralSettings().getShortName());
-        });
+        shift.getActivities().forEach(shiftActivityDTO ->
+                shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
+        );
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
             shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
@@ -211,17 +217,6 @@ public class PayOutService {
             }
         }
         return activityIds;
-    }
-
-    public void addBonusForProtectedDaysOff(boolean addValueInProtectedDaysOff, PayOutPerShift payOutPerShift, int value) {
-        if (isNotNull(payOutPerShift)) {
-            if(addValueInProtectedDaysOff){
-                payOutPerShift.setProtectedDaysOffMinutes(payOutPerShift.getProtectedDaysOffMinutes()+value);
-            }
-            payOutPerShift.setCtaBonusMinutesOfPayOut(value);
-            payOutPerShift.setScheduledMinutes(0);
-            payOutPerShift.setTotalPayOutMinutes(value);
-        }
     }
 
     /**

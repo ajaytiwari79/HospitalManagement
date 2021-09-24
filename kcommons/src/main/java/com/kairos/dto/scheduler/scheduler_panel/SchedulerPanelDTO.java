@@ -44,18 +44,13 @@ public class SchedulerPanelDTO {
     private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
     private LocalDateTime monthlyJobTriggerDate;
-    private LocalDateTime yearlyJobTriggerDate;
     private BigInteger entityId;
     private String timezone;
     private Long oneTimeTriggerDateMillis;
     private JobFrequencyType jobFrequencyType;
 
-    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, JobFrequencyType jobFrequencyType, LocalDateTime jobTriggerDate, boolean oneTimeTrigger ) {
-        if(JobFrequencyType.YEARLY.equals(jobFrequencyType)){
-            this.yearlyJobTriggerDate = jobTriggerDate;
-        } else {
-            this.monthlyJobTriggerDate = jobTriggerDate;
-        }
+    public SchedulerPanelDTO(JobType jobType, JobSubType jobSubType, JobFrequencyType jobFrequencyType, LocalDateTime monthlyJobTriggerDate, boolean oneTimeTrigger ) {
+        this.monthlyJobTriggerDate = monthlyJobTriggerDate;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
         this.jobFrequencyType = jobFrequencyType;

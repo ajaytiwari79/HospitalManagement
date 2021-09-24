@@ -2,8 +2,6 @@ package com.kairos.planner.vrp.taskplanning.model;
 
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
@@ -11,8 +9,6 @@ import java.time.LocalDateTime;
 //Note that ASV is called after this listener not before so getShift() would be stale.
 //Order for prevTaskOrShift is IRSV > this > ASV
 public class VrpTaskStartTimeListener implements VariableListener<Task> {
-
-    public  static final Logger LOGGER = LoggerFactory.getLogger(VrpTaskStartTimeListener.class);
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, Task task) {
         //Not in use
@@ -93,7 +89,7 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
             }
 
         }catch(Exception e){
-            LOGGER.error(e.getMessage());
+            e.printStackTrace();
         }
 
     }

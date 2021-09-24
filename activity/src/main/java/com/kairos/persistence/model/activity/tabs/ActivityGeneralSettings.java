@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,8 +23,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityGeneralSettings implements Serializable {
-    private static final long serialVersionUID = -1490521237013298911L;
+public class ActivityGeneralSettings {
     @KPermissionField
     private String name;
     @KPermissionField
@@ -43,12 +41,11 @@ public class ActivityGeneralSettings implements Serializable {
     private boolean active = true;
     @KPermissionField
     private String shortName;
-    @KPermissionField
-    private String ultraShortName;
     private boolean eligibleForUse = true;
     private String originalIconName;
     private String modifiedIconName;
-
+    @KPermissionField
+    private String ultraShortName;
     @KPermissionField
     private LocalDate startDate;
     @KPermissionField

@@ -4,12 +4,9 @@ import com.kairos.enums.DurationType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @Getter
 @Setter
-public class DurationField implements Serializable {
-    private static final long serialVersionUID = -5021778189597316038L;
+public class DurationField  {
     private Integer value;
     private DurationType type;
 }

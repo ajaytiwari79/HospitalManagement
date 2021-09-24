@@ -5,12 +5,9 @@ package com.kairos.commons.custom_exception;
  */
 
 public class CitizenNotFoundException extends RuntimeException{
-    private final transient Object[] params;
-    public CitizenNotFoundException(String message,Object... params) {
+    @Deprecated//Please use ExceptionService
+    public CitizenNotFoundException(String message) {
         super(message);
-        this.params = params;
     }
-    public Object[] getParams() {
-        return params;
-    }
+
 }

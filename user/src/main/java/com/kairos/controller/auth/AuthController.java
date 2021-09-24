@@ -1,7 +1,6 @@
 package com.kairos.controller.auth;
 
 import com.kairos.dto.user.auth.UserDetailsDTO;
-import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -9,7 +8,6 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
-import com.kairos.service.redis.RedisService;
 import com.kairos.utils.response.ResponseHandler;
 import com.twilio.sdk.TwilioRestException;
 import io.swagger.annotations.Api;
@@ -46,13 +44,12 @@ public class AuthController {
 
     @Inject
     private UserService userService;
-    @Inject private RedisService redisService;
 
     @Inject
     CountryService countryService;
 
     @Inject
-    private com.kairos.service.organization.OrganizationService organizationService;
+    com.kairos.service.organization.OrganizationService organizationService;
 
     /**
      * Calls userService and Check if user exists
@@ -182,9 +179,7 @@ public class AuthController {
 
     @RequestMapping(value = UNIT_URL + "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getPermissions(@PathVariable long unitId) {
-        UnitWiseStaffPermissionsDTO unitWiseStaffPermissionsDTO= userService.getPermission(unitId, UserContext.getUserDetails().getId());
-        userService.updateLastSelectedOrganizationIdAndCountryId(unitId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitWiseStaffPermissionsDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(unitId));
     }
 
     @PreAuthorize("hasPermission()")
@@ -195,6 +190,7 @@ public class AuthController {
         userInfo.put("credentials", UserContext.getUserDetails().getId());
         userInfo.put("clientId", user.getOAuth2Request().getClientId());
         userInfo.put("user12", user.getPrincipal());
+
         return userInfo;
     }
 
@@ -204,5 +200,4 @@ public class AuthController {
     ResponseEntity<Map<String, Object>> updateUserName(@Valid @RequestBody UserDetailsDTO userDetailsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateUserName(userDetailsDTO));
     }
-
 }

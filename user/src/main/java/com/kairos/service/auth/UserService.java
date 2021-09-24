@@ -7,14 +7,12 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.config.security.CustomDefaultTokenServices;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.auth.UserDetailsDTO;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -22,13 +20,11 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
@@ -43,8 +39,8 @@ import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.UnitService;
@@ -67,17 +63,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 
 /**
  * Calls UserGraphRepository to perform CRUD operation on  User
@@ -107,6 +102,8 @@ public class UserService {
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
+    private DayTypeService dayTypeService;
+    @Inject
     private SendGridMailService sendGridMailService;
     @Inject
     private ForgetPasswordTokenService forgetPasswordTokenService;
@@ -133,14 +130,7 @@ public class UserService {
 
     @Inject
     private KMailService kMailService;
-    @Inject
-    private ActivityIntegrationService activityIntegrationService;
 
-    private CustomDefaultTokenServices customDefaultTokenServices;
-
-    public void setCustomDefaultTokenServices(CustomDefaultTokenServices customDefaultTokenServices) {
-        this.customDefaultTokenServices = customDefaultTokenServices;
-    }
 
     /**
      * Calls UserGraphRepository,
@@ -466,32 +456,33 @@ public class UserService {
         return write;
     }
 
-    //@Cacheable(value = "getPermission", key = "{#unitId, #userId}", cacheManager = "cacheManager")
-    public UnitWiseStaffPermissionsDTO getPermission(Long unitId, Long userId) {
-        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
+    public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organizationId);
+        long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
-        permissionData.setHub(accessPageRepository.isHubMember(userId));
+        permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         Set<Long> unitAccessGroupIds=new HashSet<>();
         if(UserContext.getUserDetails().isSystemAdmin()){
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubSystemAdminPermissions();
             preparePermission(permissionData, permissions);
         }
         else if (permissionData.isHub()) {
-             Organization parentHub = accessPageRepository.fetchParentHub(userId);
-             unitAccessGroupIds=parentHub.getId().equals(unitId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(unitId);
+             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
+             unitAccessGroupIds=parentHub.getId().equals(organizationId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(organizationId);
             //List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
             Set<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(userId, parentHub.getId(), accessGroupIds,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
             preparePermission(permissionData, permissions);
 
         } else {
-            loadUnitPermissions(unitId, userId, permissionData);
+            loadUnitPermissions(organizationId, currentUserId, permissionData);
         }
+        updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.isManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
 
         permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
-        Organization parent = organizationService.fetchParentOrganization(unitId);
-        permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(userId,parent.getId()));
+        Organization parent = organizationService.fetchParentOrganization(organizationId);
+        permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
         return permissionData;
     }
@@ -508,7 +499,8 @@ public class UserService {
     private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
         List<UserPermissionQueryResult> unitWisePermissions;
         Long countryId = UserContext.getUserDetails().getCountryId();
-        Set<BigInteger> dayTypeIds = activityIntegrationService.getApplicableDayTypes(countryId);
+        List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
+        Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
         boolean checkDayType = true;
         List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
         for (AccessGroup currentAccessGroup : accessGroups) {
@@ -518,11 +510,12 @@ public class UserService {
             }
         }
         if (checkDayType) {
-            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds.stream().map(BigInteger::toString).collect(Collectors.toSet()), organizationId);
+            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
         } else {
             unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
         }
         HashMap<Long, Object> unitPermission = new HashMap<>();
+
         for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
             unitPermission.put(userPermissionQueryResult.getUnitId(),
                     prepareUnitPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
@@ -531,7 +524,7 @@ public class UserService {
     }
 
 
-    public void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
+    private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
@@ -562,11 +555,11 @@ public class UserService {
         return true;
     }
 
-    public String updateSelectedLanguageOfUser(Long userLanguageId) {
+    public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
-        UserContext.getUserDetails().setUserLanguage(copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
-        return getUpdatedUserToken(currentUser);
+        UserContext.getUserDetails().setUserLanguage(ObjectMapperUtils.copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
+        return true;
     }
 
     public Long getUserSelectedLanguageId(Long userId) {
@@ -654,11 +647,11 @@ public class UserService {
         return googleCalenderTokenDTO;
     }
 
-    public String updateAccessRoleOfUser(Long unitId, String accessGroupRole){
+    public boolean updateAccessRoleOfUser(Long unitId, String accessGroupRole){
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         currentUser.getUnitWiseAccessRole().put(String.valueOf(unitId),accessGroupRole);
         userGraphRepository.save(currentUser);
-        return getUpdatedUserToken(currentUser);
+        return true;
     }
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
@@ -669,7 +662,9 @@ public class UserService {
     }
 
     public boolean updateChatStatus(ChatStatus chatStatus){
-        User user = userGraphRepository.updateChatStatusByUserId(UserContext.getUserDetails().getId(),chatStatus);
+        User user = userGraphRepository.findByIdAndDeletedFalse(UserContext.getUserDetails().getId());
+        user.setChatStatus(chatStatus);
+        userGraphRepository.save(user);
         return true;
     }
 
@@ -677,21 +672,14 @@ public class UserService {
         User user = null;
         if(isNotNull(UserContext.getUserDetails())) {
             user = userRepository.findOne(UserContext.getUserDetails().getId());
-            getUpdatedUserToken(user);
+            user.setHubMember(accessPageService.isHubMember(user.getId()));
+            user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
+            SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
+            if(isNull(systemLanguage)){
+                systemLanguage = new SystemLanguage("English","en",true,true);
+            }
+            user.setUserLanguage(systemLanguage);
         }
         return user;
     }
-
-    private String getUpdatedUserToken(User user) {
-        user.setHubMember(accessPageService.isHubMember(user.getId()));
-        user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
-        SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
-        if(isNull(systemLanguage)){
-            systemLanguage = new SystemLanguage("English","en",true,true);
-        }
-        user.setUserLanguage(systemLanguage);
-        return customDefaultTokenServices.updateToken(UserContext.getAuthToken(),user);
-    }
-
-
 }

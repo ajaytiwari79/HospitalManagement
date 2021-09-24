@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 /*
  * @author: Mohit Shakya
  * @usage: This domain is for category Planned time type.
@@ -15,8 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PlannedTimeType extends MongoBaseEntity implements Serializable {
-    private static final long serialVersionUID = 1124175811502442045L;
+public class PlannedTimeType extends MongoBaseEntity {
     private String name;
     private Long countryId;
     private String imageName;

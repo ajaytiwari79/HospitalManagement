@@ -12,8 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.time.LocalDate;
-
 @QueryResult
 @Getter
 @Setter
@@ -24,8 +22,6 @@ public class StaffTeamRelationShipQueryResult {
     private Staff staff;
     private Team team;
     private int sequence;
-    private LocalDate startDate;
-    private LocalDate endDate;
 
     public Staff getStaff() {
         return staff;

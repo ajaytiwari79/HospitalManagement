@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeBankIntervalDTO implements Serializable {
+public class TimeBankIntervalDTO {
 
     private Date startDate;
     private Date endDate;

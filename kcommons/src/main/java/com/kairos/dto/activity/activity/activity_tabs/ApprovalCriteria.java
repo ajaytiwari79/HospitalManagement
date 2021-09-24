@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 /*
  *Created By Pavan on 5/9/18
  *
@@ -15,8 +13,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApprovalCriteria implements Serializable {
-    private static final long serialVersionUID = 432765501571673634L;
+public class ApprovalCriteria {
     private Float approvalPercentage;
     private Short approvalTime; // in Days
     private transient String color;

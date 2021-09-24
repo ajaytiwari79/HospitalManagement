@@ -17,7 +17,6 @@ import java.time.DayOfWeek;
 @Setter
 @NoArgsConstructor
 public class PaymentSettings extends UserBaseEntity {
-    private static final long serialVersionUID = 1058186622224447452L;
     private DayOfWeek weeklyPayDay;
     private DayOfWeek fornightlyPayDay;
     private Long lastFornightlyPayDate;

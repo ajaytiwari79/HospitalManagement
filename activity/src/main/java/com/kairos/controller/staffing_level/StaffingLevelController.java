@@ -6,10 +6,9 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelGraphConfigurationDTO
 import com.kairos.dto.activity.staffing_level.StaffingLevelPublishDTO;
 import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
-import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDTO;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.service.staffing_level.ImportStaffingLevelService;
 import com.kairos.service.staffing_level.StaffingLevelGraphConfigurationService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.Message;
@@ -45,15 +44,14 @@ public class StaffingLevelController {
 
     private static  final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelController.class);
     @Inject private StaffingLevelService staffingLevelService;
-    @Inject private ImportStaffingLevelService importStaffingLevelService;
     @Inject private StaffingLevelGraphConfigurationService staffingLevelGraphConfigurationService;
 
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for presence")
-    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid StaffingLevelDTO staffingLevelDTO, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                staffingLevelService.createStaffingLevel(staffingLevelDTO,unitId));
+                staffingLevelService.createStaffingLevel(presenceStaffingLevelDto,unitId));
     }
 
 
@@ -97,10 +95,10 @@ public class StaffingLevelController {
 
     @RequestMapping(value = "/presence/{staffingLevelId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
-    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid StaffingLevelDTO staffingLevelDTO,
+    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
         @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {
       return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.updatePresenceStaffingLevel(staffingLevelId,unitId, staffingLevelDTO));
+                staffingLevelService.updatePresenceStaffingLevel(staffingLevelId,unitId, presenceStaffingLevelDto));
     }
 
 
@@ -139,7 +137,7 @@ public class StaffingLevelController {
     @ApiOperation("update staffing level from csv")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     private ResponseEntity<Map<String, Object>> updateStaffingLevelFromCSV(@RequestParam("file") MultipartFile multipartFile,@PathVariable Long unitId) throws Exception{
-        importStaffingLevelService.processStaffingLevel(multipartFile,unitId);
+        staffingLevelService.processStaffingLevel(multipartFile,unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
@@ -211,7 +209,7 @@ public class StaffingLevelController {
 
     @PutMapping(value = "/set_initial")
     @ApiOperation("update staffing level graph configuration")
-    public ResponseEntity<Map<String, Object>> updateInitialInStaffingLevel(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> updateInitialInStaffingLevel(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateInitialInStaffingLevel());
     }
 }

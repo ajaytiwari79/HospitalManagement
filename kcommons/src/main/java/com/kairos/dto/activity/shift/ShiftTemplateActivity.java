@@ -5,7 +5,6 @@ import com.kairos.enums.shift.ShiftStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -19,7 +18,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class ShiftTemplateActivity implements Serializable {
+public class ShiftTemplateActivity {
 
     private BigInteger activityId;
     @JsonFormat(pattern = "HH:mm")
@@ -39,6 +38,6 @@ public class ShiftTemplateActivity implements Serializable {
     private BigInteger plannedTimeId;
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
     private List<ShiftTemplateActivity> childActivities;
-    private BigInteger absenceReasonCodeId;
+    private Long absenceReasonCodeId;
 
 }

@@ -6,6 +6,7 @@ import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ScoreLevel;

@@ -3,16 +3,14 @@ package com.kairos.persistence.model.access_permission;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.common.TranslationConverter;
+import com.kairos.persistence.model.country.default_data.DayType;
 import lombok.Getter;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by prerna on 5/3/18.
@@ -31,13 +29,11 @@ public class AccessGroupQueryResult {
     private boolean enabled = true;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Set<BigInteger> dayTypeIds;
+    private List<Long> dayTypeIds;
+    private List<DayType> dayTypes;
     private boolean allowedDayTypes;
     private AccessGroup parentAccessGroup;
-    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
-    private int unitCount;
-    private int staffCount;
 
     public String getName() {
         return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);

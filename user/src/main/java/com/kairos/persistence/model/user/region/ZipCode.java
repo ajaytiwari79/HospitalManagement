@@ -27,7 +27,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MUNIC
 @Setter
 public class ZipCode extends UserBaseEntity {
 
-    private static final long serialVersionUID = -2946199552117732029L;
     @NotBlank(message = ERROR_ZIPCODE_NAME_NOTEMPTY)
     private String name;
     @Range(min=1,message = ERROR_ZIPCODE_ZIPCODE_NOTNULL)

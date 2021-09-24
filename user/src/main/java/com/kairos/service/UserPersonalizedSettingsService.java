@@ -26,13 +26,15 @@ public class UserPersonalizedSettingsService{
 
 
     public UserPersonalizedSettingsDto getAllSettingsByUser(Long userId) {
+
         UserPersonalizedSettingsQueryResult userPersonalizedSettingsQueryResult =  userPersonalizedSettingsRepository.findAllByUser(userId);
         UserPersonalizedSettingsDto userPersonalizedSettingsDto;
         if(Optional.ofNullable(userPersonalizedSettingsQueryResult).isPresent()) {
-            userPersonalizedSettingsDto = new UserPersonalizedSettingsDto(new SelfRosteringViewDto(userPersonalizedSettingsQueryResult.getSelfRosteringView().getAbsenceViewSettings()));
+            userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto(userPersonalizedSettingsQueryResult.getSelfRosteringView().getAbsenceViewSettings()));
+
         }
         else {
-            userPersonalizedSettingsDto = new UserPersonalizedSettingsDto(new SelfRosteringViewDto());
+            userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto());
         }
         return userPersonalizedSettingsDto;
     }

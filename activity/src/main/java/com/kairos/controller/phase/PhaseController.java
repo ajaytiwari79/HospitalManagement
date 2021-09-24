@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by vipul on 25/9/17.
@@ -70,19 +72,11 @@ public class PhaseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getDefaultPhasesByUnit(unitId));
     }
 
-    @PutMapping(value = "phase/{id}/languageSettings")
+    @RequestMapping(value = "phase/{id}/languageSettings", method = RequestMethod.PUT)
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationPhase(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updateTranslations(id,translations));
     }
-
-    @GetMapping(value = "/get_applicable_phases")
-    @ApiOperation("get Applicable Phases")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getApplicablePhases(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getApplicablePhases(unitId));
-    }
-
 }
 

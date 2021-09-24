@@ -228,7 +228,7 @@ public class ClientException extends MongoBaseEntity {
         this.taskStatus = taskStatus;
     }
 
-    public enum TaskOperation implements Serializable {
+    public enum TaskOperation{
         PREPONE,POSTPONE,CANCEL,NONE
     }
 

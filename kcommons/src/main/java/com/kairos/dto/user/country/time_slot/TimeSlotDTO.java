@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -20,8 +18,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TimeSlotDTO implements Serializable {
-    private static final long serialVersionUID = 5540857333800102854L;
+public class TimeSlotDTO {
     @NotBlank(message = "error.name.notnull")
     private String name;
     private int startHour;
@@ -29,7 +26,7 @@ public class TimeSlotDTO implements Serializable {
     private int endHour;
     private int endMinute;
     private boolean shiftStartTime;
-    private BigInteger id;
+    private Long id;
     private Long unitId;
 
     public TimeSlotDTO(String name, int startHour, int startMinute, int endHour, int endMinute) {

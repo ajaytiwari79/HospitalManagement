@@ -1,18 +1,22 @@
 package com.planner.component.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.planner.component.exception.ExceptionService;
+import com.planner.controller.custom_responseEntityExceptionHandler.ResponseEnvelope;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
@@ -71,7 +75,7 @@ public class GenericRestClient {
             }
             responseData = response.getData();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
             /*logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());*/

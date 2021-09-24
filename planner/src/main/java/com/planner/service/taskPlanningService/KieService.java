@@ -26,7 +26,7 @@ public class KieService {
 			response = client.execute(put);
 			result = EntityUtils.toString(response.getEntity());
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -48,7 +48,7 @@ public class KieService {
 			response = client.execute(put);
 			result = EntityUtils.toString(response.getEntity());
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -68,7 +68,7 @@ public class KieService {
 			response = client.execute(post);
 			result = EntityUtils.toString(response.getEntity());
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -86,7 +86,7 @@ public class KieService {
 			response = client.execute(get);
 			result = EntityUtils.toString(response.getEntity());
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -104,7 +104,7 @@ public class KieService {
 			response = client.execute(delete);
 			result = EntityUtils.toString(response.getEntity());
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		System.out.println("result "+result);
 	}
@@ -161,7 +161,7 @@ public class KieService {
 		try {
 			build = dFact.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		Document doc = build.newDocument();
 		return doc;

@@ -20,7 +20,6 @@ public class BreakSettingsDTO {
     private BigInteger activityId;
     private boolean primary;
     private boolean includeInPlanning;
-    private Long expertiseId;
     
     @AssertTrue(message = "error.breakSettings.breakDuration.must.lessThanShiftDuration")
     public boolean isValid() {

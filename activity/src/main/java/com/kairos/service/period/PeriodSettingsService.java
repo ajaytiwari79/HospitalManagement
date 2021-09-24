@@ -5,6 +5,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.period.PeriodSettingsDTO;
 import com.kairos.persistence.model.period.PeriodSettings;
 import com.kairos.persistence.repository.period.PeriodSettingsMongoRepository;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_PERIODSETTI
  */
 @Service
 @Transactional
-public class PeriodSettingsService {
+public class PeriodSettingsService extends MongoBaseService {
 
     @Inject
     PeriodSettingsMongoRepository periodSettingsMongoRepository;
@@ -39,7 +40,7 @@ public class PeriodSettingsService {
         }
 
         PeriodSettings periodSettings = new PeriodSettings(presenceLimitInYear,absenceLimitInYear, unitId);
-        periodSettingsMongoRepository.save(periodSettings);
+        save(periodSettings);
         return periodSettings;
     }
 
@@ -59,7 +60,7 @@ public class PeriodSettingsService {
         periodSettings.setPresenceLimitInYear(periodSettingsDTO.getPresenceLimitInYear());
         periodSettings.setAbsenceLimitInYear(periodSettingsDTO.getAbsenceLimitInYear());
 
-        periodSettingsMongoRepository.save(periodSettings);
+        save(periodSettings);
         return periodSettings;
     }
 

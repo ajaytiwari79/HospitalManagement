@@ -9,7 +9,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_CO
 
 @NodeEntity
 public class AccountType extends UserBaseEntity {
-    private static final long serialVersionUID = 2091706109976800757L;
     private String name;
     @Relationship(type = IN_COUNTRY)
     private Country country;

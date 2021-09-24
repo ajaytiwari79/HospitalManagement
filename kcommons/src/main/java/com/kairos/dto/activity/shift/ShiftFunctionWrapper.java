@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +18,8 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShiftFunctionWrapper implements Serializable {
-    private Map<LocalDate, List<ShiftDTO>> shifts;
-    private Map<LocalDate, List<FunctionDTO>> assignedFunctionsObj;
+public class ShiftFunctionWrapper {
+    private Map<LocalDate,List<ShiftDTO>> shifts;
+    private Map<LocalDate,List<FunctionDTO>> assignedFunctionsObj;
 
 }

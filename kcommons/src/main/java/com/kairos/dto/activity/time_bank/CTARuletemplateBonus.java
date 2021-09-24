@@ -6,14 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CTARuletemplateBonus  implements Serializable {
+public class CTARuletemplateBonus {
 
     private List<CTADistributionDTO> ctaDistributions;
     private long ctaBonusMinutes;

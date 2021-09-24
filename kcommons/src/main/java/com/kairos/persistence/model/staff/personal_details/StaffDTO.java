@@ -92,7 +92,6 @@ public class StaffDTO {
     private String privateEmail;
     private boolean nightWorker;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
-    private boolean canRankTeam;
 
     public StaffDTO(Long id, List<SkillLevelDTO> skills) {
         this.id = id;

@@ -10,11 +10,11 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface ActivityConfigurationRepository extends MongoBaseRepository<ActivityConfiguration, BigInteger> {
+public interface ActivityConfigurationRepository extends MongoBaseRepository<ActivityConfiguration, BigInteger> ,CustomActivityConfigurationRepository{
 
    boolean existsByUnitIdAndDeletedFalse(Long unitId);
 
-   List<ActivityConfigurationDTO> findAllByUnitIdAndDeletedFalse(Long unitId);
+   List<ActivityConfiguration> findAllByUnitIdAndDeletedFalse(Long unitId);
 
    boolean existsByCountryIdAndDeletedFalse(Long countryId);
 
@@ -49,7 +49,7 @@ public interface ActivityConfigurationRepository extends MongoBaseRepository<Act
    List<ActivityConfigurationDTO> findNonWorkingConfigurationByCountryId(Long countryId);
 
    @Query("{'nonWorkingPlannedTime.phaseId':?1,unitId:?0}")
-   ActivityConfiguration findAllNonWorkingConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
+   List<ActivityConfiguration> findAllNonWorkingConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
    @Query("{'absencePlannedTime':{$exists:true}}")
    List<ActivityConfiguration> findAllAbsenceConfiguration();

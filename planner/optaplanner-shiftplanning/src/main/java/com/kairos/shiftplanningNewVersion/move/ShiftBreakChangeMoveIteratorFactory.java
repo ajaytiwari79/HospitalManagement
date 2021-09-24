@@ -5,6 +5,7 @@ import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import com.kairos.shiftplanningNewVersion.utils.StaffingLevelPlanningUtility;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
 import org.optaplanner.core.impl.score.director.ScoreDirector;

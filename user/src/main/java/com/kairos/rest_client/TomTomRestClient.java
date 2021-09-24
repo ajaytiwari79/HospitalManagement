@@ -10,8 +10,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -25,8 +23,6 @@ import java.util.Map;
  */
 @Component
 public class TomTomRestClient {
-
-    private final Logger logger = LoggerFactory.getLogger(TomTomRestClient.class);
 
     @Inject
     private EnvConfig envConfig;
@@ -44,7 +40,7 @@ public class TomTomRestClient {
                 tomTomResponse = mapper.readValue(response.getEntity().getContent(), Map.class);
             }
         } catch (URISyntaxException | IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }finally {
             ((CloseableHttpClient) httpclient).close();
         }

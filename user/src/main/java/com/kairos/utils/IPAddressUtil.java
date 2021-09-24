@@ -39,7 +39,7 @@ public class IPAddressUtil {
             try {
                 networkInterfaces = NetworkInterface.getNetworkInterfaces();
             } catch (SocketException e) {
-                logger.error(e.getMessage());
+                e.printStackTrace();
             }
             while (networkInterfaces != null && networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();

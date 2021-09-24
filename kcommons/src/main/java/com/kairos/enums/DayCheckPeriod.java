@@ -1,7 +1,5 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
-public enum DayCheckPeriod implements Serializable {
+public enum DayCheckPeriod {
     LAST,MIDDLE,START
 }

@@ -12,7 +12,6 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.rule_validator.RuleExecutionType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
@@ -20,7 +19,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
@@ -38,7 +36,7 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
     private Shift oldShift;
 
 
-    public ActivityPhaseSettingSpecification(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Phase phase, Collection<ActivityWrapper> activities, Shift oldShift) {
+    public ActivityPhaseSettingSpecification(StaffAdditionalInfoDTO staffAdditionalInfoDTO,Phase phase,Collection<ActivityWrapper> activities,Shift oldShift) {
         this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
         this.phase = phase;
         this.activities = activities;
@@ -47,61 +45,46 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-        validateRules(shift,null);
+        validateRules(shift);
         return false;
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
-        if(isNull(oldShift) || isNull(shift)){
-            throwException(SHIFT_NOT_EXISTS);
-        }
+    public void validateRules(ShiftWithActivityDTO shift) {
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(oldShift.getActivities(), shift.getActivities());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         activityPerPhaseMap.forEach((k,v)->{
-            validateForAddActivity(shiftActivityIdsDTO, k, v);
-            validateForEditActivity(shiftActivityIdsDTO, k, v);
-            validateForDeleteActivity(shiftActivityIdsDTO, k, v);
+            if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
+                if(( UserContext.getUserDetails().isStaff() && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (UserContext.getUserDetails().isManagement() && !v.isEligibleForManagement() )){
+                    throwException(ERROR_SHIFT_NOT_AUTHORISED_PHASE);
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
+                if(v.getAllowedSettings().getCanEdit().size()<2){
+                    if(v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.STAFF) && !UserContext.getUserDetails().isStaff() ||
+                            v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.MANAGEMENT) && !UserContext.getUserDetails().isManagement()
+                    ){
+                        throwException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
+                    }
+                }
+            }
+            if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
+                if((UserContext.getUserDetails().isManagement() && !v.isManagementCanDelete()) || (UserContext.getUserDetails().isStaff() && !v.isStaffCanDelete())){
+                    throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
+                }
+            }
             if(!staffAdditionalInfoDTO.isCountryAdmin() && !CollectionUtils.containsAny(phase.getAccessGroupIds(),staffAdditionalInfoDTO.getUserAccessRoleDTO().getAccessGroupIds())){
                 throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
             }
         });
     }
 
-    private void validateForDeleteActivity(ShiftActivityIdsDTO shiftActivityIdsDTO, BigInteger k, PhaseTemplateValue v) {
-        if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
-            if((UserContext.getUserDetails().isManagement() && !v.isManagementCanDelete()) || (UserContext.getUserDetails().isStaff() && !v.isStaffCanDelete())){
-                throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
-            }
-        }
-    }
-
-    private void validateForAddActivity(ShiftActivityIdsDTO shiftActivityIdsDTO, BigInteger k, PhaseTemplateValue v) {
-        if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
-            if(( UserContext.getUserDetails().isStaff() && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (UserContext.getUserDetails().isManagement() && !v.isEligibleForManagement() )){
-                throwException(ERROR_SHIFT_NOT_AUTHORISED_PHASE);
-            }
-        }
-    }
-
-    private void validateForEditActivity(ShiftActivityIdsDTO shiftActivityIdsDTO, BigInteger k, PhaseTemplateValue v) {
-        if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
-            if(v.getAllowedSettings().getCanEdit().size()<2){
-                if(v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.STAFF) && !UserContext.getUserDetails().isStaff() ||
-                        v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.MANAGEMENT) && !UserContext.getUserDetails().isManagement()
-                ){
-                    throwException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
-                }
-            }
-        }
-    }
-
     private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,Collection<ActivityWrapper> activities){
         Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
-        for(ActivityWrapper activityDTO:activities){
-            for(PhaseTemplateValue phaseTemplateValue:activityDTO.getActivity().getActivityPhaseSettings().getPhaseTemplateValues()){
+        for(ActivityWrapper activityWrapper:activities){
+            for(PhaseTemplateValue phaseTemplateValue:activityWrapper.getActivity().getActivityPhaseSettings().getPhaseTemplateValues()){
                 if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
-                    phaseTemplateValueMap.put(activityDTO.getActivity().getId(),phaseTemplateValue);
+                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(),phaseTemplateValue);
                     break;
                 }
             }

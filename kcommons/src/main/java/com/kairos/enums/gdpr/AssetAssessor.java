@@ -1,8 +1,6 @@
 package com.kairos.enums.gdpr;
 
-import java.io.Serializable;
-
-public enum AssetAssessor implements Serializable {
+public enum AssetAssessor {
 
     THIRD_PARTY,INTERNAL
 }

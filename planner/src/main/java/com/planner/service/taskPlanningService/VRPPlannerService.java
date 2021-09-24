@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class VRPPlannerService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VRPPlannerService.class);
+    private static Logger log= LoggerFactory.getLogger(VRPPlannerService.class);
     @Autowired
     private VRPGeneratorService vrpGeneratorService;
     @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
@@ -89,14 +89,14 @@ public class VRPPlannerService {
     public boolean terminateEarlyVrpPlanningSolver(String problemId){
         try{
             VrpTaskPlanningSolver solver;
-            LOGGER.info("*****Terminating solver for problem id:{}",problemId);
+            log.info("*****Terminating solver for problem id:{}",problemId);
             if((solver=runningSolversPerProblem.get(problemId))!=null){
                  solver.terminateEarly();
                 //runningSolversPerProblem.remove(problemId);
                 return true;
             }
         }catch (Exception e){
-            LOGGER.error("exception stopping solver from different thread.",e);
+            log.error("exception stopping solver from different thread.",e);
             return false;
         }
         return true;
@@ -107,7 +107,7 @@ public class VRPPlannerService {
             runningSolversPerProblem.remove(problemId);
             return true;
         }catch (Exception e){
-            LOGGER.error("exception stopping solver from different thread.",e);
+            log.error("exception stopping solver from different thread.",e);
             return false;
         }
     }
@@ -124,8 +124,8 @@ public class VRPPlannerService {
             ;
         }*/
         }catch(Exception e){
-            LOGGER.error(e.getMessage());
-            LOGGER.error("Continuing with no drls.");
+            e.printStackTrace();
+            log.error("Continuing with no drls.");
         }
         return drlFiles;
     }

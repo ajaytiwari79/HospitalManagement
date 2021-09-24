@@ -1,8 +1,6 @@
 package com.kairos.enums;
 
-import java.io.Serializable;
-
-public enum EmploymentSubType implements Serializable {
+public enum EmploymentSubType {
 
    MAIN("Main"),SECONDARY("Secondary"),NONE("None");
 

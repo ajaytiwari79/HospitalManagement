@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.RuleTemplateCategoryType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
 /**

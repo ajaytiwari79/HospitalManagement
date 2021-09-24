@@ -20,7 +20,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class VatType extends UserBaseEntity {
 
-    private static final long serialVersionUID = 1898221266888076920L;
     @NotBlank(message = "error.VatType.name.notEmpty")
     private String name;
     private int code;

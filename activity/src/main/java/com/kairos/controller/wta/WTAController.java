@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -271,7 +270,7 @@ public class WTAController {
     @ApiOperation(value = "Update Phases in Ruletemplates")
     @GetMapping(value =  UNIT_URL+ "/get_protected_days_off_count")
     public ResponseEntity<Map<String, Object>> getProtectedDaysOffCount(@PathVariable long unitId ,@RequestParam Long staffId,@RequestParam BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
     }
 
     @ApiOperation(value = "Update Phases in Ruletemplates")
@@ -324,11 +323,6 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslationRuleTemplates(id,translations));
     }
 
-    @ApiOperation(value = "update create_wta_line_on_update_weekly_hours")
-    @PostMapping(value = UNIT_URL+"/create_wta_line_on_update_weekly_hours")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createWtaLineOnUpdateEmploymentWeeklyHours(@PathVariable Long unitId, @RequestParam Long employmentId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.createWtaLineOnUpdateEmploymentWeeklyHours(unitId, employmentId, date));
-    }
+
 
 }

@@ -4,14 +4,9 @@ package com.kairos.commons.custom_exception;
  * Created by oodles on 8/2/17.
  */
     public class ZipCodeNotFound extends RuntimeException{
-    private final transient Object[] params;
-    public ZipCodeNotFound(String message,Object... params) {
+    @Deprecated//Please use ExceptionService
+    public ZipCodeNotFound(String message) {
         super(message);
-        this.params = params;
-    }
-
-    public Object[] getParams() {
-        return params;
     }
 
 }

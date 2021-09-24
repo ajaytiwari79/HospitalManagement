@@ -15,7 +15,6 @@ import static com.kairos.constants.AppConstants.ACCESS_PAGE_HAS_LANGUAGE;
 @Setter
 @RelationshipEntity(type= ACCESS_PAGE_HAS_LANGUAGE)
 public class AccessPageLanguageRelationShip extends UserBaseEntity {
-    private static final long serialVersionUID = -8703613633682760374L;
     @StartNode
     private AccessPage accessPage;
     @EndNode

@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.unit_settings;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,10 +25,6 @@ public class OpenShiftPhase {
       this.phaseName =phaseName;
       this.solveUnderStaffingOverStaffing =solveUnderStaffingOverStaffing;
       this.sequence =sequence;
-    }
-
-    public String getPhaseName(){
-        return TranslationUtil.getName(translations,phaseName);
     }
 }
 

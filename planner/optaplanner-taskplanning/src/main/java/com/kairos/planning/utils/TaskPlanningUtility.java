@@ -6,10 +6,13 @@ import com.kairos.planning.domain.Task;
 import com.kairos.planning.solution.TaskPlanningSolution;
 import org.drools.core.base.DefaultKnowledgeHelper;
 import org.drools.core.common.InternalFactHandle;
+import org.drools.core.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.kie.api.runtime.ObjectFilter;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
+import org.optaplanner.core.impl.score.director.drools.DroolsScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

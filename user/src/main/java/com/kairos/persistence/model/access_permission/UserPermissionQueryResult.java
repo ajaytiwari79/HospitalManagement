@@ -2,14 +2,12 @@ package com.kairos.persistence.model.access_permission;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @QueryResult
-public class UserPermissionQueryResult implements Serializable {
+public class UserPermissionQueryResult {
 
-    private static final long serialVersionUID = -6937335199866146927L;
     private Long unitId;
     private boolean parentOrganization;
     private List<Long> accessibleTabs;  // in case of unit te accessible tabs needs to be filtered

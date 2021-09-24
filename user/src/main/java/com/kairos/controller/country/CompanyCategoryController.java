@@ -4,7 +4,6 @@ package com.kairos.controller.country;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.company_category.CompanyCategoryDTO;
 import com.kairos.service.country.CompanyCategoryService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +15,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by pavan on 6/4/18.
@@ -27,7 +27,6 @@ public class CompanyCategoryController {
     @Inject
     CompanyCategoryService companyCategoryService;
 
-    @Inject private TranslationService translationService;
 
     //CompanyCategory
 
@@ -64,6 +63,6 @@ public class CompanyCategoryController {
     @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, companyCategoryService.updateTranslationOfCompanyCategory(id,translations));
     }
 }

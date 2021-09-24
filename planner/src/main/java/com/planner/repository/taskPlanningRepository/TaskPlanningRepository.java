@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TaskPlanningRepository extends BaseRepository {
 
-    public PlanningCitizen findById(Long id){
+    public PlanningCitizen findById(long id){
         //Select select = QueryBuilder.select().from("PlanningCitizen");
         //select.where(QueryBuilder.eq("id",id));
         return null;//(PlanningCitizen) findByField(select,PlanningCitizen.class);

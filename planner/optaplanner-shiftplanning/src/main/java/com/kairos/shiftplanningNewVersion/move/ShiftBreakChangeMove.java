@@ -2,6 +2,7 @@ package com.kairos.shiftplanningNewVersion.move;
 
 
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanningNewVersion.entity.ALI;
 import com.kairos.shiftplanningNewVersion.entity.Shift;

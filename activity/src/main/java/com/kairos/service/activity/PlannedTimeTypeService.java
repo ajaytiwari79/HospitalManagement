@@ -1,5 +1,6 @@
 package com.kairos.service.activity;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
@@ -13,10 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /*
  * @author: Mohit Shakya
@@ -45,6 +43,7 @@ public class PlannedTimeTypeService{
     }
 
     public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
+        verifyCountry(countryId);
         PlannedTimeType plannedTimeType = plannedTimeTypeRepository.findByNameAndDeletedAndCountryId("(?i)" + presenceTypeDTO.getName(), false, countryId);
         if (Optional.ofNullable(plannedTimeType).isPresent()) {
             LOGGER.error("Planned Time type already exist in country By Name {}" , presenceTypeDTO.getName());
@@ -58,6 +57,7 @@ public class PlannedTimeTypeService{
     }
 
     public List<PresenceTypeDTO> getAllPresenceTypeByCountry(Long countryId) {
+        verifyCountry(countryId);
         return plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
     }
 

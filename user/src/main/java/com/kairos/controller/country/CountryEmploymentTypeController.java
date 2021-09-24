@@ -5,7 +5,6 @@ import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -29,7 +29,6 @@ public class CountryEmploymentTypeController {
 
     @Inject
     private EmploymentTypeService employmentTypeService;
-    @Inject private TranslationService translationService;
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.POST)
     @ApiOperation("Add employment type in country")
@@ -79,8 +78,8 @@ public class CountryEmploymentTypeController {
     @RequestMapping(value = COUNTRY_URL + "/employment_type_with_organizationType", method = RequestMethod.GET)
     @ApiOperation("get  expertise level region employment Type organizationType  of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId ) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId));
+    public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId , @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId,selectedDate));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type_and_expertise", method = RequestMethod.GET)
@@ -149,13 +148,13 @@ public class CountryEmploymentTypeController {
     @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateTranslationOfEmploymentType(id,translations));
     }
     @RequestMapping(value = UNIT_URL+"/employment_type/{id}/language_settings", method = RequestMethod.PUT)
     @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypesOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateTranslationOfEmploymentType(id,translations));
     }
 
 }

@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.night_worker;
 
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
@@ -14,7 +13,6 @@ import java.util.List;
  */
 public interface NightWorkerMongoRepository extends MongoBaseRepository<NightWorker, BigInteger>, CustomNightWorkerMongoRepository{
 
-    @Cacheable(value = "findByStaffId", key = "#staffId", cacheManager = "cacheManager")
     @Query(value = "{ staffId:?0, deleted:false }")
     NightWorker findByStaffId(Long staffId);
 

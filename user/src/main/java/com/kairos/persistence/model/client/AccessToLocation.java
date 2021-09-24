@@ -10,7 +10,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class AccessToLocation extends UserBaseEntity {
-    private static final long serialVersionUID = -3286195440595234601L;
     // Lock & Emergency Information
 
     private String alarmCode;

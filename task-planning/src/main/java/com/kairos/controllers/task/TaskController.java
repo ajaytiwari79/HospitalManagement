@@ -93,7 +93,7 @@ public class TaskController {
                 Date fromDate = dateFormat.parse(startDateString);
                 localDateTime = LocalDateTime.ofInstant(fromDate.toInstant(), ZoneId.systemDefault());
             } catch (ParseException e) {
-                logger.error(e.getMessage());
+                e.printStackTrace();
             }
         }
         taskService.syncFourthWeekTasks(localDateTime);

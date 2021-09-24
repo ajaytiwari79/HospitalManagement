@@ -12,7 +12,6 @@ import java.math.BigInteger;
 @Document
 public class StaffPensionProviderDetails extends MongoBaseEntity{
 
-    private static final long serialVersionUID = -7556137674158286848L;
     private Long staffId;
     private BigInteger pensionProviderId;
 

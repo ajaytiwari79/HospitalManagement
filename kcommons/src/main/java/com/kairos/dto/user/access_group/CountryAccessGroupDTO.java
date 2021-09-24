@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +34,7 @@ public class CountryAccessGroupDTO {
     @NotNull(message = "error.startDate.notnull")
     private LocalDate startDate;
     private LocalDate endDate;
-    private Set<BigInteger> dayTypeIds;
+    private Set<Long> dayTypeIds;
     private boolean allowedDayTypes;
 
     @AssertTrue(message = "Access group can't be blank")

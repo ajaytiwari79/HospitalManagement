@@ -37,7 +37,7 @@ public class LanguageLevelService {
         return languageLevelGraphRepository.findAll();
     }
 
-    public List<Object> getLanguageLevelByCountryId(Long countryId) {
+    public List<Object> getLanguageLevelByCountryId(long countryId) {
         List<Map<String, Object>> data = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
         List<Object> objectList=new ArrayList<>();
         if (data != null) {
@@ -50,7 +50,7 @@ public class LanguageLevelService {
     }
 
 
-    public Map<String, Object> createLanguageLevel(Long countryId, LanguageLevel languageLevel) {
+    public Map<String, Object> createLanguageLevel(long countryId, LanguageLevel languageLevel) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
 
@@ -66,7 +66,7 @@ public class LanguageLevelService {
         return null;
     }
 
-    public Map<String, Object> updateLanguageLevel(LanguageLevel languageLevel, Long countryId) {
+    public Map<String, Object> updateLanguageLevel(LanguageLevel languageLevel, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
 
@@ -84,7 +84,7 @@ public class LanguageLevelService {
         return null;
     }
 
-    public LanguageLevel deleteLanguageLevel(Long languageLevelId) {
+    public LanguageLevel deleteLanguageLevel(long languageLevelId) {
         LanguageLevel languageLevel = languageLevelGraphRepository.findOne(languageLevelId);
         if (languageLevel != null) {
             languageLevel.setEnabled(false);

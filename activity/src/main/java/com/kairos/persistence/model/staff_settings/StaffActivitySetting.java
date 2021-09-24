@@ -27,13 +27,13 @@ public class StaffActivitySetting extends MongoBaseEntity {
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
-    private List<BigInteger> dayTypeIds;
+    private List<Long> dayTypeIds;
     private LocalTime defaultStartTime;
     private TimeTypeEnum secondLevelTimtype;
 
     public StaffActivitySetting(Long staffId, BigInteger activityId, Long employmentId, Long unitId,
                                 Short shortestTime, Short longestTime, Integer minLength, Integer maxThisActivityPerShift,
-                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<BigInteger> dayTypeIds, LocalTime defaultStartTime,TimeTypeEnum secondLevelTimtype) {
+                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<Long> dayTypeIds, LocalTime defaultStartTime,TimeTypeEnum secondLevelTimtype) {
         this.staffId = staffId;
         this.activityId = activityId;
         this.employmentId = employmentId;

@@ -147,7 +147,7 @@ public abstract class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID exte
 		try {
 			oldEntity = (S) entity.getClass().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		return oldEntity;
 	}

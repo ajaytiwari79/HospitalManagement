@@ -1,8 +1,11 @@
 package com.kairos.service.language;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.LanguageDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.LocationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +48,12 @@ public class LanguageService {
 
     public List<LanguageDTO> getLanguageByCountryId(long countryId){
         List<Language> languages = languageGraphRepository.getLanguageByCountryId(countryId);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(languages,LanguageDTO.class);
+        List<LanguageDTO> languageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(languages,LanguageDTO.class);
+        languageDTOS.forEach(languageDTO -> {
+            languageDTO.setCountryId(countryId);
+            languageDTO.setTranslations(TranslationUtil.getTranslatedData(languageDTO.getTranslatedNames(),languageDTO.getTranslatedDescriptions()));
+        });
+        return languageDTOS;
     }
 
     public Map<String, Object> createLanguage(long countryId, Language language){
@@ -101,6 +110,17 @@ public class LanguageService {
             return data != null ? FormatUtil.formatNeoResponse(data) : new ArrayList<>();
         }
         return data;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long languageId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        Language language =languageGraphRepository.findOne(languageId);
+        language.setTranslatedNames(translatedNames);
+        language.setTranslatedDescriptions(translatedDescriptions);
+        languageGraphRepository.save(language);
+        return language.getTranslatedData();
     }
 
 

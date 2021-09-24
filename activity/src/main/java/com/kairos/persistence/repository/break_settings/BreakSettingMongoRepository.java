@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSettings, BigInteger> {
+public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSettings, BigInteger> , CustomBreakSettingsMongoRepository{
 
     List<BreakSettingsDTO> findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(Long expertiseId);
 

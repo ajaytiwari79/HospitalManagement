@@ -7,10 +7,12 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 

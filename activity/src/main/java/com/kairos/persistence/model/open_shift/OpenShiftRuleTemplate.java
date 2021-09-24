@@ -15,7 +15,6 @@ import java.util.List;
 @Document
 public class OpenShiftRuleTemplate extends MongoBaseEntity {
 
-    private static final long serialVersionUID = 6177959137957227791L;
     private String name;
     private Long organizationTypeId;
     private Long organizationSubTypeId;

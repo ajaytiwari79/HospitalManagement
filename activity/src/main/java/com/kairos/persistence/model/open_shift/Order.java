@@ -14,7 +14,6 @@ import java.util.Set;
 @Document
 public class Order extends MongoBaseEntity {
 
-    private static final long serialVersionUID = 759858784838802365L;
     private Long unitId;
     private BigInteger activityId;
     private Long plannedTimeId;

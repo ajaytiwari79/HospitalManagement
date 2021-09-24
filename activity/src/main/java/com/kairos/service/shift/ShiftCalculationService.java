@@ -4,7 +4,6 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.Day;
 
-import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
@@ -17,11 +16,11 @@ import static com.kairos.constants.AppConstants.EVERYDAY;
  **/
 public class ShiftCalculationService {
     public static void setDayTypeToCTARuleTemplate(StaffEmploymentDetails staffAdditionalInfoDTO, List<DayTypeDTO> dayTypeDTOS, Map<Long, List<LocalDate>> publicHolidays) {
-        Map<BigInteger, List<Day>> daytypesMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
+        Map<Long, List<Day>> daytypesMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
             List<LocalDate> publicHolidaysDates= new ArrayList<>();
-            for (BigInteger dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
+            for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
                 List<Day> currentDay = daytypesMap.get(dayTypeId);
                 currentDay.forEach(day -> {
                     if (!day.name().equals(EVERYDAY)) {

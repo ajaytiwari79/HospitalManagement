@@ -9,7 +9,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -30,8 +29,7 @@ public class ShiftFunctionService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ExceptionService exceptionService;
 
-    public Map<LocalDate, List<FunctionDTO>> addFunction(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<FunctionDTO> appliedFunctionDTOs) {
-        Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
+    public void addFunction(Map<LocalDate, List<FunctionDTO>> functionDTOMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<FunctionDTO> appliedFunctionDTOs) {
         if (CollectionUtils.isNotEmpty(appliedFunctionDTOs)) {
             for (FunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
                 if (CollectionUtils.isNotEmpty(appliedFunctionDTO.getAppliedDates())) {
@@ -44,10 +42,8 @@ public class ShiftFunctionService {
                 }
             }
         }
-        return functionDTOMap;
     }
 
-    @Async
     public void updateAppliedFunctionDetail(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, Long functionId) {
         if (isNotNull(functionId)) {
             if (activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getActivityBalanceSettings().getTimeType()))) {

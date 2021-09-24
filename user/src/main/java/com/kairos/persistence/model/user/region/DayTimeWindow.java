@@ -19,7 +19,6 @@ import java.time.LocalTime;
 @Setter
 public class DayTimeWindow extends UserBaseEntity {
 
-    private static final long serialVersionUID = 2554830756960038359L;
     private DayOfWeek dayOfWeek;
     @Convert(LocalTimeConverter.class)
     private LocalTime fromTime;

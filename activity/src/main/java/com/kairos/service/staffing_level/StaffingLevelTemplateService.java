@@ -2,12 +2,10 @@ package com.kairos.service.staffing_level;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user_context.UserContext;
+import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
@@ -16,7 +14,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.day_type.DayTypeService;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +32,10 @@ import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static org.mockito.ArgumentMatchers.isNotNull;
 
 @Service
 @Transactional
-public class StaffingLevelTemplateService {
+public class StaffingLevelTemplateService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffingLevelService.class);
     @Inject
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
@@ -49,8 +46,6 @@ public class StaffingLevelTemplateService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
-    @Inject
-    private DayTypeService dayTypeService;
 
     /**
      * @param staffingLevelTemplateDTO
@@ -68,26 +63,24 @@ public class StaffingLevelTemplateService {
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
         }
-
+        StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
         StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
-        if(ObjectUtils.isNotNull(staffingLevelTemplateDTO.getSelectedDate())){
-            StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
-            staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
-            staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
-            removeLogsFromTemplate(staffingLevelTemplate);
-        }
+        staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
+        staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
         staffingLevelTemplateRepository.save(staffingLevelTemplate);
-        staffingLevelTemplate.getPresenceStaffingLevelInterval().sort(Comparator.comparing(staffingLevelInterval -> staffingLevelInterval.getSequence()));
-        return ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate,StaffingLevelTemplateDTO.class);
+        BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
+        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()
+                .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
+
+        return staffingLevelTemplateDTO;
 
     }
 
-    private void removeLogsFromTemplate(StaffingLevelTemplate staffingLevelTemplate) {
-        for (StaffingLevelInterval staffingLevelInterval : staffingLevelTemplate.getPresenceStaffingLevelInterval()) {
-            staffingLevelInterval.setStaffingLevelIntervalLogs(new TreeSet<>());
-        }
-    }
-                                                                                                                                                                        
+    /**
+     * @param staffingLevelTemplateDTO
+     * @param staffingTemplateId
+     * @return
+     */
     public StaffingLevelTemplateDTO updateStaffingLevelTemplte(StaffingLevelTemplateDTO staffingLevelTemplateDTO,
                                                            BigInteger staffingTemplateId) {
         LOGGER.info("updating staffing level Template ID={}", staffingTemplateId);
@@ -103,7 +96,7 @@ public class StaffingLevelTemplateService {
         if (Optional.ofNullable(staffingLevelTemplate).isPresent()) {
             BeanUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
             staffingLevelTemplate.setId(staffingTemplateId);
-            staffingLevelTemplateRepository.save(staffingLevelTemplate);
+            this.save(staffingLevelTemplate);
             staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplate.getPresenceStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
             } else {
@@ -113,22 +106,34 @@ public class StaffingLevelTemplateService {
 
     }
 
+    /**
+     * @param unitId
+     * @param proposedDate
+     * @return
+     * @auther anil maurya
+     * <pre>
+     *  1.get day type for selected date
+     *  2.check validity for staffing level template
+     *  3.check valid day type
+     *
+     * </pre>
+     */
     public List<StaffingLevelTemplateDTO> getStaffingLevelTemplates(Long unitId, Date proposedDate) {
         if(!Optional.ofNullable(proposedDate).isPresent()){
             return staffingLevelTemplateRepository.findAllByUnitIdAndDeletedFalse(unitId);
         }
-        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeByDate(UserContext.getUserDetails().getCountryId(),proposedDate);
-        List<BigInteger> dayTypeIds = dayTypes.stream().map(DayTypeDTO::getId).collect(Collectors.toList());
+        List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
+        List<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toList());
 
-        Optional<DayTypeDTO> holidayDayType = dayTypes.stream().filter(DayTypeDTO::isHolidayType).findFirst();
+        Optional<DayType> holidayDayType = dayTypes.stream().filter(DayType::isHolidayType).findFirst();
         LocalDate localDate = DateUtils.asLocalDate(proposedDate);
 
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = Day.valueOf(day);
         if(!holidayDayType.isPresent()) {
-            return staffingLevelTemplateRepository.                                                                                                                 findByUnitIdAndDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }else {
-            return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
+            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
         }
         }
 

@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -22,7 +23,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Tag extends MongoBaseEntity {
 
-    private static final long serialVersionUID = 184409399323717230L;
     private String name;
     @Indexed
     private MasterDataTypeEnum masterDataType;

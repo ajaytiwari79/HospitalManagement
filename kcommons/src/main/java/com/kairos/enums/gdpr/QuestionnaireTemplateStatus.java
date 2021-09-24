@@ -1,8 +1,6 @@
 package com.kairos.enums.gdpr;
 
-import java.io.Serializable;
-
-public enum  QuestionnaireTemplateStatus implements Serializable {
+public enum  QuestionnaireTemplateStatus {
 
     DRAFT("Draft"),  PUBLISHED("Published");
 

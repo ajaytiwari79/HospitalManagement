@@ -69,7 +69,7 @@ public class EmploymentDTO {
     @Range(min = 0, message = "unit Id  is required for position")
     private Long unitId;
 
-    private BigInteger reasonCodeId;
+    private Long reasonCodeId;
 
     @NotNull(message = "seniorityLevel  is required for position")
     @Range(min = 0, message = "seniorityLevel  is required for position")

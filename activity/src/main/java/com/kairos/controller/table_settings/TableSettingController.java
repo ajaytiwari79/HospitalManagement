@@ -25,7 +25,7 @@ public class TableSettingController {
     private TableSettingService tableSettingService;
 
     @RequestMapping(value = "/table/{tabId}/settings", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> saveTableSettings(@PathVariable Long unitId, @PathVariable String tabId, @RequestBody Map<String, Object> tableSettings) {
+    ResponseEntity<Map<String, Object>> saveTableSettings(@PathVariable long unitId, @PathVariable String tabId, @RequestBody Map<String, Object> tableSettings) {
 
         //User loggedInUser = UserAuthentication.getCurrentUser();
         Long loggedInUserId = UserContext.getUserDetails().getId();
@@ -40,14 +40,14 @@ public class TableSettingController {
      */
 
     @RequestMapping(value = "/table/{staffId}", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getTableConfiguration(@PathVariable Long unitId, @PathVariable Long staffId) {
+    ResponseEntity<Map<String, Object>> getTableConfiguration(@PathVariable long unitId, @PathVariable long staffId) {
 
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfiguration(staffId, unitId));
     }
 
     @GetMapping("/table_settings/{tabId}")
-    ResponseEntity<Map<String, Object>> getTableConfigurationByTabId(@PathVariable Long unitId, @PathVariable BigInteger tabId) {
+    ResponseEntity<Map<String, Object>> getTableConfigurationByTabId(@PathVariable long unitId, @PathVariable BigInteger tabId) {
 
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, tableSettingService.getTableConfigurationByTabId(unitId, tabId));

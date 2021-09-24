@@ -25,7 +25,7 @@ public class TaskMoveCHFilter implements SelectionFilter<TaskPlanningSolution, C
         prevTaskList.add(1781400l);
     }
     public  boolean accept(ScoreDirector<TaskPlanningSolution> scoreDirector, ChangeMove changeMove) {
-        updateAttempt();
+        attemts++;
         boolean acceptable = true, matches = false;
         Task task = (Task) changeMove.getEntity();
         TaskOrEmployee prevTaskOrEmployee = (TaskOrEmployee) changeMove.getToPlanningValue();
@@ -39,10 +39,6 @@ public class TaskMoveCHFilter implements SelectionFilter<TaskPlanningSolution, C
         if (matches && taskList.contains(task.getId()) && prevTaskList.contains(((Task) prevTaskOrEmployee).getId())) {
         }
         return acceptable;
-    }
-
-    private static void updateAttempt() {
-        attemts++;
     }
 
 }

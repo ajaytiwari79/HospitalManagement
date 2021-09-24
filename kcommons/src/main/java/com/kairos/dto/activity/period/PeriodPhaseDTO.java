@@ -3,7 +3,6 @@ package com.kairos.dto.activity.period;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,8 +12,7 @@ import java.time.LocalTime;
  */
 @Getter
 @Setter
-public class PeriodPhaseDTO implements Serializable {
-    private static final long serialVersionUID = 7691256326073014187L;
+public class PeriodPhaseDTO {
     private BigInteger phaseId;
     private LocalDate flippingDate;
     private LocalTime flippingTime;

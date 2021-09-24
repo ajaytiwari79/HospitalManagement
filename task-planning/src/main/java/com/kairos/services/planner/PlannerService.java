@@ -884,7 +884,7 @@ public class PlannerService extends MongoBaseService {
         try {
             updatedDate = executionDateFormat.parse(taskData.getResource());
         } catch (ParseException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
         Task task = taskMongoRepository.findOne(new BigInteger(taskData.getId()));
         TaskType taskType = taskTypeMongoRepository.findOne(task.getTaskTypeId());
@@ -1065,7 +1065,7 @@ public class PlannerService extends MongoBaseService {
                 }
 
             } catch (ParseException e) {
-                logger.error(e.getMessage());
+                e.printStackTrace();
             }
             if (Optional.ofNullable(taskData.getTimeWindow()).isPresent()) {
                 Map<String, Object> timeWindow = taskData.getTimeWindow();
@@ -2008,7 +2008,7 @@ public class PlannerService extends MongoBaseService {
         try {
             s = objectMapper.writeValueAsString(clientAggregator);
         } catch (JsonProcessingException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("citizenDataList", Arrays.asList(s));
@@ -2017,6 +2017,20 @@ public class PlannerService extends MongoBaseService {
 
     private boolean skipTaskOnPublicHoliday(TaskDemand taskDemand, TaskDemandVisit taskDemandVisit) {
         return false;
+        /*int weekdayFrequency = getWeekFrequencyAsInt(taskDemand.getWeekdayFrequency().toString());
+
+        int visitCount = taskDemandVisit.getVisitCount();
+
+        if(weekdayFrequency == 1 && visitCount==5){
+            return false;
+        }else if(weekdayFrequency == 2 && visitCount==10){
+            return false;
+        }else if(weekdayFrequency == 3 && visitCount==15){
+            return false;
+        }else if(weekdayFrequency == 4 && visitCount==20){
+            return false;
+        }
+        return true;*/
     }
 
 }

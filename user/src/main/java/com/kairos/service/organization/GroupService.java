@@ -3,7 +3,9 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.ModuleId;
@@ -103,6 +105,10 @@ public class GroupService {
         for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));
         }
+        groupDTOS.forEach(groupDTO -> {
+            groupDTO.setUnitId(unitId);
+            groupDTO.setTranslations(TranslationUtil.getTranslatedData(groupDTO.getTranslatedNames(),groupDTO.getTranslatedDescriptions()));
+        });
         return groupDTOS;
     }
 
@@ -124,7 +130,8 @@ public class GroupService {
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);
-        groupDTO.setTranslations(group.getTranslations());
+        groupDTO.setTranslatedDescriptions(group.getTranslatedDescriptions());
+        groupDTO.setTranslatedNames(group.getTranslatedNames());
         return groupDTO;
     }
 
@@ -173,5 +180,19 @@ public class GroupService {
 
         staffIds.removeAll(excludedStaffs);
         return staffIds;
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfGroup(Long groupId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Group group =groupGraphRepository.findOne(groupId);
+        group.setTranslatedNames(translatedNames);
+        group.setTranslatedDescriptions(translatedDescriptios);
+        groupGraphRepository.save(group);
+        return group.getTranslatedData();
     }
 }

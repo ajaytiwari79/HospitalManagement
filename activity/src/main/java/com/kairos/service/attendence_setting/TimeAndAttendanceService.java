@@ -18,16 +18,14 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.persistence.repository.reason_code.ReasonCodeRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -42,11 +40,10 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.enums.reason_code.ReasonCodeType.ATTENDANCE;
 
 @Service
 //Todo we have to refactor this service
-public class TimeAndAttendanceService {
+public class TimeAndAttendanceService extends MongoBaseService {
 
     @Inject
     private TimeAndAttendanceRepository timeAndAttendanceRepository;
@@ -68,11 +65,8 @@ public class TimeAndAttendanceService {
     private ShiftStateMongoRepository shiftStateMongoRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Autowired
-    @Lazy
-    private ShiftStateService shiftStateService;
     @Inject
-    private ReasonCodeRepository reasonCodeRepository;
+    private ShiftStateService shiftStateService;
 
     public TimeAndAttendanceDTO getAttendanceSetting() {
         List<StaffResultDTO> staffAndUnitId = userIntegrationService.getStaffIdsByUserId(UserContext.getUserDetails().getId());
@@ -89,13 +83,12 @@ public class TimeAndAttendanceService {
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_NOTFOUND);
         }
-        List<ReasonCodeDTO> reasonCodeDTOS=reasonCodeRepository.findByReasonCodeTypeAndUnitIdNotNull(ATTENDANCE);
         Map<Long, StaffResultDTO> unitIdAndStaffResultMap = staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId, v -> v));
         List<Long> staffIds = staffAndOrganizationIds.stream().map(StaffResultDTO::getStaffId).collect(Collectors.toList());
         List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS = staffAndOrganizationIds.stream().map(reasonCode -> new OrganizationAndReasonCodeDTO(reasonCode.getUnitId(), reasonCode.getUnitName(), reasonCode.getReasonCodes(), reasonCode.getEmployment())).collect(Collectors.toList());
         Shift shift = null;
         List<Shift> shifts = shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
-        Map<Long, List<ReasonCodeDTO>> unitAndReasonCode = reasonCodeDTOS.stream().collect(Collectors.groupingBy(ReasonCodeDTO::getUnitId));
+        Map<Long, List<ReasonCodeDTO>> unitAndReasonCode = staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId, StaffResultDTO::getReasonCodes));
         Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap = new HashMap<>();
         timeAndAttendanceDTO = updateTimeAttendanceDetails(shifts,activityIdAndLocationActivityMap,unitAndReasonCode, checkIn, reasonCodeId, timeAndAttendanceDTO, shift,unitIdAndStaffResultMap,organizationAndReasonCodeDTOS);
         if (checkIn) {

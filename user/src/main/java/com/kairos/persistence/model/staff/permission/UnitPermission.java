@@ -25,7 +25,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 @NoArgsConstructor
 public class UnitPermission extends UserBaseEntity {
 
-    private static final long serialVersionUID = -5275768551736543880L;
     private String place;
     private long startDate;
     private long endDate;

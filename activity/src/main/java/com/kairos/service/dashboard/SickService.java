@@ -19,7 +19,6 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +57,6 @@ public class SickService {
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
 
     public UserSickDataWrapper getDefaultDataOnUserSick(Long unitId) {
         UserSickDataWrapper userSickDataWrapper = new UserSickDataWrapper();
@@ -68,15 +66,14 @@ public class SickService {
         return userSickDataWrapper;
     }
 
-    public Map<String, Object> markUserAsFine(Long staffId, Long unitId, LocalDate startDate, BigInteger activityId) {
+    public Map<String, Object> markUserAsFine(Long staffId, Long unitId, LocalDate startDate) {
         Map<String, Object> response = new HashMap<>();
         if (isNull(unitId) || isNull(staffId)) {
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
         Date endDate = DateUtils.getEndOfDay(DateUtils.plusDays(asDate(startDate),21));
-        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate,activityId);
+        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate);
         List<ShiftDTO> threeWeeksShift =shiftMongoRepository.findAllShiftsByStaffIdsAndDateAndUnitId(staffId,asDate(startDate),endDate,unitId);
-        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(threeWeeksShift);
         sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);
         response.put("staffId", staffId);
@@ -126,7 +123,7 @@ public class SickService {
     }
 
     public void validateSickSettings(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<String> errorMessages, SicknessSetting sicknessSetting) {
-        if (sicknessSetting.isCanOnlyUsedOnMainEmployment() && !EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())) {
+        if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND);
         }
         if (isCollectionNotEmpty(activityWrapper.getActivity().getActivityRulesSettings().getStaffTagIds())) {

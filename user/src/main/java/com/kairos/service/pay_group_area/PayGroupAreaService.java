@@ -3,14 +3,20 @@ package com.kairos.service.pay_group_area;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.MunicipalityQueryResults;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaRelationshipRepository;
@@ -204,7 +210,12 @@ public class PayGroupAreaService {
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_LEVEL_NOTFOUND);
 
         }
-        return payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
+        List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
+        payGroupAreaQueryResults.forEach(payGroupAreaQueryResult -> {
+            payGroupAreaQueryResult.setCountryId(countryId);
+            payGroupAreaQueryResult.setTranslations(TranslationUtil.getTranslatedData(payGroupAreaQueryResult.getTranslatedNames(),payGroupAreaQueryResult.getTranslatedDescriptions()));
+        });
+        return payGroupAreaQueryResults;
     }
 
     public PayGroupAreaResponse getMunicipalityAndOrganizationLevel(Long countryId) {
@@ -214,8 +225,16 @@ public class PayGroupAreaService {
 
         }
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
+        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationLevels,LevelDTO.class);
+        levelDTOS.forEach(levelDTO -> {
+            levelDTO.setTranslations(TranslationUtil.getTranslatedData(levelDTO.getTranslatedNames(),levelDTO.getTranslatedDescriptions()));
+        });
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
-        return new PayGroupAreaResponse(organizationLevels, municipalities);
+        List<MunicipalityQueryResults> municipalityQueryResults =ObjectMapperUtils.copyCollectionPropertiesByMapper(municipalities,MunicipalityQueryResults.class);
+        municipalityQueryResults.forEach(municipality->{
+            municipality.setTranslations(TranslationUtil.getTranslatedData(municipality.getTranslatedNames(),municipality.getTranslatedDescriptions()));
+        });
+        return new PayGroupAreaResponse(levelDTOS, municipalityQueryResults);
     }
 
 
@@ -239,5 +258,19 @@ public class PayGroupAreaService {
 
     public List<PayGroupAreaQueryResult> getPayGroupAreaByLevel(Long levelId) {
         return payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(levelId);
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfPayGroupArea(Long payGroupAreaId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        PayGroupArea payGroupArea =payGroupAreaGraphRepository.findOne(payGroupAreaId);
+        payGroupArea.setTranslatedNames(translatedNames);
+        payGroupArea.setTranslatedDescriptions(translatedDescriptios);
+        payGroupAreaGraphRepository.save(payGroupArea);
+        return payGroupArea.getTranslatedData();
     }
 }

@@ -18,5 +18,4 @@ public class FavoriteFilterQueryResult {
     private List<FavoriteFilterDetailQueryResult> filtersData;
     private String name;
     private int sequence;
-    private int usedCount;
 }

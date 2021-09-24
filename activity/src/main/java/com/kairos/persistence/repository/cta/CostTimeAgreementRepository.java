@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.cta;
 
 import com.kairos.persistence.model.cta.CostTimeAgreement;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,7 +29,7 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query(value = "{countryId:?0,name:?1,deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
 
-    @Query(value = "{countryId:?0,name:?1,_id:{$ne:?2},organization:{$exists:false},deleted:false,disabled:false}",exists = true)
+    @Query(value = "{countryId:?0,name:?1,_id:{$ne:?2},deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
     @Query(value = "{name:?2,deleted:false,disabled:false,'organizationType._id':?0,'organizationSubType._id':?1}",exists = true)

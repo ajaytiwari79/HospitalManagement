@@ -14,7 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Action extends MongoBaseEntity {
 
-    private static final long serialVersionUID = 1465438156244756191L;
     private ActionType name;
     private String description;
     private Long unitId;

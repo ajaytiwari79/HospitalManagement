@@ -42,7 +42,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     private boolean restingTimeAllowed;
     private int restingTime;
     private float recommendedValue;
-    private transient DateTimeInterval interval;
 
     public DaysOffInPeriodWTATemplate(String name, boolean disabled,
                                       String description, long intervalLength, String intervalUnit) {
@@ -65,7 +64,11 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
             int count = 0;
             DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-                List<DateTimeInterval> intervals = getSortedIntervals(infoWrapper.getShifts(),dateTimeInterval);
+               // DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+               // dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1), dateTimeInterval.getEnd().plusDays(1));
+                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
+                shifts.add(infoWrapper.getShift());
+                List<DateTimeInterval> intervals = getSortedIntervals(shifts);
                 if (intervals.size() > 0) {
                     count = getDayOFF(intervals, dateTimeInterval);
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
@@ -77,15 +80,13 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         }
     }
 
-    private List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts,DateTimeInterval dateTimeInterval) {
+    private List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts) {
         List<DateTimeInterval> intervals = new ArrayList<>();
         for (ShiftWithActivityDTO s : sortShifts(shifts)) {
-            if (dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.contains(s.getEndDate())) {
-                if (restingTimeAllowed) {
-                    intervals.add(new DateTimeInterval(s.getStartDate(), asDate(DateUtils.asZonedDateTime(s.getEndDate()).plusMinutes(s.getRestingMinutes()))));
-                } else {
-                    intervals.add(s.getDateTimeInterval());
-                }
+            if(restingTimeAllowed){
+                intervals.add(new DateTimeInterval(s.getStartDate(),asDate(DateUtils.asZonedDateTime(s.getEndDate()).plusMinutes(s.getRestingMinutes()))));
+            }else {
+                intervals.add(s.getDateTimeInterval());
             }
         }
         return intervals;

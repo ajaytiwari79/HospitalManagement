@@ -18,7 +18,6 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 @NodeEntity
 public class KPermissionField extends UserBaseEntity {
 
-    private static final long serialVersionUID = -6168878190363428918L;
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private String fieldName;
 

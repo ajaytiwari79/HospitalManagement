@@ -14,7 +14,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 //@QueryResult
 public class Feature extends UserBaseEntity{
 
-    private static final long serialVersionUID = 1013722195323308919L;
     private String name;
     private String description;
 

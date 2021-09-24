@@ -4,7 +4,6 @@ import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.configuration.PermissionSchemaScanner;
 import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.redis.RedisService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 
 /**
  * Creates below mentioned bootstrap data(if Not Available)
@@ -31,7 +28,6 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
 
     @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject private RedisService redisService;
 
 
     /**
@@ -41,7 +37,6 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        redisService.removeKeyFromCacheAsyscronously(newHashSet("find*","get*"));
         createPermissionModel();
         createActionPermissions();
 

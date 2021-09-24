@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -17,8 +16,7 @@ import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_CANNOT_EM
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PresencePlannedTime implements Serializable {
-    private static final long serialVersionUID = -2217829019922052960L;
+public class PresencePlannedTime {
     private BigInteger phaseId;
     @Valid
     private List<EmploymentWisePlannedTimeConfiguration> employmentWisePlannedTimeConfigurations;

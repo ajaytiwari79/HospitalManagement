@@ -22,8 +22,6 @@ import static com.kairos.constants.CommonConstants.PACKAGE_NAME;
 import static de.danielbechler.diff.node.DiffNode.State.ADDED;
 import static de.danielbechler.diff.node.DiffNode.State.CHANGED;
 
-//import org.neo4j.ogm.annotation.NodeEntity;
-
 /**
  * pradeep
  * 8/5/19
@@ -146,7 +144,7 @@ public class AuditLogging {
             deleted = (boolean)newEntity.getClass().getMethod("isDeleted").invoke(newEntity);
 
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            LOGGER.error(e.getMessage());
+            e.printStackTrace();
         }
         if(isNull(id)) {
             return LoggingType.CREATED;

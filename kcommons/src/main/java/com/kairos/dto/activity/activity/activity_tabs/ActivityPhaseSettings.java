@@ -5,15 +5,12 @@ package com.kairos.dto.activity.activity.activity_tabs;/*
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ActivityPhaseSettings implements Serializable {
+public class ActivityPhaseSettings {
 
-    private static final long serialVersionUID = -994347464666492206L;
     private BigInteger activityId;
     private List<PhaseTemplateValue> phaseTemplateValues;
 

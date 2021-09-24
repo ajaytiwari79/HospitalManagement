@@ -8,6 +8,7 @@ import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.cta.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,7 +69,7 @@ public class CTARuleTemplateDTO {
     private Set<BigInteger> timeTypeIds;
     private Set<BigInteger> plannedTimeIds;
 
-    private List<BigInteger> dayTypeIds;
+    private List<Long> dayTypeIds;
     private List<DayOfWeek> days;
     private List<LocalDate> publicHolidays;
     @NotNull
@@ -79,19 +80,18 @@ public class CTARuleTemplateDTO {
     private Long countryId;
     private Long unitId;
     private Map<String, TranslationInfo> translations;
-    private boolean notApplicableForSunday; // this is for getting  compensation on sunday
 
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
     }
 
-    public List<BigInteger> getDayTypeIds() {
+    public List<Long> getDayTypeIds() {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : this.dayTypeIds;
         return dayTypeIds;
     }
 
-    public void setDayTypeIds(List<BigInteger> dayTypeIds) {
+    public void setDayTypeIds(List<Long> dayTypeIds) {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
     }
 
@@ -137,10 +137,6 @@ public class CTARuleTemplateDTO {
 
     public String getDescription() {
         return  TranslationUtil.getDescription(translations,description);
-    }
-
-    public Map<String, TranslationInfo> getTranslations() {
-        return isNull(translations) ? new HashMap<>() : translations;
     }
 
     @Override

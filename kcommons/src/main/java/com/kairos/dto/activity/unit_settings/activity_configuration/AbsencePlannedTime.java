@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -16,8 +15,7 @@ import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_CANNOT_EM
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AbsencePlannedTime implements Serializable {
-    private static final long serialVersionUID = -1005159234337559723L;
+public class AbsencePlannedTime {
     private BigInteger phaseId;
     private BigInteger timeTypeId;  // if exception is true then time type is null
     @NotEmpty(message = PLANNED_TIME_CANNOT_EMPTY)
