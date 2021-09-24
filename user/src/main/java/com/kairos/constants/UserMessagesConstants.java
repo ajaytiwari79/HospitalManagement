@@ -273,6 +273,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_ORGANIZATIONSERVICE_TEAM_NOTFOUND = "message.organizationService.team.notFound";
     public static final String MESSAGE_ORGANIZATIONTYPE_ID_NOTFOUND = "message.organizationtype.id.notfound";
     public static final String MESSAGE_ORGANIZATIONTYPE_NAME_DUPLICATE = "message.organizationtype.name.duplicate";
+    public static final String MESSAGE_ORGANIZATIONSUBTYPE_NAME_DUPLICATE = "message.organizationsubtype.name.duplicate";
     public static final String MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP = "message.teamservice.unit.id.notFound.by.group";
     public static final String ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY = "error.teamservice.stafforteam.notEmpty";
     public static final String MESSAGE_TEAMSERVICE_SOMETHINGWRONG = "message.teamservice.somethingwrong";

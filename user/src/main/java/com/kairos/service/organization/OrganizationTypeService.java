@@ -124,6 +124,11 @@ public class OrganizationTypeService{
     public Map<String, Object> addOrganizationTypeSubType(OrganizationType organizationType, Long organizationTypeId) {
         OrganizationType type = organizationTypeGraphRepository.findOne(organizationTypeId);
         if (type != null) {
+            String subTypeName = organizationType.getName();
+            long count = type.getOrganizationTypeList().stream().filter(OrganizationSubType ->OrganizationSubType.getName().equals(subTypeName)).count();
+            if(count > 0){
+                exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSUBTYPE_NAME_DUPLICATE);
+            }
             organizationType = organizationTypeGraphRepository.save(organizationType);
             organizationTypeGraphRepository.createSubTypeRelation(organizationType.getId(), organizationTypeId);
             return organizationType.retrieveDetails();
