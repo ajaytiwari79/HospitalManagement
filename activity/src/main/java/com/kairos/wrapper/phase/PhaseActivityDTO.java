@@ -9,7 +9,6 @@ import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConf
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import lombok.Builder;
 import lombok.Getter;
