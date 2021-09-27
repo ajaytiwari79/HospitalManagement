@@ -28,13 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
@@ -189,10 +187,20 @@ public class WTAOrganizationService  {
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTAOfExpertiseAndDate(unitId, expertiseId, selectedDate);
         if(isNotNull(employmentId)){
-            List<WTAResponseDTO> wtaResponseDTOList =workingTimeAgreementMongoRepository.getWTAByEmployment(employmentId).stream().map(wta -> new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId())).collect(Collectors.toList());
-            List<CTAResponseDTO> employmentCtaResponseDTOS = costTimeAgreementRepository.getCTAByEmployment(employmentId).stream().map(cta->new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId())).collect(Collectors.toList());
+            List<WTAResponseDTO> wtaResponseDTOList;
+            List<CTAResponseDTO> ctaResponseDTOList;
+            if(isNotNull(selectedDate)){
+                Date date = asDate(selectedDate);
+                WTAQueryResultDTO wtaByEmploymentIdAndDate = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(employmentId, date);
+                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(employmentId,date);
+                wtaResponseDTOList = newArrayList(new WTAResponseDTO(wtaByEmploymentIdAndDate.getName(), wtaByEmploymentIdAndDate.getId(), wtaByEmploymentIdAndDate.getParentId()));
+                ctaResponseDTOList = newArrayList(new CTAResponseDTO(ctaResponseDTO.getName(), ctaResponseDTO.getId(), ctaResponseDTO.getParentId()));
+            }else {
+                wtaResponseDTOList =workingTimeAgreementMongoRepository.getWTAByEmployment(employmentId).stream().map(wta -> new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId())).collect(Collectors.toList());
+                ctaResponseDTOList = costTimeAgreementRepository.getCTAByEmployment(employmentId).stream().map(cta->new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId())).collect(Collectors.toList());
+            }
             wtaResponseDTOS.addAll(wtaResponseDTOList);
-            ctaResponseDTOS.addAll(employmentCtaResponseDTOS);
+            ctaResponseDTOS.addAll(ctaResponseDTOList);
         }
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }

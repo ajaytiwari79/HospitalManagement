@@ -287,7 +287,7 @@ public class TimeBankCalculationService {
                 scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case CommonConstants.FULL_DAY_CALCULATION:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? getEmploymentLineByDate(staffEmploymentDetails.getEmploymentLines(),asLocalDate(shiftActivity.getStartDate())).getFullTimeWeeklyMinutes() : getEmploymentLineByDate(staffEmploymentDetails.getEmploymentLines(),asLocalDate(shiftActivity.getStartDate())).getTotalWeeklyMinutes();
                 duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
@@ -296,7 +296,7 @@ public class TimeBankCalculationService {
                 scheduledMinutes = duration;
                 break;
             case CommonConstants.FULL_WEEK:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? getEmploymentLineByDate(staffEmploymentDetails.getEmploymentLines(),asLocalDate(shiftActivity.getStartDate())).getFullTimeWeeklyMinutes() : getEmploymentLineByDate(staffEmploymentDetails.getEmploymentLines(),asLocalDate(shiftActivity.getStartDate())).getTotalWeeklyMinutes();
                 duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
@@ -847,6 +847,16 @@ public class TimeBankCalculationService {
             }
         }
         return hourlyCost;
+    }
+
+    public EmploymentLinesDTO getEmploymentLineByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate) {
+        for (EmploymentLinesDTO employmentLine : employmentLines) {
+            DateTimeInterval positionInterval = employmentLine.getInterval();
+            if ((positionInterval == null && (employmentLine.getStartDate().equals(localDate) || employmentLine.getStartDate().isBefore(localDate))) || (positionInterval != null && (positionInterval.contains(asDate(localDate)) || employmentLine.getEndDate().equals(localDate)))) {
+                return employmentLine;
+            }
+        }
+        return null;
     }
 
     private Object[] getSumOfTimebankValues(List<DailyTimeBankEntry> dailyTimeBankEntries,Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsDTOMap) {

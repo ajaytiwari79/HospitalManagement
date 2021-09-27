@@ -5,6 +5,7 @@ import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,12 @@ import javax.inject.Inject;
 public class ChatRestClient {
     private static final Logger logger = LoggerFactory.getLogger(ChatRestClient.class);
 
+    private static String chatServerUrl;
 
+    @Value("${chat.matrix.url}")
+    public void setPlannerServiceUrl(String chatServerUrl) {
+        ChatRestClient.chatServerUrl = chatServerUrl;
+    }
 
     @Inject
     private OrganizationService organizationService;
@@ -33,6 +39,7 @@ public class ChatRestClient {
      */
     public StaffChatDetails registerUser(StaffChatDetails staffChatDetails) {
         try {
+            String url = chatServerUrl+"register?kind=user";
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity requestEntity = new HttpEntity(staffChatDetails,headers);
@@ -40,7 +47,7 @@ public class ChatRestClient {
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            "http://127.0.0.1:8008/_matrix/client/r0/register?kind=user",
+                            url,
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 

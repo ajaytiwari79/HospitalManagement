@@ -21,6 +21,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -124,6 +126,11 @@ public class OrganizationTypeService{
     public Map<String, Object> addOrganizationTypeSubType(OrganizationType organizationType, Long organizationTypeId) {
         OrganizationType type = organizationTypeGraphRepository.findOne(organizationTypeId);
         if (type != null) {
+            String subTypeName = organizationType.getName().trim();
+            long count = isCollectionEmpty(type.getOrganizationTypeList())? 0 : type.getOrganizationTypeList().stream().filter(organizationSubType ->organizationSubType.getName().trim().equals(subTypeName) && organizationSubType.isEnable()).count();
+            if(count > 0){
+                exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSUBTYPE_NAME_DUPLICATE);
+            }
             organizationType = organizationTypeGraphRepository.save(organizationType);
             organizationTypeGraphRepository.createSubTypeRelation(organizationType.getId(), organizationTypeId);
             return organizationType.retrieveDetails();
