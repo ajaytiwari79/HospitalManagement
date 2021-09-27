@@ -30,9 +30,9 @@ public class TimeBankController {
     private TimeBankCalculationService timeBankCalculationService;
 
     @GetMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@RequestParam(required = false) Long employmentId, @RequestParam(value = "query",required = false) String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@RequestParam(required = false) String sortingOrder,@PathVariable Long unitId,@RequestParam(required = false) Long employmentId, @RequestParam(value = "query",required = false) String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getAdvanceViewTimeBank
-                (unitId,employmentId,query,startDate,endDate));
+                (sortingOrder,unitId,employmentId,query,startDate,endDate));
     }
 
     @GetMapping(value = "overview/employment/{employmentId}/")

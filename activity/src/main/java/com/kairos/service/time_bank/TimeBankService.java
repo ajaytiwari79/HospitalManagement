@@ -283,7 +283,7 @@ public class TimeBankService implements KPIService {
      * @param endDate
      * @return TimeBankAndPayoutDTO
      */
-    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
+    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(String sortingOrder,Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
         AdvanceViewData advanceViewData = new AdvanceViewData(unitId, employmentId, query, startDate, endDate).invoke();
         endDate = advanceViewData.getEndDate();
         List<EmploymentWithCtaDetailsDTO> employmentDetails = advanceViewData.getEmploymentDetails();
@@ -295,7 +295,7 @@ public class TimeBankService implements KPIService {
         List<Long> employmentIds = advanceViewData.getEmploymentIds();
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
-        return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts);
+        return timeBankCalculationService.getTimeBankAdvanceView(sortingOrder,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts);
     }
 
     /**

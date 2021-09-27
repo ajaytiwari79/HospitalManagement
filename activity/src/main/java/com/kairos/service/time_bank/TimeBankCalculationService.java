@@ -388,7 +388,7 @@ public class TimeBankCalculationService {
         return new Object[]{shiftWithActivityDTOS, intervalPayOutPerShifts};
     }
 
-    public TimeBankAndPayoutDTO getTimeBankAdvanceView(List<Interval> intervals, Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, List<TimeTypeDTO> timeTypeDTOS, Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap,List<PayOutPerShift> payOutPerShifts) {
+    public TimeBankAndPayoutDTO getTimeBankAdvanceView(String sortingOrder,List<Interval> intervals, Long unitId, long totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, List<TimeTypeDTO> timeTypeDTOS, Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap,List<PayOutPerShift> payOutPerShifts) {
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = employmentWithCtaDetailsDTOS.get(0);
         TimeBankDTO timeBankDTO = new TimeBankDTO(startDate, asDate(DateUtils.asLocalDate(endDate)), employmentWithCtaDetailsDTO, employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getId(), employmentWithCtaDetailsDTO.getTotalWeeklyMinutes(), employmentWithCtaDetailsDTO.getWorkingDaysInWeek());
         Interval interval = new Interval(startDate.getTime(), endDate.getTime());
@@ -397,13 +397,15 @@ public class TimeBankCalculationService {
         Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = (Map<Interval, List<ShiftWithActivityDTO>>) objects[0];
         Map<Interval, List<PayOutPerShift>> payOutsintervalMap = (Map<Interval, List<PayOutPerShift>>) objects[1];
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = getTimeBankIntervals(unitId, startDate, endDate, totalTimeBankBeforeStartDate, query, intervals, shiftsintervalMap, timeBanksIntervalMap, timeTypeDTOS, employmentWithCtaDetailsDTOS, payoutTransactionIntervalMap, payOutsintervalMap);
-        Collections.reverse(timeBankIntervalDTOS);
+        if(isNull(sortingOrder) || sortingOrder.equals("DSC")){
+            Collections.reverse(timeBankIntervalDTOS);
+        }
         timeBankDTO.setTimeIntervals(timeBankIntervalDTOS);
         List<CTADistributionDTO> scheduledCTADistributions = timeBankIntervalDTOS.stream().flatMap(ti -> ti.getTimeBankDistribution().getScheduledCTADistributions().stream()).collect(Collectors.toList());
         getTotalTimebankDetails(shifts, timeTypeDTOS, employmentWithCtaDetailsDTO, timeBankDTO, interval, timeBankIntervalDTOS, scheduledCTADistributions);
         List<PayOutPerShift> payOutPerShiftBeforestartDate = payOutRepository.findAllByEmploymentAndBeforeDate(employmentWithCtaDetailsDTO.getId(), startDate);
         long payoutMinutesBefore = isCollectionNotEmpty(payOutPerShiftBeforestartDate) ? payOutPerShiftBeforestartDate.stream().mapToLong(PayOutPerShift::getTotalPayOutMinutes).sum() : 0;
-        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOutPerShifts, payoutMinutesBefore, payoutTransactionIntervalMap, employmentWithCtaDetailsDTOS, query);
+        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(sortingOrder,intervals, payOutPerShifts, payoutMinutesBefore, payoutTransactionIntervalMap, employmentWithCtaDetailsDTOS, query);
         return new TimeBankAndPayoutDTO(timeBankDTO, payOut);
     }
 
