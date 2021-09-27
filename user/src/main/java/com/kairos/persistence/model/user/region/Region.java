@@ -27,6 +27,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NoArgsConstructor
 public class Region extends UserBaseEntity {
 
+    private static final long serialVersionUID = 202781127800317559L;
     @NotBlank(message = ERROR_REGION_NAME_NOTEMPTY)
     private String name;
     @NotBlank(message = ERROR_REGION_CODE_NOTEMPTY)

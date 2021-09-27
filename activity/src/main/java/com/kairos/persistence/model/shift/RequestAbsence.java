@@ -22,4 +22,5 @@ public class RequestAbsence {
     private TodoStatus todoStatus;
     private Long reasonCodeId;
     private String remarks;
+    private String methodForCalculatingTime;
 }

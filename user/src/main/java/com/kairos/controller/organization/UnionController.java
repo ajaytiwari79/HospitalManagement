@@ -5,6 +5,7 @@ import com.kairos.dto.user.organization.union.LocationDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.service.organization.UnionService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,8 @@ public class UnionController {
 
     @Inject
     private UnionService unionService;
+
+    @Inject private TranslationService translationService;
 
     @RequestMapping(value =COUNTRY_URL+"/unions", method = RequestMethod.GET)
     @ApiOperation("Get All Unions")
@@ -135,6 +138,6 @@ public class UnionController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unionService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 }

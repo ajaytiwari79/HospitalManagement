@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -27,7 +28,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PhaseDTO {
+public class PhaseDTO implements Serializable {
     private BigInteger id;
 
     @NotNull(message = "error.phase.name.notnull")

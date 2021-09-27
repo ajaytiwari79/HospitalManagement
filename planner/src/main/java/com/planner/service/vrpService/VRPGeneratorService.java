@@ -58,7 +58,7 @@ public class VRPGeneratorService {
             out.write(json);
             out.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }*/
         return solution;
     }

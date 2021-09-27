@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FunctionDTO {
+public class FunctionDTO implements Serializable {
     private Long id;
     @NotBlank(message = "error.function.name.notEmpty")
     private String name;

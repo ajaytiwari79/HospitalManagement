@@ -1,6 +1,8 @@
 package com.kairos.enums.kpi;
 
-public enum YAxisConfig {
+import java.io.Serializable;
+
+public enum YAxisConfig implements Serializable {
 
     PRESENCE_UNDER_STAFFING("Presence Under Staffing"),PRESENCE_OVER_STAFFING("Presence Over Staffing"),ABSENCE_UNDER_STAFFING("Absence Under Staffing"),ABSENCE_OVER_STAFFING("Absence Over Staffing"),STAFF_AGE("Staff Age"),SUM_OF_CHILDREN("Sum Of Children"),WORKED_ON_PUBLIC_HOLIDAY("Worked On Public Holiday"),
     TIME_TYPE("TimeType"),ACTIVITY("Activity"),PLANNED_TIME("Planned Time"),TOTAL_PLANNED_HOURS("Total Planned Hours"),DELTA_TIMEBANK("Delta Timebank"),UNAVAILABILITY("Unavailability"), PAYOUT("Payout"),STAFFING_LEVEL_CAPACITY("Staffing Level capacity") ,

@@ -58,7 +58,7 @@ public class EmploymentWithCtaDetailsDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public EmploymentWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> employmentLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate,Long unitId,Long employmentTypeId) {
+    public EmploymentWithCtaDetailsDTO(Long id, Integer totalWeeklyHours, int totalWeeklyMinutes, int workingDaysInWeek, Long staffId, LocalDate startDate, LocalDate endDate, List<EmploymentLinesDTO> employmentLines, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate,Long unitId,Long employmentTypeId,ZoneId unitTimeZone) {
         this.id = id;
         this.totalWeeklyHours = totalWeeklyHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -71,6 +71,7 @@ public class EmploymentWithCtaDetailsDTO {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
         this.unitId = unitId;
         this.employmentTypeId=employmentTypeId;
+        this.unitTimeZone = unitTimeZone;
     }
 
 }

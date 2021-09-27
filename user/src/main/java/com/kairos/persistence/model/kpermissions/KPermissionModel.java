@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NoArgsConstructor
 @NodeEntity
 public class KPermissionModel extends UserBaseEntity {
+    private static final long serialVersionUID = 1061944026662314194L;
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private String modelName;
 

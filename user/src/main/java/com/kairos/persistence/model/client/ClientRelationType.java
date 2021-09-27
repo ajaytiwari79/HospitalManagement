@@ -18,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.RELAT
 @NodeEntity
 public class ClientRelationType extends UserBaseEntity {
 
+    private static final long serialVersionUID = -4853300405183714712L;
     @Relationship(type = RELATION_WITH_NEXT_TO_KIN)
     Client nextToKin;
     @Relationship(type = RELATION_TYPE)

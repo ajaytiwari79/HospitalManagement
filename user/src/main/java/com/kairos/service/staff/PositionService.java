@@ -5,7 +5,6 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -18,7 +17,6 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.EngineerType;
-import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -28,7 +26,10 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.position.*;
+import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.StaffPositionDTO;
+import com.kairos.persistence.model.staff.position.StaffPositionDetail;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -36,11 +37,9 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.rest_client.priority_group.GenericRestClient;
-import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -49,6 +48,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -58,6 +58,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,13 +113,9 @@ public class PositionService {
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private UserGraphRepository userGraphRepository;
-    @Inject
-    private KafkaProducer kafkaProducer;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
@@ -145,7 +142,7 @@ public class PositionService {
             }
         }
         Long positionStartDate = DateUtils.getIsoDateInLong(staffPositionDetail.getEmployedSince());
-        EngineerType engineerType = engineerTypeGraphRepository.findOne(staffPositionDetail.getEngineerTypeId());
+        EngineerType engineerType = isNotNull(staffPositionDetail.getEngineerTypeId()) ? engineerTypeGraphRepository.findOne(staffPositionDetail.getEngineerTypeId()) : null;
         objectToUpdate.setEmail(staffPositionDetail.getEmail());
         objectToUpdate.setCardNumber(staffPositionDetail.getCardNumber());
         objectToUpdate.setSendNotificationBy(staffPositionDetail.getSendNotificationBy());
@@ -207,6 +204,7 @@ public class PositionService {
         setUnitWiseAccessRole(unitId, staffId);
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
         return response;
     }
 
@@ -318,38 +316,12 @@ public class PositionService {
         Organization organization = organizationGraphRepository.findOrganizationOfStaff(staffId);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
-        List<Map<String, Object>> units= unitGraphRepository.getSubOrgHierarchy(organization.getId());
-        Map<String, TranslationInfo> unitTranslations = TranslationUtil.getTranslatedData(unit.getTranslatedNames(),unit.getTranslatedDescriptions());
+        List<Map<String, Object>> units= ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getSubOrgHierarchy(organization.getId()), HashedMap.class);
         List<Map<String, Object>> positions;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit instanceof Organization) {
-            for (AccessGroup accessGroup : accessGroups) {
-                positions = new ArrayList<>();
-                Map<String, TranslationInfo> translations = TranslationUtil.getTranslatedData(accessGroup.getTranslatedNames(),accessGroup.getTranslatedDescriptions());
-                QueryResult queryResult = new QueryResult();
-                queryResult.setId(unit.getId());
-                queryResult.setName(unit.getName());
-                queryResult.setTranslations(unitTranslations);
-                Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
-                if (employment != null && !employment.isEmpty()) {
-                    positions.add(employment);
-                    queryResult.setAccessable(true);
-                    queryResult.setStartDate((String) employment.get(START_DATE));
-                    queryResult.setEndDate((String) employment.get(END_DATE));
-                } else {
-                    queryResult.setAccessable(false);
-                }
-                Map<String, Object> workPlace = new HashMap<>();
-                workPlace.put("id", accessGroup.getId());
-                workPlace.put("name", accessGroup.getName());
-                workPlace.put("tree", queryResult);
-                workPlace.put("startDate", accessGroup.getStartDate());
-                workPlace.put("endDate", accessGroup.getEndDate());
-                workPlace.put("positions", positions);
-                workPlace.put("translations",translations);
-                workPlaces.add(workPlace);
-            }
+            getWorkPlaces(staffId, unit, accessGroups, workPlaces);
             return workPlaces;
         }
 
@@ -357,75 +329,118 @@ public class PositionService {
         List<QueryResult> list;
         List<Long> ids;
         for (AccessGroup accessGroup : accessGroups) {
-            Map<String, TranslationInfo> translations = TranslationUtil.getTranslatedData(accessGroup.getTranslatedNames(),accessGroup.getTranslatedDescriptions());
             list = new ArrayList<>();
             ids = new ArrayList<>();
             positions = new ArrayList<>();
             for (Map<String, Object> unitData : units) {
                 Map<String, Object> parentUnit = (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get("parent");
-                long id = (long) parentUnit.get("id");
+                long id = Long.valueOf(parentUnit.get("id").toString());
+                TranslationUtil.convertTranslationFromStringToMap(parentUnit);
                 Map<String, Object> position;
                 if (ids.contains(id)) {
-                    for (QueryResult queryResult : list) {
-                        if (queryResult.getId() == id) {
-                            List<QueryResult> childs = queryResult.getChildren();
-                            QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
-                            child.setTranslations(unitTranslations);
-                            position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                            if (position != null && !position.isEmpty()) {
-                                positions.add(position);
-                                child.setAccessable(true);
-
-                                child.setStartDate((String) position.get(START_DATE));
-                                child.setEndDate((String) position.get(END_DATE));
-                            } else {
-                                child.setAccessable(false);
-                            }
-                            childs.add(child);
-                            break;
-                        }
-                    }
+                    getQueryList(staffId, unit, positions, objectMapper, list, accessGroup, unitData, id);
                 } else {
-                    List<QueryResult> queryResults = new ArrayList<>();
-                    QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
-                    child.setTranslations(unitTranslations);
-                    position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                    if (position != null && !position.isEmpty()) {
-                        positions.add(position);
-                        child.setAccessable(true);
-                        child.setStartDate((String) position.get(START_DATE));
-                        child.setEndDate((String) position.get(END_DATE));
-
-                    } else {
-                        child.setAccessable(false);
-                    }
-                    queryResults.add(child);
-                    QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
-                    queryResult.setTranslations(TranslationUtil.getTranslatedData(organization.getTranslatedNames(),organization.getTranslatedDescriptions()));
-                    position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
-                    if (position != null && !position.isEmpty()) {
-                        positions.add(position);
-                        queryResult.setAccessable(true);
-                        queryResult.setStartDate((String) position.get(START_DATE));
-                        queryResult.setEndDate((String) position.get(END_DATE));
-                    } else {
-                        queryResult.setAccessable(false);
-                    }
-                    list.add(queryResult);
+                    getQueryResults(staffId, organization, unit, positions, objectMapper, list, accessGroup, unitData, parentUnit, id);
                 }
                 ids.add(id);
             }
             Map<String, Object> workPlace = new HashMap<>();
             workPlace.put("id", accessGroup.getId());
-            workPlace.put("name", accessGroup.getName());
             workPlace.put("startDate", accessGroup.getStartDate());
             workPlace.put("endDate", accessGroup.getEndDate());
+            workPlace.put("name", TranslationUtil.getName(accessGroup.getTranslations(),accessGroup.getName()));
             workPlace.put("tree", treeStructureService.getTreeStructure(list));
             workPlace.put("positions", positions);
-            workPlace.put("translations",translations);
+            workPlace.put("translations",accessGroup.getTranslations());
             workPlaces.add(workPlace);
         }
         return workPlaces;
+    }
+
+    private void getQueryResults(long staffId, Organization organization, OrganizationBaseEntity unit, List<Map<String, Object>> positions, ObjectMapper objectMapper, List<QueryResult> list, AccessGroup accessGroup, Map<String, Object> unitData, Map<String, Object> parentUnit, long id) {
+        Map<String, Object> position;
+        List<QueryResult> queryResults = new ArrayList<>();
+        Map<String, Object> childMap = (Map<String, Object>)((Map<String, Object>) unitData.get("data")).get(CHILD);
+        TranslationUtil.convertTranslationFromStringToMap(childMap);
+        QueryResult child = objectMapper.convertValue(childMap, QueryResult.class);
+        child.setTranslations(unit.getTranslations());
+        position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+        if (position != null && !position.isEmpty()) {
+            positions.add(position);
+            child.setAccessable(true);
+            child.setStartDate((String) position.get(START_DATE));
+            child.setEndDate((String) position.get(END_DATE));
+
+        } else {
+            child.setAccessable(false);
+        }
+        queryResults.add(child);
+        QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
+        queryResult.setTranslations(organization.getTranslations());
+        position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
+        if (position != null && !position.isEmpty()) {
+            positions.add(position);
+            queryResult.setAccessable(true);
+            queryResult.setStartDate((String) position.get(START_DATE));
+            queryResult.setEndDate((String) position.get(END_DATE));
+        } else {
+            queryResult.setAccessable(false);
+        }
+        list.add(queryResult);
+    }
+
+    private void getQueryList(long staffId, OrganizationBaseEntity unit, List<Map<String, Object>> positions, ObjectMapper objectMapper, List<QueryResult> list, AccessGroup accessGroup, Map<String, Object> unitData, long id) {
+        Map<String, Object> position;
+        for (QueryResult queryResult : list) {
+            if (queryResult.getId() == id) {
+                List<QueryResult> childs = queryResult.getChildren();
+                Map<String, Object> data= (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get(CHILD);
+                TranslationUtil.convertTranslationFromStringToMap(data);
+                QueryResult child = objectMapper.convertValue(data, QueryResult.class);
+                child.setTranslations(unit.getTranslations());
+                position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+                if (position != null && !position.isEmpty()) {
+                    positions.add(position);
+                    child.setAccessable(true);
+
+                    child.setStartDate((String) position.get(START_DATE));
+                    child.setEndDate((String) position.get(END_DATE));
+                } else {
+                    child.setAccessable(false);
+                }
+                childs.add(child);
+                break;
+            }
+        }
+    }
+
+    private void getWorkPlaces(long staffId, OrganizationBaseEntity unit, List<AccessGroup> accessGroups, List<Map<String, Object>> workPlaces) {
+        List<Map<String, Object>> positions;
+        for (AccessGroup accessGroup : accessGroups) {
+            positions=new ArrayList<>();
+            QueryResult queryResult = new QueryResult();
+            queryResult.setId(unit.getId());
+            queryResult.setName(unit.getName());
+            queryResult.setTranslations(unit.getTranslations());
+            Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
+            if (employment != null && !employment.isEmpty()) {
+                positions.add(employment);
+                queryResult.setAccessable(true);
+                queryResult.setStartDate((String) employment.get(START_DATE));
+                queryResult.setEndDate((String) employment.get(END_DATE));
+            } else {
+                queryResult.setAccessable(false);
+            }
+            Map<String, Object> workPlace = new HashMap<>();
+            workPlace.put("id", accessGroup.getId());
+            workPlace.put("name", TranslationUtil.getName(accessGroup.getTranslations(),accessGroup.getName()));
+            workPlace.put("startDate", accessGroup.getStartDate());
+            workPlace.put("endDate", accessGroup.getEndDate());
+            workPlace.put("tree", queryResult);
+            workPlace.put("positions", positions);
+            workPlace.put("translations",accessGroup.getTranslations());
+            workPlaces.add(workPlace);
+        }
     }
 
 
@@ -534,7 +549,7 @@ public class PositionService {
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
-    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId,boolean saveAsDraft) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, BigInteger reasonCodeId, Long accessGroupId, boolean saveAsDraft) throws Exception {
         Long employmentEndDate = null;
         if (Optional.ofNullable(endDateMillis).isPresent() && !saveAsDraft) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
@@ -563,33 +578,26 @@ public class PositionService {
 
     }
 
-    private Position saveEmploymentEndDate(Organization organization, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
+    private Position saveEmploymentEndDate(Organization organization, Long employmentEndDate, Long staffId, BigInteger reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
 
         Organization parentUnit = organizationService.fetchParentOrganization(organization.getId());
-        ReasonCode reasonCode = null;
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
         //TODO Commented temporary due to kafka down on QA server
 //         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, position.getEndDateMillis(), parentOrganization.getId(), position.getId(),
 //             parentOrganization.getTimeZone());
         position.setEndDateMillis(employmentEndDate);
         if (!Optional.ofNullable(employmentEndDate).isPresent()) {
-            positionGraphRepository.deletePositionReasonCodeRelation(staffId);
-            position.setReasonCode(reasonCode);
+            position.setReasonCodeId(reasonCodeId);
         } else if (Optional.ofNullable(employmentEndDate).isPresent() && Objects.equals(employmentEndDate, endDateMillis)) {
-            positionGraphRepository.deletePositionReasonCodeRelation(staffId);
             if(isNotNull(reasonCodeId)) {
-                reasonCode = reasonCodeGraphRepository.findById(reasonCodeId).get();
+                position.setReasonCodeId(reasonCodeId);
             }
-            position.setReasonCode(reasonCode);
+
         }
         if (Optional.ofNullable(accessGroupId).isPresent()) {
             position.setAccessGroupIdOnPositionEnd(accessGroupId);
         }
         positionGraphRepository.save(position);
-
-        PositionReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
-        position.setReasonCode(employmentReasonCode.getReasonCode());
-
         return position;
 
     }

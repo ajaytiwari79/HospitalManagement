@@ -1,7 +1,6 @@
 package com.kairos.shiftplanningNewVersion.move;
 
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
-
 import com.kairos.shiftplanningNewVersion.solution.StaffingLevelSolution;
 import org.joda.time.DateTime;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;

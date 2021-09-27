@@ -7,9 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
-
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter

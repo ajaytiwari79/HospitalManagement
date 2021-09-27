@@ -33,8 +33,6 @@ public interface CustomCostTimeAgreementRepository {
     List<CTAResponseDTO> getDefaultCTA(Long unitId, Long expertiseId);
     List<CTAResponseDTO> getDefaultCTAOfExpertiseAndDate(Long unitId, Long expertiseId,LocalDate selectedDate);
 
-    List<CTAResponseDTO> getVersionsCTA(List<Long> upIds);
-
     List<CTAResponseDTO> getParentCTAByUpIds(List<Long> employmentIds);
 
     List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds);
@@ -52,7 +50,6 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
 
-    boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate);
     List<CTARuleTemplateDTO> getCTARultemplateByEmploymentId(Long employmentId);
 
     boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId);

@@ -2,25 +2,18 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.LevelDTO;
-import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
-import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,21 +37,10 @@ public class OrganizationTypeService{
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private ActivityIntegrationService activityIntegrationService;
 
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
-
-        List<OrgTypeLevelWrapper> orgTypeLevelWrappers = organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
-        orgTypeLevelWrappers.forEach(orgTypeLevelWrapper -> {
-            List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeLevelWrapper.getLevels(),LevelDTO.class);
-            levelDTOS.forEach(levelDTO -> {
-                levelDTO.setTranslations(TranslationUtil.getTranslatedData(levelDTO.getTranslatedNames(),levelDTO.getTranslatedDescriptions()));
-            });
-            orgTypeLevelWrapper.setCountryId(countryId);
-            orgTypeLevelWrapper.setTranslations(TranslationUtil.getTranslatedData(orgTypeLevelWrapper.getTranslatedNames(),orgTypeLevelWrapper.getTranslatedDescriptions()));
-            orgTypeLevelWrapper.setLevels(levelDTOS);
-
-        });
-        return orgTypeLevelWrappers;
+        return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
     }
 
     public OrganizationType createOrganizationTypeForCountry(Long countryId, OrganizationTypeDTO organizationTypeDTO) {
@@ -75,7 +57,7 @@ public class OrganizationTypeService{
         List<Level> levels = countryGraphRepository.getLevelsByIdsIn(countryId, organizationTypeDTO.getLevels());
 
         OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(), country, levels);
-        return prepareResponse(organizationTypeGraphRepository.save(organizationType));
+        return prepareResponse(organizationTypeGraphRepository.save(organizationType), countryId, true);
     }
 
 
@@ -111,7 +93,7 @@ public class OrganizationTypeService{
     }
 
 
-    public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+    public OrganizationType updateOrganizationType(Long countryId,UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONTYPE_ID_NOTFOUND, updateOrganizationTypeDTO.getId());
@@ -126,15 +108,18 @@ public class OrganizationTypeService{
             orgTypeToUpdate.setLevels(levels);
         }
         orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName().trim());
-        return prepareResponse(organizationTypeGraphRepository.save(orgTypeToUpdate));
+        return prepareResponse(organizationTypeGraphRepository.save(orgTypeToUpdate), countryId, false);
     }
 
-    private OrganizationType prepareResponse(OrganizationType organizationType) {
+    private OrganizationType prepareResponse(OrganizationType organizationType, Long countryId, boolean createOrgType) {
         OrganizationType response = new OrganizationType();
         response.setId(organizationType.getId());
         response.setName(organizationType.getName());
         List<Level> activeLevels = organizationType.getLevels().parallelStream().filter(level -> !level.isDeleted()).collect(Collectors.toList());
         response.setLevels(activeLevels);
+        if(createOrgType) {
+            activityIntegrationService.createDefaultGranularitySetting(countryId, organizationType.getId());
+        }
         return response;
     }
 
@@ -183,19 +168,7 @@ public class OrganizationTypeService{
      * @return
      */
     public List<SkillCategoryQueryResults> getSkillsByOrganizationTypeId( long orgTypeId) {
-        List<SkillCategoryQueryResults> skillCategoryQueryResultsList = organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
-        skillCategoryQueryResultsList.forEach(skillCategoryQueryResults -> {
-            skillCategoryQueryResults.setTranslations(TranslationUtil.getTranslatedData(skillCategoryQueryResults.getTranslatedNames(),skillCategoryQueryResults.getTranslatedDescriptions()));
-            List<SkillDTO> skillDTOS = new ArrayList<>();
-            if(isCollectionNotEmpty(skillCategoryQueryResults.getSkillList())){
-                skillDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(skillCategoryQueryResults.getSkillList(), SkillDTO.class);
-            }
-            for(SkillDTO skillDTO :skillDTOS){
-                skillDTO.setTranslations(TranslationUtil.getTranslatedData(skillDTO.getTranslatedNames(),skillDTO.getTranslatedDescriptions()));
-            }
-            skillCategoryQueryResults.setSkillList(skillDTOS);
-        });
-        return  skillCategoryQueryResultsList;
+        return organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
     }
 
     public OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId, Set<Long> orgSubServiceId) {
@@ -230,20 +203,5 @@ public class OrganizationTypeService{
     public List<Long> getOrganizationIdsByOrgSubTypeIdsAndSubServiceIds(List<Long> organizationSubTypeIds, List<Long> organizationSubServicesIds) {
         return organizationTypeGraphRepository.getOrganizationIdsByOrgSubTypeIdsAndOrgSubServiceIds(organizationSubTypeIds, organizationSubServicesIds);
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long orgTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        OrganizationType organizationType =organizationTypeGraphRepository.findOne(orgTypeId);
-        organizationType.setTranslatedNames(translatedNames);
-        organizationType.setTranslatedDescriptions(translatedDescriptios);
-        organizationTypeGraphRepository.save(organizationType);
-        return organizationType.getTranslatedData();
-    }
-
 
 }

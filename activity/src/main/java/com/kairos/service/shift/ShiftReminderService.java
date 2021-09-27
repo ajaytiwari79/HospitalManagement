@@ -4,6 +4,7 @@ import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.FrequencySettings;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
@@ -122,16 +123,12 @@ public class ShiftReminderService{
                  */
                 if (current.getSendReminder().getTimeValue() <= remainingUnit && current.getRepeatReminder().getDurationType().compareTo(DurationType.DAYS) != 1) {
                     nextTriggerDateTime = DateUtils.substractDurationInLocalDateTime(shiftDateTime, current.getSendReminder().getTimeValue(), current.getSendReminder().getDurationType());
-                    if (current.getRepeatReminder().getDurationType() == DurationType.MINUTES) {
-                        nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
-                    }
+                    nextTriggerDateTime = getNextTrigger(nextTriggerDateTime, current, current.getRepeatReminder());
                     break;
                 }
                 if (current.getSendReminder().getTimeValue() >= remainingUnit && durationType != current.getRepeatReminder().getDurationType()) {
                     nextTriggerDateTime = lastTriggerDateTime;
-                    if (current.getRepeatReminder().getDurationType() == DurationType.MINUTES) {
-                        nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
-                    }
+                    nextTriggerDateTime = getNextTrigger(nextTriggerDateTime, current, current.getRepeatReminder());
                     break;
                 }
                 if (current.isRepeatAllowed() && remainingUnit >= current.getRepeatReminder().getTimeValue()) {
@@ -148,19 +145,30 @@ public class ShiftReminderService{
                 }
             } else if (current.getRepeatReminder().getDurationType().equals(durationType)) {
                 nextTriggerDateTime = lastTriggerDateTime;
-                if (current.getRepeatReminder().getDurationType() == DurationType.MINUTES) {
-                    nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
-                }
+                nextTriggerDateTime = getNextTrigger(nextTriggerDateTime, current, current.getRepeatReminder());
                 break;
             } else {
-                nextTriggerDateTime = lastTriggerDateTime;
-                if (durationType == DurationType.DAYS && current.getSendReminder().getDurationType() == DurationType.MINUTES) {
-
-                    nextTriggerDateTime = nextTriggerDateTime.plusMinutes(remainingUnit * 24 * 60);
-                } else if (current.getSendReminder().getDurationType() == DurationType.MINUTES) {
-                    nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
-                }
+                nextTriggerDateTime = getLocalDateTime(lastTriggerDateTime, durationType, remainingUnit, current);
             }
+        }
+        return nextTriggerDateTime;
+    }
+
+    private LocalDateTime getLocalDateTime(LocalDateTime lastTriggerDateTime, DurationType durationType, long remainingUnit, ActivityReminderSettings current) {
+        LocalDateTime nextTriggerDateTime;
+        nextTriggerDateTime = lastTriggerDateTime;
+        if (durationType == DurationType.DAYS && current.getSendReminder().getDurationType() == DurationType.MINUTES) {
+
+            nextTriggerDateTime = nextTriggerDateTime.plusMinutes(remainingUnit * 24 * 60);
+        } else {
+            nextTriggerDateTime = getNextTrigger(nextTriggerDateTime, current, current.getSendReminder());
+        }
+        return nextTriggerDateTime;
+    }
+
+    private LocalDateTime getNextTrigger(LocalDateTime nextTriggerDateTime, ActivityReminderSettings current, FrequencySettings repeatReminder) {
+        if (repeatReminder.getDurationType() == DurationType.MINUTES) {
+            nextTriggerDateTime = nextTriggerDateTime.plusMinutes(current.getRepeatReminder().getTimeValue());
         }
         return nextTriggerDateTime;
     }

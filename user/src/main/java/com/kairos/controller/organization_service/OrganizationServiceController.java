@@ -1,9 +1,11 @@
 package com.kairos.controller.organization_service;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATA_NOTFOUND;
 
 
 /**
@@ -30,9 +32,12 @@ import static com.kairos.constants.ApiConstants.*;
 @Api(API_V1)
 public class OrganizationServiceController {
 
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
     @Inject
-    OrganizationServiceService organizationServiceService;
-
+    private OrganizationServiceService organizationServiceService;
+    @Inject private ExceptionService exceptionService;
+    @Inject private TranslationService translationService;
 
     // GET by id
     @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}", method = RequestMethod.GET)
@@ -45,7 +50,10 @@ public class OrganizationServiceController {
     @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}", method = RequestMethod.PUT)
     @ApiOperation("Update a  organization_service by id")
     public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @PathVariable Long countryId,@RequestBody Map<String, Object> data) {
-        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name").toString(), data.get("description").toString(),countryId);
+        if(!data.containsKey(NAME) || !data.containsKey(DESCRIPTION)){
+            exceptionService.invalidRequestException(MESSAGE_DATA_NOTFOUND,"Organization Service");
+        }
+        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get(NAME).toString(), data.get(DESCRIPTION).toString(),countryId);
         if (organizationService == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -70,7 +78,7 @@ public class OrganizationServiceController {
     @RequestMapping(value = COUNTRY_URL+"/organization_type/{orgTypeId}/organization_service", method = RequestMethod.GET)
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationServices(@PathVariable long orgTypeId) {
-        List<Map<String,Object>> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
+        List<OrganizationServiceDTO> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 
@@ -135,7 +143,7 @@ public class OrganizationServiceController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 //  Todo please do not remove this commited code I am working On it later

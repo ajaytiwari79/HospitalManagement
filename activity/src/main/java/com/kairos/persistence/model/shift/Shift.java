@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
 import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -41,6 +42,7 @@ import static com.kairos.enums.shift.ShiftType.SICK;
 @NoArgsConstructor
 public class Shift extends MongoBaseEntity {
 
+    private static final long serialVersionUID = 2080914438098119264L;
     protected Date startDate;
     protected Date endDate;
     protected Integer shiftStartTime;//In Second
@@ -84,6 +86,13 @@ public class Shift extends MongoBaseEntity {
     private boolean planningPeriodPublished;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
+    private int restingMinutes;
+    private Date coverShiftDate;
+    private boolean createdByCoverShift;
+    protected ShiftDeletedBy deletedBy;
+    private Long employmentTypeId;
+    private Long expertiseId;
+    private String stopBrickGlue;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
@@ -162,7 +171,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public boolean isShiftUpdated(Shift shift) {
-        if (this.getActivities().size() != shift.getActivities().size()) {
+        if (this.getActivities().size() != shift.getActivities().size()  || !this.getStaffId().equals(shift.getStaffId())) {
             return true;
         }
         for (int i = 0; i < shift.getActivities().size(); i++) {
@@ -180,11 +189,11 @@ public class Shift extends MongoBaseEntity {
         List<ShiftActivity> shiftActivitiesForOverStaffing = new ArrayList<>();
         if (shift == null) {
             for (int i = 0; i < this.getActivities().size(); i++) {
-                shiftActivitiesForOverStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate(),this.getActivities().get(i).getActivityName()));
+                shiftActivitiesForOverStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate(),this.getActivities().get(i).getActivityName(),this.getActivities().get(i).getUltraShortName(),this.getActivities().get(i).getShortName()));
             }
         } else if (this == shift) {
             for (int i = 0; i < this.getActivities().size(); i++) {
-                shiftActivitiesForUnderStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate(),this.getActivities().get(i).getActivityName()));
+                shiftActivitiesForUnderStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate(),this.getActivities().get(i).getActivityName(),this.getActivities().get(i).getUltraShortName(),this.getActivities().get(i).getShortName()));
             }
         } else {
             List<ShiftActivityLineInterval> shiftActivityLines=getShiftActivityLineIntervals(shift);
@@ -204,7 +213,7 @@ public class Shift extends MongoBaseEntity {
             Date startDateToBeSet=shiftActivity.getStartDate();
             while (endDateToBeSet.before(shiftActivity.getEndDate())){
                 endDateToBeSet= addMinutes(endDateToBeSet,15);
-                shiftActivityLineIntervals.add(new ShiftActivityLineInterval(startDateToBeSet,endDateToBeSet,shiftActivity.getActivityId(),shiftActivity.getActivityName()));
+                shiftActivityLineIntervals.add(new ShiftActivityLineInterval(startDateToBeSet,endDateToBeSet,shiftActivity.getActivityId(),shiftActivity.getActivityName(),shiftActivity.getShortName(),shiftActivity.getUltraShortName()));
                 startDateToBeSet=endDateToBeSet;
             }
         }
@@ -215,7 +224,7 @@ public class Shift extends MongoBaseEntity {
         List<ShiftActivity> shiftActivitiesForCheckingStaffingLevel = new ArrayList<>();
         for (ShiftActivityLineInterval activityLineInterval:currentActivityLines){
             if(shiftActivityLines.stream().noneMatch(k->k.getStartDate().equals(activityLineInterval.getStartDate()) && k.getActivityId().equals(activityLineInterval.getActivityId()))){
-                shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate(),activityLineInterval.getActivityName()));
+                shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate(),activityLineInterval.getActivityName(),activityLineInterval.getUltraShortName(),activityLineInterval.getShortName()));
             }
         }
         if(shiftActivitiesForCheckingStaffingLevel.size()>1)

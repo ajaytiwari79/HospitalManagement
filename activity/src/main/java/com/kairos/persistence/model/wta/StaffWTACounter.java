@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Document
 public class StaffWTACounter extends MongoBaseEntity{
 
+    private static final long serialVersionUID = 3250639003609271457L;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger ruleTemplateId;

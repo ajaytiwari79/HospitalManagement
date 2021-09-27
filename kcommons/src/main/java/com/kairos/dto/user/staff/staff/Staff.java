@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by oodles on 3/2/17.
@@ -21,6 +23,8 @@ public class Staff {
     private String profilePic;
     private List<Long> skills;
     private StaffStatusEnum currentStatus;
+    private Set<Long> employmentIds = new HashSet<>();
+    private Boolean wtaViolationOccurIfPlanned;
 
     public Staff(Long id, String firstName, String lastName, List<Long> skills, StaffStatusEnum currentStatus) {
 

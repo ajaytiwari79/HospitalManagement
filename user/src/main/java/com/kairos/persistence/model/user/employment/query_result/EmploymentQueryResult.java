@@ -6,18 +6,19 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.staff.personal_details.StaffChildDetail;
+import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 /**
  * Created by vipul on 10/8/17.
@@ -38,7 +39,7 @@ public class EmploymentQueryResult {
     private Long parentUnitId;
     private Long unitId;
     private Long staffId;
-    private Map<String, Object> reasonCode;
+    private BigInteger reasonCodeId;
     private Map<String, Object> unitInfo;
     private List<EmploymentLinesQueryResult> employmentLines;
     private Boolean history;
@@ -53,11 +54,18 @@ public class EmploymentQueryResult {
     private long totalShifts;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private Long expertiseId;
-    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private String cprNumber;
+    private List<CareDays> seniorDays;
+    private List<CareDays> childCareDays;
+    private List<StaffChildDetail> staffChildDetails;
 
-
-
-
+    public void setEmploymentLines(List<EmploymentLinesQueryResult> employmentLines) {
+        if (isCollectionNotEmpty(employmentLines)){
+            employmentLines.sort(Comparator.comparing(EmploymentLinesQueryResult::getStartDate));
+            this.endDate = employmentLines.get(employmentLines.size()-1).getEndDate();
+        }
+        this.employmentLines = employmentLines;
+    }
     /**
      *  Please do not use in backend its just only for FE compactibility
      */
@@ -78,7 +86,7 @@ public class EmploymentQueryResult {
     }
 
     public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
-                                 Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+                                 BigInteger reasonCodeId, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -89,7 +97,7 @@ public class EmploymentQueryResult {
         this.unitId=unitId;
         this.parentUnitId=parentUnitId;
         this.published=published;
-        this.reasonCode=reasonCode;
+        this.reasonCodeId=reasonCodeId;
         this.unitInfo=unitInfo;
         this.employmentSubType =employmentSubType;
         this.employmentLines=employmentLines;

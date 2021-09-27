@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class SickSettings extends MongoBaseEntity {
+    private static final long serialVersionUID = 4520055628702423913L;
     private Long staffId;
     private Long unitId;
     private Long userId;

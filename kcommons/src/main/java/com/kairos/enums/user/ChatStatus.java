@@ -1,6 +1,8 @@
 package com.kairos.enums.user;
 
-public enum ChatStatus {
+import java.io.Serializable;
+
+public enum ChatStatus implements Serializable {
 
     ONLINE("Online"), OFFLINE("Offline"), IDLE("Idle"), AWAY("Away");
     public String value;

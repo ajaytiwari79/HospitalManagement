@@ -2,8 +2,8 @@ package com.kairos.controller.function;
 
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.service.country.FunctionService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -25,6 +25,8 @@ import static com.kairos.constants.ApiConstants.*;
 public class FunctionController {
     @Inject
     private FunctionService functionService;
+
+    @Inject private TranslationService translationService;
 
     @ApiOperation(value = "")
     @PostMapping(API_ORGANIZATION_UNIT_URL + "/appliedFunctionsByEmploymentIds")
@@ -100,7 +102,7 @@ public class FunctionController {
 
     @ApiOperation(value = "add translated data")
     @PostMapping(API_V1 + UNIT_URL + "/function/{functionId}/update_translation")
-    public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long functionId, @RequestBody TranslationDTO translationData) {
+    public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long functionId, @RequestBody Map<String, TranslationInfo> translationData) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateTranslation(functionId, translationData));
     }
 
@@ -113,8 +115,12 @@ public class FunctionController {
     @ApiOperation(value = "add translated data")
     @PutMapping(API_V1 + COUNTRY_URL + "/function/{id}/language_settings")
     public ResponseEntity<Map<String, Object>> updateTranslationOfCountryFunctions(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateTranslationOfCountryFunctions(id, translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id, translations));
     }
 
-
+    @GetMapping(value = API_V1 + UNIT_URL + "/employment/functions_with_access_role")
+    @ApiOperation("find functions with access role")
+    public ResponseEntity<Map<String, Object>> getFunctionsAndUserAccessRole(@PathVariable Long unitId, @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsAndUserAccessRole(unitId, startDate, endDate));
+    }
 }

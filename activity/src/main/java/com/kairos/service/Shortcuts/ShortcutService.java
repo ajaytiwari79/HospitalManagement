@@ -7,7 +7,8 @@ import com.kairos.dto.activity.counter.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.persistence.model.shortcuts.Shortcut;
 import com.kairos.persistence.repository.Shortcuts.ShortcutsMongoRepository;
-import com.kairos.service.counter.CounterDistService;
+import com.kairos.rest_client.KPIIntegrationService;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +30,13 @@ public class ShortcutService {
     private ShortcutsMongoRepository  shortcutsMongoRepository;
     @Inject
     private ExceptionService exceptionService;
-    @Inject
-    private CounterDistService counterDistService;
+    @Inject private UserIntegrationService userIntegrationService;
+    @Inject private KPIIntegrationService kpiIntegrationService;
 
 
     public List<TabKPIDTO> getTabKPIs(List<String> tabIds, List<BigInteger> kpiIds, Long staffId,Long unitId){
          List<TabKPIDTO> tabKPIDTOS=new ArrayList<>();
-        List<TabKPIMappingDTO> tabKPIMappingDTOS = counterDistService.getTabKPIByTabIdsAndKpiIds(tabIds, kpiIds, staffId);
+        List<TabKPIMappingDTO> tabKPIMappingDTOS = kpiIntegrationService.getTabKPIByTabIdsAndKpiIds(tabIds, kpiIds, staffId,unitId);
         Map<String,List<TabKPIMappingDTO>> tabIdAndTabKPIDtoMap=tabKPIMappingDTOS.stream().collect(Collectors.groupingBy(k -> k.getTabId(),Collectors.toList()));
         for (String tabId : tabIds) {
             tabKPIDTOS.add(new TabKPIDTO(unitId,tabId,tabIdAndTabKPIDtoMap.containsKey(tabId) ? tabIdAndTabKPIDtoMap.get(tabId).stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList()): new ArrayList<>()));

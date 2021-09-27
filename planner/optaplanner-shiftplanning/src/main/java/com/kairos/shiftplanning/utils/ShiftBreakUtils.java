@@ -3,13 +3,13 @@ package com.kairos.shiftplanning.utils;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.BreakSettings;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.BreakWTATemplate;
 
 import java.time.ZonedDateTime;
@@ -52,21 +52,7 @@ public class ShiftBreakUtils {
                     placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStart(), 15) : placeBreakAfterThisDate;
                 }
                 breakActivity = getBreakByShiftActivity(shift, breakSettings, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
-                if (isNull(breakActivity)) {
-                    AtomicReference<ZonedDateTime> atomicReference = new AtomicReference<>(placeBreakAfterThisDate);
-                    Optional<ShiftActivity> shiftActivityOptional = shift.getShiftActivities().stream().filter(shiftActivity -> shiftActivity.getInterval().containsAndEqualsEndDate(atomicReference.get())).findAny();
-                    //todo break fall in gap then break will insert in first activity
-                    if(shiftActivityOptional.isPresent()){
-                        ZonedDateTime breakEndDate = placeBreakAfterThisDate.plusMinutes(breakSettings.getBreakDurationInMinute());
-                        Optional<PlannedTime> plannedTimeOptional = shiftActivityOptional.get().getPlannedTimes().stream().filter(plannedTime -> plannedTime.getInterval().containsAndEqualsEndDate(atomicReference.get())).findFirst();
-                        breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, plannedTimeOptional);
-                        Activity activity = shiftActivityOptional.get().getActivity();
-                        breakActivity.setBreakNotHeld(!activity.isBreakAllowed());
-                        if (shiftActivityOptional.isPresent() && breakActivity.isBreakNotHeld() && !activity.getTimeType().isBreakNotHeldValid()) {
-                            breakActivity = null;
-                        }
-                    }
-                }
+                breakActivity = getBreakActivityIfNotPlaced(shift, breakSettings, breakActivity, placeBreakAfterThisDate);
             }
             if (isNotNull(breakActivity)) {
                 breakActivities.add(breakActivity);
@@ -74,13 +60,31 @@ public class ShiftBreakUtils {
         }
         shift.setBreakActivities(breakActivities);
     }
+    private static ShiftActivity getBreakActivityIfNotPlaced(ShiftImp shift, BreakSettings breakSettings, ShiftActivity breakActivity, ZonedDateTime placeBreakAfterThisDate) {
+        if (isNull(breakActivity)) {
+            AtomicReference<ZonedDateTime> atomicReference = new AtomicReference<>(placeBreakAfterThisDate);
+            Optional<ShiftActivity> shiftActivityOptional = shift.getShiftActivities().stream().filter(shiftActivity -> shiftActivity.getInterval().containsAndEqualsEndDate(atomicReference.get())).findAny();
+            //todo break fall in gap then break will insert in first activity
+            if(shiftActivityOptional.isPresent()){
+                ZonedDateTime breakEndDate = placeBreakAfterThisDate.plusMinutes(breakSettings.getBreakDurationInMinute());
+                Optional<PlannedTime> plannedTimeOptional = shiftActivityOptional.get().getPlannedTimes().stream().filter(plannedTime -> plannedTime.getInterval().containsAndEqualsEndDate(atomicReference.get())).findFirst();
+                breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, plannedTimeOptional);
+                Activity activity = shiftActivityOptional.get().getActivity();
+                breakActivity.setBreakNotHeld(!activity.isBreakAllowed());
+                if (shiftActivityOptional.isPresent() && breakActivity.isBreakNotHeld() && !activity.getTimeType().isBreakNotHeldValid()) {
+                    breakActivity = null;
+                }
+            }
+        }
+        return breakActivity;
+    }
 
     private static ShiftActivity buildBreakActivity(ZonedDateTime startDate, ZonedDateTime endDate, BreakSettings breakSettings,Optional<PlannedTime> plannedTimeOptional) {
         List<PlannedTime> plannedTimes = newArrayList(new PlannedTime(plannedTimeOptional.get().getPlannedTimeId(), startDate, endDate));
         return ShiftActivity.builder().startDate(startDate).activity(breakSettings.getActivity()).endDate(endDate).plannedTimes(plannedTimes).breakNotHeld(false).build();
     }
 
-    private static BreakAvailabilitySettings findCurrentBreakAvailability(ZonedDateTime startDate, Map<String,TimeSlot> timeSlotMap, BreakWTATemplate breakWTATemplate) {
+    private static BreakAvailabilitySettings findCurrentBreakAvailability(ZonedDateTime startDate, Map<String, TimeSlot> timeSlotMap, BreakWTATemplate breakWTATemplate) {
         BreakAvailabilitySettings breakAvailabilitySettings = null;
         TimeSlot currentTimeSlot = timeSlotMap.values().stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(startDate.get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
         if (currentTimeSlot != null && breakWTATemplate != null && !breakWTATemplate.isDisabled()) {

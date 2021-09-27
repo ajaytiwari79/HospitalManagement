@@ -7,7 +7,6 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.rest_client.SchedulerServiceRestClient;
-import com.kairos.scheduler.queue.producer.KafkaProducer;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +24,6 @@ public class UserToSchedulerQueueService {
     @Inject
     private SchedulerServiceRestClient schedulerServiceRestClient;
 
-    @Inject
-    private KafkaProducer kafkaProducer;
     public void pushToJobQueueOnEmploymentEnd(Long employmentEndDate, Long currentEmploymentEndDate,Long organiationId,Long employmentId, ZoneId unitTimeZone)  {
 
         String url = null;

@@ -1,0 +1,3 @@
+//Add new tab for unit general setting
+Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"General Setting",isModule:false,moduleId:"tab_469",active:true,`translatedNames.english`:"General Setting"});
+Match(ap:AccessPage) where ap.moduleId="tab_48" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Granularity",isModule:false,moduleId:"tab_470",active:true,`translatedNames.english`:"Granularity"});

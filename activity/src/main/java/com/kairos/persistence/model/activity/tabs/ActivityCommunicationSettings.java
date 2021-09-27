@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +15,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityCommunicationSettings {
+public class ActivityCommunicationSettings implements Serializable {
+
+    private static final long serialVersionUID = 213213213563L;
     @KPermissionField
     private boolean allowCommunicationReminder;
     @KPermissionField

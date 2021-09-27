@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.open_shift;
 
-public enum WeekType {
+import java.io.Serializable;
+
+public enum WeekType implements Serializable {
     EVEN,ODD
 }

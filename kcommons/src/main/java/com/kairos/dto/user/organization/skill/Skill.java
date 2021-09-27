@@ -1,10 +1,12 @@
 package com.kairos.dto.user.organization.skill;
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +27,9 @@ public class Skill {
     private String shortName;
     private SkillStatus skillStatus;
     private SkillCategory skillCategory;
-
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;
@@ -42,7 +46,7 @@ public class Skill {
         return data;
     }
 
-    public enum SkillLevel {
+    public enum SkillLevel implements Serializable {
 
         BASIC("Basic"), ADVANCE("Advance"), EXPERT("Expert");
         public String value;
@@ -62,7 +66,7 @@ public class Skill {
     }
 
 
-    public enum SkillStatus {
+    public enum SkillStatus implements Serializable {
         PENDING, APPROVED, REJECTED;
     }
 

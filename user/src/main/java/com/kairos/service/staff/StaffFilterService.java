@@ -20,6 +20,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.enums.cta.AccountType;
+import com.kairos.enums.shift.ShiftDeletedBy;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
@@ -45,7 +46,10 @@ import com.kairos.service.country.FunctionService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.service.organization.*;
+import com.kairos.service.organization.GroupService;
+import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.TeamService;
+import com.kairos.service.organization.UnitService;
 import com.kairos.service.organization_meta_data.SickConfigurationService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
@@ -71,8 +75,8 @@ import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
-import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.FilterType.TEAM;
+import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
@@ -137,7 +141,6 @@ public class StaffFilterService {
     private UnitService unitService;
     @Inject
     private TeamService teamService;
-    @Inject private TimeSlotService timeSlotService;
     @Inject private FunctionGraphRepository functionGraphRepository;
     @Inject private SickConfigurationService sickConfigurationService;
 
@@ -171,7 +174,6 @@ public class StaffFilterService {
 
     private List<FilterSelectionQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper) {
         List<FilterSelectionQueryResult> queryResults = new ArrayList<>();
-
         filterData.forEach(filterDetailDTO -> queryResults.add(objectMapper.convertValue(filterDetailDTO, FilterSelectionQueryResult.class)));
         return queryResults;
     }
@@ -204,6 +206,14 @@ public class StaffFilterService {
                 return getStatusFilter();
             case REAL_TIME_STATUS:
                 return dtoToQueryesultConverter(RealTimeStatus.getListOfRealtimeStatusForFilters(), objectMapper);
+            default:
+                return getFilterDetailsByFilterType(filterType, countryId, unitId, objectMapper);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId, ObjectMapper objectMapper){
+        switch (filterType) {
             case TIME_SLOT:
                 return getTimeSlots();
             case ASSIGN_ACTIVITY:
@@ -235,6 +245,8 @@ public class StaffFilterService {
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
             case CTA_ACCOUNT_TYPE:
                 return getCTAAccounts();
+            case STOPBRICK_DELETED_BY:
+                return dtoToQueryesultConverter(ShiftDeletedBy.getListOfShiftDeleteByForFilters(), objectMapper);
             default:
                 break;
         }
@@ -683,9 +695,6 @@ public class StaffFilterService {
         if (filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))) {
             List<BigInteger> teamActivityIds = teamGraphRepository.getTeamActivityIdsByTeamIds(filterTypeMap.get(TEAM).stream().map(value -> new Long((String) value)).collect(Collectors.toList()));
             requiredDataForFilterDTO.setTeamActivityIds(teamActivityIds);
-        }
-        if(filterTypeMap.containsKey(TIME_SLOT) && isCollectionNotEmpty(filterTypeMap.get(TIME_SLOT))) {
-            requiredDataForFilterDTO.setTimeSlotDTOS(timeSlotService.getUnitTimeSlotByNames(unitId,(Set<String>) filterTypeMap.get(TIME_SLOT)));
         }
         return requiredDataForFilterDTO;
     }

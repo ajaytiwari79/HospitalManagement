@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
 

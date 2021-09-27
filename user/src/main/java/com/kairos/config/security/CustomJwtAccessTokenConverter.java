@@ -3,7 +3,6 @@ package com.kairos.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.persistence.model.auth.UserPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -19,7 +18,6 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-        UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> authDetails = (Map<String, Object>)authentication.getDetails();
 
          ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(authDetails);

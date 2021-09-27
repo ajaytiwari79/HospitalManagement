@@ -1,15 +1,11 @@
 package com.kairos.persistence.repository.kpermissions;
 
-import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.kpermissions.KPermissionField;
 import com.kairos.persistence.model.kpermissions.KPermissionFieldQueryResult;
-import com.kairos.persistence.model.kpermissions.KPermissionSubModelFieldQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 
-import java.util.List;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FIELD;
 
 public interface PermissionFieldRepository extends Neo4jBaseRepository<KPermissionField,Long> {
 

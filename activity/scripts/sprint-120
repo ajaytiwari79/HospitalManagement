@@ -1,0 +1,2 @@
+db.coverShift.createIndex( { shiftId:1,staffId:1,deleted:1,date:1 }, { unique: true } );
+http://dev.kairosplanning.com/kairos/activity/api/v1/unit/2403/update_employmentType_and_expertiseId

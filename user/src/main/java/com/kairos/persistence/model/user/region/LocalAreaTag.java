@@ -24,6 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.LAT_L
 @Setter
 public class LocalAreaTag extends UserBaseEntity {
 
+    private static final long serialVersionUID = -2898534540284438195L;
     @NotNull
     private String name;
 

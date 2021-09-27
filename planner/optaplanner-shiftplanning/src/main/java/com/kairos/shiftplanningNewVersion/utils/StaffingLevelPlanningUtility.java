@@ -8,6 +8,7 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.Day;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
@@ -18,15 +19,12 @@ import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.shiftplanning.constraints.activityconstraint.CountryHolidayCalender;
 import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
 import com.kairos.shiftplanning.domain.activity.Activity;
-
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
-
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.staff.EmploymentLine;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelPlannerEntity;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanningNewVersion.entity.ALI;
@@ -68,7 +66,8 @@ import java.util.stream.IntStream;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.shiftplanning.constants.ShiftPlanningMessageConstants.MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL;
 

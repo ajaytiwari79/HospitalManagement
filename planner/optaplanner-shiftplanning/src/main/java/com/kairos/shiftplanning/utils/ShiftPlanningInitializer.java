@@ -1,7 +1,6 @@
 package com.kairos.shiftplanning.utils;
 
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -15,6 +14,7 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.phase.PhaseType;
@@ -70,7 +70,7 @@ public class ShiftPlanningInitializer {
         updateEmployees(shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
         Map<BigInteger, Activity> activityMap = updateActivityRelatedDetails(shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
         List<ShiftImp> shiftImp = getShiftRequestPhase(shiftPlanningProblemSubmitDTO, shiftPlanningSolution,activityMap);
-        int activitiesRank[] = shiftPlanningSolution.getActivities().stream().mapToInt(activity -> activity.getActivityPrioritySequence()).toArray();
+        int activitiesRank[] = shiftPlanningSolution.getActivities().stream().mapToInt(activity -> activity.getRanking()).toArray();
         StaffingLevelMatrix staffingLevelMatrix = new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(shiftPlanningSolution.getWeekDates(), shiftPlanningSolution.getActivityLineIntervals(), INTERVAL_MINS, shiftPlanningSolution.getActivities()), activitiesRank);
         shiftPlanningSolution.setStaffingLevelMatrix(staffingLevelMatrix);
         shiftPlanningSolution.setShifts(shiftImp);
@@ -219,7 +219,7 @@ public class ShiftPlanningInitializer {
             }
         }
         shiftPlanningSolution.setActivityLineIntervals(activityLineIntervalList);
-        shiftPlanningSolution.setActivities(dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getActivityPrioritySequence)).collect(Collectors.toList()));
+        shiftPlanningSolution.setActivities(dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getRanking)).collect(Collectors.toList()));
         shiftPlanningSolution.setWeekDates(new ArrayList<>(localDates));
         shiftPlanningSolution.setActivitiesIntervalsGroupedPerDay(activityLineIntervalMap);
         shiftPlanningSolution.setActivitiesPerDay(activitiesPerDay);
@@ -241,10 +241,10 @@ public class ShiftPlanningInitializer {
                 .methodForCalculatingTime(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())
                 .multiplyWithValue(activityDTO.getActivityTimeCalculationSettings().getMultiplyWithValue())
                 .name(activityDTO.getName())
-                .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getActivityRulesSettings().getDayTypes()))
+                .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<BigInteger>(activityDTO.getActivityRulesSettings().getDayTypes()))
                 .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getActivitySkillSettings().getActivitySkills(), Skill.class))
             //    .tags(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getTags(), Tag.class))
-                .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).activityPrioritySequence(activityDTO.getActivitySequence()).build();
+                .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).ranking(activityDTO.getActivitySequence()).build();
     }
 
     private TimeType getTimeType(ActivityDTO activityDTO, Map<BigInteger, TimeTypeDTO> timeTypeMap) {

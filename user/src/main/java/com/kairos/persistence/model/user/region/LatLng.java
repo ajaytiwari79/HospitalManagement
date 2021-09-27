@@ -13,6 +13,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @Setter
 public class LatLng extends UserBaseEntity {
 
+    private static final long serialVersionUID = -6255219179678109018L;
     private float lat;
     private float lng;
     private int coordOrder;

@@ -1,6 +1,5 @@
 package com.planner.controller;
 
-import com.kairos.dto.planner.planninginfo.PlanningSubmissionDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.commonUtil.OptaNotFoundException;
 import com.planner.commonUtil.ResponseHandler;
@@ -21,7 +20,6 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
-import static com.planner.constants.ApiConstants.SHIFTPLANNING;
 
 @RestController
 @RequestMapping(API_UNIT_URL + "/planner")

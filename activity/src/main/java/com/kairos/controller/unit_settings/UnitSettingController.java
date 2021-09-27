@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -92,4 +93,11 @@ public class UnitSettingController {
     public ResponseEntity<Map<String,Object>> getAllTimeTypes(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.getAllTimeTypes(unitId));
     }
+
+    @PutMapping("/update_time_zone")
+    public ResponseEntity<Map<String,Object>> updateTimeZone(@PathVariable Long unitId,@RequestBody ZoneId timeZone){
+        unitSettingService.updateTimeZone(unitId,timeZone);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
+    }
+
 }

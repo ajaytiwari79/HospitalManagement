@@ -19,6 +19,7 @@ public enum FilterType {
     AGE("Age", STAFF), ORGANIZATION_EXPERIENCE("Organisation Experience", STAFF), ESCALATION_CAUSED_BY("Escalation Caused By", SHIFT), EMPLOYMENT_SUB_TYPE("Employment Sub Type", STAFF),
     MAIN_TEAM("Main Team", STAFF), SKILL_LEVEL("Skill Level", STAFF), ACCESS_GROUPS("Access Groups", STAFF), BIRTHDAY("Birthday", STAFF), SENIORITY("Seniority", STAFF), PAY_GRADE_LEVEL("Pay Grade Level", STAFF),
     TIME_BANK_BALANCE("Time Bank balance", SHIFT), EMPLOYED_SINCE("Employed Since", STAFF), TEAM_TYPE("Team Type", STAFF), CTA_ACCOUNT_TYPE("CTA Account Type", STAFF), ASSIGN_ACTIVITY("Assign Activity", STAFF), ASSIGN_TIME_TYPE("Assign Time Type", STAFF),
+    STOPBRICK_DELETED_BY("Stopbrick Delete By", SHIFT),
     UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH("Update Data After Planning Period Publish", SHIFT),INCLUDE_DRAFT_SHIFT("Include Draft Shift",SHIFT);
 
 

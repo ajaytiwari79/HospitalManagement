@@ -1,42 +1,27 @@
 package com.kairos.service.country;
 
-import com.google.api.services.calendar.model.Event;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.dto.kpermissions.FieldPermissionUserData;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.country.LevelDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.CurrencyDTO;
+import com.kairos.persistence.model.country.default_data.RelationType;
+import com.kairos.persistence.model.country.default_data.RelationTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
-import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
-import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.RelationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.VehicalGraphRepository;
 import com.kairos.persistence.repository.user.region.LevelGraphRepository;
@@ -45,16 +30,13 @@ import com.kairos.rest_client.PlannedTimeTypeRestClient;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.google_calender.CountryCalenderService;
-import com.kairos.service.kpermissions.PermissionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,9 +45,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
-import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -78,23 +58,13 @@ public class CountryService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
-    private CountryHolidayCalenderGraphRepository countryHolidayGraphRepository;
-
-    @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private UnitGraphRepository unitGraphRepository;
-    @Inject
-    private DayTypeGraphRepository dayTypeGraphRepository;
-    @Inject
-    private
-    OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Inject
     CurrencyService currencyService;
     private @Inject
     TimeTypeRestClient timeTypeRestClient;
-    private @Inject
-    DayTypeService dayTypeService;
     private @Inject
     PhaseRestClient phaseRestClient;
     private @Inject
@@ -116,12 +86,9 @@ public class CountryService {
     @Inject
     private GenericRestClient genericRestClient;
     @Inject
-    private PermissionService permissionService;
+    private ActivityIntegrationService activityIntegrationService;
 
-    /**
-     * @param country
-     * @return
-     */
+
     public Map<String, Object> createCountry(Country country) {
         String name = "(?i)" + country.getName();
         List<Country> countryFound = countryGraphRepository.checkDuplicateCountry(name);
@@ -136,10 +103,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param id
-     * @return
-     */
+
     public CountryDTO getCountryById(Long id) {
         Country country = findById(id);
         CountryDTO countryDTO = new CountryDTO(country.getId(), country.getName());
@@ -149,10 +113,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param country
-     * @return
-     */
+
     public Map<String, Object> updateCountry(Country country) {
         List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry("(?i)" + country.getName(), country.getId());
         if (!duplicateCountryList.isEmpty()) {
@@ -168,9 +129,7 @@ public class CountryService {
     }
 
 
-    /**
-     * @param id
-     */
+
     public boolean deleteCountry(Long id) {
         Country currentCountry = countryGraphRepository.findOne(id);
         if (currentCountry != null) {
@@ -181,116 +140,12 @@ public class CountryService {
         return false;
     }
 
-
-    /**
-     * @return
-     */
     public List<Map<String, Object>> getAllCountries() {
         return FormatUtil.formatNeoResponse(countryGraphRepository.findAllCountriesMinimum());
     }
 
-
-    public List<Object> getAllCountryHolidaysByCountryIdAndYear(int year, Long countryId) {
-        Long start = new DateTime().withYear(year).withDayOfYear(1).getMillis();
-        List<Object> objectList = new ArrayList<>();
-        Long end;
-        GregorianCalendar cal = new GregorianCalendar();
-        if (cal.isLeapYear(year)) {
-            logger.info("Leap Year found");
-            end = new DateTime().withYear(year).withDayOfYear(366).getMillis();
-        } else {
-            logger.info("No Leap Year found");
-            end = new DateTime().withYear(year).withDayOfYear(365).getMillis();
-        }
-        logger.info("Year Start:{}  Year end:{}" , start , end);
-        List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidaysByYear(countryId, start, end);
-        if (!data.isEmpty()) {
-            for (Map<String, Object> map : data) {
-                Object o = map.get("result");
-                objectList.add(o);
-            }
-        }
-
-
-        return objectList;
-    }
-
-
-    private void fetchHolidaysFromGoogleCalender(Long countryId) {
-        List<CountryHolidayCalender> calenderList = new ArrayList<>();
-        Country country = countryGraphRepository.findOne(countryId, 2);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-
-        }
-        try {
-            List<Event> eventList = CountryCalenderService.getEventsFromGoogleCalender();
-            if (eventList != null) {
-                logger.info("No. of Events received are: {}" , eventList.size());
-            }
-            CountryHolidayCalender holidayCalender = null;
-            for (Event event : eventList) {
-                holidayCalender = new CountryHolidayCalender();
-                holidayCalender.setHolidayTitle(event.getSummary() != null ? event.getSummary() : "");
-                holidayCalender.setHolidayDate(DateUtils.asLocalDate(DateTime.parse(event.getStart().get("date").toString()).getMillis()));
-                holidayCalender.setHolidayType(event.getVisibility() != null ? event.getSummary() : "");
-                holidayCalender.setGoogleCalId(event.getId());
-                validateAndSaveHolidayCalender(countryId, calenderList, country, holidayCalender, event);
-            }
-        } catch (Exception e) {
-            logger.info("Exception occured: {}" , e.getCause());
-            e.printStackTrace();
-        }
-
-    }
-
-    private void validateAndSaveHolidayCalender(Long countryId, List<CountryHolidayCalender> calenderList, Country country, CountryHolidayCalender holidayCalender, Event event) {
-        if (countryHolidayGraphRepository.checkIfHolidayExist(event.getId(), countryId) > 0) {
-            logger.info("Duplicate Holiday");
-        } else {
-            logger.info("Unique Holiday");
-            holidayCalender.setGoogleCalId(event.getId());
-            calenderList.add(holidayCalender);
-        }
-
-        // Setting holiday to Country
-        if (country.getCountryHolidayCalenderList() == null) {
-            logger.info("Adding holidays");
-            country.setCountryHolidayCalenderList(calenderList);
-        } else {
-            logger.info("Adding holidays again");
-            List<CountryHolidayCalender> currentHolidayList = country.getCountryHolidayCalenderList();
-            currentHolidayList.addAll(calenderList);
-            country.setCountryHolidayCalenderList(currentHolidayList);
-        }
-        countryGraphRepository.save(country);
-    }
-
-
-    public List<Map<String, Object>> getAllCountryAllHolidaysByCountryId(Long countryId) {
-        return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-
-    }
-
-    public List<Map<String, Object>> getAllUnitAllHolidaysByUnitId(Long unitId) {
-        return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryGraphRepository.getCountryIdByUnitId(unitId)));
-
-    }
-
-    public boolean triggerGoogleCalenderService(Long countryId) {
-        try {
-
-            if (DateTime.now().getYear() == 2017) {
-                logger.info("Running google service in 2017");
-                fetchHolidaysFromGoogleCalender(countryId);
-                return true;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-
+    public List<CountryHolidayCalenderDTO> getAllCountryAllHolidaysByCountryId(Long countryId) {
+       return activityIntegrationService.getCountryHolidaysByCountryId(countryId);
 
     }
 
@@ -341,11 +196,7 @@ public class CountryService {
 
     public List<LevelDTO> getLevels(long countryId) {
         List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
-        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
-        for(LevelDTO level :levelDTOS){
-            level.setTranslations(level.getTranslatedData());
-        }
-        return levelDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
     }
 
     public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
@@ -368,12 +219,7 @@ public class CountryService {
 
     public List<RelationTypeDTO> getRelationTypes(Long countryId) {
         List<RelationType> relationTypes = countryGraphRepository.getRelationTypesByCountry(countryId);
-        List<RelationTypeDTO> relationTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes,RelationTypeDTO.class);
-        relationTypeDTOS.forEach(relationTypeDTO -> {
-            relationTypeDTO.setCountryId(countryId);
-            relationTypeDTO.setTranslations(TranslationUtil.getTranslatedData(relationTypeDTO.getTranslatedNames(),relationTypeDTO.getTranslatedDescriptions()));
-        });
-        return relationTypeDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes, RelationTypeDTO.class);
     }
 
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {
@@ -449,48 +295,18 @@ public class CountryService {
         return vehicalGraphRepository.save(vehicleToUpdate);
     }
 
-    /**
-     * @param countryId
-     * @return
-     * @auther anil maurya
-     */
-    //TODO Reduce web service calls/multiple calls
-    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId) {
-        List<ActivityTypeDTO> activityTypeDTOS;
-        List<PhaseResponseDTO> phases;
-        if (Optional.ofNullable(unitId).isPresent()) {
-            countryId = getCountryIdByUnitId(unitId);
-            activityTypeDTOS = activityTypesRestClient.getActivitiesForUnit(unitId);
-            phases = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, API_ALL_PHASES_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {
-            });
-        } else {
-            activityTypeDTOS = activityTypesRestClient.getActivitiesForCountry(countryId);
-            phases = phaseRestClient.getPhases(countryId);
 
+    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTA(Long countryId, Long unitId) {
+        if(isNull(countryId)){
+            countryId = UserContext.getUserDetails().getCountryId();
         }
-        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(ActivityTypeDTO::getCategoryId).collect(Collectors.toSet());
-        List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
         List<CurrencyDTO> currencies = currencyService.getCurrencies(countryId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
-        List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
-        List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
-        //wrap data into wrapper class
-        CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper = new CTARuleTemplateDefaultDataWrapper();
         List<EmploymentTypeDTO> employmentTypeDTOS = getEmploymentTypeDTOS(employmentTypes);
-        List<DayTypeDTO> dayTypeDTOS = getDayTypeDTOS(dayTypes);
-        setDefaultData(countryId, activityTypeDTOS, phases, activityCategories, currencies, timeType, plannedTime, functions, ctaRuleTemplateDefaultDataWrapper, employmentTypeDTOS, dayTypeDTOS);
-        return ctaRuleTemplateDefaultDataWrapper;
+        return CTARuleTemplateDefaultDataWrapper.builder().functions(functions).employmentTypes(employmentTypeDTOS).currencies(currencies).build();
     }
 
-    private List<DayTypeDTO> getDayTypeDTOS(List<DayType> dayTypes) {
-        return dayTypes.stream().map(dayType -> {
-                DayTypeDTO dayTypeDTO = new DayTypeDTO();
-                BeanUtils.copyProperties(dayType, dayTypeDTO);
-                return dayTypeDTO;
-            }).collect(Collectors.toList());
-    }
 
     private List<EmploymentTypeDTO> getEmploymentTypeDTOS(List<EmploymentType> employmentTypes) {
         return employmentTypes.stream().map(employmentType -> {
@@ -500,40 +316,11 @@ public class CountryService {
             }).collect(Collectors.toList());
     }
 
-    private void setDefaultData(Long countryId, List<ActivityTypeDTO> activityTypeDTOS, List<PhaseResponseDTO> phases, List<ActivityCategoryDTO> activityCategories, List<CurrencyDTO> currencies, List<TimeTypeDTO> timeTypes, List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper, List<EmploymentTypeDTO> employmentTypeDTOS, List<DayTypeDTO> dayTypeDTOS) {
-        ctaRuleTemplateDefaultDataWrapper.setDayTypes(dayTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setActivityTypes(activityTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setActivityCategories(activityCategories);
-        ctaRuleTemplateDefaultDataWrapper.setHolidayMapList(this.getAllCountryAllHolidaysByCountryId(countryId));
-        ctaRuleTemplateDefaultDataWrapper.setEmploymentTypes(employmentTypeDTOS);
-        ctaRuleTemplateDefaultDataWrapper.setTimeTypes(timeTypes);
-        ctaRuleTemplateDefaultDataWrapper.setPlannedTime(plannedTime);
-        ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
-        ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
-        ctaRuleTemplateDefaultDataWrapper.setFunctions(functions);
-    }
-
     // For getting all OrganizationLevel and Unions
     public OrganizationLevelAndUnionWrapper getUnionAndOrganizationLevels(Long countryId) {
         List<UnionQueryResult> unions = unitGraphRepository.findAllUnionsByCountryId(countryId);
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         return new OrganizationLevelAndUnionWrapper(unions, organizationLevels);
-    }
-
-    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
-        FieldPermissionUserData fieldPermissionUserData=permissionService.fetchPermissions(newHashSet("Activity"), UserContext.getUserDetails().getLastSelectedOrganizationId());
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId,fieldPermissionUserData);
-    }
-
-    public List<TimeSlotDTO> getDefaultTimeSlot() {
-        List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
-        timeSlotDTOS.add(new TimeSlotDTO(DAY, DAY_START_HOUR, 00, DAY_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(EVENING, EVENING_START_HOUR, 00, EVENING_END_HOUR, 00));
-        timeSlotDTOS.add(new TimeSlotDTO(NIGHT, NIGHT_START_HOUR, 00, NIGHT_END_HOUR, 00));
-        return timeSlotDTOS;
     }
 
 
@@ -559,35 +346,5 @@ public class CountryService {
     public Country findById(Long countryId){
         return countryGraphRepository.findById(countryId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_COUNTRY_ID_NOTFOUND, countryId)));
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long levelId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Level level =levelGraphRepository.findOne(levelId);
-        level.setTranslatedNames(translatedNames);
-        level.setTranslatedDescriptions(translatedDescriptios);
-        levelGraphRepository.save(level);
-        return level.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfRelationType(Long relationTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        RelationType relationType =relationTypeGraphRepository.findOne(relationTypeId);
-        relationType.setTranslatedNames(translatedNames);
-        relationType.setTranslatedDescriptions(translatedDescriptios);
-        relationTypeGraphRepository.save(relationType);
-        return relationType.getTranslatedData();
-    }
-
-
 
 }

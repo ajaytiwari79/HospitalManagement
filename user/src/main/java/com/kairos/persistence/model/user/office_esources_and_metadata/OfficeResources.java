@@ -18,6 +18,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @AllArgsConstructor
 public class OfficeResources extends UserBaseEntity {
 
+    private static final long serialVersionUID = 761390047865302173L;
     private String name;
     private String resourceType;
 }

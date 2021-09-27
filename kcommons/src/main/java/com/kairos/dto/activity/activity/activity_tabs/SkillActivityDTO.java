@@ -6,13 +6,14 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class SkillActivityDTO {
+public class SkillActivityDTO implements Serializable {
     private BigInteger activityId;
     private List<ActivitySkill> activitySkills;
 

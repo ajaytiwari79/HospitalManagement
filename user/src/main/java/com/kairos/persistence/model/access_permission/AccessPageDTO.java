@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.access_permission;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
@@ -9,6 +8,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +22,9 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 @QueryResult
 @Getter
 @Setter
-public class AccessPageDTO {
+public class AccessPageDTO implements Serializable {
 
+    private static final long serialVersionUID = 2379059749381861748L;
     private Long id;
     @NotNull(message = ERROR_NAME_NOTNULL)
     private String name;

@@ -3,7 +3,6 @@ package com.kairos.service.employment;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.PositionDTO;
-import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.user.employment.Employment;
@@ -13,11 +12,9 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentSenio
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
-import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.scheduler.SchedulerToUserQueueService;
@@ -39,7 +36,6 @@ import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_POSITION_END_DATE_GREATER_THAN_EMPLOYMENT_START_DATE;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_REASONCODE_ID_NOTFOUND;
 
 /**
  * CreatedBy vipulpandey on 27/10/18
@@ -51,8 +47,6 @@ public class EmploymentJobService {
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
-    private KafkaProducer kafkaProducer;
-    @Inject
     private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
     @Inject
     private UnitGraphRepository unitGraphRepository;
@@ -60,8 +54,6 @@ public class EmploymentJobService {
     private PositionGraphRepository positionGraphRepository;
     @Inject
     private ExceptionService exceptionService;
-    @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
@@ -137,14 +129,10 @@ public class EmploymentJobService {
             exceptionService.actionNotPermittedException(MESSAGE_POSITION_END_DATE_GREATER_THAN_EMPLOYMENT_START_DATE, employmentStartDateMax);
         }
         List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
-        ReasonCode reasonCode = reasonCodeGraphRepository.findOne(positionDTO.getReasonCodeId(), 0);
-        if (isNull(reasonCode)) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, positionDTO.getReasonCodeId());
-        }
         for (Employment employment : employments) {
             employment.setEndDate(DateUtils.getLocalDate(endDateMillis));
-            if (!Optional.ofNullable(employment.getReasonCode()).isPresent()) {
-                employment.setReasonCode(reasonCode);
+            if (!Optional.ofNullable(employment.getReasonCodeId()).isPresent()) {
+                employment.setReasonCodeId(positionDTO.getReasonCodeId());
             }
         }
         if (CollectionUtils.isNotEmpty(employments)) {
@@ -152,8 +140,7 @@ public class EmploymentJobService {
         }
         Position position = positionGraphRepository.findByStaffId(staffId);
         position.setEndDateMillis(endDateMillis);
-        //positionGraphRepository.deletePositionReasonCodeRelation(staffId);
-        position.setReasonCode(reasonCode);
+        position.setReasonCodeId(positionDTO.getReasonCodeId());
         position.setAccessGroupIdOnPositionEnd(positionDTO.getAccessGroupIdOnPositionEnd());
         employmentGraphRepository.saveAll(employments);
         positionGraphRepository.save(position);

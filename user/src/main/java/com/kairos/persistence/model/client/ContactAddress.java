@@ -31,6 +31,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class ContactAddress extends UserBaseEntity{
+    private static final long serialVersionUID = 3513986749867681647L;
     @KPermissionField
     private String street;
     @KPermissionField

@@ -1,9 +1,11 @@
 package com.kairos.utils.user_context;
 
+import java.io.Serializable;
+
 /**
  * Created by prabjot on 19/10/16.
  */
-public enum Gender {
+public enum Gender implements Serializable {
 
     MALE("Male"), FEMALE("Female");
     private final String value;

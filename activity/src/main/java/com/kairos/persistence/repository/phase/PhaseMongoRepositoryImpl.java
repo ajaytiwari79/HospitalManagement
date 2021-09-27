@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.phase;
 
-
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
@@ -77,15 +75,6 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<PhaseResponseDTO> getAllPlanningPhasesByUnit(Long unitId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING)),
-                sort(Sort.Direction.ASC)
-        );
-        AggregationResults<PhaseResponseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseResponseDTO.class);
-        return result.getMappedResults();
-    }
-
     public List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId).and(SEQUENCE).gt(sequence).and(DURATION).gt(0));
         query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
@@ -109,18 +98,5 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
         query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
         return mongoTemplate.find(query, Phase.class, PHASES);
     }
-    public List<Phase> getPlanningPhasesByCountry(Long countryId) {
-        Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
-        return mongoTemplate.find(query, Phase.class, PHASES);
-    }
-
-    public List<PhaseResponseDTO> findPlanningPhasesByCountry(Long countryId) {
-        Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
-        query.fields().include("id").include("name");
-        return mongoTemplate.find(query, PhaseResponseDTO.class, PHASES);
-    }
-
 
 }

@@ -24,9 +24,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "OPTIONAL MATCH(function)-[:" + HAS_ORGANIZATION_LEVEL + "]->(level:Level) " +
             "OPTIONAL MATCH(function)-[:" + HAS_UNION + "]->(union:Organization{union:true}) " +
             "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   " +
-            "RETURN {english: CASE WHEN function.`translatedNames.english` IS NULL THEN '' ELSE function.`translatedNames.english` END,danish: CASE WHEN function.`translatedNames.danish` IS NULL THEN '' ELSE function.`translatedNames.danish` END,hindi: CASE WHEN function.`translatedNames.hindi` IS NULL THEN '' ELSE function.`translatedNames.hindi` END,britishenglish: CASE WHEN function.`translatedNames.britishenglish` IS NULL THEN '' ELSE function.`translatedNames.britishenglish` END} as translatedNames,\n" +
-            "{english: CASE WHEN function.`translatedDescriptions.english` IS NULL THEN '' ELSE function.`translatedDescriptions.english` END,danish: CASE WHEN function.`translatedDescriptions.danish` IS NULL THEN '' ELSE function.`translatedDescriptions.danish` END,hindi: CASE WHEN function.`translatedDescriptions.hindi` IS NULL THEN '' ELSE function.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN function.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE function.`translatedDescriptions.britishenglish` END}as translatedDescriptions,  " +
-            "id(function) as id,function.name as name,function.description as description," +
+            "RETURN " +
+            "id(function) as id,function.name as name,function.translations as translations,function.description as description," +
             "function.startDate as startDate,function.endDate as endDate,function.code as code,unions,organizationLevels,function.icon as icon ORDER BY function.creationDate  DESC")
     List<FunctionDTO> findFunctionsByCountry(long countryId);
 
@@ -53,8 +52,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "MATCH(expertiseLine)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(:FunctionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(fpm:FunctionalPaymentMatrix) \n" +
             "MATCH(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(slf:SeniorityLevelFunction) " +
             "MATCH(slf)-[:" + HAS_FUNCTIONAL_AMOUNT + "]-(fn:Function) \n" +
-            "RETURN distinct id(fn) as id ,fn.code as code,fn.name as name")
-    List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
+            "RETURN distinct id(fn) as id ,fn.code as code,fn.name as name,fn.startDate as startDate,fn.endDate as endDate")
+    List<FunctionDTO> getFunctionsByExpertiseLineId(Long expertiseLineId);
 
     @Query("MATCH (unit:Unit) where id(unit)={3} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +

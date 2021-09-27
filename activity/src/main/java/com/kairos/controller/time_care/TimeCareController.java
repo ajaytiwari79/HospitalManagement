@@ -1,7 +1,7 @@
 package com.kairos.controller.time_care;
 
 import com.kairos.persistence.model.staffing_level.TimeCareStaffingLevelDTO;
-import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivityHelperService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.response.ResponseHandler;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class TimeCareController {
 
     @Inject
-    private ActivityService activityService;
+    private ActivityHelperService activityHelperService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(TimeCareController.class);
@@ -49,7 +49,7 @@ public class TimeCareController {
                                                                  @PathVariable Long countryId, @PathVariable Long unitId,
                                                                  @PathVariable BigInteger presenceTimeTypeId,@PathVariable BigInteger absenceTimeTypeId) {
         logger.info("Get activities from time care " + getAllActivitiesResponses);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.createActivitiesFromTimeCare(getAllActivitiesResponses, unitId, countryId,presenceTimeTypeId,absenceTimeTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityHelperService.createActivitiesFromTimeCare(getAllActivitiesResponses, unitId, countryId,presenceTimeTypeId,absenceTimeTypeId));
     }
 
 

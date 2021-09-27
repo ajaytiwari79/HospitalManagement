@@ -7,10 +7,10 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.MongoSequence;
-import com.kairos.persistence.model.counter.FibonacciKPI;
-import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.mongodb.client.MongoDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -35,6 +35,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
 	MongoDatabase mongoDatabase;
+	private final Logger logger = LoggerFactory.getLogger(MongoBaseRepositoryImpl.class);
 
 	/**
 	 *  Sequence collection name prefix
@@ -146,9 +147,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 				className = entity.getClass().getSuperclass().getSimpleName();
 			}
-			if(entity.getClass().equals(FibonacciKPI.class)){
-				className = KPI.class.getSimpleName();
-			}
 			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
 			entity.setCreatedAt(DateUtils.getDate());
 			entity.setId(nextSequence(className));
@@ -169,7 +167,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		try {
 			oldEntity = (S) entity.getClass().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return oldEntity;
 	}
@@ -184,7 +182,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	@Override
 	public Collection<T> findAllById(Collection<ID>  id){
 		Assert.notNull("The given sort must not be null!");
-		Query query = new Query(Criteria.where(DELETED).is(false).and("id").in(id));
+		Query query = new Query(Criteria.where(DELETED).is(false).and("_id").in(id));
 		return mongoOperations.find(query,entityInformation.getJavaType(),entityInformation.getCollectionName());
 	}
 

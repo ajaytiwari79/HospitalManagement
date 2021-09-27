@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.utils.RestClientUrlUtil.getKPIServiceBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 
 
@@ -58,6 +59,29 @@ public class GenericRestClient {
      */
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getUserServiceBaseUrl(restClientUrlType, id) + uri;
+        String url = baseUrl +getURIWithParam(queryParam);
+        V responseData = null;
+        try {
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    restTemplate.exchange(
+                            url,
+                            httpMethod,
+                            new HttpEntity<>(t), typeReference, pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                exceptionService.internalError(response.getMessage());
+            }
+            responseData = response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+        }
+        return responseData;
+    }
+
+    public <T extends Object, V> V publishRequestToKPIService(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getKPIServiceBaseUrl(restClientUrlType, id) + uri;
         String url = baseUrl +getURIWithParam(queryParam);
         V responseData = null;
         try {
@@ -140,7 +164,7 @@ public class GenericRestClient {
         try {
             uri = uri + builder.build().toString();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return uri;
     }

@@ -1,0 +1,14 @@
+var ultraShortName = {};
+var shortName = {};
+db.getCollection('shifts').find({}).forEach(function(s){
+    s.activities.forEach(function(a){
+        if(ultraShortName[a.activityId]===undefined || shortName[a.activityId]===undefined){
+            var activity = db.activities.findOne({"_id":a.activityId});
+            ultraShortName[a.activityId] = activity.activityGeneralSettings.ultraShortName;
+            shortName[a.activityId] = activity.activityGeneralSettings.shortName;
+        }
+            a.ultraShortName = ultraShortName[a.activityId]===undefined ? "" : ultraShortName[a.activityId];
+            a.shortName = shortName[a.activityId]===undefined ? "" : shortName[a.activityId];
+        });
+        db.shifts.save(s);
+    });

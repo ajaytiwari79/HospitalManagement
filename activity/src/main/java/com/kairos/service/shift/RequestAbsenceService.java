@@ -1,13 +1,12 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
@@ -77,6 +76,7 @@ public class RequestAbsenceService {
         Activity activity = activityMongoRepository.findOne(requestAbsence.getActivityId());
         requestAbsence.setActivityName(activity.getName());
         Shift shift = shiftOptional.get();
+        requestAbsence.setMethodForCalculatingTime(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime());
         shift.setRequestAbsence(requestAbsence);
         shiftMongoRepository.save(shift);
         todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE);
@@ -142,7 +142,7 @@ public class RequestAbsenceService {
     private <T> T approvedStatus(Todo todo, Shift shift, ActivityWrapper activityWrapper) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS;
         T response;
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), new HashSet<>());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId());
         if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())){
             Date startDate = getStartOfDay(shift.getStartDate());
             Date endDate = CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) ? asDate(asZonedDateTime(shift.getStartDate()).plusWeeks(1).truncatedTo(ChronoUnit.DAYS)) : asDate(asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
@@ -221,7 +221,7 @@ public class RequestAbsenceService {
     }
 
     private List<ShiftActivity> updateShiftActivity(ActivityWrapper activityWrapper,DateTimeInterval dateTimeInterval, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity) {
-        ShiftActivity absenceActivity = new ShiftActivity(activityWrapper.getActivity().getName(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate(),activityWrapper.getActivity().getId(),activityWrapper.getTimeType());
+        ShiftActivity absenceActivity = new ShiftActivity(activityWrapper.getActivity().getName(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate(),activityWrapper.getActivity().getId(),activityWrapper.getTimeType(),activityWrapper.getActivity().getActivityGeneralSettings().getUltraShortName(),activityWrapper.getActivity().getActivityGeneralSettings().getShortName());
         absenceActivity.getStatus().add(ShiftStatus.REQUEST);
         if(shiftActivity.getInterval().overlaps(dateTimeInterval)){
             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(dateTimeInterval);

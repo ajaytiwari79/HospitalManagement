@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class Role extends UserBaseEntity {
 
+    private static final long serialVersionUID = 4914246171930275080L;
     private String authority;
     private String accessLevel;
     private Long countryId;

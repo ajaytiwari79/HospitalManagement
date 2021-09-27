@@ -1,5 +1,7 @@
 package com.kairos.enums.cta;
 
-public enum CalculationUnit {
+import java.io.Serializable;
+
+public enum CalculationUnit implements Serializable {
     HOURS, MONEY, UNITS
 }

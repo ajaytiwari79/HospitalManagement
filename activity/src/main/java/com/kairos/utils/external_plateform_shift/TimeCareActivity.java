@@ -2,10 +2,11 @@ package com.kairos.utils.external_plateform_shift;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+//import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * Created by oodles on 14/12/16.
@@ -30,7 +31,7 @@ public class TimeCareActivity {
     @JacksonXmlProperty
     private Boolean IsBreak;
     @JacksonXmlProperty
-    @XmlElementWrapper
+   // @XmlElementWrapper
     private List<String> ArrayOfSkill;
     @JacksonXmlProperty
     private Boolean NegativeDayBalance;

@@ -1,9 +1,12 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.SendGridMailService;
+import com.kairos.service.exception.ExceptionService;
 import com.mindscapehq.raygun4java.core.RaygunClient;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.core.annotation.Order;
@@ -17,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -32,7 +36,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -46,6 +51,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.constants.ActivityMessagesConstants.INTERNAL_SERVER_ERROR;
+import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 
 @RestControllerAdvice
 @Order(1)
@@ -64,6 +70,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     private SendGridMailService sendGridMailService;
     @Inject
     private RaygunClient raygunClient;
+    @Inject private EnvConfigCommon envConfigCommon;
+    @Inject private ExceptionService exceptionService;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -363,10 +371,19 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     // 409
 
-    @ExceptionHandler({DuplicateDataException.class, DataAccessException.class, InvalidDataAccessApiUsageException.class,InvalidRequestException.class})
+    @ExceptionHandler(DuplicateDataException.class)
+    protected ResponseEntity<Object> handleConflict(final DuplicateDataException ex, final WebRequest request) {
+        logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setMessage(message);
+        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler({DataAccessException.class, InvalidDataAccessApiUsageException.class,InvalidRequestException.class})
     protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
-        final String bodyOfResponse = "This should be application specific";
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(ex.getMessage());
@@ -376,12 +393,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     //409
 
     @ExceptionHandler({TimeTypeLinkedException.class})
-    protected ResponseEntity<Object> handleTimeTypeHasLink(final RuntimeException ex, final WebRequest request) {
+    protected ResponseEntity<Object> handleTimeTypeHasLink(final TimeTypeLinkedException ex, final WebRequest request) {
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
-        final String bodyOfResponse = "This should be application specific";
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
@@ -396,50 +413,53 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
-        sendGridMailService.sendMailToBackendOnException(ex);
-        raygunClient.send(ex);
+        if(!envConfigCommon.getCurrentProfile().equals(LOCAL_PROFILE) && !(ex instanceof CannotCreateTransactionException) && !(ex instanceof HttpServerErrorException) && !(ex instanceof ClientAbortException) && !(ex instanceof ResourceAccessException)) {
+            raygunClient.send(ex);
+            sendGridMailService.sendMailToBackendOnException(ex);
+        }
         logger.error("exception {}", ex.getCause());
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
-
-
-    /*@ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({AddressNotVerifiedByTomTom.class,
-            ZipCodeNotFound.class, CitizenNotFoundException.class})
-    @ResponseBody
-    public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex, HttpServletRequest request) {
-        logger.error("exception in activity service", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
-    }*/
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(value = ActionNotPermittedException.class)
     @ResponseBody
     public ResponseEnvelope actionNotPermittedExceptionHandler(ActionNotPermittedException ex, HttpServletRequest request) {
-        logger.error("error in user service ", ex);
+        logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return errorMessage;
 
     }
 
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler({DataNotFoundByIdException.class, TaskDemandException.class})
+    @ExceptionHandler({TaskDemandException.class})
     @ResponseBody
-    public ResponseEnvelope taskDemandExceptionHandler(RuntimeException ex, HttpServletRequest request) {
+    public ResponseEnvelope taskDemandExceptionHandler(TaskDemandException ex, HttpServletRequest request) {
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
+        return errorMessage;
+
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({DataNotFoundByIdException.class})
+    @ResponseBody
+    public ResponseEnvelope taskDemandExceptionHandler(DataNotFoundByIdException ex, HttpServletRequest request) {
+        logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
+        String message = convertMessage(ex.getMessage(),ex.getParams());
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setPath(request.getRequestURL().toString());
+        errorMessage.setMessage(message);
         return errorMessage;
 
     }
@@ -449,11 +469,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(value = InvalidClientException.class)
     @ResponseBody
     public ResponseEnvelope clientExceptionHandler(InvalidClientException ex, HttpServletRequest request) {
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return errorMessage;
 
     }
@@ -463,11 +484,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(value = FlsCredentialException.class)
     @ResponseBody
     public ResponseEnvelope flsCredentialExceptionHandler(FlsCredentialException ex, HttpServletRequest request) {
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return errorMessage;
 
 
@@ -477,11 +499,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler({DataNotFoundException.class})
     @ResponseBody
     public ResponseEnvelope dataNotFound(DataNotFoundException ex, HttpServletRequest request) {
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return errorMessage;
 
     }
@@ -490,24 +513,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler({DataNotModifiedException.class})
     @ResponseBody
     public ResponseEnvelope dataNotModified(DataNotModifiedException ex, HttpServletRequest request) {
+        String message = convertMessage(ex.getMessage(),ex.getParams());
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler({HttpClientErrorException.class})
-    @ResponseBody
-    public ResponseEnvelope clientException(HttpClientErrorException ex, HttpServletRequest request) {
-        logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(message);
         return errorMessage;
 
     }

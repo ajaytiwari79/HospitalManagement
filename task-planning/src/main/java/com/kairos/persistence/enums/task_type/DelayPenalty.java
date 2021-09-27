@@ -3,7 +3,7 @@ package com.kairos.persistence.enums.task_type;
 /**
  * Created by prabjot on 11/7/17.
  */
-public enum DelayPenalty {
+public enum DelayPenalty implements Serializable {
     AVOID(0),ALLOW(0.1F),PROHIBITED(1),STRONGLY_PROHIBITED(10);
 
     public float value;

@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class LocationType extends UserBaseEntity {
 
+    private static final long serialVersionUID = -6078351718240580830L;
     @NotBlank(message = "error.LocationType.name.notEmpty")
     private String name;
     private String description;
