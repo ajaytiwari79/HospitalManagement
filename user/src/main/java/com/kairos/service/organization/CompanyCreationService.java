@@ -418,14 +418,17 @@ public class CompanyCreationService {
 
     private void setOrganizationTypeAndSubTypeInOrganization(OrganizationBaseEntity organizationBaseEntity, OrganizationBasicDTO organizationBasicDTO) {
         if (organizationBasicDTO.getTypeId() != null) {
+            organizationBaseRepository.removeOrgTypeRelation(organizationBaseEntity.getId(),organizationBasicDTO.getTypeId());
             OrganizationType organizationType = organizationTypeGraphRepository.findOne(organizationBasicDTO.getTypeId());
             organizationBaseEntity.setOrganizationType(organizationType);
         }
         if (organizationBasicDTO.getLevelId() != null) {
+            organizationBaseRepository.removeLevelRelation(organizationBaseEntity.getId(),organizationBasicDTO.getLevelId());
             Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
             organizationBaseEntity.setLevel(level);
         }
         if (organizationBasicDTO.getSubTypeId() != null) {
+            organizationBaseRepository.removeOrgSubTypeRelation(organizationBaseEntity.getId(), organizationBasicDTO.getSubTypeId());
             List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
             organizationBaseEntity.setOrganizationSubTypes(organizationSubTypes);
         }
