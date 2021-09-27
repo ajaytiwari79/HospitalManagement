@@ -312,7 +312,7 @@ public class TimeBankService {
         return costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
     }
 
-    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
+    public TimeBankAndPayoutDTO getAdvanceViewTimeBank(String sortingOrder,Long unitId, Long employmentId, String query, Date startDate, Date endDate) {
         AdvanceViewData advanceViewData = new AdvanceViewData(unitId, employmentId, query, startDate, endDate,this).invoke();
         endDate = advanceViewData.getEndDate();
         List<EmploymentWithCtaDetailsDTO> employmentDetails = advanceViewData.getEmploymentDetails();
@@ -325,7 +325,7 @@ public class TimeBankService {
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
         boolean includeTimeTypeCalculation = !newHashSet("DAILY-VIEW", "INDIVIDUAL-VIEW").contains(query);
-        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
+        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(sortingOrder,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
     }
 
     /**
