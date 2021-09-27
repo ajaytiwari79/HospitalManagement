@@ -10,6 +10,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import lombok.*;
 

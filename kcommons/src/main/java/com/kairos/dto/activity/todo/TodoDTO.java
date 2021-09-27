@@ -7,6 +7,7 @@ import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.Map;
  **/
 @Getter
 @Setter
+@Document(collection = "todo")
 public class TodoDTO {
 
     private BigInteger id;
