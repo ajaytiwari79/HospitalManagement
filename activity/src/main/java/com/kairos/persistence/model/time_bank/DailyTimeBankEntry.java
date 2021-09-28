@@ -1,10 +1,13 @@
 package com.kairos.persistence.model.time_bank;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.enums.Day;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -41,6 +44,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private DailyTimeBankEntry draftDailyTimeBankEntry;
     private int timeBankOffMinutes;
     private long protectedDaysOffMinutes;
+    private DayOfWeek dayOfWeek;
 
 
     public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {
@@ -48,6 +52,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.staffId = staffId;
         this.date = date;
         this.publishedBalances = new HashMap<>();
+        this.dayOfWeek = date.getDayOfWeek();
     }
 
     public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date,int contractualMinutes,int deltaTimeBankMinutes) {
@@ -57,6 +62,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.publishedBalances = new HashMap<>();
         this.contractualMinutes = contractualMinutes;
         this.deltaTimeBankMinutes = deltaTimeBankMinutes;
+        this.dayOfWeek = date.getDayOfWeek();
     }
 
 

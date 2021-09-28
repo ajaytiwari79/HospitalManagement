@@ -1,6 +1,8 @@
 package com.kairos.controller.time_bank;
 
 import com.kairos.constants.ApiConstants;
+import com.kairos.dto.activity.time_bank.TimebankFilterDTO;
+import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.service.time_bank.AsyncTimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
@@ -29,10 +31,10 @@ public class TimeBankController {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
 
-    @GetMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@RequestParam(required = false) String sortingOrder,@PathVariable Long unitId,@RequestParam(required = false) Long employmentId, @RequestParam(value = "query",required = false) String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    @PostMapping(value = "/employment")
+    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@RequestParam(required = false) String sortingOrder,@RequestBody TimebankFilterDTO timebankFilterDTO, @PathVariable Long unitId, @RequestParam(required = false) Long employmentId, @RequestParam(value = "query",required = false) String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getAdvanceViewTimeBank
-                (sortingOrder,unitId,employmentId,query,startDate,endDate));
+                (sortingOrder,timebankFilterDTO,unitId,employmentId,query,startDate,endDate));
     }
 
     @GetMapping(value = "overview/employment/{employmentId}/")

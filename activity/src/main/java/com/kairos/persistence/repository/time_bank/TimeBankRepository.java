@@ -26,9 +26,6 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     @Query(value = "{employmentId:?0,deleted:false,date:{$lte:?1}}")
     List<DailyTimeBankEntry> findAllByEmploymentIdAndBeforeDate(Long employmentId, Date timeBankDate);
 
-    @Query("{employmentId:{$in:?0},deleted:false,date:{ $lte:?1}}")
-    List<DailyTimeBankEntry> findAllByEmploymentIdsAndBeforDate(List<Long> employmentIds, Date endDate);
-
     @Query("{deleted:false}")
     List<DailyTimeBankEntry> findAllAndDeletedFalse();
 
