@@ -18,6 +18,6 @@ public class PayOutCTADistributionDTO {
     //cta ruletemplate based distributions
     private List<CTADistributionDTO> scheduledCTADistributions;
     private CTARuletemplateBonus ctaRuletemplateBonus;
-    private long plannedMinutesOfPayout;
+    private double plannedMinutesOfPayout;
 
 }

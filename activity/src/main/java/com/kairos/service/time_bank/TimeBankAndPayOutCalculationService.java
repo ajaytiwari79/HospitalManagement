@@ -45,7 +45,7 @@ public class TimeBankAndPayOutCalculationService {
 
 
 
-    public TimeBankAndPayoutDTO getTimeBankAdvanceView(TimebankFilterDTO timebankFilterDTO,String sortingOrder,Set<LocalDate> dateSet, Set<DayOfWeek> dayOfWeekSet,List<DateTimeInterval> intervals, Long unitId, double totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, List<TimeTypeDTO> timeTypeDTOS, Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionIntervalMap, List<PayOutPerShift> payOutPerShifts, boolean includeTimeTypeCalculation) {
+    public TimeBankAndPayoutDTO getTimeBankAdvanceView(TimebankFilterDTO timebankFilterDTO,String sortingOrder,List<DateTimeInterval> intervals, Long unitId, double totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, List<TimeTypeDTO> timeTypeDTOS, Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionIntervalMap, List<PayOutPerShift> payOutPerShifts, boolean includeTimeTypeCalculation) {
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = employmentWithCtaDetailsDTOS.get(0);
         TimeBankDTO timeBankDTO = new TimeBankDTO(startDate, asDate(DateUtils.asLocalDate(endDate)), employmentWithCtaDetailsDTO, employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getId(), employmentWithCtaDetailsDTO.getTotalWeeklyMinutes(), employmentWithCtaDetailsDTO.getWorkingDaysInWeek());
         DateTimeInterval interval = new DateTimeInterval(startDate.getTime(), endDate.getTime());
@@ -60,9 +60,7 @@ public class TimeBankAndPayOutCalculationService {
         timeBankDTO.setTimeIntervals(timeBankIntervalDTOS);
         List<CTADistributionDTO> scheduledCTADistributions = timeBankIntervalDTOS.stream().flatMap(ti -> ti.getTimeBankDistribution().getScheduledCTADistributions().stream()).collect(Collectors.toList());
         getTotalTimebankDetails(timebankFilterDTO,shifts, timeTypeDTOS, employmentWithCtaDetailsDTO, timeBankDTO, interval, timeBankIntervalDTOS, scheduledCTADistributions,includeTimeTypeCalculation);
-        List<PayOutPerShift> payOutPerShiftBeforestartDate = payOutRepository.findAllByEmploymentAndBeforeDate(dateSet,dayOfWeekSet,employmentWithCtaDetailsDTO.getId(), startDate);
-        long payoutMinutesBefore = isCollectionNotEmpty(payOutPerShiftBeforestartDate) ? payOutPerShiftBeforestartDate.stream().mapToLong(PayOutPerShift::getTotalPayOutMinutes).sum() : 0;
-        PayOutDTO payOutDTO = payOutCalculationService.getAdvanceViewPayout(timebankFilterDTO,sortingOrder,intervals, payOutPerShifts, payoutMinutesBefore, payoutTransactionIntervalMap, employmentWithCtaDetailsDTOS, query);
+        PayOutDTO payOutDTO = payOutCalculationService.getAdvanceViewPayout(timebankFilterDTO,sortingOrder,intervals, payOutPerShifts, payoutTransactionIntervalMap, employmentWithCtaDetailsDTOS, query,startDate);
         return new TimeBankAndPayoutDTO(timeBankDTO, payOutDTO);
     }
 
@@ -84,7 +82,7 @@ public class TimeBankAndPayOutCalculationService {
         double approvePayOut = calculatedTimebankValues[8];
         double totalPlannedMinutes = calculatedTimebankValues[9];
         double plannedMinutesOfTimebank = calculatedTimebankValues[10];
-        double protectedDaysOffMinutes = (long)calculatedTimebankValues[11];
+        double protectedDaysOffMinutes = calculatedTimebankValues[11];
         timeBankDTO.setApprovePayOut(approvePayOut);
         timeBankDTO.setPaidoutChange(paidPayOut);
         timeBankDTO.setRequestPayOut(requestPayOut);
@@ -143,7 +141,7 @@ public class TimeBankAndPayOutCalculationService {
 
     public CTARuletemplateBonus getCTABonusDistributions(Map<String, Double> ctaDistributionMap, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
         List<CTADistributionDTO> ctaBonusDistributions = new ArrayList<>();
-        long ctaBonusMinutes = 0;
+        double ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : ctaRuleTemplateDTOS) {
             if (ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT) && newHashSet(CONDITIONAL_BONUS,BONUS_HOURS,FUNCTIONS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getCalculationFor())) {
                 CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0d),0);

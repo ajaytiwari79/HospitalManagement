@@ -19,20 +19,20 @@ public class PayOutIntervalDTO {
     private Date startDate;
     private Date endDate;
     //In minutes
-    private long totalPayOutAfterCtaMin;
-    private long totalPayOutBeforeCtaMin;
-    private long payoutChange;
-    private float payOutChangeCost;
+    private double totalPayOutAfterCtaMin;
+    private Double totalPayOutBeforeCtaMin;
+    private double payoutChange;
+    private double payOutChangeCost;
     private String title;
     private PayOutCTADistributionDTO payOutDistribution;
     private DayOfWeek dayOfWeek;
-    private long protectedDaysOffMinutes;
+    private double protectedDaysOffMinutes;
     private int sequence;
 
 
 
 
-    public PayOutIntervalDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin, long payoutChange, PayOutCTADistributionDTO payOutDistribution,DayOfWeek dayOfWeek,String title,float payOutChangeCost) {
+    public PayOutIntervalDTO(Date startDate, Date endDate, double totalPayOutAfterCtaMin, double totalPayOutBeforeCtaMin, double payoutChange, PayOutCTADistributionDTO payOutDistribution,DayOfWeek dayOfWeek,String title,double payOutChangeCost) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;

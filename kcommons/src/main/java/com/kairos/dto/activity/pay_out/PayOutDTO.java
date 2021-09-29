@@ -26,17 +26,17 @@ public class PayOutDTO {
     private Date startDate;
     private Date endDate;
     //In minutes
-    private long totalPayOutAfterCtaMin;
-    private long totalPayOutBeforeCtaMin;
-    private long payOutChange;
-    private long protectedDaysOffMinutes;
+    private double totalPayOutAfterCtaMin;
+    private double totalPayOutBeforeCtaMin;
+    private double payOutChange;
+    private double protectedDaysOffMinutes;
 
     //Distributed min on the basis of Interval;
     private List<PayOutIntervalDTO> timeIntervals = new ArrayList<>();
     private PayOutCTADistributionDTO payOutDistribution;
 
 
-    public PayOutDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin,long payOutChange, List<PayOutIntervalDTO> timeIntervals, PayOutCTADistributionDTO payOutDistribution,long protectedDaysOffMinutes) {
+    public PayOutDTO(Date startDate, Date endDate, double totalPayOutAfterCtaMin, double totalPayOutBeforeCtaMin,double payOutChange, List<PayOutIntervalDTO> timeIntervals, PayOutCTADistributionDTO payOutDistribution,double protectedDaysOffMinutes) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;

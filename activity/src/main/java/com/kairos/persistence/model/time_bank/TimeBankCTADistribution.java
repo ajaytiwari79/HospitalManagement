@@ -16,7 +16,7 @@ public class TimeBankCTADistribution {
     private int minutes;
     private BigInteger ctaRuleTemplateId;
     private LocalDate ctaDate;
-    private transient float cost;
+    private transient double cost;
 
     public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId) {
         this.ctaName = ctaName;

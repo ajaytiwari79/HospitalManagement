@@ -78,7 +78,7 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
 
     @Override
     public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBeforDate(Set<LocalDate> dateSet, Set<DayOfWeek> dayOfWeekSet,List<Long> employmentIds, Date endDate){
-        Criteria criteria = Criteria.where(EMPLOYMENT_ID).is(employmentIds).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(EMPLOYMENT_ID).in(employmentIds).and(DELETED).is(false);
         if(isCollectionNotEmpty(dayOfWeekSet)) {
             criteria = criteria.and("dayOfWeek").in(dayOfWeekSet);
         }

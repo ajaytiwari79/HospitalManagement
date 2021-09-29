@@ -339,7 +339,7 @@ public class TimeBankService {
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(dates,dayOfWeeks,employmentIds, endDate);
         Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
         boolean includeTimeTypeCalculation = !newHashSet("DAILY-VIEW", "INDIVIDUAL-VIEW").contains(query);
-        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(timebankFilterDTO,sortingOrder,dates,dayOfWeeks,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
+        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(timebankFilterDTO,sortingOrder,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
     }
 
     /**

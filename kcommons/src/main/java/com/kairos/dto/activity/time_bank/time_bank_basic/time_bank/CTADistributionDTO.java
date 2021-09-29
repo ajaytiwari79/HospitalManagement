@@ -21,6 +21,6 @@ public class CTADistributionDTO  implements Serializable {
     private BigInteger id;
     private String name;
     private double minutes;
-    private float cost;
+    private double cost;
 
 }

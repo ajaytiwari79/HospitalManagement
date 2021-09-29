@@ -15,9 +15,9 @@ import java.math.BigInteger;
 public class PayOutPerShiftCTADistribution {
 
     private String ctaName;
-    private int minutes;
+    private double minutes;
     private BigInteger ctaRuleTemplateId;
-    private transient float cost;
+    private transient double cost;
 
 
     @Override
