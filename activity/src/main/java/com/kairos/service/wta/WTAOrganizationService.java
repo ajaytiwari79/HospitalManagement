@@ -188,8 +188,8 @@ public class WTAOrganizationService extends MongoBaseService {
             }
             Set<String> employmentWTANames = wtaResponseDTOList.stream().map(wtaResponseDTO -> wtaResponseDTO.getName()).collect(Collectors.toSet());
             Set<String> employmentCTANames = ctaResponseDTOList.stream().map(ctaResponseDTO -> ctaResponseDTO.getName()).collect(Collectors.toSet());
-            wtaResponseDTOList.removeIf(wtaQueryResultDTO -> employmentWTANames.contains(wtaQueryResultDTO.getName()));
-            ctaResponseDTOList.removeIf(ctaQueryResultDTO -> employmentCTANames.contains(ctaQueryResultDTO.getName()));
+            wtaResponseDTOS.removeIf(wtaQueryResultDTO -> employmentWTANames.contains(wtaQueryResultDTO.getName()));
+            ctaResponseDTOS.removeIf(ctaQueryResultDTO -> employmentCTANames.contains(ctaQueryResultDTO.getName()));
             wtaResponseDTOS.addAll(wtaResponseDTOList);
             ctaResponseDTOS.addAll(ctaResponseDTOList);
         }
