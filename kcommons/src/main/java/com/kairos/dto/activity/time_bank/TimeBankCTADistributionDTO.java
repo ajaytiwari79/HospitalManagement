@@ -17,5 +17,5 @@ public class TimeBankCTADistributionDTO  implements Serializable {
 
     private List<CTADistributionDTO> scheduledCTADistributions;
     private CTARuletemplateBonus ctaRuletemplateBonus;
-    private long plannedMinutesOfTimebank;
+    private double plannedMinutesOfTimebank;
 }

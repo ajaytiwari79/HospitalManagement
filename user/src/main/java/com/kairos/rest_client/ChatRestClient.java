@@ -54,7 +54,7 @@ public class ChatRestClient {
             StaffChatDetails response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 BeanUtils.copyProperties(response,staffChatDetails);
-                System.out.println(restExchange.toString());
+                //System.out.println(restExchange.toString());
             }
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());

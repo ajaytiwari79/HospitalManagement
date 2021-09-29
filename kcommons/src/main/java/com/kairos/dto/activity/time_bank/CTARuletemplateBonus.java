@@ -16,5 +16,5 @@ import java.util.List;
 public class CTARuletemplateBonus  implements Serializable {
 
     private List<CTADistributionDTO> ctaDistributions;
-    private long ctaBonusMinutes;
+    private double ctaBonusMinutes;
 }

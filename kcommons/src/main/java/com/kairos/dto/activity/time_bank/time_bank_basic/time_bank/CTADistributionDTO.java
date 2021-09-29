@@ -20,7 +20,7 @@ import java.math.BigInteger;
 public class CTADistributionDTO  implements Serializable {
     private BigInteger id;
     private String name;
-    private int minutes;
+    private double minutes;
     private float cost;
 
 }

@@ -19,17 +19,17 @@ public class TimeBankIntervalDTO implements Serializable {
     private Date startDate;
     private Date endDate;
     //In minutes
-    private long totalTimeBankAfterCtaMin;
-    private long totalTimeBankBeforeCtaMin;
+    private double totalTimeBankAfterCtaMin;
+    private double totalTimeBankBeforeCtaMin;
     //Its is the sum of scheduled minutes of payout and timebank
-    private long totalScheduledMin;
-    private long totalTimeBankMin;
-    private long totalContractedMin;
-    private long totalTimeBankDiff;
-    private long paidoutChange;
-    private long approvePayOut;
-    private long requestPayOut;
-    private long totalDeltaBalanceCorrection;
+    private double totalScheduledMin;
+    private double totalTimeBankMin;
+    private double totalContractedMin;
+    private double totalTimeBankDiff;
+    private double paidoutChange;
+    private double approvePayOut;
+    private double requestPayOut;
+    private double totalDeltaBalanceCorrection;
     private String phaseName;
     private String title;
     private TimeBankCTADistributionDTO timeBankDistribution;
@@ -37,16 +37,16 @@ public class TimeBankIntervalDTO implements Serializable {
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private String headerName;
     //Its is the sum of Planned minutes of payout and timebank
-    private long totalPlannedMinutes;
-    private int timeBankChangeMinutes;
-    private long accumulatedTimebankMinutes;
-    private long expectedTimebankMinutes;
-    private long publishedBalancesMinutes;
-    private float totalContractedCost;
-    private float totalPlannedCost;
-    private float totalTimeBankDiffCost;
-    private long timeBankOffMinutes;
-    private long protectedDaysOffMinutes;
+    private double totalPlannedMinutes;
+    private double timeBankChangeMinutes;
+    private double accumulatedTimebankMinutes;
+    private double expectedTimebankMinutes;
+    private double publishedBalancesMinutes;
+    private double totalContractedCost;
+    private double totalPlannedCost;
+    private double totalTimeBankDiffCost;
+    private double timeBankOffMinutes;
+    private double protectedDaysOffMinutes;
     private int sequence;
 
     public TimeBankIntervalDTO(String title) {

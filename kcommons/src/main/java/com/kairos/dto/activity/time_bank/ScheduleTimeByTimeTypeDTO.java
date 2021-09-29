@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ScheduleTimeByTimeTypeDTO implements Serializable {
 
-    private int totalMin;
+    private double totalMin;
     private BigInteger timeTypeId;
     private String name;
     private List<ScheduleTimeByTimeTypeDTO> children = new ArrayList();

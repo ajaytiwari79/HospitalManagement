@@ -54,7 +54,6 @@ public class ArrayUtilUnitTest {
         stringTranslationInfoMap.put("urdu",translationInfo);
         String str= ObjectMapperUtils.objectToJsonString(stringTranslationInfoMap);
         Map<String, TranslationInfo> again=ObjectMapperUtils.jsonStringToObject(str,Map.class);
-        System.out.println(again);
 
     }
 

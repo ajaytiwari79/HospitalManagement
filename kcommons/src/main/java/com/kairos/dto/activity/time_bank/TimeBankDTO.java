@@ -31,19 +31,19 @@ public class TimeBankDTO {
     private Long unitId;
     private String query;
 
-    private long totalTimeBankAfterCtaMin;
-    private long totalTimeBankBeforeCtaMin;
-    private long totalScheduledMin;
-    private long totalTimeBankMin;
-    private long totalContractedMin;
-    private long totalTimeBankMinLimit;
-    private long totalTimeBankMaxLimit;
-    private long totalTimeBankInPercent = 10;
-    private long totalTimeBankDiff;
-    private long paidoutChange;
-    private long approvePayOut;
-    private long requestPayOut;
-    private long totalDeltaBalanceCorrection;
+    private double totalTimeBankAfterCtaMin;
+    private double totalTimeBankBeforeCtaMin;
+    private double totalScheduledMin;
+    private double totalTimeBankMin;
+    private double totalContractedMin;
+    private double totalTimeBankMinLimit;
+    private double totalTimeBankMaxLimit;
+    private double totalTimeBankInPercent = 10;
+    private double totalTimeBankDiff;
+    private double paidoutChange;
+    private double approvePayOut;
+    private double requestPayOut;
+    private double totalDeltaBalanceCorrection;
     private String phaseName;
 
     //Distributed min on the basis of Interval;
@@ -56,15 +56,15 @@ public class TimeBankDTO {
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
     private float hourlyCost;
-    private long totalPlannedMinutes;
-    private long actualTimebankMinutes;
+    private double totalPlannedMinutes;
+    private double actualTimebankMinutes;
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
-    private long totalContractedCost;
-    private long totalPlannedCost;
-    private long totalTimeBankDiffCost;
-    private long timeBankOffMinutes;
-    private long protectedDaysOffMinutes;
+    private double totalContractedCost;
+    private double totalPlannedCost;
+    private double totalTimeBankDiffCost;
+    private double timeBankOffMinutes;
+    private double protectedDaysOffMinutes;
 
 
 

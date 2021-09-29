@@ -174,7 +174,7 @@ public class CalculatePlannedHoursAndScheduledHours {
             ctaBonusAndScheduledMinutes = shiftActivity.getScheduledMinutes();
             shiftActivityDTO.setScheduledMinutesOfTimebank(shiftActivity.getScheduledMinutes() + shiftActivityDTO.getScheduledMinutesOfTimebank());
         } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-            ctaBonusAndScheduledMinutes = (int) Math.round(getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivity, staffAdditionalInfoDTO.getEmployment(),dayTypeDTOMap));
+                                                        ctaBonusAndScheduledMinutes = (int) Math.round(getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivity, staffAdditionalInfoDTO.getEmployment(),dayTypeDTOMap));
             updateTimeBankDistribution(ruleTemplate, shiftActivityDTO, ctaBonusAndScheduledMinutes);
             shiftActivityDTO.setTimeBankCtaBonusMinutes(ctaBonusAndScheduledMinutes + shiftActivityDTO.getTimeBankCtaBonusMinutes());
             ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusAndScheduledMinutes);
@@ -462,7 +462,7 @@ public class CalculatePlannedHoursAndScheduledHours {
         DailyTimeBankEntry dailyTimeBankEntry = employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId());
         if (count > 0) {
             CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId());
-            int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+            int contractualMinutes = (int) timeBankCalculationService.getContractualMinutesByDate(null,activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
             int value = 0;
             for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
                 if (UNUSED_DAYOFF_LEAVES.equals(ruleTemplate.getCalculationFor()) && TIMEBANK_ACCOUNT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {
@@ -500,7 +500,7 @@ public class CalculatePlannedHoursAndScheduledHours {
         PayOutPerShift payOutPerShift = employmentIdAndPayOutPerShiftMap.get(employmentDetails.getId());
         if (count > 0) {
             CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId());
-            int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+            int contractualMinutes = (int) timeBankCalculationService.getContractualMinutesByDate(null,activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
             int value = 0;
             for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
                 if (UNUSED_DAYOFF_LEAVES.equals(ruleTemplate.getCalculationFor()) && PAID_OUT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {

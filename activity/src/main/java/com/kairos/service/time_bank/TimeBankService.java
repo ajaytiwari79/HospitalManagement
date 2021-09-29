@@ -317,11 +317,21 @@ public class TimeBankService {
         Object[] objects = getDayTypeDetails(timebankFilterDTO);
         Set<DayOfWeek> dayOfWeeks = (Set<DayOfWeek>)objects[1];
         Set<LocalDate> dates = (Set<LocalDate>)objects[0];
-        AdvanceViewData advanceViewData = new AdvanceViewData(dates,dayOfWeeks,unitId, employmentId, query, startDate, endDate,this).invoke();
+        timebankFilterDTO = isNull(timebankFilterDTO) ? new TimebankFilterDTO() : timebankFilterDTO;
+        timebankFilterDTO.setDayOfWeeks(dayOfWeeks);
+        timebankFilterDTO.setDates(dates);
+        if(isNotNull(endDate)){
+            timebankFilterDTO.setIncludeDynamicCost(true);
+        }
+        AdvanceViewData advanceViewData = new AdvanceViewData(timebankFilterDTO,unitId, employmentId, query, startDate, endDate,this).invoke();
         endDate = advanceViewData.getEndDate();
         List<EmploymentWithCtaDetailsDTO> employmentDetails = advanceViewData.getEmploymentDetails();
+        Optional<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOOptional = employmentDetails.stream().filter(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId().equals(employmentId)).findAny();
+        if(employmentWithCtaDetailsDTOOptional.isPresent()) {
+            timebankFilterDTO.setEmployment(employmentWithCtaDetailsDTOOptional.get());
+        }
         List<DateTimeInterval> intervals = advanceViewData.getIntervals();
-        long totalTimeBankBeforeStartDate = advanceViewData.getTotalTimeBankBeforeStartDate();
+        double totalTimeBankBeforeStartDate = advanceViewData.getTotalTimeBankBeforeStartDate();
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = advanceViewData.getShiftQueryResultWithActivities();
         List<TimeTypeDTO> timeTypeDTOS = advanceViewData.getTimeTypeDTOS();
         List<PayOutPerShift> payOutPerShifts = advanceViewData.getPayOutPerShifts();
@@ -329,7 +339,7 @@ public class TimeBankService {
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(dates,dayOfWeeks,employmentIds, endDate);
         Map<DateTimeInterval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
         boolean includeTimeTypeCalculation = !newHashSet("DAILY-VIEW", "INDIVIDUAL-VIEW").contains(query);
-        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(sortingOrder,dates,dayOfWeeks,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
+        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(timebankFilterDTO,sortingOrder,dates,dayOfWeeks,intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts, includeTimeTypeCalculation);
     }
 
     /**
@@ -691,7 +701,7 @@ public class TimeBankService {
             DailyTimeBankEntry dailyTimeBankEntry = todayDailyTimebank.get(employmentIdAndStaffAdditionalInfoDTOEntry.getKey());
             DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getUnitId());
             if(!todayDailyTimebank.containsKey(employmentIdAndStaffAdditionalInfoDTOEntry.getKey())){
-                int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(planningPeriodInterval, LocalDate.now(), employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getEmployment().getEmploymentLines());
+                int contractualMinutes = (int) timeBankCalculationService.getContractualMinutesByDate(null,planningPeriodInterval, LocalDate.now(), employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getEmployment().getEmploymentLines());
                 dailyTimeBankEntry = new DailyTimeBankEntry(employmentIdAndStaffAdditionalInfoDTOEntry.getKey(), employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getId(), LocalDate.now(),contractualMinutes,-contractualMinutes);
             }
             LocalDate startDate = planningPeriod.getStartDate();
@@ -702,7 +712,7 @@ public class TimeBankService {
                 if(isNotNull(dailyTimeBankEntryByStartDate) && dailyTimeBankEntryByStartDate.isPublishedSomeActivities()){
                     publishBalance = dailyTimeBankEntryByStartDate.getDeltaAccumulatedTimebankMinutes();
                 }else {
-                    publishBalance = -timeBankCalculationService.getContractualMinutesByDate(planningPeriodInterval, startDate, employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getEmployment().getEmploymentLines());
+                    publishBalance = (int)-timeBankCalculationService.getContractualMinutesByDate(null,planningPeriodInterval, startDate, employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getEmployment().getEmploymentLines());
                 }
                 publishedBalance.put(startDate,publishBalance);
                 startDate = startDate.plusDays(1);
@@ -731,7 +741,7 @@ public class TimeBankService {
         return new Object[]{dates,dayOfWeeks};
     }
 
-    public long getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public double getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = startDate.plusDays(1);
         DailyTimeBankEntry dailyTimeBankEntriy = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asLocalDate(startDate));
@@ -745,14 +755,14 @@ public class TimeBankService {
         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), false);
         TreeMap<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = asyncTimeBankCalculationService.getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),true,staffAdditionalInfoDTO.getEmployment(),null);
-        long expectedTimebank = timeBankByDateDTOMap.lastEntry().getValue().getExpectedTimebankMinutes();
+        double expectedTimebank = timeBankByDateDTOMap.lastEntry().getValue().getExpectedTimebankMinutes();
         if (isNotNull(dailyTimeBankEntry)) {
             expectedTimebank += dailyTimeBankEntry.getDeltaTimeBankMinutes();
         }
         return expectedTimebank;
     }
 
-    public long getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDataHelper shiftDataHelper) {
+    public double getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDataHelper shiftDataHelper) {
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = startDate.plusDays(1);
         DailyTimeBankEntry dailyTimeBankEntriy = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asLocalDate(startDate));
@@ -766,7 +776,7 @@ public class TimeBankService {
         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, planningPeriodInterval, shiftDataHelper.getDayTypes(), false);
         TreeMap<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = asyncTimeBankCalculationService.getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),true,staffAdditionalInfoDTO.getEmployment(),shiftDataHelper);
-        long expectedTimebank = timeBankByDateDTOMap.lastEntry().getValue().getExpectedTimebankMinutes();
+        double expectedTimebank = timeBankByDateDTOMap.lastEntry().getValue().getExpectedTimebankMinutes();
         if (isNotNull(dailyTimeBankEntry)) {
             expectedTimebank += dailyTimeBankEntry.getDeltaTimeBankMinutes();
         }
