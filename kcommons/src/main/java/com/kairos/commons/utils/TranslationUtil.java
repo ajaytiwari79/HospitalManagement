@@ -56,7 +56,7 @@ public class TranslationUtil {
     }
 
     public static String getDescription(Map<String, TranslationInfo> translations, String description) {
-        boolean isNullOrEmptyString = isNotNull(translations) && isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription().trim());
+        boolean isNullOrEmptyString = isMapNotEmpty(translations) && isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription()) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription().trim());
         if(isNullOrEmptyString) {
             return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription();
         }else {
