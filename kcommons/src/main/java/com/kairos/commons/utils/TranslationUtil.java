@@ -10,8 +10,7 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.kairos.commons.utils.ObjectUtils.isMapEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TranslationUtil {
