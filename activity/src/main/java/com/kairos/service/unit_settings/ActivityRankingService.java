@@ -11,6 +11,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -207,6 +209,7 @@ public class ActivityRankingService {
             }
             activityRankingRepository.saveEntities(activityRankings);
             mergeActivityRanking(activityRankings, true);
+            this.removeActivityFromDraftRanking(activity.getId());
         }
     }
 
@@ -279,6 +282,25 @@ public class ActivityRankingService {
                 activityRankingRepository.saveEntities(activityRankings);
                 mergeActivityRanking(activityRankings, false);
             }
+            this.removeActivityFromDraftRanking(activity.getId());
+        }
+    }
+
+    private void removeActivityFromDraftRanking(BigInteger activityId){
+        List<ActivityRanking> activityRankings = activityRankingRepository.getAllDraftRankings();
+        List<ActivityRanking> parentActivityRankings = activityRankingRepository.getAllRankingByDraftId(activityRankings.stream().map(ActivityRanking::getId).collect(Collectors.toList()));
+        Map<BigInteger, ActivityRanking> parentActivityRankMap = parentActivityRankings.stream().collect(Collectors.toMap(ActivityRanking::getDraftId, v->v));
+        List<ActivityRanking> updateRankings = new ArrayList<>();
+        for (ActivityRanking activityRanking : activityRankings) {
+            if(activityRanking.getFullDayActivities().remove(activityId) || activityRanking.getFullWeekActivities().remove(activityId) || activityRanking.getPresenceActivities().remove(activityId)){
+                if(isCollectionEmpty(activityRanking.getFullDayActivities()) && isCollectionEmpty(activityRanking.getFullWeekActivities()) && isCollectionEmpty(activityRanking.getPresenceActivities())){
+                    activityRanking.setDeleted(true);
+                }
+                updateRankings.add(activityRanking);
+            }
+        }
+        if(isCollectionNotEmpty(updateRankings)) {
+            activityRankingRepository.saveEntities(updateRankings);
         }
     }
 
