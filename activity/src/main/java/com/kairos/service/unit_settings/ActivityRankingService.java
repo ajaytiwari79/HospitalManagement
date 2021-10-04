@@ -182,6 +182,7 @@ public class ActivityRankingService {
                 }
             }
         }
+        this.removeActivityFromDraftRanking();
     }
 
     @Async
@@ -209,8 +210,8 @@ public class ActivityRankingService {
             }
             activityRankingRepository.saveEntities(activityRankings);
             mergeActivityRanking(activityRankings, true);
-            this.removeActivityFromDraftRanking(activity.getId());
         }
+        this.removeActivityFromDraftRanking();
     }
 
     private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity,long unitOrExpertiseId, boolean presenceActivity){
@@ -282,25 +283,28 @@ public class ActivityRankingService {
                 activityRankingRepository.saveEntities(activityRankings);
                 mergeActivityRanking(activityRankings, false);
             }
-            this.removeActivityFromDraftRanking(activity.getId());
         }
+        this.removeActivityFromDraftRanking();
     }
 
-    private void removeActivityFromDraftRanking(BigInteger activityId){
+    private void removeActivityFromDraftRanking(){
         List<ActivityRanking> activityRankings = activityRankingRepository.getAllDraftRankings();
         List<ActivityRanking> parentActivityRankings = activityRankingRepository.getAllRankingByDraftId(activityRankings.stream().map(ActivityRanking::getId).collect(Collectors.toList()));
         Map<BigInteger, ActivityRanking> parentActivityRankMap = parentActivityRankings.stream().collect(Collectors.toMap(ActivityRanking::getDraftId, v->v));
-        List<ActivityRanking> updateRankings = new ArrayList<>();
         for (ActivityRanking activityRanking : activityRankings) {
-            if(activityRanking.getFullDayActivities().remove(activityId) || activityRanking.getFullWeekActivities().remove(activityId) || activityRanking.getPresenceActivities().remove(activityId)){
-                if(isCollectionEmpty(activityRanking.getFullDayActivities()) && isCollectionEmpty(activityRanking.getFullWeekActivities()) && isCollectionEmpty(activityRanking.getPresenceActivities())){
-                    activityRanking.setDeleted(true);
-                }
-                updateRankings.add(activityRanking);
+            if(parentActivityRankMap.containsKey(activityRanking.getId())){
+                ActivityRanking parentActivityRanking = parentActivityRankMap.get(activityRanking.getId());
+                activityRanking.setFullDayActivities(parentActivityRanking.getFullDayActivities());
+                activityRanking.setFullWeekActivities(parentActivityRanking.getFullWeekActivities());
+                activityRanking.setPresenceActivities(parentActivityRanking.getPresenceActivities());
+                activityRanking.setStartDate(parentActivityRanking.getStartDate());
+                activityRanking.setEndDate(parentActivityRanking.getEndDate());
+            } else {
+                activityRanking.setDeleted(true);
             }
         }
-        if(isCollectionNotEmpty(updateRankings)) {
-            activityRankingRepository.saveEntities(updateRankings);
+        if(isCollectionNotEmpty(activityRankings)) {
+            activityRankingRepository.saveEntities(activityRankings);
         }
     }
 
