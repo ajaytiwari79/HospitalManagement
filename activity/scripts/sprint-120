@@ -1,2 +1,16 @@
 db.coverShift.createIndex( { shiftId:1,staffId:1,deleted:1,date:1 }, { unique: true } );
 http://dev.kairosplanning.com/kairos/activity/api/v1/unit/2403/update_employmentType_and_expertiseId
+
+db.shifts.aggregate([
+    {$group: {
+        _id: {id: "$activities._id"},
+        uniqueIds: {$addToSet: "$activities._id"},
+        count: {$sum: 1}
+        }
+    }
+    ]).forEach(function(a){
+        if(a.count>1){
+            print("dasdsa "+a.uniqueIds)
+            }
+
+        });
