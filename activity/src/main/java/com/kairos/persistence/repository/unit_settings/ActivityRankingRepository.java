@@ -42,4 +42,10 @@ public interface ActivityRankingRepository extends MongoBaseRepository<ActivityR
     @Query("{countryId:?0, deleted:false, published:true,expertiseId:{$exists:true}}")
     List<ActivityRanking> getCurrentlyActiveActivityRankingSettings(Long countryId);
 
+    @Query("{'deleted':false, 'published':false}")
+    List<ActivityRanking> getAllDraftRankings();
+
+    @Query("{'deleted':false, 'published':true,'draftId':{'$in':?0}}")
+    List<ActivityRanking> getAllRankingByDraftId(List<BigInteger> draftIds);
+
 }

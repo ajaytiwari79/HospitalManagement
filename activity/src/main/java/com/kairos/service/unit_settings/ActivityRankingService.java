@@ -11,6 +11,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.payroll_setting.PayrollPeriod;
 import com.kairos.persistence.model.unit_settings.ActivityRanking;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityRankingRepository;
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -180,6 +182,7 @@ public class ActivityRankingService {
                 }
             }
         }
+        this.removeActivityFromDraftRanking();
     }
 
     @Async
@@ -208,6 +211,7 @@ public class ActivityRankingService {
             activityRankingRepository.saveEntities(activityRankings);
             mergeActivityRanking(activityRankings, true);
         }
+        this.removeActivityFromDraftRanking();
     }
 
     private void modifyActivityRanking(List<ActivityRanking> activityRankings, Activity activity,long unitOrExpertiseId, boolean presenceActivity){
@@ -279,6 +283,28 @@ public class ActivityRankingService {
                 activityRankingRepository.saveEntities(activityRankings);
                 mergeActivityRanking(activityRankings, false);
             }
+        }
+        this.removeActivityFromDraftRanking();
+    }
+
+    private void removeActivityFromDraftRanking(){
+        List<ActivityRanking> activityRankings = activityRankingRepository.getAllDraftRankings();
+        List<ActivityRanking> parentActivityRankings = activityRankingRepository.getAllRankingByDraftId(activityRankings.stream().map(ActivityRanking::getId).collect(Collectors.toList()));
+        Map<BigInteger, ActivityRanking> parentActivityRankMap = parentActivityRankings.stream().collect(Collectors.toMap(ActivityRanking::getDraftId, v->v));
+        for (ActivityRanking activityRanking : activityRankings) {
+            if(parentActivityRankMap.containsKey(activityRanking.getId())){
+                ActivityRanking parentActivityRanking = parentActivityRankMap.get(activityRanking.getId());
+                activityRanking.setFullDayActivities(parentActivityRanking.getFullDayActivities());
+                activityRanking.setFullWeekActivities(parentActivityRanking.getFullWeekActivities());
+                activityRanking.setPresenceActivities(parentActivityRanking.getPresenceActivities());
+                activityRanking.setStartDate(parentActivityRanking.getStartDate());
+                activityRanking.setEndDate(parentActivityRanking.getEndDate());
+            } else {
+                activityRanking.setDeleted(true);
+            }
+        }
+        if(isCollectionNotEmpty(activityRankings)) {
+            activityRankingRepository.saveEntities(activityRankings);
         }
     }
 
