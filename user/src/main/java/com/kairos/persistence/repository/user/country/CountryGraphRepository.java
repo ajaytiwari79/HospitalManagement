@@ -102,8 +102,8 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} RETURN level")
     Level getLevel(Long countryId, Long levelId);
 
-    //@Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{isEnabled:false}) where id(ot)={0} DETACH DELETE rel")
-    //void removeLevelRelationshipFromOrganizationType(Long organizationTypeId);
+    @Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{isEnabled:false}) where id(ot)={0} DETACH DELETE rel")
+    void removeLevelRelationshipFromOrganizationType(Long organizationTypeId);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true})<-[:"+IN_ORGANIZATION_LEVEL+"]-(payTable:PayTable{published:true}) \n" +
             "where id(country)={0} AND id(level)={1} \n" +
@@ -160,8 +160,8 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level) IN {1} RETURN level")
     List<Level> getLevelsByIdsIn(Long countryId,List<Long> levelIds);
 
-    @Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{isEnabled:false}) where id(ot)={0} DETACH DELETE rel")
-    void removeLevelRelationshipFromOrganizationType(Long organizationTypeId);
+    //@Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{isEnabled:false}) where id(ot)={0} DETACH DELETE rel")
+    //void removeLevelRelationshipFromOrganizationType(Long organizationTypeId);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} " +
             "RETURN id(employmentType) as id ,employmentType.name as name ORDER BY employmentType.creationDate DESC")
