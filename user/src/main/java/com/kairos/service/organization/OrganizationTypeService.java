@@ -122,6 +122,7 @@ public class OrganizationTypeService{
             orgTypeToUpdate.setLevels(null);
         }
         if (!updateOrganizationTypeDTO.getLevelsToUpdate().isEmpty()) {
+            countryGraphRepository.removeLevelRelationshipFromOrganizationType(orgTypeToUpdate.getId());
             List<Level> levels = countryGraphRepository.getLevelsByIdsIn(orgTypeToUpdate.getCountry().getId(), updateOrganizationTypeDTO.getLevelsToUpdate());
             orgTypeToUpdate.setLevels(levels);
         }
