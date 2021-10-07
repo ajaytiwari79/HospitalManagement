@@ -1,10 +1,5 @@
 package com.kairos.persistence.repository.organization;
-/*
- *Created By Pavan on 30/5/19
- *
- */
 
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -12,8 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT;
-import static com.kairos.persistence.model.constants.RelationshipConstants.VAT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface OrganizationBaseRepository extends Neo4jBaseRepository<OrganizationBaseEntity,Long> {
