@@ -104,6 +104,7 @@ public class OrganizationTypeService{
             orgTypeToUpdate.setLevels(null);
         }
         if (!updateOrganizationTypeDTO.getLevelsToUpdate().isEmpty()) {
+            countryGraphRepository.removeLevelRelationshipFromOrganizationType(orgTypeToUpdate.getId());
             List<Level> levels = countryGraphRepository.getLevelsByIdsIn(orgTypeToUpdate.getCountry().getId(), updateOrganizationTypeDTO.getLevelsToUpdate());
             orgTypeToUpdate.setLevels(levels);
         }
@@ -126,8 +127,8 @@ public class OrganizationTypeService{
     public Map<String, Object> addOrganizationTypeSubType(OrganizationType organizationType, Long organizationTypeId) {
         OrganizationType type = organizationTypeGraphRepository.findOne(organizationTypeId);
         if (type != null) {
-            String subTypeName = organizationType.getName().trim();
-            long count = isCollectionEmpty(type.getOrganizationTypeList())? 0 : type.getOrganizationTypeList().stream().filter(organizationSubType ->organizationSubType.getName().trim().equals(subTypeName) && organizationSubType.isEnable()).count();
+            String subTypeName = organizationType.getName().toLowerCase().trim();
+            long count = isCollectionEmpty(type.getOrganizationTypeList())? 0 : type.getOrganizationTypeList().stream().filter(organizationSubType ->organizationSubType.getName().toLowerCase().trim().equals(subTypeName) && organizationSubType.isEnable()).count();
             if(count > 0){
                 exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSUBTYPE_NAME_DUPLICATE);
             }

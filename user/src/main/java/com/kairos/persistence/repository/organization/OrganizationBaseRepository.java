@@ -4,6 +4,7 @@ package com.kairos.persistence.repository.organization;
  *
  */
 
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -39,4 +40,13 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
 
     @Query("MATCH(org)-[rel:" + VAT_TYPE + "]->(vatType:VatType) where id(org)={0} DETACH DELETE rel")
     void removeVatTypeRelation(long orgId);
+
+    @Query("MATCH(org)-[rel:" + TYPE_OF + "]->(orgType:OrganizationType) where id(org)={0} AND id(orgType)<>{1} DETACH DELETE rel")
+    void removeOrgTypeRelation(long orgId, long typeId);
+
+    @Query("MATCH(org)-[rel:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) where id(org)={0} AND NOT id(orgType) IN {1} DETACH DELETE rel")
+    void removeOrgSubTypeRelation(long orgId, List<Long> subTypeIds);
+
+    @Query("MATCH(org)-[rel:" + HAS_LEVEL + "]->(level:Level) where id(org)={0} AND id(level)<>{1} DETACH DELETE rel")
+    void removeLevelRelation(long orgId, long levelId);
 }
