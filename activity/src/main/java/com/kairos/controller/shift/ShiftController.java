@@ -302,4 +302,12 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> updateShiftStatus(@PathVariable Long unitId, @RequestParam("shift_status") ShiftStatus shiftStatus, @RequestBody ShiftActivitiesIdDTO shiftActivitiesIdDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateShiftStatus(unitId, shiftStatus, shiftActivitiesIdDTO));
     }
+
+    @ApiOperation("Get Stop Brick count")
+    @GetMapping(value = "/stop_brick_count")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStopBrickCount(@PathVariable Long unitId, @RequestParam(value = "startDate")
+    @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftFetchService.getStopBrickCount(unitId,employmentId, startDate));
+    }
 }

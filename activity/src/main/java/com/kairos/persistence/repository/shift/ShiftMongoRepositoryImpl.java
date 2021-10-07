@@ -17,6 +17,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.expertise.ExpertisePublishSetting;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
@@ -692,6 +693,15 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             update.set("expertiseId",((Integer)map.get("expertiseId")).longValue());
             mongoTemplate.findAndModify(new Query(criteria),update,Shift.class);
         }
+    }
+
+    @Override
+    public int getStopBrickCount(Long unitId, Long employmentId, LocalDate startDate,LocalDate endDate, BigInteger stopBrickActivityId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(EMPLOYMENT_ID).is(employmentId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).gte(startDate).lte(endDate).and(ACTIVITIES_ACTIVITY_ID).is(stopBrickActivityId)),
+                group().count().as("count")
+        );
+        return (int)((Map)mongoTemplate.aggregate(aggregation, Shift.class,Map.class).getMappedResults().get(0)).get("count");
     }
 
 }

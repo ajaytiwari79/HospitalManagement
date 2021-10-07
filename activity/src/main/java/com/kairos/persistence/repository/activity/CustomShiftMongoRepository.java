@@ -92,4 +92,6 @@ public interface CustomShiftMongoRepository {
     void removeDraftShiftByExpertiseSettings(Long unitId);
     void updateEmploymentTypeAndExpertiseId(List<Map> employmentExpertiseMap);
 
+    int getStopBrickCount(Long unitId, Long employmentId, LocalDate startDate,LocalDate endDate, BigInteger stopBrickActivityId);
+
 }

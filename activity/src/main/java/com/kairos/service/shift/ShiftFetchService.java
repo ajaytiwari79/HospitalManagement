@@ -19,6 +19,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ViewType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.open_shift.OpenShift;
@@ -26,6 +27,9 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -53,6 +57,7 @@ import com.kairos.service.staffing_level.StaffingLevelAvailableCountService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
+import com.kairos.utils.worktimeagreement.RuletemplateUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
@@ -432,5 +437,18 @@ public class ShiftFetchService {
             shiftDTOS = shifts.stream().filter(shiftDTO -> !shiftDTO.isDraft()).collect(Collectors.toList());
         }
         return shiftDTOS;
+    }
+
+    public int getStopBrickCount(Long unitId,Long employmentId,Date date){
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(employmentId,date,date, WTATemplateType.VETO_AND_STOP_BRICKS);
+        if(isCollectionEmpty(wtaQueryResultDTOS) || isCollectionEmpty(wtaQueryResultDTOS.get(0).getRuleTemplates()) || isNull(((VetoAndStopBricksWTATemplate)wtaQueryResultDTOS.get(0).getRuleTemplates().get(0)).getStopBrickActivityId())){
+            return 1;
+        }
+        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) wtaQueryResultDTOS.get(0).getRuleTemplates().get(0);
+        BigInteger stopBrickActivityId = vetoAndStopBricksWTATemplate.getStopBrickActivityId();
+
+        RuletemplateUtils.validateRuleTemplate(vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate());
+        DateTimeInterval intervalByNumberOfWeeks = RuletemplateUtils.getIntervalByNumberOfWeeks(date, vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate(), asLocalDate(date).plusMonths(1));
+        return shiftMongoRepository.getStopBrickCount(unitId,employmentId,intervalByNumberOfWeeks.getStartLocalDate(),intervalByNumberOfWeeks.getEndLocalDate(),stopBrickActivityId);
     }
 }
