@@ -635,8 +635,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if(isCollectionNotEmpty(notEligibleStaffDataDTO.getTagIds())){
             queryParameters.put(TAG_IDS, notEligibleStaffDataDTO.getTagIds());
             query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag) where id(tag) in {tagIds}");
-        }else {
-            query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag)");
         }
         query.append(" WITH staff,staffChildDetails,teams,organization,employmentIds,user,COLLECT(tag) AS tags RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName as lastName,staff.profilePic AS profilePic,teams,id(organization) AS unitId,employmentIds as employmentIds,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags");
         Result result = session.query(query.toString(), queryParameters);
