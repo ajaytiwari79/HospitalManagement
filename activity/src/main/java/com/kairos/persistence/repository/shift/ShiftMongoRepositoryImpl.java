@@ -701,7 +701,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(Criteria.where(EMPLOYMENT_ID).is(employmentId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).gte(startDate).lte(endDate).and(ACTIVITIES_ACTIVITY_ID).is(stopBrickActivityId)),
                 group().count().as("count")
         );
-        return (int)((Map)mongoTemplate.aggregate(aggregation, Shift.class,Map.class).getMappedResults().get(0)).get("count");
+        List<Map> results = mongoTemplate.aggregate(aggregation, Shift.class, Map.class).getMappedResults();
+        return isCollectionNotEmpty(results) ? (int)(results.get(0)).get("count") : 0;
     }
 
 }

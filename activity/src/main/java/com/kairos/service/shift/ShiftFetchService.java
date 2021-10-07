@@ -439,7 +439,7 @@ public class ShiftFetchService {
         return shiftDTOS;
     }
 
-    public int getStopBrickCount(Long unitId,Long employmentId,Date date){
+    public float getStopBrickCount(Long unitId,Long employmentId,Date date){
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(employmentId,date,date, WTATemplateType.VETO_AND_STOP_BRICKS);
         if(isCollectionEmpty(wtaQueryResultDTOS) || isCollectionEmpty(wtaQueryResultDTOS.get(0).getRuleTemplates()) || isNull(((VetoAndStopBricksWTATemplate)wtaQueryResultDTOS.get(0).getRuleTemplates().get(0)).getStopBrickActivityId())){
             return 1;
@@ -449,6 +449,8 @@ public class ShiftFetchService {
 
         RuletemplateUtils.validateRuleTemplate(vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate());
         DateTimeInterval intervalByNumberOfWeeks = RuletemplateUtils.getIntervalByNumberOfWeeks(date, vetoAndStopBricksWTATemplate.getNumberOfWeeks(), vetoAndStopBricksWTATemplate.getValidationStartDate(), asLocalDate(date).plusMonths(1));
-        return shiftMongoRepository.getStopBrickCount(unitId,employmentId,intervalByNumberOfWeeks.getStartLocalDate(),intervalByNumberOfWeeks.getEndLocalDate(),stopBrickActivityId);
+        int vetoBrickCount = shiftMongoRepository.getStopBrickCount(unitId, employmentId, intervalByNumberOfWeeks.getStartLocalDate(), intervalByNumberOfWeeks.getEndLocalDate(), vetoAndStopBricksWTATemplate.getVetoActivityId());
+        int stopBrickCount = shiftMongoRepository.getStopBrickCount(unitId, employmentId, intervalByNumberOfWeeks.getStartLocalDate(), intervalByNumberOfWeeks.getEndLocalDate(), stopBrickActivityId);
+        return ((float) (vetoAndStopBricksWTATemplate.getTotalBlockingPoints() - (vetoBrickCount+(stopBrickCount*0.5))));
     }
 }
